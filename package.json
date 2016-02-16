@@ -1,0 +1,29 @@
+{
+  "name": "sermon",
+  "version": "0.0.1",
+  "description": "your logger, inspired by bunyan",
+  "main": "sermon.js",
+  "scripts": {
+    "test": "standard && tap test.js"
+  },
+  "precommit": "test",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mcollina/sermon.git"
+  },
+  "keywords": [
+    "logger",
+    "stream"
+  ],
+  "author": "Matteo Collina <hello@matteocollina.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mcollina/sermon/issues"
+  },
+  "homepage": "https://github.com/mcollina/sermon#readme",
+  "devDependencies": {
+    "pre-commit": "^1.1.2",
+    "standard": "^6.0.5",
+    "tap": "^5.5.0"
+  }
+}
