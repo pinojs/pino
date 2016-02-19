@@ -54,6 +54,25 @@ function levelTest (name, level) {
     instance.level = name
     instance[name]({ hello: 'world' })
   })
+
+  test('passing an object and a string at level ' + name, function (t) {
+    t.plan(2)
+    var instance = sermon(sink(function (chunk, enc, cb) {
+      t.ok(Date.parse(chunk.time) <= new Date(), 'time is greater than Date.now()')
+      delete chunk.time
+      t.deepEqual(chunk, {
+        pid: pid,
+        hostname: hostname,
+        level: level,
+        msg: 'a string',
+        hello: 'world',
+        v: 0
+      })
+    }))
+
+    instance.level = name
+    instance[name]({ hello: 'world' }, 'a string')
+  })
 }
 
 levelTest('fatal', 60)

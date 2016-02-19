@@ -64,12 +64,7 @@ function sermon (stream, opts) {
 
   return result
 
-  function asJson (msg, num) {
-    var obj = null
-    if (is.isObject(msg)) {
-      obj = msg
-      msg = undefined
-    }
+  function asJson (obj, msg, num) {
     var data = JSON.stringify(new Message(num, msg))
     if (obj) {
       data = data.slice(0, data.length - 1)
@@ -81,28 +76,52 @@ function sermon (stream, opts) {
     return data + '\n'
   }
 
-  function fatal (msg) {
-    stream.write(asJson(msg, 60))
+  function fatal (obj, msg) {
+    if (!is.isObject(obj)) {
+      msg = obj
+      obj = null
+    }
+    stream.write(asJson(obj, msg, 60))
   }
 
-  function error (msg) {
-    stream.write(asJson(msg, 50))
+  function error (obj, msg) {
+    if (!is.isObject(obj)) {
+      msg = obj
+      obj = null
+    }
+    stream.write(asJson(obj, msg, 50))
   }
 
-  function warn (msg) {
-    stream.write(asJson(msg, 40))
+  function warn (obj, msg) {
+    if (!is.isObject(obj)) {
+      msg = obj
+      obj = null
+    }
+    stream.write(asJson(obj, msg, 40))
   }
 
-  function info (msg) {
-    stream.write(asJson(msg, 30))
+  function info (obj, msg) {
+    if (!is.isObject(obj)) {
+      msg = obj
+      obj = null
+    }
+    stream.write(asJson(obj, msg, 30))
   }
 
-  function debug (msg) {
-    stream.write(asJson(msg, 20))
+  function debug (obj, msg) {
+    if (!is.isObject(obj)) {
+      msg = obj
+      obj = null
+    }
+    stream.write(asJson(obj, msg, 20))
   }
 
-  function trace (msg) {
-    stream.write(asJson(msg, 10))
+  function trace (obj, msg) {
+    if (!is.isObject(obj)) {
+      msg = obj
+      obj = null
+    }
+    stream.write(asJson(obj, msg, 10))
   }
 
   function Message (level, msg) {
