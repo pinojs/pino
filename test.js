@@ -36,6 +36,24 @@ function levelTest (name, level) {
     instance.level = name
     instance[name]('hello world')
   })
+
+  test('passing objects at level ' + name, function (t) {
+    t.plan(2)
+    var instance = sermon(sink(function (chunk, enc, cb) {
+      t.ok(Date.parse(chunk.time) <= new Date(), 'time is greater than Date.now()')
+      delete chunk.time
+      t.deepEqual(chunk, {
+        pid: pid,
+        hostname: hostname,
+        level: level,
+        hello: 'world',
+        v: 0
+      })
+    }))
+
+    instance.level = name
+    instance[name]({ hello: 'world' })
+  })
 }
 
 levelTest('fatal', 60)
@@ -64,4 +82,34 @@ test('set the level', function (t) {
   instance.info('hello world')
   instance.error('this is an error')
   instance.fatal('this is fatal')
+})
+
+test('does not explode with a circular ref', function (t) {
+  var instance = sermon(sink(function (chunk, enc, cb) {
+    // nothing to check
+    cb()
+  }))
+  var b = {}
+  var a = {
+    hello: b
+  }
+  b.a = a // circular ref
+  instance.info(a)
+  t.end()
+})
+
+test('explode with a circular ref with safe = false', function (t) {
+  var instance = sermon(sink(function (chunk, enc, cb) {
+    // nothing to check
+    cb()
+  }), { safe: false })
+  var b = {}
+  var a = {
+    hello: b
+  }
+  b.a = a // circular ref
+  t.throws(function () {
+    instance.info(a)
+  })
+  t.end()
 })

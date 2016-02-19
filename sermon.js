@@ -1,5 +1,7 @@
 'use strict'
 
+var stringifySafe = require('json-stringify-safe')
+var is = require('core-util-is')
 var os = require('os')
 var pid = process.pid
 var hostname = os.hostname()
@@ -17,6 +19,7 @@ function sermon (stream, opts) {
   stream = stream || process.stdout
   opts = opts || {}
 
+  var stringify = opts.safe !== false ? stringifySafe : JSON.stringify
   var name = opts.name
   var level
   var funcs = {
@@ -61,28 +64,45 @@ function sermon (stream, opts) {
 
   return result
 
+  function asJson (msg, num) {
+    var obj = null
+    if (is.isObject(msg)) {
+      obj = msg
+      msg = undefined
+    }
+    var data = JSON.stringify(new Message(num, msg))
+    if (obj) {
+      data = data.slice(0, data.length - 1)
+      for (var key in obj) {
+        data += ',"' + key + '":' + stringify(obj[key])
+      }
+      data += '}'
+    }
+    return data + '\n'
+  }
+
   function fatal (msg) {
-    stream.write(JSON.stringify(new Message(60, msg)) + '\n')
+    stream.write(asJson(msg, 60))
   }
 
   function error (msg) {
-    stream.write(JSON.stringify(new Message(50, msg)) + '\n')
+    stream.write(asJson(msg, 50))
   }
 
   function warn (msg) {
-    stream.write(JSON.stringify(new Message(40, msg)) + '\n')
+    stream.write(asJson(msg, 40))
   }
 
   function info (msg) {
-    stream.write(JSON.stringify(new Message(30, msg)) + '\n')
+    stream.write(asJson(msg, 30))
   }
 
   function debug (msg) {
-    stream.write(JSON.stringify(new Message(20, msg)) + '\n')
+    stream.write(asJson(msg, 20))
   }
 
   function trace (msg) {
-    stream.write(JSON.stringify(new Message(10, msg)) + '\n')
+    stream.write(asJson(msg, 10))
   }
 
   function Message (level, msg) {
@@ -90,7 +110,7 @@ function sermon (stream, opts) {
     this.hostname = hostname
     this.name = name
     this.level = level
-    this.msg = msg
+    this.msg = msg && msg.toString()
     this.time = new Date()
     this.v = 0
   }

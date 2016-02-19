@@ -23,6 +23,7 @@
   "homepage": "https://github.com/mcollina/sermon#readme",
   "devDependencies": {
     "benchmark": "^2.1.0",
+    "bole": "^2.0.0",
     "bunyan": "^1.6.0",
     "fastbench": "^1.0.0",
     "flush-write-stream": "^1.0.0",
@@ -31,6 +32,8 @@
     "tap": "^5.5.0"
   },
   "dependencies": {
+    "core-util-is": "^1.0.2",
+    "json-stringify-safe": "^5.0.1",
     "split2": "^2.0.1"
   }
 }
