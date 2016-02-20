@@ -73,6 +73,16 @@ function levelTest (name, level) {
     instance.level = name
     instance[name]({ hello: 'world' }, 'a string')
   })
+
+  test('formatting logs as ' + name, function (t) {
+    t.plan(2)
+    var instance = sermon(sink(function (chunk, enc, cb) {
+      check(t, chunk, level, 'hello 42')
+    }))
+
+    instance.level = name
+    instance[name]('hello %d', 42)
+  })
 }
 
 levelTest('fatal', 60)

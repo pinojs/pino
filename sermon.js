@@ -2,6 +2,7 @@
 
 var stringifySafe = require('json-stringify-safe')
 var is = require('core-util-is')
+var format = require('util').format
 var os = require('os')
 var pid = process.pid
 var hostname = os.hostname()
@@ -76,50 +77,110 @@ function sermon (stream, opts) {
     return data + '\n'
   }
 
-  function fatal (obj, msg) {
-    if (!is.isObject(obj)) {
-      msg = obj
-      obj = null
+  function fatal () {
+    var base = 0
+    var obj = null
+    var msg // so it does not happear in the json
+    if (is.isObject(arguments[0])) {
+      obj = arguments[0]
+      base += 1
+    }
+    var toFormat = new Array(arguments.length - base)
+    for (var i = base; i < arguments.length; i++) {
+      toFormat[i - base] = arguments[i]
+    }
+    if (toFormat.length > 0) {
+      msg = format.apply(null, toFormat)
     }
     stream.write(asJson(obj, msg, 60))
   }
 
-  function error (obj, msg) {
-    if (!is.isObject(obj)) {
-      msg = obj
-      obj = null
+  function error () {
+    var base = 0
+    var obj = null
+    var msg // so it does not happear in the json
+    if (is.isObject(arguments[0])) {
+      obj = arguments[0]
+      base += 1
+    }
+    var toFormat = new Array(arguments.length - base)
+    for (var i = base; i < arguments.length; i++) {
+      toFormat[i - base] = arguments[i]
+    }
+    if (toFormat.length > 0) {
+      msg = format.apply(null, toFormat)
     }
     stream.write(asJson(obj, msg, 50))
   }
 
-  function warn (obj, msg) {
-    if (!is.isObject(obj)) {
-      msg = obj
-      obj = null
+  function warn () {
+    var base = 0
+    var obj = null
+    var msg // so it does not happear in the json
+    if (is.isObject(arguments[0])) {
+      obj = arguments[0]
+      base += 1
+    }
+    var toFormat = new Array(arguments.length - base)
+    for (var i = base; i < arguments.length; i++) {
+      toFormat[i - base] = arguments[i]
+    }
+    if (toFormat.length > 0) {
+      msg = format.apply(null, toFormat)
     }
     stream.write(asJson(obj, msg, 40))
   }
 
-  function info (obj, msg) {
-    if (!is.isObject(obj)) {
-      msg = obj
-      obj = null
+  function info () {
+    var base = 0
+    var obj = null
+    var msg // so it does not happear in the json
+    if (is.isObject(arguments[0])) {
+      obj = arguments[0]
+      base += 1
+    }
+    var toFormat = new Array(arguments.length - base)
+    for (var i = base; i < arguments.length; i++) {
+      toFormat[i - base] = arguments[i]
+    }
+    if (toFormat.length > 0) {
+      msg = format.apply(null, toFormat)
     }
     stream.write(asJson(obj, msg, 30))
   }
 
-  function debug (obj, msg) {
-    if (!is.isObject(obj)) {
-      msg = obj
-      obj = null
+  function debug () {
+    var base = 0
+    var obj = null
+    var msg // so it does not happear in the json
+    if (is.isObject(arguments[0])) {
+      obj = arguments[0]
+      base += 1
+    }
+    var toFormat = new Array(arguments.length - base)
+    for (var i = base; i < arguments.length; i++) {
+      toFormat[i - base] = arguments[i]
+    }
+    if (toFormat.length > 0) {
+      msg = format.apply(null, toFormat)
     }
     stream.write(asJson(obj, msg, 20))
   }
 
-  function trace (obj, msg) {
-    if (!is.isObject(obj)) {
-      msg = obj
-      obj = null
+  function trace () {
+    var base = 0
+    var obj = null
+    var msg // so it does not happear in the json
+    if (is.isObject(arguments[0])) {
+      obj = arguments[0]
+      base += 1
+    }
+    var toFormat = new Array(arguments.length - base)
+    for (var i = base; i < arguments.length; i++) {
+      toFormat[i - base] = arguments[i]
+    }
+    if (toFormat.length > 0) {
+      msg = format.apply(null, toFormat)
     }
     stream.write(asJson(obj, msg, 10))
   }
