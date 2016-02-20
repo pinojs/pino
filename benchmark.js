@@ -4,12 +4,10 @@ var bench = require('fastbench')
 var sermon = require('./')
 var bunyan = require('bunyan')
 var bole = require('bole')('bench')
+var winston = require('winston')
 var fs = require('fs')
 var dest = fs.createWriteStream('/dev/null')
 var slog = sermon(dest)
-var slogUnsafe = sermon(dest, {
-  safe: false
-})
 var max = 10
 var blog = bunyan.createLogger({
   name: 'myapp',
@@ -24,10 +22,19 @@ require('bole').output({
   stream: dest
 })
 
+winston.add(winston.transports.File, { filename: '/dev/null' })
+winston.remove(winston.transports.Console)
+
 var run = bench([
   function benchBunyan (cb) {
     for (var i = 0; i < max; i++) {
       blog.info('hello world')
+    }
+    setImmediate(cb)
+  },
+  function benchWinston (cb) {
+    for (var i = 0; i < max; i++) {
+      winston.info('hello world')
     }
     setImmediate(cb)
   },
@@ -49,15 +56,15 @@ var run = bench([
     }
     setImmediate(cb)
   },
-  function benchSermonObj (cb) {
+  function benchWinstonObj (cb) {
     for (var i = 0; i < max; i++) {
-      slog.info({ hello: 'world' })
+      winston.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
-  function benchSermonObjUnsafe (cb) {
+  function benchSermonObj (cb) {
     for (var i = 0; i < max; i++) {
-      slogUnsafe.info({ hello: 'world' })
+      slog.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
