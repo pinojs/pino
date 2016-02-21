@@ -1,15 +1,15 @@
 {
-  "name": "sermon",
+  "name": "pino",
   "version": "0.0.1",
   "description": "your logger, inspired by bunyan",
-  "main": "sermon.js",
+  "main": "pino.js",
   "scripts": {
     "test": "standard && tap test.js"
   },
   "precommit": "test",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mcollina/sermon.git"
+    "url": "git+https://github.com/mcollina/pino.git"
   },
   "keywords": [
     "logger",
@@ -18,9 +18,9 @@
   "author": "Matteo Collina <hello@matteocollina.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mcollina/sermon/issues"
+    "url": "https://github.com/mcollina/pino/issues"
   },
-  "homepage": "https://github.com/mcollina/sermon#readme",
+  "homepage": "https://github.com/mcollina/pino#readme",
   "devDependencies": {
     "benchmark": "^2.1.0",
     "bole": "^2.0.0",

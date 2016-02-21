@@ -1,7 +1,7 @@
 'use strict'
 
 var test = require('tap').test
-var sermon = require('./')
+var pino = require('./')
 var writeStream = require('flush-write-stream')
 var os = require('os')
 var split = require('split2')
@@ -29,7 +29,7 @@ function check (t, chunk, level, msg) {
 function levelTest (name, level) {
   test(name + ' logs as ' + level, function (t) {
     t.plan(2)
-    var instance = sermon(sink(function (chunk, enc, cb) {
+    var instance = pino(sink(function (chunk, enc, cb) {
       check(t, chunk, level, 'hello world')
     }))
 
@@ -39,7 +39,7 @@ function levelTest (name, level) {
 
   test('passing objects at level ' + name, function (t) {
     t.plan(2)
-    var instance = sermon(sink(function (chunk, enc, cb) {
+    var instance = pino(sink(function (chunk, enc, cb) {
       t.ok(Date.parse(chunk.time) <= new Date(), 'time is greater than Date.now()')
       delete chunk.time
       t.deepEqual(chunk, {
@@ -57,7 +57,7 @@ function levelTest (name, level) {
 
   test('passing an object and a string at level ' + name, function (t) {
     t.plan(2)
-    var instance = sermon(sink(function (chunk, enc, cb) {
+    var instance = pino(sink(function (chunk, enc, cb) {
       t.ok(Date.parse(chunk.time) <= new Date(), 'time is greater than Date.now()')
       delete chunk.time
       t.deepEqual(chunk, {
@@ -76,7 +76,7 @@ function levelTest (name, level) {
 
   test('formatting logs as ' + name, function (t) {
     t.plan(2)
-    var instance = sermon(sink(function (chunk, enc, cb) {
+    var instance = pino(sink(function (chunk, enc, cb) {
       check(t, chunk, level, 'hello 42')
     }))
 
@@ -101,7 +101,7 @@ test('set the level', function (t) {
     level: 60,
     msg: 'this is fatal'
   }]
-  var instance = sermon(sink(function (chunk, enc, cb) {
+  var instance = pino(sink(function (chunk, enc, cb) {
     var current = expected.shift()
     check(t, chunk, current.level, current.msg)
     cb()
@@ -114,7 +114,7 @@ test('set the level', function (t) {
 })
 
 test('does not explode with a circular ref', function (t) {
-  var instance = sermon(sink(function (chunk, enc, cb) {
+  var instance = pino(sink(function (chunk, enc, cb) {
     // nothing to check
     cb()
   }))
@@ -128,7 +128,7 @@ test('does not explode with a circular ref', function (t) {
 })
 
 test('explode with a circular ref with safe = false', function (t) {
-  var instance = sermon(sink(function (chunk, enc, cb) {
+  var instance = pino(sink(function (chunk, enc, cb) {
     // nothing to check
     cb()
   }), { safe: false })

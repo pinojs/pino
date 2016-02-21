@@ -1,13 +1,13 @@
 'use strict'
 
 var bench = require('fastbench')
-var sermon = require('./')
+var pino = require('./')
 var bunyan = require('bunyan')
 var bole = require('bole')('bench')
 var winston = require('winston')
 var fs = require('fs')
 var dest = fs.createWriteStream('/dev/null')
-var slog = sermon(dest)
+var plog = pino(dest)
 var max = 10
 var blog = bunyan.createLogger({
   name: 'myapp',
@@ -44,9 +44,9 @@ var run = bench([
     }
     setImmediate(cb)
   },
-  function benchSermon (cb) {
+  function benchPino (cb) {
     for (var i = 0; i < max; i++) {
-      slog.info('hello world')
+      plog.info('hello world')
     }
     setImmediate(cb)
   },
@@ -62,9 +62,9 @@ var run = bench([
     }
     setImmediate(cb)
   },
-  function benchSermonObj (cb) {
+  function benchPinoObj (cb) {
     for (var i = 0; i < max; i++) {
-      slog.info({ hello: 'world' })
+      plog.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
