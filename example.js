@@ -1,8 +1,9 @@
 'use strict'
 
-var sermon = require('./')()
+var pino = require('./')()
+var info = pino.info
 
-sermon.info('hello world')
-sermon.info('the answer is %d', 42)
-sermon.info({ obj: 42 }, 'hello world')
-setImmediate(sermon.info, 'wrapped')
+info('hello world')
+info('the answer is %d', 42)
+info({ obj: 42 }, 'hello world')
+setImmediate(info, 'after setImmediate')
