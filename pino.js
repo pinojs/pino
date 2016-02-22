@@ -34,28 +34,25 @@ function sermon (stream, opts) {
   }
 
   for (var key in levels) {
-    // needed because we cannot put arguments manipulation
-    // in another function without paying a perf drop
+    funcs[key] = function plog (a, b, c, d, e, f, g, h, i, j, k) {
+      var base = 0
+      var obj = null
+      var params = null
+      var msg
+      if (Object(a) === a) {
+        obj = a
+        params = [b, c, d, e, f, g, h, i, j, k]
+        base = 1
+      } else {
+        params = [a, b, c, d, e, f, g, h, i, j, k]
+      }
+      if ((params.length = arguments.length - base) > 0) {
+        msg = format.apply(null, params)
+      }
 
-    eval('' + // eslint-disable-line no-eval
-      'funcs.' + key + ' = function ' + key + ' () {\n' +
-      '  var base = 0\n' +
-      '  var obj = null\n' +
-      '  var msg // so it does not happear in the json\n' +
-      '  if (is.isObject(arguments[0])) {\n' +
-      '    obj = arguments[0]\n' +
-      '    base += 1\n' +
-      '  }\n' +
-      '  var toFormat = new Array(arguments.length - base)\n' +
-      '  for (var i = base; i < arguments.length; i++) {\n' +
-      '    toFormat[i - base] = arguments[i]\n' +
-      '  }\n' +
-      '  if (toFormat.length > 0) {\n' +
-      '    msg = format.apply(null, toFormat)\n' +
-      '  }\n' +
-      '  stream.write(asJson(obj, msg, ' + levels[key] + ' ))\n' +
-      '}'
-    )
+      stream.write(asJson(obj, msg, plog.level))
+    }
+    funcs[key].level = levels[key]
   }
 
   Object.defineProperty(result, 'level', {
