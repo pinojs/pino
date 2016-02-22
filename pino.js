@@ -1,7 +1,6 @@
 'use strict'
 
 var stringifySafe = require('json-stringify-safe')
-var is = require('core-util-is') // eslint-disable-line no-unused-vars
 var format = require('util').format  // eslint-disable-line no-unused-vars
 var os = require('os')
 var pid = process.pid
