@@ -16,7 +16,7 @@ var levels = {
   'trace': 10
 }
 
-function sermon (stream, opts) {
+function pino (stream, opts) {
   stream = stream || process.stdout
   opts = opts || {}
 
@@ -64,7 +64,7 @@ function sermon (stream, opts) {
 
   function genLogFunction (key) {
     var level = levels[key]
-    return function plog (a, b, c, d, e, f, g, h, i, j, k) {
+    return function (a, b, c, d, e, f, g, h, i, j, k) {
       var base = 0
       var obj = null
       var params = null
@@ -109,4 +109,4 @@ function sermon (stream, opts) {
 
 function noop () {}
 
-module.exports = sermon
+module.exports = pino
