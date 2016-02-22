@@ -34,25 +34,7 @@ function sermon (stream, opts) {
   }
 
   for (var key in levels) {
-    funcs[key] = function plog (a, b, c, d, e, f, g, h, i, j, k) {
-      var base = 0
-      var obj = null
-      var params = null
-      var msg
-      if (Object(a) === a) {
-        obj = a
-        params = [b, c, d, e, f, g, h, i, j, k]
-        base = 1
-      } else {
-        params = [a, b, c, d, e, f, g, h, i, j, k]
-      }
-      if ((params.length = arguments.length - base) > 0) {
-        msg = format.apply(null, params)
-      }
-
-      stream.write(asJson(obj, msg, plog.level))
-    }
-    funcs[key].level = levels[key]
+    funcs[key] = genLogFunction(key)
   }
 
   Object.defineProperty(result, 'level', {
@@ -79,6 +61,28 @@ function sermon (stream, opts) {
   result.level = 'info'
 
   return result
+
+  function genLogFunction (key) {
+    var level = levels[key]
+    return function plog (a, b, c, d, e, f, g, h, i, j, k) {
+      var base = 0
+      var obj = null
+      var params = null
+      var msg
+      if (Object(a) === a) {
+        obj = a
+        params = [b, c, d, e, f, g, h, i, j, k]
+        base = 1
+      } else {
+        params = [a, b, c, d, e, f, g, h, i, j, k]
+      }
+      if ((params.length = arguments.length - base) > 0) {
+        msg = format.apply(null, params)
+      }
+
+      stream.write(asJson(obj, msg, level))
+    }
+  }
 
   function asJson (obj, msg, num) { // eslint-disable-line no-unused-vars
     var data = JSON.stringify(new Message(num, msg))
