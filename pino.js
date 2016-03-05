@@ -99,7 +99,7 @@ function pino (opts, stream) {
         data += ',"type":"Error","stack":' + stringify(obj.stack) + '}'
       } else {
         for (var key in obj) {
-          if (obj[key]) {
+          if (obj.hasOwnProperty(key) && obj[key] !== undefined) {
             data += ',"' + key + '":' + stringify(obj[key])
           }
         }

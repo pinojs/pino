@@ -225,3 +225,28 @@ test('set undefined properties', function (t) {
 
   instance.info({ hello: 'world', property: undefined })
 })
+
+test('set properties defined in the prototype chain', function (t) {
+  t.plan(2)
+
+  var instance = pino(sink(function (chunk, enc, cb) {
+    t.ok(Date.parse(chunk.time) <= new Date(), 'time is greater than Date.now()')
+    delete chunk.time
+    t.deepEqual(chunk, {
+      pid: pid,
+      hostname: hostname,
+      level: 30,
+      hello: 'world',
+      v: 0
+    })
+    cb()
+  }))
+
+  function MyObject () {
+    this.hello = 'world'
+  }
+
+  MyObject.prototype.some = function () {}
+
+  instance.info(new MyObject())
+})
