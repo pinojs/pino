@@ -1,6 +1,9 @@
 # pino
 
 [Extremely fast](#benchmarks) node.js logger, inspired by Bunyan.
+It also includes a shell utility to pretty-print its log files.
+
+![cli](https://raw.githubusercontent.com/mcollina/pino/master/demo.png)
 
 Still _alpha code_, and in active development.
 
