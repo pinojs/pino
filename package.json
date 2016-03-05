@@ -3,6 +3,9 @@
   "version": "0.1.2",
   "description": "your logger, inspired by bunyan",
   "main": "pino.js",
+  "bin": {
+    "pino": "./bin.js"
+  },
   "scripts": {
     "test": "standard && tap test.js"
   },
@@ -33,6 +36,9 @@
     "winston": "^2.1.1"
   },
   "dependencies": {
+    "chalk": "^1.1.1",
+    "core-util-is": "^1.0.2",
+    "fast-json-parse": "^1.0.0",
     "json-stringify-safe": "^5.0.1",
     "split2": "^2.0.1"
   }
