@@ -150,10 +150,10 @@ test('does not explode with a circular ref', function (t) {
 })
 
 test('explode with a circular ref with safe = false', function (t) {
-  var instance = pino(sink(function (chunk, enc, cb) {
+  var instance = pino({ safe: false }, sink(function (chunk, enc, cb) {
     // nothing to check
     cb()
-  }), { safe: false })
+  }))
   var b = {}
   var a = {
     hello: b
@@ -163,4 +163,46 @@ test('explode with a circular ref with safe = false', function (t) {
     instance.info(a)
   })
   t.end()
+})
+
+test('set the name', function (t) {
+  t.plan(2)
+
+  var instance = pino({
+    name: 'hello'
+  }, sink(function (chunk, enc, cb) {
+    t.ok(Date.parse(chunk.time) <= new Date(), 'time is greater than Date.now()')
+    delete chunk.time
+    t.deepEqual(chunk, {
+      pid: pid,
+      hostname: hostname,
+      level: 60,
+      name: 'hello',
+      msg: 'this is fatal',
+      v: 0
+    })
+    cb()
+  }))
+
+  instance.fatal('this is fatal')
+})
+
+test('set the level via constructor', function (t) {
+  t.plan(4)
+  var expected = [{
+    level: 50,
+    msg: 'this is an error'
+  }, {
+    level: 60,
+    msg: 'this is fatal'
+  }]
+  var instance = pino({ level: 'error' }, sink(function (chunk, enc, cb) {
+    var current = expected.shift()
+    check(t, chunk, current.level, current.msg)
+    cb()
+  }))
+
+  instance.info('hello world')
+  instance.error('this is an error')
+  instance.fatal('this is fatal')
 })

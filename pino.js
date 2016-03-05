@@ -15,7 +15,11 @@ var levels = {
   'trace': 10
 }
 
-function pino (stream, opts) {
+function pino (opts, stream) {
+  if (opts && opts._writableState) {
+    stream = opts
+    opts = null
+  }
   stream = stream || process.stdout
   opts = opts || {}
 
@@ -57,7 +61,7 @@ function pino (stream, opts) {
     }
   })
 
-  result.level = 'info'
+  result.level = opts.level || 'info'
 
   return result
 
