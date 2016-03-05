@@ -5,7 +5,12 @@ It also includes a shell utility to pretty-print its log files.
 
 ![cli](https://raw.githubusercontent.com/mcollina/pino/master/demo.png)
 
-Still _alpha code_, and in active development.
+* [Installation](#install)
+* [Usage](#usage)
+* [API](#api)
+* [Benchmarks](#benchmarks)
+* [How do I rotate log files?](#rotate)
+* [License](#license)
 
 ## Install
 
@@ -134,6 +139,7 @@ object, all its properties will be included in the JSON line.
 If more args follows `msg`, these will be used to format `msg` using
 [`util.format`](https://nodejs.org/api/util.html#util_util_format_format)
 
+<a name="benchmarks"></a>
 ## Benchmarks
 
 As far as I know, it is the fastest logger in town:
@@ -155,6 +161,33 @@ benchBunyanObj*10000: 1220ms
 benchWinstonObj*10000: 2119ms
 benchPinoObj*10000: 524ms
 benchBoleObj*10000: 1522ms
+```
+
+<a name="rotate"></a>
+## How do I rotate log files
+
+You should configure
+[logrotate](https://github.com/logrotate/logrotate) to rotate your log
+files, and just redirect the standard output of your application to a
+file, like so:
+
+```
+node server.js > /var/log/myapp.log
+```
+
+In order to rotate your log files, add in `/etc/logrotate.d/myapp`:
+
+```
+/var/log/myapp.log {
+       su root
+       daily
+       rotate 7
+       delaycompress
+       compress
+       notifempty
+       missingok
+       copytruncate
+}
 ```
 
 ## License
