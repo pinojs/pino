@@ -206,3 +206,22 @@ test('set the level via constructor', function (t) {
   instance.error('this is an error')
   instance.fatal('this is fatal')
 })
+
+test('set undefined properties', function (t) {
+  t.plan(2)
+
+  var instance = pino(sink(function (chunk, enc, cb) {
+    t.ok(Date.parse(chunk.time) <= new Date(), 'time is greater than Date.now()')
+    delete chunk.time
+    t.deepEqual(chunk, {
+      pid: pid,
+      hostname: hostname,
+      level: 30,
+      hello: 'world',
+      v: 0
+    })
+    cb()
+  }))
+
+  instance.info({ hello: 'world', property: undefined })
+})

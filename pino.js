@@ -99,7 +99,9 @@ function pino (opts, stream) {
         data += ',"type":"Error","stack":' + stringify(obj.stack) + '}'
       } else {
         for (var key in obj) {
-          data += ',"' + key + '":' + stringify(obj[key])
+          if (obj[key]) {
+            data += ',"' + key + '":' + stringify(obj[key])
+          }
         }
         data += '}'
       }
