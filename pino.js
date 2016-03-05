@@ -84,13 +84,21 @@ function pino (stream, opts) {
   }
 
   function asJson (obj, msg, num) { // eslint-disable-line no-unused-vars
+    if (!msg && obj instanceof Error) {
+      msg = obj.message
+    }
     var data = JSON.stringify(new Message(num, msg))
     if (obj) {
       data = data.slice(0, data.length - 1)
-      for (var key in obj) {
-        data += ',"' + key + '":' + stringify(obj[key])
+
+      if (obj instanceof Error) {
+        data += ',"type":"Error","stack":' + stringify(obj.stack) + '}'
+      } else {
+        for (var key in obj) {
+          data += ',"' + key + '":' + stringify(obj[key])
+        }
+        data += '}'
       }
-      data += '}'
     }
     return data + '\n'
   }

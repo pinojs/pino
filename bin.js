@@ -42,7 +42,7 @@ function asColoredLevel (value) {
 }
 
 function withSpaces (value) {
-  var lines = stringifySafe(value, null, 2).split('\n')
+  var lines = value.split('\n')
   for (var i = 1; i < lines.length; i++) {
     lines[i] = '    ' + lines[i]
   }
@@ -55,7 +55,7 @@ function filter (value) {
 
   for (var i = 0; i < keys.length; i++) {
     if (standardKeys.indexOf(keys[i]) < 0) {
-      result += '    ' + keys[i] + ': ' + withSpaces(value[keys[i]])
+      result += '    ' + keys[i] + ': ' + withSpaces(stringifySafe(value[keys[i]], null, 2)) + '\n'
     }
   }
 
@@ -78,9 +78,10 @@ function mapLine (line) {
     }
     line += value.pid + ' on ' + value.hostname + ')'
     line += ': ' + chalk.cyan(value.msg) + '\n'
-    obj = filter(value)
-    if (obj) {
-      line += obj + '\n'
+    if (value.type === 'Error') {
+      line += '    ' + withSpaces(value.stack) + '\n'
+    } else {
+      line += filter(value)
     }
     return line
   }

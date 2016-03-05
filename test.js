@@ -83,6 +83,28 @@ function levelTest (name, level) {
     instance.level = name
     instance[name]('hello %d', 42)
   })
+
+  test('passing error at level ' + name, function (t) {
+    t.plan(2)
+    var err = new Error('myerror')
+    var instance = pino(sink(function (chunk, enc, cb) {
+      t.ok(Date.parse(chunk.time) <= new Date(), 'time is greater than Date.now()')
+      delete chunk.time
+      t.deepEqual(chunk, {
+        pid: pid,
+        hostname: hostname,
+        level: level,
+        type: 'Error',
+        msg: err.message,
+        stack: err.stack,
+        v: 0
+      })
+      cb()
+    }))
+
+    instance.level = name
+    instance[name](err)
+  })
 }
 
 levelTest('fatal', 60)
