@@ -24,11 +24,13 @@ var pino = require('pino')(
   process.stdout
 )
 var info = pino.info
+var error = pino.error
 
 info('hello world')
 info('the answer is %d', 42)
 info({ obj: 42 }, 'hello world')
 setImmediate(info, 'wrapped')
+error(new Error('something bad happened'))
 ```
 
 ## Benchmarks
