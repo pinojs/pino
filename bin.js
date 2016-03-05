@@ -65,7 +65,6 @@ function filter (value) {
 function mapLine (line) {
   var parsed = new Parse(line)
   var value = parsed.value
-  var obj
 
   if (parsed.err) {
     // pass through
