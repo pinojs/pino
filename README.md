@@ -10,6 +10,7 @@ It also includes a shell utility to pretty-print its log files.
 * [API](#api)
 * [Benchmarks](#benchmarks)
 * [How do I rotate log files?](#rotate)
+* [Acknowledgements](#acknowledgements)
 * [License](#license)
 
 ## Install
@@ -62,6 +63,8 @@ This produces:
   * <a href="#info"><code>logger.<b>info()</b></code></a>
   * <a href="#debug"><code>logger.<b>debug()</b></code></a>
   * <a href="#trace"><code>logger.<b>trace()</b></code></a>
+  * <a href="#reqSerializer"><code>pino.stdSerializers.<b>req</b></code></a>
+  * <a href="#resSerializer"><code>pino.stdSerializers.<b>res</b></code></a>
 
 <a name="constructor"></a>
 ### pino([opts], [stream])
@@ -71,8 +74,27 @@ Returns a new logger. Allowed options are:
 * `safe`: avoid error causes by circular references in the object tree,
   default `true`
 * `name`: the name of the logger, default `undefined`
+* `serializers`: an object containing functions for custom serialization
+  of objects. These functions should return an jsonificable object and
+  they should never throw.
 
 `stream` is a Writable stream, defaults to `process.stdout`.
+
+Example:
+
+```js
+'use strict'
+
+var pino = require('pino')
+var instance = pino({
+  name: 'myapp',
+  safe: true,
+  serializers: {
+    req: pino.stdSerializers.req
+    res: pino.stdSerializers.res
+  }
+}
+```
 
 <a name="level"></a>
 ### logger.level
@@ -139,6 +161,59 @@ object, all its properties will be included in the JSON line.
 If more args follows `msg`, these will be used to format `msg` using
 [`util.format`](https://nodejs.org/api/util.html#util_util_format_format)
 
+<a name="reqSerializer"></a>
+### pino.stdSerializers.req
+
+Function to generate a jsonificable object out of an HTTP request from
+node HTTP server.
+
+It returns an object in the form:
+
+```js
+{
+  pid: 93535,
+  hostname: 'your host',
+  level: 30,
+  msg: 'my request',
+  time: '2016-03-07T12:21:48.766Z',
+  v: 0,
+  req: {
+    method: 'GET',
+    url: '/',
+    headers: {
+      host: 'localhost:50201',
+      connection: 'close'
+    },
+    remoteAddress: '::ffff:127.0.0.1',
+    remotePort: 50202
+  }
+}
+```
+
+<a name="resSerializer"></a>
+### pino.stdSerializers.res
+
+Function to generate a jsonificable object out of an HTTP
+response from
+node HTTP server.
+
+It returns an object in the form:
+
+```js
+{
+  pid: 93581,
+  hostname: 'myhost',
+  level: 30,
+  msg: 'my response',
+  time: '2016-03-07T12:23:18.041Z',
+  v: 0,
+  res: {
+    statusCode: 200,
+    header: 'HTTP/1.1 200 OK\r\nDate: Mon, 07 Mar 2016 12:23:18 GMT\r\nConnection: close\r\nContent-Length: 5\r\n\r\n'
+  }
+}
+```
+
 <a name="benchmarks"></a>
 ## Benchmarks
 
@@ -189,6 +264,11 @@ In order to rotate your log files, add in `/etc/logrotate.d/myapp`:
        copytruncate
 }
 ```
+
+<a name="acknowledgements"></a>
+## Acknowledgements
+
+This project was kindly sponsored by [nearForm](http://nearform.com).
 
 ## License
 
