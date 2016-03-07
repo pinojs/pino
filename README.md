@@ -10,6 +10,7 @@ It also includes a shell utility to pretty-print its log files.
 * [API](#api)
 * [Benchmarks](#benchmarks)
 * [How do I rotate log files?](#rotate)
+* [Acknowledgements](#acknowledgements)
 * [License](#license)
 
 ## Install
@@ -189,6 +190,11 @@ In order to rotate your log files, add in `/etc/logrotate.d/myapp`:
        copytruncate
 }
 ```
+
+<a name="acknowledgements"></a>
+## Acknowledgements
+
+This project was kindly sponsored by [nearForm](http://nearform.com).
 
 ## License
 
