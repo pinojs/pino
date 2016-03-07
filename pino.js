@@ -1,7 +1,7 @@
 'use strict'
 
 var stringifySafe = require('json-stringify-safe')
-var format = require('util').format  // eslint-disable-line no-unused-vars
+var format = require('util').format
 var os = require('os')
 var pid = process.pid
 var hostname = os.hostname()
@@ -94,7 +94,7 @@ function pino (opts, stream) {
     }
   }
 
-  function asJson (obj, msg, num) { // eslint-disable-line no-unused-vars
+  function asJson (obj, msg, num) {
     if (!msg && obj instanceof Error) {
       msg = obj.message
     }
