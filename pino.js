@@ -76,6 +76,10 @@ function pino (opts, stream) {
         obj = a
         params = [b, c, d, e, f, g, h, i, j, k]
         base = 1
+
+        if (obj.method && obj.headers && obj.socket) {
+          obj = mapHttpRequest(obj)
+        }
       } else {
         params = [a, b, c, d, e, f, g, h, i, j, k]
       }
@@ -121,5 +125,17 @@ function pino (opts, stream) {
 }
 
 function noop () {}
+
+function mapHttpRequest (req) {
+  return {
+    req: {
+      method: req.method,
+      url: req.url,
+      headers: req.headers,
+      remoteAddress: req.connection.remoteAddress,
+      remotePort: req.connection.remotePort
+    }
+  }
+}
 
 module.exports = pino
