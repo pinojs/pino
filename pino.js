@@ -101,10 +101,8 @@ function pino (opts, stream) {
     var data = message(num, msg)
     var value
     if (obj) {
-      data = data.slice(0, data.length - 1)
-
       if (obj instanceof Error) {
-        data += ',"type":"Error","stack":' + stringify(obj.stack) + '}'
+        data += ',"type":"Error","stack":' + stringify(obj.stack)
       } else {
         for (var key in obj) {
           value = obj[key]
@@ -113,12 +111,13 @@ function pino (opts, stream) {
             data += ',"' + key + '":' + stringify(value)
           }
         }
-        data += '}'
       }
     }
-    return data + '\n'
+    return data + '}\n'
   }
 
+  // returns string json with final brace omitted
+  // the final brace is added by asJson
   function message (level, msg) {
     return '{"pid":' + pid + ',' +
       (typeof hostname === 'undefined' ? '' : '"hostname":"' + hostname + '",') +
@@ -126,7 +125,7 @@ function pino (opts, stream) {
       '"level":' + level + ',' +
       (typeof msg === 'undefined' ? '' : '"msg":"' + (msg && msg.toString()) + '",') +
       '"time":"' + (new Date()).toISOString() + '",' +
-      '"v":' + 0 + '}'
+      '"v":' + 0
   }
 }
 
