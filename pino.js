@@ -101,7 +101,7 @@ function pino (opts, stream) {
     var data = message(num, msg)
     var value
     if (obj) {
-      if (obj instanceof Error) {
+      if (obj.stack) {
         data += ',"type":"Error","stack":' + stringify(obj.stack)
       } else {
         for (var key in obj) {
@@ -120,10 +120,10 @@ function pino (opts, stream) {
   // the final brace is added by asJson
   function message (level, msg) {
     return '{"pid":' + pid + ',' +
-      (typeof hostname === 'undefined' ? '' : '"hostname":"' + hostname + '",') +
-      (typeof name === 'undefined' ? '' : '"name":"' + name + '",') +
+      (hostname === undefined ? '' : '"hostname":"' + hostname + '",') +
+      (name === undefined ? '' : '"name":"' + name + '",') +
       '"level":' + level + ',' +
-      (typeof msg === 'undefined' ? '' : '"msg":"' + (msg && msg.toString()) + '",') +
+      (msg === undefined ? '' : '"msg":"' + (msg && msg.toString()) + '",') +
       '"time":"' + (new Date()).toISOString() + '",' +
       '"v":' + 0
   }
