@@ -145,22 +145,22 @@ If more args follows `msg`, these will be used to format `msg` using
 As far as I know, it is the fastest logger in town:
 
 ```
-benchBunyan*10000: 1128ms
-benchWinston*10000: 1903ms
-benchBole*10000: 1511ms
-benchPino*10000: 439ms
-benchBunyanObj*10000: 1209ms
-benchWinstonObj*10000: 1948ms
-benchPinoObj*10000: 526ms
-benchBoleObj*10000: 1466ms
-benchBunyan*10000: 1064ms
-benchWinston*10000: 1827ms
-benchBole*10000: 1524ms
-benchPino*10000: 438ms
-benchBunyanObj*10000: 1220ms
-benchWinstonObj*10000: 2119ms
-benchPinoObj*10000: 524ms
-benchBoleObj*10000: 1522ms
+benchBunyan*10000: 1116.721ms
+benchWinston*10000: 1783.362ms
+benchBole*10000: 1496.580ms
+benchPino*10000: 363.430ms
+benchBunyanObj*10000: 1228.538ms
+benchWinstonObj*10000: 1895.251ms
+benchPinoObj*10000: 427.989ms
+benchBoleObj*10000: 1487.543ms
+benchBunyan*10000: 1088.231ms
+benchWinston*10000: 1733.589ms
+benchBole*10000: 1514.004ms
+benchPino*10000: 377.418ms
+benchBunyanObj*10000: 1205.833ms
+benchWinstonObj*10000: 1800.594ms
+benchPinoObj*10000: 412.170ms
+benchBoleObj*10000: 1522.469ms
 ```
 
 <a name="rotate"></a>

@@ -91,7 +91,7 @@ function pino (opts, stream) {
     if (!msg && obj instanceof Error) {
       msg = obj.message
     }
-    var data = JSON.stringify(new Message(num, msg))
+    var data = message(num, msg)
     if (obj) {
       data = data.slice(0, data.length - 1)
 
@@ -109,14 +109,14 @@ function pino (opts, stream) {
     return data + '\n'
   }
 
-  function Message (level, msg) {
-    this.pid = pid
-    this.hostname = hostname
-    this.name = name
-    this.level = level
-    this.msg = msg && msg.toString()
-    this.time = new Date()
-    this.v = 0
+  function message (level, msg) {
+    return '{"pid":' + pid + ',' +
+      (typeof hostname === 'undefined' ? '' : '"hostname":"' + hostname + '",') +
+      (typeof name === 'undefined' ? '' : '"name":"' + name + '",') +
+      '"level":' + level + ',' +
+      (typeof msg === 'undefined' ? '' : '"msg":"' + (msg && msg.toString()) + '",') +
+      '"time":"' + (new Date()).toISOString() + '",' +
+      '"v":' + 0 + '}'
   }
 }
 
