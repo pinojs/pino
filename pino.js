@@ -35,6 +35,7 @@ function pino (opts, stream) {
     debug: null,
     trace: null
   }
+  var serializers = opts.serializers || {}
 
   for (var key in levels) {
     funcs[key] = genLogFunction(key)
@@ -96,6 +97,7 @@ function pino (opts, stream) {
       msg = obj.message
     }
     var data = JSON.stringify(new Message(num, msg))
+    var value
     if (obj) {
       data = data.slice(0, data.length - 1)
 
@@ -103,8 +105,10 @@ function pino (opts, stream) {
         data += ',"type":"Error","stack":' + stringify(obj.stack) + '}'
       } else {
         for (var key in obj) {
-          if (obj.hasOwnProperty(key) && obj[key] !== undefined) {
-            data += ',"' + key + '":' + stringify(obj[key])
+          value = obj[key]
+          if (obj.hasOwnProperty(key) && value !== undefined) {
+            value = serializers[key] ? serializers[key](value) : value
+            data += ',"' + key + '":' + stringify(value)
           }
         }
         data += '}'
@@ -128,14 +132,22 @@ function noop () {}
 
 function mapHttpRequest (req) {
   return {
-    req: {
-      method: req.method,
-      url: req.url,
-      headers: req.headers,
-      remoteAddress: req.connection.remoteAddress,
-      remotePort: req.connection.remotePort
-    }
+    req: asReqValue(req)
+  }
+}
+
+function asReqValue (req) {
+  return {
+    method: req.method,
+    url: req.url,
+    headers: req.headers,
+    remoteAddress: req.connection.remoteAddress,
+    remotePort: req.connection.remotePort
   }
 }
 
 module.exports = pino
+
+module.exports.stdSerializers = {
+  req: asReqValue
+}

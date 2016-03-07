@@ -255,7 +255,7 @@ test('set properties defined in the prototype chain', function (t) {
 test('http request support', function (t) {
   t.plan(3)
 
-  var originalReq;
+  var originalReq
   var instance = pino(sink(function (chunk, enc, cb) {
     t.ok(Date.parse(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
@@ -279,6 +279,48 @@ test('http request support', function (t) {
   var server = http.createServer(function (req, res) {
     originalReq = req
     instance.info(req, 'my request')
+    res.end('hello')
+  }).listen(function (err) {
+    t.error(err)
+    t.teardown(server.close.bind(server))
+
+    http.get('http://localhost:' + server.address().port, function (res) {
+      res.resume()
+    })
+  })
+})
+
+test('http request support via serializer', function (t) {
+  t.plan(3)
+
+  var originalReq
+  var instance = pino({
+    serializers: {
+      req: pino.stdSerializers.req
+    }
+  }, sink(function (chunk, enc, cb) {
+    t.ok(Date.parse(chunk.time) <= new Date(), 'time is greater than Date.now()')
+    delete chunk.time
+    t.deepEqual(chunk, {
+      pid: pid,
+      hostname: hostname,
+      level: 30,
+      msg: 'my request',
+      v: 0,
+      req: {
+        method: originalReq.method,
+        url: originalReq.url,
+        headers: originalReq.headers,
+        remoteAddress: originalReq.connection.remoteAddress,
+        remotePort: originalReq.connection.remotePort
+      }
+    })
+    cb()
+  }))
+
+  var server = http.createServer(function (req, res) {
+    originalReq = req
+    instance.info({ req: req }, 'my request')
     res.end('hello')
   }).listen(function (err) {
     t.error(err)
