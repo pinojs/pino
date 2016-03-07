@@ -80,6 +80,8 @@ function pino (opts, stream) {
 
         if (obj.method && obj.headers && obj.socket) {
           obj = mapHttpRequest(obj)
+        } else if (obj.statusCode) {
+          obj = mapHttpResponse(obj)
         }
       } else {
         params = [a, b, c, d, e, f, g, h, i, j, k]
@@ -136,6 +138,12 @@ function mapHttpRequest (req) {
   }
 }
 
+function mapHttpResponse (res) {
+  return {
+    res: asResValue(res)
+  }
+}
+
 function asReqValue (req) {
   return {
     method: req.method,
@@ -146,8 +154,16 @@ function asReqValue (req) {
   }
 }
 
+function asResValue (res) {
+  return {
+    statusCode: res.statusCode,
+    header: res._header
+  }
+}
+
 module.exports = pino
 
 module.exports.stdSerializers = {
-  req: asReqValue
+  req: asReqValue,
+  res: asResValue
 }
