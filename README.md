@@ -68,6 +68,24 @@ Then we simply pipe a log file through `pino`:
 cat log | pino
 ```
 
+There's also a transformer flag that converts Epoch timestamps to ISO timestamps. 
+
+```sh
+cat log | pino -t
+```
+
+For instance, `pino -t` will transform this:
+
+```js
+{"pid":14139,"hostname":"MacBook-Pro-3.home","level":30,"msg":"hello world","time":1457537229339,"v":0}
+```
+
+Into this:
+
+```js
+{"pid":14139,"hostname":"MacBook-Pro-3.home","level":30,"msg":"hello world","time":"2016-03-09T15:27:09.339Z","v":0}
+```
+
 <a name="api"></a>
 ## API
 
@@ -92,7 +110,8 @@ Returns a new logger. Allowed options are:
 * `name`: the name of the logger, default `undefined`
 * `serializers`: an object containing functions for custom serialization
   of objects. These functions should return an jsonificable object and
-  they should never throw.
+  they should never throw
+* `slowtime`: Outputs ISO time stamps (`'2016-03-09T15:18:53.889Z'`) instead of Epoch time stamps (`1457536759176`). **WARNING**: This option carries a 25% performance drop, we recommend using default Epoch timestamps and transforming logs after if required. The `pino -t` command will do this for you (see [CLI](#cli))
 
 `stream` is a Writable stream, defaults to `process.stdout`.
 

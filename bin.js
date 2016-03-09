@@ -9,6 +9,8 @@ var chalk = require('chalk')
 
 process.stdin.pipe(split(mapLine)).pipe(process.stdout)
 
+var timeTrans = ~process.argv.indexOf('-t')
+
 var levelColors = {
   60: chalk.bgRed,
   50: chalk.red,
@@ -69,19 +71,24 @@ function mapLine (line) {
   if (parsed.err) {
     // pass through
     return line
-  } else {
-    line = '[' + new Date(value.time).toISOString() + '] ' + asColoredLevel(value)
-    line += ' ('
-    if (value.name) {
-      line += value.name + '/'
-    }
-    line += value.pid + ' on ' + value.hostname + ')'
-    line += ': ' + chalk.cyan(value.msg) + '\n'
-    if (value.type === 'Error') {
-      line += '    ' + withSpaces(value.stack) + '\n'
-    } else {
-      line += filter(value)
-    }
-    return line
   }
+
+  if (timeTrans) {
+    value.time = new Date(value.time).toISOString()
+    return JSON.stringify(value) + '\n'
+  }
+
+  line = '[' + new Date(value.time).toISOString() + '] ' + asColoredLevel(value)
+  line += ' ('
+  if (value.name) {
+    line += value.name + '/'
+  }
+  line += value.pid + ' on ' + value.hostname + ')'
+  line += ': ' + chalk.cyan(value.msg) + '\n'
+  if (value.type === 'Error') {
+    line += '    ' + withSpaces(value.stack) + '\n'
+  } else {
+    line += filter(value)
+  }
+  return line
 }

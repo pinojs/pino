@@ -22,7 +22,7 @@ function pino (opts, stream) {
   }
   stream = stream || process.stdout
   opts = opts || {}
-
+  var slowtime = opts.slowtime
   var stringify = opts.safe !== false ? stringifySafe : JSON.stringify
   var name = opts.name
   var level
@@ -124,7 +124,7 @@ function pino (opts, stream) {
       (name === undefined ? '' : '"name":"' + name + '",') +
       '"level":' + level + ',' +
       (msg === undefined ? '' : '"msg":"' + (msg && msg.toString()) + '",') +
-      '"time":' + Date.now() + ',' +
+      '"time":' + (slowtime ? '"' + (new Date()).toISOString() + '"' : Date.now()) + ',' +
       '"v":' + 0
   }
 }
