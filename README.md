@@ -7,8 +7,8 @@ It also includes a shell utility to pretty-print its log files.
 
 * [Installation](#install)
 * [Usage](#usage)
-* [API](#api)
 * [Benchmarks](#benchmarks)
+* [API](#api)
 * [How do I rotate log files?](#rotate)
 * [Acknowledgements](#acknowledgements)
 * [License](#license)
@@ -51,6 +51,31 @@ This produces:
 {"pid":13087,"hostname":"MacBook-Pro-3.home","level":30,"msg":"after setImmediate","time":1457531561641,"v":0}
 
 ```
+
+<a name="benchmarks"></a>
+## Benchmarks
+
+As far as we know, it is the fastest logger in town:
+
+```
+benchBunyan*10000: 1093.236ms
+benchWinston*10000: 1904.147ms
+benchBole*10000: 1563.632ms
+benchPino*10000: 287.858ms
+benchBunyanObj*10000: 1187.016ms
+benchWinstonObj*10000: 1990.980ms
+benchPinoObj*10000: 366.865ms
+benchBoleObj*10000: 1475.934ms
+benchBunyan*10000: 1043.486ms
+benchWinston*10000: 1801.232ms
+benchBole*10000: 1524.136ms
+benchPino*10000: 280.797ms
+benchBunyanObj*10000: 1188.472ms
+benchWinstonObj*10000: 1868.626ms
+benchPinoObj*10000: 371.082ms
+benchBoleObj*10000: 1496.449ms
+```
+
 
 <a name="cli"></a>
 ## CLI
@@ -245,30 +270,6 @@ It returns an object in the form:
     header: 'HTTP/1.1 200 OK\r\nDate: Mon, 07 Mar 2016 12:23:18 GMT\r\nConnection: close\r\nContent-Length: 5\r\n\r\n'
   }
 }
-```
-
-<a name="benchmarks"></a>
-## Benchmarks
-
-As far as we know, it is the fastest logger in town:
-
-```
-benchBunyan*10000: 1093.236ms
-benchWinston*10000: 1904.147ms
-benchBole*10000: 1563.632ms
-benchPino*10000: 287.858ms
-benchBunyanObj*10000: 1187.016ms
-benchWinstonObj*10000: 1990.980ms
-benchPinoObj*10000: 366.865ms
-benchBoleObj*10000: 1475.934ms
-benchBunyan*10000: 1043.486ms
-benchWinston*10000: 1801.232ms
-benchBole*10000: 1524.136ms
-benchPino*10000: 280.797ms
-benchBunyanObj*10000: 1188.472ms
-benchWinstonObj*10000: 1868.626ms
-benchPinoObj*10000: 371.082ms
-benchBoleObj*10000: 1496.449ms
 ```
 
 <a name="rotate"></a>
