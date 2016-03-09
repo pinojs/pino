@@ -7,12 +7,12 @@ var pid = process.pid
 var hostname = os.hostname()
 
 var levels = {
-  'fatal': 60,
-  'error': 50,
-  'warn': 40,
-  'info': 30,
-  'debug': 20,
-  'trace': 10
+  fatal: 60,
+  error: 50,
+  warn: 40,
+  info: 30,
+  debug: 20,
+  trace: 10
 }
 
 function pino (opts, stream) {
@@ -49,7 +49,7 @@ function pino (opts, stream) {
     set: function (l) {
       level = levels[l]
       if (!level) {
-        throw new Error('unkown level ' + l)
+        throw new Error('unknown level ' + l)
       }
 
       Object.keys(levels).forEach(function (key) {
