@@ -70,7 +70,7 @@ function mapLine (line) {
     // pass through
     return line
   } else {
-    line = '[' + value.time + '] ' + asColoredLevel(value)
+    line = '[' + new Date(value.time).toISOString() + '] ' + asColoredLevel(value)
     line += ' ('
     if (value.name) {
       line += value.name + '/'

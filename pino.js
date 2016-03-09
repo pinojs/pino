@@ -124,7 +124,7 @@ function pino (opts, stream) {
       (name === undefined ? '' : '"name":"' + name + '",') +
       '"level":' + level + ',' +
       (msg === undefined ? '' : '"msg":"' + (msg && msg.toString()) + '",') +
-      '"time":"' + (new Date()).toISOString() + '",' +
+      '"time":' + Date.now() + ',' +
       '"v":' + 0
   }
 }

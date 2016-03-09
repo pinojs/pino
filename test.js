@@ -16,7 +16,7 @@ function sink (func) {
 }
 
 function check (t, chunk, level, msg) {
-  t.ok(Date.parse(chunk.time) <= new Date(), 'time is greater than Date.now()')
+  t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
   delete chunk.time
   t.deepEqual(chunk, {
     pid: pid,
@@ -41,7 +41,7 @@ function levelTest (name, level) {
   test('passing objects at level ' + name, function (t) {
     t.plan(2)
     var instance = pino(sink(function (chunk, enc, cb) {
-      t.ok(Date.parse(chunk.time) <= new Date(), 'time is greater than Date.now()')
+      t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
       delete chunk.time
       t.deepEqual(chunk, {
         pid: pid,
@@ -59,7 +59,7 @@ function levelTest (name, level) {
   test('passing an object and a string at level ' + name, function (t) {
     t.plan(2)
     var instance = pino(sink(function (chunk, enc, cb) {
-      t.ok(Date.parse(chunk.time) <= new Date(), 'time is greater than Date.now()')
+      t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
       delete chunk.time
       t.deepEqual(chunk, {
         pid: pid,
@@ -89,7 +89,7 @@ function levelTest (name, level) {
     t.plan(2)
     var err = new Error('myerror')
     var instance = pino(sink(function (chunk, enc, cb) {
-      t.ok(Date.parse(chunk.time) <= new Date(), 'time is greater than Date.now()')
+      t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
       delete chunk.time
       t.deepEqual(chunk, {
         pid: pid,
@@ -172,7 +172,7 @@ test('set the name', function (t) {
   var instance = pino({
     name: 'hello'
   }, sink(function (chunk, enc, cb) {
-    t.ok(Date.parse(chunk.time) <= new Date(), 'time is greater than Date.now()')
+    t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     t.deepEqual(chunk, {
       pid: pid,
@@ -212,7 +212,7 @@ test('set undefined properties', function (t) {
   t.plan(2)
 
   var instance = pino(sink(function (chunk, enc, cb) {
-    t.ok(Date.parse(chunk.time) <= new Date(), 'time is greater than Date.now()')
+    t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     t.deepEqual(chunk, {
       pid: pid,
@@ -231,7 +231,7 @@ test('set properties defined in the prototype chain', function (t) {
   t.plan(2)
 
   var instance = pino(sink(function (chunk, enc, cb) {
-    t.ok(Date.parse(chunk.time) <= new Date(), 'time is greater than Date.now()')
+    t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     t.deepEqual(chunk, {
       pid: pid,
@@ -257,7 +257,7 @@ test('http request support', function (t) {
 
   var originalReq
   var instance = pino(sink(function (chunk, enc, cb) {
-    t.ok(Date.parse(chunk.time) <= new Date(), 'time is greater than Date.now()')
+    t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     t.deepEqual(chunk, {
       pid: pid,
@@ -299,7 +299,7 @@ test('http request support via serializer', function (t) {
       req: pino.stdSerializers.req
     }
   }, sink(function (chunk, enc, cb) {
-    t.ok(Date.parse(chunk.time) <= new Date(), 'time is greater than Date.now()')
+    t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     t.deepEqual(chunk, {
       pid: pid,
@@ -337,7 +337,7 @@ test('http response support', function (t) {
 
   var originalRes
   var instance = pino(sink(function (chunk, enc, cb) {
-    t.ok(Date.parse(chunk.time) <= new Date(), 'time is greater than Date.now()')
+    t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     t.deepEqual(chunk, {
       pid: pid,
@@ -376,7 +376,7 @@ test('http response support via a serializer', function (t) {
       res: pino.stdSerializers.res
     }
   }, sink(function (chunk, enc, cb) {
-    t.ok(Date.parse(chunk.time) <= new Date(), 'time is greater than Date.now()')
+    t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     t.deepEqual(chunk, {
       pid: pid,
