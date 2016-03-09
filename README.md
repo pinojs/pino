@@ -3,7 +3,7 @@
 [Extremely fast](#benchmarks) node.js logger, inspired by Bunyan.
 It also includes a shell utility to pretty-print its log files.
 
-![cli](https://raw.githubusercontent.com/mcollina/pino/master/demo.png)
+![cli](demo.png)
 
 * [Installation](#install)
 * [Usage](#usage)
@@ -42,14 +42,48 @@ error(new Error('something bad happened'))
 This produces:
 
 ```
-{"pid":12244,"hostname":"MBP-di-Matteo","level":30,"msg":"hello world","time":"2016-03-05T16:00:45.858Z","v":0}
-{"pid":12244,"hostname":"MBP-di-Matteo","level":50,"msg":"this is at error level","time":"2016-03-05T16:00:45.860Z","v":0}
-{"pid":12244,"hostname":"MBP-di-Matteo","level":30,"msg":"the answer is 42","time":"2016-03-05T16:00:45.861Z","v":0}
-{"pid":12244,"hostname":"MBP-di-Matteo","level":30,"msg":"hello world","time":"2016-03-05T16:00:45.861Z","v":0,"obj":42}
-{"pid":12244,"hostname":"MBP-di-Matteo","level":30,"msg":"hello world","time":"2016-03-05T16:00:45.862Z","v":0,"obj":42,"b":2}
-{"pid":12244,"hostname":"MBP-di-Matteo","level":30,"msg":"another","time":"2016-03-05T16:00:45.862Z","v":0,"obj":{"aa":"bbb"}}
-{"pid":12244,"hostname":"MBP-di-Matteo","level":50,"msg":"an error","time":"2016-03-05T16:00:45.863Z","v":0,"type":"Error","stack":"Error: an error\n    at Object.<anonymous> (/Users/matteo/Repositories/pino/example.js:14:7)\n    at Module._compile (module.js:435:26)\n    at Object.Module._extensions..js (module.js:442:10)\n    at Module.load (module.js:356:32)\n    at Function.Module._load (module.js:313:12)\n    at Function.Module.runMain (module.js:467:10)\n    at startup (node.js:136:18)\n    at node.js:963:3"}
-{"pid":12244,"hostname":"MBP-di-Matteo","level":30,"msg":"after setImmediate","time":"2016-03-05T16:00:45.865Z","v":0}
+{"pid":13087,"hostname":"MacBook-Pro-3.home","level":30,"msg":"hello world","time":1457531561635,"v":0}
+{"pid":13087,"hostname":"MacBook-Pro-3.home","level":50,"msg":"this is at error level","time":1457531561636,"v":0}
+{"pid":13087,"hostname":"MacBook-Pro-3.home","level":30,"msg":"the answer is 42","time":1457531561637,"v":0}
+{"pid":13087,"hostname":"MacBook-Pro-3.home","level":30,"msg":"hello world","time":1457531561637,"v":0,"obj":42}
+{"pid":13087,"hostname":"MacBook-Pro-3.home","level":30,"msg":"hello world","time":1457531561638,"v":0,"obj":42,"b":2}
+{"pid":13087,"hostname":"MacBook-Pro-3.home","level":30,"msg":"another","time":1457531561638,"v":0,"obj":{"aa":"bbb"}}
+{"pid":13087,"hostname":"MacBook-Pro-3.home","level":50,"msg":"an error","time":1457531561639,"v":0,"type":"Error","stack":"Error: an error\n    at Object.<anonymous> (/Users/davidclements/z/nearForm/pino/example.js:14:7)\n    at Module._compile (module.js:413:34)\n    at Object.Module._extensions..js (module.js:422:10)\n    at Module.load (module.js:357:32)\n    at Function.Module._load (module.js:314:12)\n    at Function.Module.runMain (module.js:447:10)\n    at startup (node.js:141:18)\n    at node.js:933:3"}
+{"pid":13087,"hostname":"MacBook-Pro-3.home","level":30,"msg":"after setImmediate","time":1457531561641,"v":0}
+
+```
+
+<a name="cli"></a>
+## CLI
+
+To use the command line tool, we can install `pino` globally:
+
+```sh
+npm install -g pino
+```
+
+Then we simply pipe a log file through `pino`:
+
+```sh
+cat log | pino
+```
+
+There's also a transformer flag that converts Epoch timestamps to ISO timestamps. 
+
+```sh
+cat log | pino -t
+```
+
+For instance, `pino -t` will transform this:
+
+```js
+{"pid":14139,"hostname":"MacBook-Pro-3.home","level":30,"msg":"hello world","time":1457537229339,"v":0}
+```
+
+Into this:
+
+```js
+{"pid":14139,"hostname":"MacBook-Pro-3.home","level":30,"msg":"hello world","time":"2016-03-09T15:27:09.339Z","v":0}
 ```
 
 <a name="api"></a>
@@ -76,7 +110,8 @@ Returns a new logger. Allowed options are:
 * `name`: the name of the logger, default `undefined`
 * `serializers`: an object containing functions for custom serialization
   of objects. These functions should return an jsonificable object and
-  they should never throw.
+  they should never throw
+* `slowtime`: Outputs ISO time stamps (`'2016-03-09T15:18:53.889Z'`) instead of Epoch time stamps (`1457536759176`). **WARNING**: This option carries a 25% performance drop, we recommend using default Epoch timestamps and transforming logs after if required. The `pino -t` command will do this for you (see [CLI](#cli))
 
 `stream` is a Writable stream, defaults to `process.stdout`.
 
@@ -217,25 +252,25 @@ It returns an object in the form:
 <a name="benchmarks"></a>
 ## Benchmarks
 
-As far as I know, it is the fastest logger in town:
+As far as we know, it is the fastest logger in town:
 
 ```
-benchBunyan*10000: 1116.721ms
-benchWinston*10000: 1783.362ms
-benchBole*10000: 1496.580ms
-benchPino*10000: 363.430ms
-benchBunyanObj*10000: 1228.538ms
-benchWinstonObj*10000: 1895.251ms
-benchPinoObj*10000: 427.989ms
-benchBoleObj*10000: 1487.543ms
-benchBunyan*10000: 1088.231ms
-benchWinston*10000: 1733.589ms
-benchBole*10000: 1514.004ms
-benchPino*10000: 377.418ms
-benchBunyanObj*10000: 1205.833ms
-benchWinstonObj*10000: 1800.594ms
-benchPinoObj*10000: 412.170ms
-benchBoleObj*10000: 1522.469ms
+benchBunyan*10000: 1093.236ms
+benchWinston*10000: 1904.147ms
+benchBole*10000: 1563.632ms
+benchPino*10000: 287.858ms
+benchBunyanObj*10000: 1187.016ms
+benchWinstonObj*10000: 1990.980ms
+benchPinoObj*10000: 366.865ms
+benchBoleObj*10000: 1475.934ms
+benchBunyan*10000: 1043.486ms
+benchWinston*10000: 1801.232ms
+benchBole*10000: 1524.136ms
+benchPino*10000: 280.797ms
+benchBunyanObj*10000: 1188.472ms
+benchWinstonObj*10000: 1868.626ms
+benchPinoObj*10000: 371.082ms
+benchBoleObj*10000: 1496.449ms
 ```
 
 <a name="rotate"></a>
