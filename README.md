@@ -24,19 +24,18 @@ npm install pino --save
 ```js
 'use strict'
 
-var pino = require('pino')(
-  // or any other stream
-  // defaults to stdout
-  process.stdout
-)
+var pino = require('./')()
 var info = pino.info
 var error = pino.error
 
 info('hello world')
+error('this is at error level')
 info('the answer is %d', 42)
 info({ obj: 42 }, 'hello world')
-setImmediate(info, 'wrapped')
-error(new Error('something bad happened'))
+info({ obj: 42, b: 2 }, 'hello world')
+info({ obj: { aa: 'bbb' } }, 'another')
+setImmediate(info, 'after setImmediate')
+error(new Error('an error'))
 ```
 
 This produces:
@@ -108,9 +107,7 @@ Returns a new logger. Allowed options are:
 * `safe`: avoid error causes by circular references in the object tree,
   default `true`
 * `name`: the name of the logger, default `undefined`
-* `serializers`: an object containing functions for custom serialization
-  of objects. These functions should return an jsonificable object and
-  they should never throw
+* `serializers`: an object containing functions for custom serialization of objects. These functions should return an JSONifiable object and they should never throw
 * `slowtime`: Outputs ISO time stamps (`'2016-03-09T15:18:53.889Z'`) instead of Epoch time stamps (`1457536759176`). **WARNING**: This option carries a 25% performance drop, we recommend using default Epoch timestamps and transforming logs after if required. The `pino -t` command will do this for you (see [CLI](#cli))
 
 `stream` is a Writable stream, defaults to `process.stdout`.
@@ -134,8 +131,9 @@ var instance = pino({
 <a name="level"></a>
 ### logger.level
 
-Property to read and write the current level of the logger.
-In order of priotity, avaliable levels are:
+Set this property to the desired logging level.
+
+In order of priority, available levels are:
 
   1. <a href="#fatal">`'fatal'`</a>
   2. <a href="#error">`'error'`</a>
@@ -144,9 +142,9 @@ In order of priotity, avaliable levels are:
   5. <a href="#debug">`'debug'`</a>
   6. <a href="#trace">`'trace'`</a>
 
-By setting a given level (e.g. `logger.level = 'info'`) you enable all
-the levels including and above the passed one (in the example, info,
-warn, error and fatal). The default is `info`.
+Example: `logger.level = 'info'`
+
+The logging level is a *minimum* level. For instance if `logger.level` is `'info'` then all `fatal`, `error`, `warn`, and `info` logs will be enabled.
 
 <a name="fatal"></a>
 ### logger.fatal([obj], msg, [...])
@@ -199,7 +197,7 @@ If more args follows `msg`, these will be used to format `msg` using
 <a name="reqSerializer"></a>
 ### pino.stdSerializers.req
 
-Function to generate a jsonificable object out of an HTTP request from
+Function to generate a JSONifiable object out of an HTTP request from
 node HTTP server.
 
 It returns an object in the form:
@@ -228,7 +226,7 @@ It returns an object in the form:
 <a name="resSerializer"></a>
 ### pino.stdSerializers.res
 
-Function to generate a jsonificable object out of an HTTP
+Function to generate a JSONifiable object out of an HTTP
 response from
 node HTTP server.
 
