@@ -15,6 +15,11 @@ var levels = {
   trace: 10
 }
 
+var reverseLevels = Object.keys(levels).reduce(function (acc, key) {
+  acc[levels[key]] = key
+  return acc
+}, {})
+
 function pino (opts, stream) {
   if (opts && opts._writableState) {
     stream = opts
@@ -22,8 +27,9 @@ function pino (opts, stream) {
   }
   stream = stream || process.stdout
   opts = opts || {}
+  var safe = opts.safe
   var slowtime = opts.slowtime
-  var stringify = opts.safe !== false ? stringifySafe : JSON.stringify
+  var stringify = safe !== false ? stringifySafe : JSON.stringify
   var name = opts.name
   var level
   var funcs = {}
@@ -36,6 +42,8 @@ function pino (opts, stream) {
     trace: null
   }
   var serializers = opts.serializers || {}
+  var meta = ''
+  var end = '}\n'
 
   for (var key in levels) {
     funcs[key] = genLogFunction(key)
@@ -62,7 +70,30 @@ function pino (opts, stream) {
     }
   })
 
+  function child (meta) {
+    if (!meta) {
+      throw new Error('missing options for child logger')
+    }
+
+    var opts = {
+      safe: safe,
+      meta: meta,
+      level: reverseLevels[level]
+    }
+
+    return pino(opts, stream)
+  }
+
   result.level = opts.level || 'info'
+
+  if (opts.meta) {
+    meta = JSON.stringify(opts.meta)
+    meta = meta.slice(0, meta.length - 1)
+    meta = meta.slice(1)
+    end = ',' + meta + end
+  } else {
+    result.child = child
+  }
 
   return result
 
@@ -113,7 +144,7 @@ function pino (opts, stream) {
         }
       }
     }
-    return data + '}\n'
+    return data + end
   }
 
   // returns string json with final brace omitted

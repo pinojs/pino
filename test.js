@@ -106,6 +106,28 @@ function levelTest (name, level) {
     instance.level = name
     instance[name](err)
   })
+
+  test('child logger for level ' + name, function (t) {
+    t.plan(2)
+    var instance = pino(sink(function (chunk, enc, cb) {
+      t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
+      delete chunk.time
+      t.deepEqual(chunk, {
+        pid: pid,
+        hostname: hostname,
+        level: level,
+        msg: 'hello world',
+        hello: 'world',
+        v: 0
+      })
+    }))
+
+    instance.level = name
+    var child = instance.child({
+      hello: 'world'
+    })
+    child[name]('hello world')
+  })
 }
 
 levelTest('fatal', 60)
