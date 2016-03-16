@@ -156,9 +156,9 @@ var instance = pino({
 ```
 
 <a name="child"></a>
-### logger.child(opts)
+### logger.child(bindings)
 
-Creates a child logger, setting all key-value pairs is `opts` as
+Creates a child logger, setting all key-value pairs in `bindings` as
 properties in the log lines. All serializers will be applied to the
 given pair.
 
