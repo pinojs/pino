@@ -115,6 +115,7 @@ Into this:
 ## API
 
   * <a href="#constructor"><code><b>pino()</b></code></a>
+  * <a href="#child"><code>logger.<b>child()</b></code></a>
   * <a href="#level"><code>logger.<b>level</b></code></a>
   * <a href="#fatal"><code>logger.<b>fatal()</b></code></a>
   * <a href="#error"><code>logger.<b>error()</b></code></a>
@@ -153,6 +154,25 @@ var instance = pino({
   }
 }
 ```
+
+<a name="child"></a>
+### logger.child(opts)
+
+Creates a child logger, setting all key-value pairs is `opts` as
+properties in the log lines. All serializers will be applied to the
+given pair.
+
+Example:
+
+```js
+logger.child({ a: 'property' }).info('hello child!')
+// generates
+// {"pid":46497,"hostname":"MacBook-Pro-di-Matteo.local","level":30,"msg":"hello child!","time":1458124707120,"v":0,"a":"property"}
+```
+
+It leverage the output stream of the parent and
+its log level. These settings are immutable and pulled out during the
+instantiation of the child logger.
 
 <a name="level"></a>
 ### logger.level

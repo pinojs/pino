@@ -12,3 +12,5 @@ info({ obj: 42, b: 2 }, 'hello world')
 info({ obj: { aa: 'bbb' } }, 'another')
 setImmediate(info, 'after setImmediate')
 error(new Error('an error'))
+
+pino.child({ a: 'property' }).info('hello child!')

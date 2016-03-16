@@ -169,7 +169,8 @@ function setup (result, funcs, level, stream, opts, serializers, stringify) {
     var toPino = {
       safe: safe,
       meta: data,
-      level: level
+      level: level,
+      serializers: serializers
     }
 
     return pino(toPino, stream)
