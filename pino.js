@@ -52,7 +52,7 @@ function pino (opts, stream) {
       }
     })
   } else {
-    setup(result, funcs, level, stream, opts)
+    setup(result, funcs, level, stream, opts, serializers, stringify)
   }
 
   return result
@@ -120,7 +120,7 @@ function pino (opts, stream) {
   }
 }
 
-function setup (result, funcs, level, stream, opts) {
+function setup (result, funcs, level, stream, opts, serializers, stringify) {
   var safe = opts.safe
 
   Object.defineProperty(result, 'level', {
@@ -152,13 +152,19 @@ function setup (result, funcs, level, stream, opts) {
       throw new Error('missing options for child logger')
     }
 
-    var meta = JSON.stringify(opts)
-    meta = meta.slice(0, meta.length - 1)
-    meta = meta.slice(1)
+    var data = ''
+    var value
+    for (var key in opts) {
+      value = opts[key]
+      if (opts.hasOwnProperty(key) && value !== undefined) {
+        value = serializers[key] ? serializers[key](value) : value
+        data += '"' + key + '":' + stringify(value)
+      }
+    }
 
     var toPino = {
       safe: safe,
-      meta: meta,
+      meta: data,
       level: level
     }
 
