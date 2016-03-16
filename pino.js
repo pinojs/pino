@@ -147,16 +147,16 @@ function setup (result, funcs, level, stream, opts, serializers, stringify) {
   result.level = opts.level || 'info'
   result.child = child
 
-  function child (opts) {
+  function child (bindings) {
     if (!opts) {
-      throw new Error('missing options for child logger')
+      throw new Error('missing bindings for child logger')
     }
 
     var data = ''
     var value
-    for (var key in opts) {
-      value = opts[key]
-      if (opts.hasOwnProperty(key) && value !== undefined) {
+    for (var key in bindings) {
+      value = bindings[key]
+      if (bindings.hasOwnProperty(key) && value !== undefined) {
         value = serializers[key] ? serializers[key](value) : value
         data += '"' + key + '":' + stringify(value)
       }
