@@ -73,7 +73,7 @@ function pino (opts, stream) {
       var obj = null
       var params = null
       var msg
-      if (Object(a) === a) {
+      if (typeof a === 'object' && a !== null) {
         obj = a
         params = [b, c, d, e, f, g, h, i, j, k]
         base = 1
