@@ -22,21 +22,21 @@ require('bole').output({
 })
 
 var run = bench([
-  function benchPinoChild (cb) {
+  function benchPinoCreation (cb) {
     var child = plog.child({ a: 'property' })
     for (var i = 0; i < max; i++) {
       child.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
-  function benchBunyanObj (cb) {
+  function benchBunyanCreation (cb) {
     var child = blog.child({ a: 'property' })
     for (var i = 0; i < max; i++) {
       child.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
-  function benchBoleChild (cb) {
+  function benchBoleCreation (cb) {
     var child = bole('child')
     for (var i = 0; i < max; i++) {
       child.info({ hello: 'world' })
