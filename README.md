@@ -59,22 +59,22 @@ This produces:
 As far as we know, it is the fastest logger in town:
 
 ```
-benchBunyan*10000: 1093.236ms
-benchWinston*10000: 1904.147ms
-benchBole*10000: 1563.632ms
-benchPino*10000: 287.858ms
-benchBunyanObj*10000: 1187.016ms
-benchWinstonObj*10000: 1990.980ms
-benchPinoObj*10000: 366.865ms
-benchBoleObj*10000: 1475.934ms
-benchBunyan*10000: 1043.486ms
-benchWinston*10000: 1801.232ms
-benchBole*10000: 1524.136ms
-benchPino*10000: 280.797ms
-benchBunyanObj*10000: 1188.472ms
-benchWinstonObj*10000: 1868.626ms
-benchPinoObj*10000: 371.082ms
-benchBoleObj*10000: 1496.449ms
+benchBunyan*10000: 1075.649ms
+benchWinston*10000: 1840.185ms
+benchBole*10000: 1635.768ms
+benchPino*10000: 265.838ms
+benchBunyanObj*10000: 1250.343ms
+benchWinstonObj*10000: 1828.912ms
+benchPinoObj*10000: 357.569ms
+benchBoleObj*10000: 1594.823ms
+benchBunyan*10000: 1082.447ms
+benchWinston*10000: 1717.277ms
+benchBole*10000: 1591.113ms
+benchPino*10000: 260.141ms
+benchBunyanObj*10000: 1231.469ms
+benchWinstonObj*10000: 1807.529ms
+benchPinoObj*10000: 385.072ms
+benchBoleObj*10000: 1542.180ms
 ```
 
 
