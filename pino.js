@@ -73,6 +73,7 @@ function pino (opts, stream) {
       var obj = null
       var params = null
       var msg
+      var len
       if (typeof a === 'object' && a !== null) {
         obj = a
         params = [b, c, d, e, f, g, h, i, j, k]
@@ -86,8 +87,11 @@ function pino (opts, stream) {
       } else {
         params = [a, b, c, d, e, f, g, h, i, j, k]
       }
-      if ((params.length = arguments.length - base) > 0) {
+      len = params.length = arguments.length - base
+      if (len > 1) {
         msg = format.apply(null, params)
+      } else if (len) {
+        msg = params[0]
       }
 
       stream.write(asJson(obj, msg, level))
