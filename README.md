@@ -10,7 +10,7 @@ It also includes a shell utility to pretty-print its log files.
 * [Benchmarks](#benchmarks)
 * [API](#api)
 * [How do I rotate log files?](#rotate)
-* [What happened to my transports?](#transports)
+* [How to use Transports with Pino](#transports)
 * [Acknowledgements](#acknowledgements)
 * [License](#license)
 
@@ -301,14 +301,15 @@ In order to rotate your log files, add in `/etc/logrotate.d/myapp`:
 ```
 
 <a name="transports"></a>
-## What happened to my transports?
+## How to use Transports with Pino
 
-There will never be an API for transports, or support for ObjectMode Writable streams.
-This library is fast because it does way less than the others. We went a
-great length to make sure this library is _really fast_, and transports
+Transports are not part of Pino. There will never be an API for transports,
+or support for ObjectMode Writable streams.
+This library is fast because it does way less than the others. We went
+to great lengths to make sure this library is _really fast_, and transports
 will slow things down.
 
-So, how do you do a transport? You create another node process to do that, and you pipe them together.
+So, how do you do a transport? With Pino, we create a separate process for our transport and pipe to it.
 It's the Unix philosophy.
 
 Something like:
@@ -316,11 +317,20 @@ Something like:
 ```js
 var split = require('split2')
 var pump = require('pump')
+var through = require('through2')
 
-pump(process.stdin, split2(JSON.parse), myAwesomeTransport)
+var myTransport = through.obj(function (chunk, enc, cb) {
+  // do whatever you want here!
+  console.log(chunk)
+  cb()
+}
+
+pump(process.stdin, split2(JSON.parse), myTransport)
 ```
 
-Doing it inside the same process will add unnecessary load to your single-threaded node.js, effectively slowing you down.
+Using transports in the same process causes unnecessary load and slows down Node's single threaded event loop.
+
+If you write a transport, let us know and we will add a link here!
 
 <a name="acknowledgements"></a>
 ## Acknowledgements
