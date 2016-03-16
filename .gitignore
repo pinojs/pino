@@ -31,3 +31,7 @@ node_modules
 
 # Optional REPL history
 .node_repl_history
+
+# 0x
+.__browserify_string_empty.js
+profile-*

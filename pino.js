@@ -15,11 +15,6 @@ var levels = {
   trace: 10
 }
 
-var reverseLevels = Object.keys(levels).reduce(function (acc, key) {
-  acc[levels[key]] = key
-  return acc
-}, {})
-
 function pino (opts, stream) {
   if (opts && opts._writableState) {
     stream = opts
@@ -27,11 +22,10 @@ function pino (opts, stream) {
   }
   stream = stream || process.stdout
   opts = opts || {}
-  var safe = opts.safe
   var slowtime = opts.slowtime
-  var stringify = safe !== false ? stringifySafe : JSON.stringify
+  var stringify = opts.safe !== false ? stringifySafe : JSON.stringify
   var name = opts.name
-  var level
+  var level = opts.level
   var funcs = {}
   var result = {
     fatal: null,
@@ -42,57 +36,23 @@ function pino (opts, stream) {
     trace: null
   }
   var serializers = opts.serializers || {}
-  var meta = ''
   var end = '}\n'
 
   for (var key in levels) {
     funcs[key] = genLogFunction(key)
   }
 
-  Object.defineProperty(result, 'level', {
-    enumerable: false,
-    get: function () {
-      return level
-    },
-    set: function (l) {
-      level = levels[l]
-      if (!level) {
-        throw new Error('unknown level ' + l)
-      }
-
-      Object.keys(levels).forEach(function (key) {
-        if (level <= levels[key]) {
-          result[key] = funcs[key]
-        } else {
-          result[key] = noop
-        }
-      })
-    }
-  })
-
-  function child (meta) {
-    if (!meta) {
-      throw new Error('missing options for child logger')
-    }
-
-    var opts = {
-      safe: safe,
-      meta: meta,
-      level: reverseLevels[level]
-    }
-
-    return pino(opts, stream)
-  }
-
-  result.level = opts.level || 'info'
-
   if (opts.meta) {
-    meta = JSON.stringify(opts.meta)
-    meta = meta.slice(0, meta.length - 1)
-    meta = meta.slice(1)
-    end = ',' + meta + end
+    end = ',' + opts.meta + end
+    Object.keys(levels).forEach(function (key) {
+      if (level <= levels[key]) {
+        result[key] = funcs[key]
+      } else {
+        result[key] = noop
+      }
+    })
   } else {
-    result.child = child
+    setup(result, funcs, level, stream, opts)
   }
 
   return result
@@ -161,6 +121,52 @@ function pino (opts, stream) {
       (msg === undefined ? '' : '"msg":"' + (msg && msg.toString()) + '",') +
       '"time":' + (slowtime ? '"' + (new Date()).toISOString() + '"' : Date.now()) + ',' +
       '"v":' + 0
+  }
+}
+
+function setup (result, funcs, level, stream, opts) {
+  var safe = opts.safe
+
+  Object.defineProperty(result, 'level', {
+    enumerable: false,
+    get: function () {
+      return level
+    },
+    set: function (l) {
+      level = levels[l]
+      if (!level) {
+        throw new Error('unknown level ' + l)
+      }
+
+      Object.keys(levels).forEach(function (key) {
+        if (level <= levels[key]) {
+          result[key] = funcs[key]
+        } else {
+          result[key] = noop
+        }
+      })
+    }
+  })
+
+  result.level = opts.level || 'info'
+  result.child = child
+
+  function child (opts) {
+    if (!opts) {
+      throw new Error('missing options for child logger')
+    }
+
+    var meta = JSON.stringify(opts)
+    meta = meta.slice(0, meta.length - 1)
+    meta = meta.slice(1)
+
+    var toPino = {
+      safe: safe,
+      meta: meta,
+      level: level
+    }
+
+    return pino(toPino, stream)
   }
 }
 
