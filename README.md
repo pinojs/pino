@@ -170,7 +170,7 @@ logger.child({ a: 'property' }).info('hello child!')
 // {"pid":46497,"hostname":"MacBook-Pro-di-Matteo.local","level":30,"msg":"hello child!","time":1458124707120,"v":0,"a":"property"}
 ```
 
-It leverage the output stream of the parent and
+It leverages the output stream of the parent and
 its log level. These settings are immutable and pulled out during the
 instantiation of the child logger.
 
