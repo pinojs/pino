@@ -59,22 +59,23 @@ This produces:
 As far as we know, it is the fastest logger in town:
 
 ```
-benchBunyan*10000: 1075.649ms
-benchWinston*10000: 1840.185ms
-benchBole*10000: 1635.768ms
-benchPino*10000: 265.838ms
-benchBunyanObj*10000: 1250.343ms
-benchWinstonObj*10000: 1828.912ms
-benchPinoObj*10000: 357.569ms
-benchBoleObj*10000: 1594.823ms
-benchBunyan*10000: 1082.447ms
-benchWinston*10000: 1717.277ms
-benchBole*10000: 1591.113ms
-benchPino*10000: 260.141ms
-benchBunyanObj*10000: 1231.469ms
-benchWinstonObj*10000: 1807.529ms
-benchPinoObj*10000: 385.072ms
-benchBoleObj*10000: 1542.180ms
+benchBunyan*10000: 1230ms
+benchWinston*10000: 2139ms
+benchBole*10000: 1615ms
+benchPino*10000: 314ms
+benchBunyan*10000: 1135ms
+benchWinston*10000: 2025ms
+benchBole*10000: 1635ms
+benchPino*10000: 312ms
+benchBunyanObj*10000: 1480ms
+benchWinstonObj*10000: 2252ms
+benchPinoObj*10000: 409ms
+benchBoleObj*10000: 1765ms
+benchBunyanObj*10000: 1415ms
+benchWinstonObj*10000: 2224ms
+benchPinoObj*10000: 400ms
+benchBoleObj*10000: 1739ms
+benchBunyanObj*10000: 1366ms
 ```
 
 
@@ -173,6 +174,27 @@ logger.child({ a: 'property' }).info('hello child!')
 It leverages the output stream of the parent and
 its log level. These settings are immutable and pulled out during the
 instantiation of the child logger.
+
+Creating a child logger is fast:
+
+```
+benchPinoCreation*10000: 507ms
+benchBunyanCreation*10000: 1473ms
+benchBoleCreation*10000: 1648ms
+benchPinoCreation*10000: 461ms
+benchBunyanCreation*10000: 1448ms
+benchBoleCreation*10000: 1621ms
+```
+
+And logging throuh a child logger has little performance penalty:
+
+```
+benchPinoChild*10000: 394ms
+benchBoleChild*10000: 1504ms
+benchBunyanObj*10000: 1326ms
+benchPinoChild*10000: 368ms
+benchBoleChild*10000: 1486ms
+```
 
 <a name="level"></a>
 ### logger.level
