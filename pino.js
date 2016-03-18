@@ -24,7 +24,7 @@ function pino (opts, stream) {
   var slowtime = opts.slowtime
   var stringify = opts.safe !== false ? stringifySafe : JSON.stringify
   var name = opts.name
-  var level
+  var level = opts.level
   var funcs = {}
   var result = {
     fatal: null,
@@ -35,33 +35,24 @@ function pino (opts, stream) {
     trace: null
   }
   var serializers = opts.serializers || {}
+  var end = '}\n'
 
   for (var key in levels) {
     funcs[key] = genLogFunction(key)
   }
 
-  Object.defineProperty(result, 'level', {
-    enumerable: false,
-    get: function () {
-      return level
-    },
-    set: function (l) {
-      level = levels[l]
-      if (!level) {
-        throw new Error('unknown level ' + l)
+  if (opts.meta) {
+    end = ',' + opts.meta + end
+    Object.keys(levels).forEach(function (key) {
+      if (level <= levels[key]) {
+        result[key] = funcs[key]
+      } else {
+        result[key] = noop
       }
-
-      Object.keys(levels).forEach(function (key) {
-        if (level <= levels[key]) {
-          result[key] = funcs[key]
-        } else {
-          result[key] = noop
-        }
-      })
-    }
-  })
-
-  result.level = opts.level || 'info'
+    })
+  } else {
+    setup(result, funcs, level, stream, opts, serializers, stringify)
+  }
 
   return result
 
@@ -116,7 +107,7 @@ function pino (opts, stream) {
         }
       }
     }
-    return data + '}\n'
+    return data + end
   }
 
   // returns string json with final brace omitted
@@ -129,6 +120,59 @@ function pino (opts, stream) {
       (msg === undefined ? '' : '"msg":"' + (msg && msg.toString()) + '",') +
       '"time":' + (slowtime ? '"' + (new Date()).toISOString() + '"' : Date.now()) + ',' +
       '"v":' + 0
+  }
+}
+
+function setup (result, funcs, level, stream, opts, serializers, stringify) {
+  var safe = opts.safe
+
+  Object.defineProperty(result, 'level', {
+    enumerable: false,
+    get: function () {
+      return level
+    },
+    set: function (l) {
+      level = levels[l]
+      if (!level) {
+        throw new Error('unknown level ' + l)
+      }
+
+      Object.keys(levels).forEach(function (key) {
+        if (level <= levels[key]) {
+          result[key] = funcs[key]
+        } else {
+          result[key] = noop
+        }
+      })
+    }
+  })
+
+  result.level = opts.level || 'info'
+  result.child = child
+
+  function child (bindings) {
+    if (!opts) {
+      throw new Error('missing bindings for child logger')
+    }
+
+    var data = ''
+    var value
+    for (var key in bindings) {
+      value = bindings[key]
+      if (bindings.hasOwnProperty(key) && value !== undefined) {
+        value = serializers[key] ? serializers[key](value) : value
+        data += '"' + key + '":' + stringify(value)
+      }
+    }
+
+    var toPino = {
+      safe: safe,
+      meta: data,
+      level: level,
+      serializers: serializers
+    }
+
+    return pino(toPino, stream)
   }
 }
 
