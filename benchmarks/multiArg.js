@@ -8,6 +8,11 @@ var winston = require('winston')
 var fs = require('fs')
 var dest = fs.createWriteStream('/dev/null')
 var plog = pino(dest)
+var deep = require('../package.json')
+deep.deep = Object.assign({}, deep)
+deep.deep.deep = Object.assign({}, deep)
+deep.deep.deep.deep = Object.assign({}, deep)
+
 var max = 10
 var blog = bunyan.createLogger({
   name: 'myapp',
@@ -113,6 +118,30 @@ var run = bench([
   function benchPinoInterpolateExtra (cb) {
     for (var i = 0; i < max; i++) {
       plog.info('hello %s %j %d', 'world', {obj: true}, 4, {another: 'obj'})
+    }
+    setImmediate(cb)
+  },
+  function benchBunyanInterpolateDeep (cb) {
+    for (var i = 0; i < max; i++) {
+      blog.info('hello %j', deep)
+    }
+    setImmediate(cb)
+  },
+  function benchWinstonInterpolateDeep (cb) {
+    for (var i = 0; i < max; i++) {
+      winston.info('hello %j', deep)
+    }
+    setImmediate(cb)
+  },
+  function benchBoleInterpolateDeep (cb) {
+    for (var i = 0; i < max; i++) {
+      bole.info('hello %j', deep)
+    }
+    setImmediate(cb)
+  },
+  function benchPinoInterpolateDeep (cb) {
+    for (var i = 0; i < max; i++) {
+      plog.info('hello %j', deep)
     }
     setImmediate(cb)
   }
