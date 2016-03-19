@@ -58,26 +58,34 @@ This produces:
 
 As far as we know, it is the fastest logger in town:
 
+`info('hello world')`:
+
 ```
-benchBunyan*10000: 1230ms
-benchWinston*10000: 2139ms
-benchBole*10000: 1615ms
-benchPino*10000: 314ms
-benchBunyan*10000: 1135ms
-benchWinston*10000: 2025ms
-benchBole*10000: 1635ms
-benchPino*10000: 312ms
-benchBunyanObj*10000: 1480ms
-benchWinstonObj*10000: 2252ms
-benchPinoObj*10000: 409ms
-benchBoleObj*10000: 1765ms
-benchBunyanObj*10000: 1415ms
-benchWinstonObj*10000: 2224ms
-benchPinoObj*10000: 400ms
-benchBoleObj*10000: 1739ms
-benchBunyanObj*10000: 1366ms
+benchBunyan*10000: 1115.193ms
+benchWinston*10000: 1722.497ms
+benchBole*10000: 1640.052ms
+benchPino*10000: 265.622ms
 ```
 
+`info({'hello': 'world'})`:
+
+```
+benchBunyanObj*10000: 1252.539ms
+benchWinstonObj*10000: 1729.837ms
+benchBoleObj*10000: 1491.677ms
+benchPinoObj*10000: 365.207ms
+```
+
+`info('hello %s %j %d', 'world', {obj: true}, 4, {another: 'obj'})`:
+
+```
+benchBunyanInterpolateExtra*10000: 2607.519ms
+benchWinstonInterpolateExtra*10000: 2258.154ms
+benchBoleInterpolateExtra*10000: 3069.085ms
+benchPinoInterpolateExtra*10000: 450.634ms
+```
+
+In multiple cases, pino is 6x faster than alternatives.
 
 <a name="cli"></a>
 ## CLI

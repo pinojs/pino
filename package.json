@@ -41,6 +41,7 @@
     "core-util-is": "^1.0.2",
     "fast-json-parse": "^1.0.0",
     "json-stringify-safe": "^5.0.1",
+    "quick-format": "^1.0.0",
     "split2": "^2.0.1"
   }
 }

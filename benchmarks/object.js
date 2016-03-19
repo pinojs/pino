@@ -38,15 +38,15 @@ var run = bench([
     }
     setImmediate(cb)
   },
-  function benchPinoObj (cb) {
-    for (var i = 0; i < max; i++) {
-      plog.info({ hello: 'world' })
-    }
-    setImmediate(cb)
-  },
   function benchBoleObj (cb) {
     for (var i = 0; i < max; i++) {
       bole.info({ hello: 'world' })
+    }
+    setImmediate(cb)
+  },
+  function benchPinoObj (cb) {
+    for (var i = 0; i < max; i++) {
+      plog.info({ hello: 'world' })
     }
     setImmediate(cb)
   }

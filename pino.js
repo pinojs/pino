@@ -1,7 +1,7 @@
 'use strict'
 
 var stringifySafe = require('json-stringify-safe')
-var format = require('util').format
+var format = require('quick-format')
 var os = require('os')
 var pid = process.pid
 var hostname = os.hostname()
@@ -80,7 +80,7 @@ function pino (opts, stream) {
       }
       len = params.length = arguments.length - base
       if (len > 1) {
-        msg = format.apply(null, params)
+        msg = format(params)
       } else if (len) {
         msg = params[0]
       }
