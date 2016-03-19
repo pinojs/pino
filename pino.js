@@ -1,6 +1,7 @@
 'use strict'
 
 var stringifySafe = require('json-stringify-safe')
+var format = require('quick-format')
 var os = require('os')
 var pid = process.pid
 var hostname = os.hostname()
@@ -213,74 +214,3 @@ module.exports.stdSerializers = {
   req: asReqValue,
   res: asResValue
 }
-
-var inspect = require('util').inspect
-
-// Did not inline format called from  (target text too big).
-function format (args) {
-  var f = args[0]
-  var argLen = args.length
-
-  var str = ''
-  var a = 1
-  var lastPos = 0
-  for (var i = 0; i < f.length;) {
-    if (f.charCodeAt(i) === 37 && i + 1 < f.length) {
-      switch (f.charCodeAt(i + 1)) {
-        case 100: // 'd'
-          if (a >= argLen) { break }
-          if (lastPos < i) {
-            str += f.slice(lastPos, i)
-          }
-          str += Number(args[a++])
-          lastPos = i = i + 2
-          continue
-        case 106: // 'j'
-          if (a >= argLen) {
-            break
-          }
-          if (lastPos < i) {
-            str += f.slice(lastPos, i)
-          }
-          str += stringifySafe(args[a++])
-          lastPos = i = i + 2
-          continue
-        case 115: // 's'
-          if (a >= argLen) {
-            break
-          }
-          if (lastPos < i) {
-            str += f.slice(lastPos, i)
-          }
-          str += String(args[a++])
-          lastPos = i = i + 2
-          continue
-        case 37: // '%'
-          if (lastPos < i) {
-            str += f.slice(lastPos, i)
-          }
-          str += '%'
-          lastPos = i = i + 2
-          continue
-      }
-    }
-    ++i
-  }
-  if (lastPos === 0) {
-    str = f
-  } else if (lastPos < f.length) {
-    str += f.slice(lastPos)
-  }
-  while (a < argLen) {
-    var x = args[a++]
-    if (x === null || (typeof x !== 'object' && typeof x !== 'symbol')) {
-      str += ' ' + x
-    } else {
-      str += ' ' + inspect(x)
-    }
-  }
-  return str
-}
-
-// Did not inline format called from  (target AST is too large [early]).
-// function format(e){for(var t=e[0],c=e.length,i="",n=1,r=0,o=0;o<t.length;){if(37===t.charCodeAt(o)&&o+1<t.length)switch(t.charCodeAt(o+1)){case 100:if(n>=c)break;o>r&&(i+=t.slice(r,o)),i+=Number(e[n++]),r=o+=2;continue;case 106:if(n>=c)break;o>r&&(i+=t.slice(r,o)),i+=stringifySafe(e[n++]),r=o+=2;continue;case 115:if(n>=c)break;o>r&&(i+=t.slice(r,o)),i+=String(e[n++]),r=o+=2;continue;case 37:o>r&&(i+=t.slice(r,o)),i+="%",r=o+=2;continue}++o}for(0===r?i=t:r<t.length&&(i+=t.slice(r));c>n;){var a=e[n++];i+=null===a||"object"!=typeof a&&"symbol"!=typeof a?" "+a:" "+inspect(a)}return i}
