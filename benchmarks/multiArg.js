@@ -73,6 +73,12 @@ var run = bench([
     }
     setImmediate(cb)
   },
+  function benchPinoInterpolate (cb) {
+    for (var i = 0; i < max; i++) {
+      plog.info('hello %s', 'world')
+    }
+    setImmediate(cb)
+  },
   function benchBunyanInterpolateAll (cb) {
     for (var i = 0; i < max; i++) {
       blog.info('hello %s %j %d', 'world', {obj: true}, 4)

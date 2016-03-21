@@ -23,7 +23,7 @@ function check (t, chunk, level, msg) {
     hostname: hostname,
     level: level,
     msg: msg,
-    v: 0
+    v: 1
   })
 }
 
@@ -48,7 +48,7 @@ function levelTest (name, level) {
         hostname: hostname,
         level: level,
         hello: 'world',
-        v: 0
+        v: 1
       })
     }))
 
@@ -67,7 +67,7 @@ function levelTest (name, level) {
         level: level,
         msg: 'a string',
         hello: 'world',
-        v: 0
+        v: 1
       })
     }))
 
@@ -98,7 +98,7 @@ function levelTest (name, level) {
         type: 'Error',
         msg: err.message,
         stack: err.stack,
-        v: 0
+        v: 1
       })
       cb()
     }))
@@ -118,7 +118,7 @@ function levelTest (name, level) {
         level: level,
         msg: 'hello world',
         hello: 'world',
-        v: 0
+        v: 1
       })
     }))
 
@@ -202,7 +202,7 @@ test('set the name', function (t) {
       level: 60,
       name: 'hello',
       msg: 'this is fatal',
-      v: 0
+      v: 1
     })
     cb()
   }))
@@ -241,7 +241,7 @@ test('set undefined properties', function (t) {
       hostname: hostname,
       level: 30,
       hello: 'world',
-      v: 0
+      v: 1
     })
     cb()
   }))
@@ -260,7 +260,7 @@ test('set properties defined in the prototype chain', function (t) {
       hostname: hostname,
       level: 30,
       hello: 'world',
-      v: 0
+      v: 1
     })
     cb()
   }))
@@ -286,7 +286,7 @@ test('http request support', function (t) {
       hostname: hostname,
       level: 30,
       msg: 'my request',
-      v: 0,
+      v: 1,
       req: {
         method: originalReq.method,
         url: originalReq.url,
@@ -328,7 +328,7 @@ test('http request support via serializer', function (t) {
       hostname: hostname,
       level: 30,
       msg: 'my request',
-      v: 0,
+      v: 1,
       req: {
         method: originalReq.method,
         url: originalReq.url,
@@ -366,7 +366,7 @@ test('http response support', function (t) {
       hostname: hostname,
       level: 30,
       msg: 'my response',
-      v: 0,
+      v: 1,
       res: {
         statusCode: originalRes.statusCode,
         header: originalRes._header
@@ -405,7 +405,7 @@ test('http response support via a serializer', function (t) {
       hostname: hostname,
       level: 30,
       msg: 'my response',
-      v: 0,
+      v: 1,
       res: {
         statusCode: originalRes.statusCode,
         header: originalRes._header
@@ -454,7 +454,7 @@ test('http request support via serializer in a child', function (t) {
       hostname: hostname,
       level: 30,
       msg: 'my request',
-      v: 0,
+      v: 1,
       req: {
         method: originalReq.method,
         url: originalReq.url,
