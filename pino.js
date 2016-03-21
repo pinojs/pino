@@ -1,6 +1,6 @@
 'use strict'
 
-var stringifySafe = require('json-stringify-safe')
+var stringifySafe = require('fast-safe-stringify')
 var format = require('quick-format')
 var os = require('os')
 var pid = process.pid
@@ -23,7 +23,8 @@ function pino (opts, stream) {
   stream = stream || process.stdout
   opts = opts || {}
   var slowtime = opts.slowtime
-  var stringify = opts.safe !== false ? stringifySafe : JSON.stringify
+  var safe = opts.safe !== false
+  var stringify = safe ? stringifySafe : JSON.stringify
   var name = opts.name
   var level = opts.level
   var funcs = {}
@@ -80,7 +81,7 @@ function pino (opts, stream) {
       }
       len = params.length = arguments.length - base
       if (len > 1) {
-        msg = format(params)
+        msg = format(params, safe ? null : {lowres: true})
       } else if (len) {
         msg = params[0]
       }
@@ -120,7 +121,7 @@ function pino (opts, stream) {
       '"level":' + level + ',' +
       (msg === undefined ? '' : '"msg":"' + (msg && msg.toString()) + '",') +
       '"time":' + (slowtime ? '"' + (new Date()).toISOString() + '"' : Date.now()) + ',' +
-      '"v":' + 0
+      '"v":' + 1
   }
 }
 
