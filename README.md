@@ -11,6 +11,7 @@ It also includes a shell utility to pretty-print its log files.
 * [API](#api)
 * [How do I rotate log files?](#rotate)
 * [How to use Transports with Pino](#transports)
+* [Changelog](#changelog)
 * [Acknowledgements](#acknowledgements)
 * [License](#license)
 
@@ -381,6 +382,26 @@ pump(process.stdin, split2(JSON.parse), myTransport)
 Using transports in the same process causes unnecessary load and slows down Node's single threaded event loop.
 
 If you write a transport, let us know and we will add a link here!
+
+<a name="changelog"></a>
+## Changelog
+
+### v1.0.3
+
+* [#16](https://github.com/mcollina/pino/pull/16) added changelog
+
+### v1.0.2
+
+* [#15](https://github.com/mcollina/pino/pull/15) improved serializer output around circular references 
+
+### v1.0.1
+
+* [#13](https://github.com/mcollina/pino/pull/13) 6x speed increase on multi arg logs by using custom format/interpolation function instead of util.format
+
+### v1.0.0
+
+* first stable release
+
 
 <a name="acknowledgements"></a>
 ## Acknowledgements
