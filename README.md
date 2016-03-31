@@ -137,7 +137,7 @@ Into this:
   * <a href="#resSerializer"><code>pino.stdSerializers.<b>res</b></code></a>
 
 <a name="constructor"></a>
-### pino([opts], [stream])
+### pino([stream], [opts])
 
 Returns a new logger. Allowed options are:
 
