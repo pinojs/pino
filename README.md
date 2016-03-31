@@ -386,6 +386,10 @@ If you write a transport, let us know and we will add a link here!
 <a name="changelog"></a>
 ## Changelog
 
+### v1.0.4
+
+* README fix: the order of params in the constructor was inverted
+
 ### v1.0.3
 
 * [#16](https://github.com/mcollina/pino/pull/16) added changelog
