@@ -480,3 +480,17 @@ test('http request support via serializer in a child', function (t) {
     })
   })
 })
+
+test('throw if creating child without bindings', function (t) {
+  t.plan(1)
+
+  var instance = pino(
+    sink(function (chunk, enc, cb) {
+      t.ok(Date.parse(chunk.time) <= new Date(), 'time is greater than Date.now()')
+      t.end()
+    }))
+
+  t.throws(function () {
+    instance.child()
+  })
+})
