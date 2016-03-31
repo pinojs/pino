@@ -209,9 +209,18 @@ function asResValue (res) {
   }
 }
 
+function asErrValue (err) {
+  return {
+    type: err.constructor.name,
+    message: err.message,
+    stack: err.stack
+  }
+}
+
 module.exports = pino
 
 module.exports.stdSerializers = {
   req: asReqValue,
-  res: asResValue
+  res: asResValue,
+  err: asErrValue
 }

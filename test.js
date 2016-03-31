@@ -107,6 +107,34 @@ function levelTest (name, level) {
     instance[name](err)
   })
 
+  test('passing error with a serializer at level ' + name, function (t) {
+    t.plan(2)
+    var err = new Error('myerror')
+    var instance = pino({
+      serializers: {
+        err: pino.stdSerializers.err
+      }
+    }, sink(function (chunk, enc, cb) {
+      t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
+      delete chunk.time
+      t.deepEqual(chunk, {
+        pid: pid,
+        hostname: hostname,
+        level: level,
+        err: {
+          type: 'Error',
+          message: err.message,
+          stack: err.stack
+        },
+        v: 1
+      })
+      cb()
+    }))
+
+    instance.level = name
+    instance[name]({ err: err })
+  })
+
   test('child logger for level ' + name, function (t) {
     t.plan(2)
     var instance = pino(sink(function (chunk, enc, cb) {

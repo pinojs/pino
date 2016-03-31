@@ -135,6 +135,7 @@ Into this:
   * <a href="#trace"><code>logger.<b>trace()</b></code></a>
   * <a href="#reqSerializer"><code>pino.stdSerializers.<b>req</b></code></a>
   * <a href="#resSerializer"><code>pino.stdSerializers.<b>res</b></code></a>
+  * <a href="#errSerializer"><code>pino.stdSerializers.<b>err</b></code></a>
 
 <a name="constructor"></a>
 ### pino([stream], [opts])
@@ -321,6 +322,24 @@ It returns an object in the form:
     statusCode: 200,
     header: 'HTTP/1.1 200 OK\r\nDate: Mon, 07 Mar 2016 12:23:18 GMT\r\nConnection: close\r\nContent-Length: 5\r\n\r\n'
   }
+}
+```
+
+<a name="errSerializer"></a>
+### pino.stdSerializers.err
+
+Serializes an `Error` object if passed in as an property.
+
+```js
+{
+  "pid": 40510,
+  "hostname": "MBP-di-Matteo",
+  "level": 50,
+  "msg": "an error",
+  "time": 1459433282301,
+  "v": 1,
+  "type": "Error",
+  "stack": "Error: an error\n    at Object.<anonymous> (/Users/matteo/Repositories/pino/example.js:16:7)\n    at Module._compile (module.js:435:26)\n    at Object.Module._extensions..js (module.js:442:10)\n    at Module.load (module.js:356:32)\n    at Function.Module._load (module.js:313:12)\n    at Function.Module.runMain (module.js:467:10)\n    at startup (node.js:136:18)\n    at node.js:963:3"
 }
 ```
 
