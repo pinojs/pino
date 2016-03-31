@@ -405,6 +405,13 @@ If you write a transport, let us know and we will add a link here!
 <a name="changelog"></a>
 ## Changelog
 
+### v1.1.0
+
+* [#18](https://github.com/mcollina/pino/pull/18) Added the error
+  serializer
+* [#17](https://github.com/mcollina/pino/pull/17) throw when creating a
+  child logger without bindings
+
 ### v1.0.5
 
 * Restored the binary functionality to pretty-print the logs
