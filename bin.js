@@ -2,7 +2,6 @@
 
 'use strict'
 
-var stringifySafe = require('json-stringify-safe')
 var split = require('split2')
 var Parse = require('fast-json-parse')
 var chalk = require('chalk')
@@ -57,7 +56,7 @@ function filter (value) {
 
   for (var i = 0; i < keys.length; i++) {
     if (standardKeys.indexOf(keys[i]) < 0) {
-      result += '    ' + keys[i] + ': ' + withSpaces(stringifySafe(value[keys[i]], null, 2)) + '\n'
+      result += '    ' + keys[i] + ': ' + withSpaces(JSON.stringify(value[keys[i]], null, 2)) + '\n'
     }
   }
 
