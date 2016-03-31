@@ -153,7 +153,7 @@ function setup (result, funcs, level, stream, opts, serializers, stringify) {
   result.child = child
 
   function child (bindings) {
-    if (!opts) {
+    if (!bindings) {
       throw new Error('missing bindings for child logger')
     }
 
