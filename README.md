@@ -386,6 +386,10 @@ If you write a transport, let us know and we will add a link here!
 <a name="changelog"></a>
 ## Changelog
 
+### v1.0.5
+
+* Restored the binary functionality to pretty-print the logs
+
 ### v1.0.4
 
 * README fix: the order of params in the constructor was inverted
