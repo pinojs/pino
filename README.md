@@ -500,7 +500,6 @@ parents and children will up in log output.
 * [#21](https://github.com/mcollina/pino/pull/21) sub-child loggers, up to 20% perf improvement
 * breaking change in that methods must be called on (or else bound to) the `pino` object
 
-
 ### v1.1.1
 
 * [#22](https://github.com/mcollina/pino/pull/22) fix json output
