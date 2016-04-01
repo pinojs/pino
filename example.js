@@ -1,16 +1,20 @@
 'use strict'
 
 var pino = require('./')()
-var info = pino.info
-var error = pino.error
 
-info('hello world')
-error('this is at error level')
-info('the answer is %d', 42)
-info({ obj: 42 }, 'hello world')
-info({ obj: 42, b: 2 }, 'hello world')
-info({ obj: { aa: 'bbb' } }, 'another')
-setImmediate(info, 'after setImmediate')
-error(new Error('an error'))
+pino.info('hello world')
+pino.error('this is at error level')
+pino.info('the answer is %d', 42)
+pino.info({ obj: 42 }, 'hello world')
+pino.info({ obj: 42, b: 2 }, 'hello world')
+pino.info({ obj: { aa: 'bbb' } }, 'another')
+setImmediate(function () {
+  pino.info('after setImmediate')
+})
+pino.error(new Error('an error'))
 
-pino.child({ a: 'property' }).info('hello child!')
+var child = pino.child({ a: 'property' })
+child.info('hello child!')
+
+var childsChild = child.child({ another: 'property' })
+childsChild.info('hello baby..')
