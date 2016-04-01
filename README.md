@@ -405,6 +405,11 @@ If you write a transport, let us know and we will add a link here!
 <a name="changelog"></a>
 ## Changelog
 
+
+### v1.1.1
+
+* [#22](https://github.com/mcollina/pino/pull/22) fix json output
+
 ### v1.1.0
 
 * [#18](https://github.com/mcollina/pino/pull/18) Added the error
