@@ -489,7 +489,7 @@ This equates to the same log output that Bunyan supplies.
 
 One of Pino's performance tricks is to avoid building objects and stringifying 
 them, so we're building strings instead. This is why duplicate keys between 
-parents and children will up in log output.
+parents and children will end up in log output.
 
 
 <a name="changelog"></a>
