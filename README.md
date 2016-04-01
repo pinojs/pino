@@ -495,7 +495,7 @@ parents and children will up in log output.
 <a name="changelog"></a>
 ## Changelog
 
-### 2.0.0
+### v2.0.0
 
 * [#21](https://github.com/mcollina/pino/pull/21) sub-child loggers, up to 20% perf improvement
 * breaking change in that methods must be called on (or else bound to) the `pino` object
