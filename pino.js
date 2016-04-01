@@ -163,13 +163,13 @@ function setup (result, funcs, level, stream, opts, serializers, stringify) {
       value = bindings[key]
       if (bindings.hasOwnProperty(key) && value !== undefined) {
         value = serializers[key] ? serializers[key](value) : value
-        data += '"' + key + '":' + stringify(value)
+        data += '"' + key + '":' + stringify(value) + ','
       }
     }
 
     var toPino = {
       safe: safe,
-      meta: data,
+      meta: data.substr(0, data.length - 1),
       level: level,
       serializers: serializers
     }
