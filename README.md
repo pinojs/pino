@@ -11,6 +11,7 @@ It also includes a shell utility to pretty-print its log files.
 * [API](#api)
 * [How do I rotate log files?](#rotate)
 * [How to use Transports with Pino](#transports)
+* [Caveats](#caveats)
 * [Changelog](#changelog)
 * [Acknowledgements](#acknowledgements)
 * [License](#license)
@@ -27,30 +28,39 @@ npm install pino --save
 'use strict'
 
 var pino = require('./')()
-var info = pino.info
-var error = pino.error
 
-info('hello world')
-error('this is at error level')
-info('the answer is %d', 42)
-info({ obj: 42 }, 'hello world')
-info({ obj: 42, b: 2 }, 'hello world')
-info({ obj: { aa: 'bbb' } }, 'another')
-setImmediate(info, 'after setImmediate')
-error(new Error('an error'))
+pino.info('hello world')
+pino.error('this is at error level')
+pino.info('the answer is %d', 42)
+pino.info({ obj: 42 }, 'hello world')
+pino.info({ obj: 42, b: 2 }, 'hello world')
+pino.info({ obj: { aa: 'bbb' } }, 'another')
+setImmediate(function () {
+  pino.info('after setImmediate')
+})
+pino.error(new Error('an error'))
+
+var child = pino.child({ a: 'property' })
+child.info('hello child!')
+
+var childsChild = child.child({ another: 'property' })
+childsChild.info('hello baby..')
+
 ```
 
 This produces:
 
 ```
-{"pid":13087,"hostname":"MacBook-Pro-3.home","level":30,"msg":"hello world","time":1457531561635,"v":0}
-{"pid":13087,"hostname":"MacBook-Pro-3.home","level":50,"msg":"this is at error level","time":1457531561636,"v":0}
-{"pid":13087,"hostname":"MacBook-Pro-3.home","level":30,"msg":"the answer is 42","time":1457531561637,"v":0}
-{"pid":13087,"hostname":"MacBook-Pro-3.home","level":30,"msg":"hello world","time":1457531561637,"v":0,"obj":42}
-{"pid":13087,"hostname":"MacBook-Pro-3.home","level":30,"msg":"hello world","time":1457531561638,"v":0,"obj":42,"b":2}
-{"pid":13087,"hostname":"MacBook-Pro-3.home","level":30,"msg":"another","time":1457531561638,"v":0,"obj":{"aa":"bbb"}}
-{"pid":13087,"hostname":"MacBook-Pro-3.home","level":50,"msg":"an error","time":1457531561639,"v":0,"type":"Error","stack":"Error: an error\n    at Object.<anonymous> (/Users/davidclements/z/nearForm/pino/example.js:14:7)\n    at Module._compile (module.js:413:34)\n    at Object.Module._extensions..js (module.js:422:10)\n    at Module.load (module.js:357:32)\n    at Function.Module._load (module.js:314:12)\n    at Function.Module.runMain (module.js:447:10)\n    at startup (node.js:141:18)\n    at node.js:933:3"}
-{"pid":13087,"hostname":"MacBook-Pro-3.home","level":30,"msg":"after setImmediate","time":1457531561641,"v":0}
+{"pid":94473,"hostname":"MacBook-Pro-3.home","level":30,"msg":"hello world","time":1459529098958,"v":1}
+{"pid":94473,"hostname":"MacBook-Pro-3.home","level":50,"msg":"this is at error level","time":1459529098959,"v":1}
+{"pid":94473,"hostname":"MacBook-Pro-3.home","level":30,"msg":"the answer is 42","time":1459529098960,"v":1}
+{"pid":94473,"hostname":"MacBook-Pro-3.home","level":30,"msg":"hello world","time":1459529098960,"obj":42,"v":1}
+{"pid":94473,"hostname":"MacBook-Pro-3.home","level":30,"msg":"hello world","time":1459529098960,"obj":42,"b":2,"v":1}
+{"pid":94473,"hostname":"MacBook-Pro-3.home","level":30,"msg":"another","time":1459529098960,"obj":{"aa":"bbb"},"v":1}
+{"pid":94473,"hostname":"MacBook-Pro-3.home","level":50,"msg":"an error","time":1459529098961,"type":"Error","stack":"Error: an error\n    at Object.<anonymous> (/Users/davidclements/z/nearForm/pino/example.js:14:12)\n    at Module._compile (module.js:435:26)\n    at Object.Module._extensions..js (module.js:442:10)\n    at Module.load (module.js:356:32)\n    at Function.Module._load (module.js:311:12)\n    at Function.Module.runMain (module.js:467:10)\n    at startup (node.js:136:18)\n    at node.js:963:3","v":1}
+{"pid":94473,"hostname":"MacBook-Pro-3.home","level":30,"msg":"hello child!","time":1459529098962,"a":"property","v":1}
+{"pid":94473,"hostname":"MacBook-Pro-3.home","level":30,"msg":"hello baby..","time":1459529098962,"another":"property","a":"property","v":1}
+{"pid":94473,"hostname":"MacBook-Pro-3.home","level":30,"msg":"after setImmediate","time":1459529098963,"v":1}
 
 ```
 
@@ -59,34 +69,34 @@ This produces:
 
 As far as we know, it is the fastest logger in town:
 
-`info('hello world')`:
+`pino.info('hello world')`:
 
 ```
-benchBunyan*10000: 1115.193ms
-benchWinston*10000: 1722.497ms
-benchBole*10000: 1640.052ms
-benchPino*10000: 265.622ms
+benchBunyan*10000: 1005ms
+benchWinston*10000: 1810ms
+benchBole*10000: 1493ms
+benchPino*10000: 254ms
 ```
 
-`info({'hello': 'world'})`:
+`pino.info({'hello': 'world'})`:
 
 ```
-benchBunyanObj*10000: 1252.539ms
-benchWinstonObj*10000: 1729.837ms
-benchBoleObj*10000: 1491.677ms
-benchPinoObj*10000: 365.207ms
+benchBunyanObj*10000: 1262ms
+benchWinstonObj*10000: 1979ms
+benchBoleObj*10000: 1545ms
+benchPinoObj*10000: 341ms
 ```
 
-`info('hello %s %j %d', 'world', {obj: true}, 4, {another: 'obj'})`:
+`pino.info('hello %s %j %d', 'world', {obj: true}, 4, {another: 'obj'})`:
 
 ```
-benchBunyanInterpolateExtra*10000: 2607.519ms
-benchWinstonInterpolateExtra*10000: 2258.154ms
-benchBoleInterpolateExtra*10000: 3069.085ms
-benchPinoInterpolateExtra*10000: 450.634ms
+benchBunyanInterpolateExtra*10000: 2747ms
+benchWinstonInterpolateExtra*10000: 2659ms
+benchBoleInterpolateExtra*10000: 3366ms
+benchPinoInterpolateExtra*10000: 548ms
 ```
 
-In multiple cases, pino is 6x faster than alternatives.
+In multiple cases, pino is over 6x faster than alternatives.
 
 <a name="cli"></a>
 ## CLI
@@ -156,14 +166,14 @@ Example:
 'use strict'
 
 var pino = require('pino')
-var instance = pino({
+var logger = ({
   name: 'myapp',
   safe: true,
   serializers: {
     req: pino.stdSerializers.req
     res: pino.stdSerializers.res
   }
-}
+})
 ```
 
 <a name="child"></a>
@@ -181,29 +191,62 @@ logger.child({ a: 'property' }).info('hello child!')
 // {"pid":46497,"hostname":"MacBook-Pro-di-Matteo.local","level":30,"msg":"hello child!","time":1458124707120,"v":0,"a":"property"}
 ```
 
-It leverages the output stream of the parent and
-its log level. These settings are immutable and pulled out during the
-instantiation of the child logger.
+Child loggers use the same output stream as the parent and inherit
+the current log level of the parent at the time they are spawned.
 
-Creating a child logger is fast:
+From v2.x.x the log level of a child is mutable (whereas in
+v1.x.x it was immutable), and can be set independently of the parent. 
+
+For example
 
 ```
-benchPinoCreation*10000: 507ms
-benchBunyanCreation*10000: 1473ms
-benchBoleCreation*10000: 1648ms
-benchPinoCreation*10000: 461ms
-benchBunyanCreation*10000: 1448ms
+var logger = pino()
+logger.level = 'error'
+logger.info('nope') //does not log
+var child = logger.child({foo: 'bar'})
+child.info('nope again') //does not log
+child.level = 'info'
+child.info('hooray') //will log
+logger.info('nope nope nope') //will not log, level is still set to error
+```
+
+Also from version 2.x.x we can spawn child loggers from child loggers, for instance
+
+```
+var logger = pino()
+var child = logger.child({father: true})
+var childChild = child.child({baby: true})
+```
+
+Child logger creation is fast:
+
+```
+benchPinoCreation*10000: 364ms
+benchBunyanCreation*10000: 1309ms
 benchBoleCreation*10000: 1621ms
+benchPinoCreation*10000: 350ms
+benchBunyanCreation*10000: 1295ms
+benchBoleCreation*10000: 1595ms
 ```
 
-And logging throuh a child logger has little performance penalty:
+Logging through a child logger has little performance penalty:
 
 ```
-benchPinoChild*10000: 394ms
-benchBoleChild*10000: 1504ms
-benchBunyanObj*10000: 1326ms
-benchPinoChild*10000: 368ms
-benchBoleChild*10000: 1486ms
+benchBunyanObj*10000: 1309ms
+benchPinoChild*10000: 335ms
+benchBoleChild*10000: 1487ms
+benchBunyanObj*10000: 1262ms
+benchPinoChild*10000: 331ms
+benchBoleChild*10000: 1473ms
+```
+
+Spawning children from children has negligible overhead:
+
+```
+benchBunyanChildChild*10000: 1353ms
+benchPinoChildChild*10000: 332ms
+benchBunyanChildChild*10000: 1333ms
+benchPinoChildChild*10000: 334ms
 ```
 
 <a name="level"></a>
@@ -275,8 +318,8 @@ If more args follows `msg`, these will be used to format `msg` using
 <a name="reqSerializer"></a>
 ### pino.stdSerializers.req
 
-Function to generate a JSONifiable object out of an HTTP request from
-node HTTP server.
+Generates a JSONifiable object from the HTTP `request` object passed to 
+the `createServer` callback of Node's HTTP server.
 
 It returns an object in the form:
 
@@ -304,9 +347,8 @@ It returns an object in the form:
 <a name="resSerializer"></a>
 ### pino.stdSerializers.res
 
-Function to generate a JSONifiable object out of an HTTP
-response from
-node HTTP server.
+Generates a JSONifiable object from the HTTP `response` object passed to 
+the `createServer` callback of Node's HTTP server.
 
 It returns an object in the form:
 
@@ -346,16 +388,17 @@ Serializes an `Error` object if passed in as an property.
 <a name="rotate"></a>
 ## How do I rotate log files
 
-You should configure
-[logrotate](https://github.com/logrotate/logrotate) to rotate your log
-files, and just redirect the standard output of your application to a
-file, like so:
+Use a separate tool for log rotation. 
+
+We recommend [logrotate](https://github.com/logrotate/logrotate)
+
+Consider we output our logs to `/var/log/myapp.log` like so:
 
 ```
-node server.js > /var/log/myapp.log
+> node server.js > /var/log/myapp.log
 ```
 
-In order to rotate your log files, add in `/etc/logrotate.d/myapp`:
+We would rotate our log files with logrotate, by adding the following to `/etc/logrotate.d/myapp`:
 
 ```
 /var/log/myapp.log {
@@ -373,16 +416,9 @@ In order to rotate your log files, add in `/etc/logrotate.d/myapp`:
 <a name="transports"></a>
 ## How to use Transports with Pino
 
-Transports are not part of Pino. There will never be an API for transports,
-or support for ObjectMode Writable streams.
-This library is fast because it does way less than the others. We went
-to great lengths to make sure this library is _really fast_, and transports
-will slow things down.
+Create a separate process and pipe to it.
 
-So, how do you do a transport? With Pino, we create a separate process for our transport and pipe to it.
-It's the Unix philosophy.
-
-Something like:
+For example:
 
 ```js
 var split = require('split2')
@@ -398,12 +434,76 @@ var myTransport = through.obj(function (chunk, enc, cb) {
 pump(process.stdin, split2(JSON.parse), myTransport)
 ```
 
+```sh
+node my-app-which-logs-stuff-to-stdout.js | node my-transport-process.js
+```
+
 Using transports in the same process causes unnecessary load and slows down Node's single threaded event loop.
 
 If you write a transport, let us know and we will add a link here!
 
+<a name="caveats"></a>
+## Caveats
+
+There's some fine points to be aware of, which are a result of worthwhile trade-offs:
+
+### 11 Arguments
+
+The logger functions (e.g. `pino.info`) can take a maximum of 11 arguments.
+
+If you need more than that to write a log entry, you're probably doing it wrong.
+
+### Duplicate Keys
+
+It's possible for naming conflicts to arise between child loggers and
+children of child loggers.
+
+This isn't as bad as it sounds, even if you do use the same keys between
+parent and child loggers Pino resolves the conflict in the sanest way.
+
+For example, consider the following:
+
+```js
+var pino = require('pino')
+var fs = require('fs')
+pino(fs.createWriteStream('./my-log'))
+  .child({a: 'property'})
+  .child({a: 'prop'})
+  .info('howdy')
+```
+
+```sh
+$ cat my-log
+{"pid":95469,"hostname":"MacBook-Pro-3.home","level":30,"msg":"howdy","time":1459534114473,"a":"property","a":"prop","v":1}
+```
+
+Notice how there's two key's named `a` in the JSON output. The sub-childs properties
+appear after the parent child properties. This means if we run our logs through `pino -t` (or convert them to objects in any other way) we'll end up with one `a` property whose value corresponds to the lowest child in the hierarchy:
+
+```sh
+$ cat my-log | pino -t
+{"pid":95469,"hostname":"MacBook-Pro-3.home","level":30,"msg":"howdy","time":"2016-04-01T18:08:34.473Z","a":"prop","v":1}
+```
+
+This equates to the same log output that Bunyan supplies.
+
+One of Pino's performance tricks is to avoid building objects and stringifying 
+them, so we're building strings instead. This is why duplicate keys between 
+parents and children will up in log output.
+
+
 <a name="changelog"></a>
 ## Changelog
+
+### 2.0.0
+
+* [#21](https://github.com/mcollina/pino/pull/21) sub-child loggers, up to 20% perf improvement
+* breaking change in that methods must be called on (or else bound to) the `pino` object
+
+
+### v1.1.1
+
+* [#22](https://github.com/mcollina/pino/pull/22) fix json output
 
 ### v1.1.0
 
