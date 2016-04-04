@@ -35,7 +35,11 @@ function pino (opts, stream) {
   var level = opts.level || 'info'
   var serializers = opts.serializers || {}
   var end = ',"v":' + LOG_VERSION + '}\n'
-  return new Pino(level, stream, serializers, stringify, end, name, hostname, slowtime, '')
+  var logger = new Pino(level, stream, serializers, stringify, end, name, hostname, slowtime, '')
+  process.on('exit', function () {
+    logger.stream.write(logger.cache)
+  })
+  return logger
 }
 
 function Pino (level, stream, serializers, stringify, end, name, hostname, slowtime, chindings) {
@@ -47,6 +51,7 @@ function Pino (level, stream, serializers, stringify, end, name, hostname, slowt
   this.hostname = hostname
   this.slowtime = slowtime
   this.chindings = chindings
+  this.cache = ''
   this._setLevel(level)
 }
 
@@ -201,7 +206,11 @@ function genLog (level) {
     } else if (len) {
       msg = params[0]
     }
-    this.stream.write(this.asJson(obj, msg, level))
+    this.cache += this.asJson(obj, msg, level)
+    if (this.cache.length > 2048) {
+      this.stream.write(this.cache)
+      this.cache = ''
+    }
   }
 }
 
