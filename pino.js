@@ -50,7 +50,6 @@ function pino (opts, stream) {
       } else {
         stream.write(logger.buf)
       }
-      process.exit()
     })
   }
 

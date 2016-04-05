@@ -573,9 +573,11 @@ test('extreme mode', function (t) {
     t.is(actual, expected)
     t.is(actual2.trim(), expected2)
 
-    os.hostname = hostname
-    Date.now = now
-    global.process = proc
+    t.teardown(function () {
+      os.hostname = hostname
+      Date.now = now
+      global.process = proc
+    })
 
     t.end()
   })
