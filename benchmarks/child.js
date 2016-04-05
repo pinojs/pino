@@ -25,7 +25,7 @@ require('bole').output({
 })
 
 var run = bench([
-  function benchBunyanObj (cb) {
+  function benchBunyanChild (cb) {
     for (var i = 0; i < max; i++) {
       blog.info({ hello: 'world' })
     }
