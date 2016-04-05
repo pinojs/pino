@@ -522,3 +522,33 @@ test('throw if creating child without bindings', function (t) {
     instance.child()
   })
 })
+
+test('extreme mode', function (t) {
+  var now = Date.now
+  Date.now = function () {
+    return 1459875739796
+  }
+
+  var expected = ''
+  var actual = ''
+  var normal = pino(writeStream(function (s, enc, cb) {
+    expected += s
+    cb()
+  }))
+
+  var extreme = pino({extreme: true}, writeStream(function (s, enc, cb) {
+    actual += s
+    cb()
+  }))
+
+  var i = 44
+  while (i--) {
+    normal.info('h')
+    extreme.info('h')
+  }
+
+  t.is(actual, expected)
+
+  Date.now = now
+  t.end()
+})
