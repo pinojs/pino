@@ -151,7 +151,7 @@ Pino.prototype.child = function child (bindings) {
   }
   data = this.chindings + data.substr(0, data.length - 1)
 
-  return new Pino(this.level, this.stream, this.serializers, this.stringify, this.end, this.name, this.hostname, this.slowtime, data)
+  return new Pino(this.level, this.stream, this.serializers, this.stringify, this.end, this.name, this.hostname, this.slowtime, data, this.cache, this.flatstr)
 }
 
 Pino.prototype.write = function (obj, msg, num) {
