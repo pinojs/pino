@@ -525,10 +525,20 @@ test('throw if creating child without bindings', function (t) {
 
 test('extreme mode', function (t) {
   var now = Date.now
+  var hostname = os.hostname
+  var proc = process
+  global.process = {
+    __proto__: process,
+    pid: 123456
+  }
   Date.now = function () {
     return 1459875739796
   }
-
+  os.hostname = function () {
+    return 'abcdefghijklmnopqr'
+  }
+  delete require.cache[require.resolve('./')]
+  var pino = require('./')
   var expected = ''
   var actual = ''
   var normal = pino(writeStream(function (s, enc, cb) {
@@ -548,7 +558,8 @@ test('extreme mode', function (t) {
   }
 
   t.is(actual, expected)
-
+  os.hostname = hostname
   Date.now = now
+  global.process = proc
   t.end()
 })
