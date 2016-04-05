@@ -14,11 +14,6 @@
     "type": "git",
     "url": "git+https://github.com/mcollina/pino.git"
   },
-  "standard": {
-    "ignore": [
-      "flatten-string.js"
-    ]
-  },
   "keywords": [
     "fast",
     "logger",
@@ -46,6 +41,7 @@
     "core-util-is": "^1.0.2",
     "fast-json-parse": "^1.0.0",
     "fast-safe-stringify": "^1.0.4",
+    "flatstr": "^1.0.0",
     "quick-format": "^2.0.0",
     "split2": "^2.0.1"
   }

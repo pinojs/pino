@@ -10,8 +10,6 @@ var dest = fs.createWriteStream('/dev/null')
 var plog = pino(dest)
 delete require.cache[require.resolve('../')]
 var plogExtreme = require('../')({extreme: true}, dest)
-delete require.cache[require.resolve('../')]
-var plogInsanity = require('../')({insanity: true}, dest)
 
 var deep = require('../package.json')
 deep.deep = Object.assign({}, deep)
@@ -66,12 +64,6 @@ var run = bench([
     }
     setImmediate(cb)
   },
-  function benchPinoInsanityMulti (cb) {
-    for (var i = 0; i < max; i++) {
-      plogInsanity.info('hello', 'world')
-    }
-    setImmediate(cb)
-  },
   function benchBunyanInterpolate (cb) {
     for (var i = 0; i < max; i++) {
       blog.info('hello %s', 'world')
@@ -99,12 +91,6 @@ var run = bench([
   function benchPinoExtremeInterpolate (cb) {
     for (var i = 0; i < max; i++) {
       plogExtreme.info('hello %s', 'world')
-    }
-    setImmediate(cb)
-  },
-  function benchPinoInsanityInterpolate (cb) {
-    for (var i = 0; i < max; i++) {
-      plogInsanity.info('hello %s', 'world')
     }
     setImmediate(cb)
   },
@@ -138,12 +124,6 @@ var run = bench([
     }
     setImmediate(cb)
   },
-  function benchPinoInsanityInterpolateAll (cb) {
-    for (var i = 0; i < max; i++) {
-      plogInsanity.info('hello %s %j %d', 'world', {obj: true}, 4)
-    }
-    setImmediate(cb)
-  },
   function benchBunyanInterpolateExtra (cb) {
     for (var i = 0; i < max; i++) {
       blog.info('hello %s %j %d', 'world', {obj: true}, 4, {another: 'obj'})
@@ -174,12 +154,6 @@ var run = bench([
     }
     setImmediate(cb)
   },
-  function benchPinoInsanityInterpolateExtra (cb) {
-    for (var i = 0; i < max; i++) {
-      plogInsanity.info('hello %s %j %d', 'world', {obj: true}, 4, {another: 'obj'})
-    }
-    setImmediate(cb)
-  },
   function benchBunyanInterpolateDeep (cb) {
     for (var i = 0; i < max; i++) {
       blog.info('hello %j', deep)
@@ -207,12 +181,6 @@ var run = bench([
   function benchPinoExtremeInterpolateDeep (cb) {
     for (var i = 0; i < max; i++) {
       plogExtreme.info('hello %j', deep)
-    }
-    setImmediate(cb)
-  },
-  function benchPinoInsanityInterpolateDeep (cb) {
-    for (var i = 0; i < max; i++) {
-      plogInsanity.info('hello %j', deep)
     }
     setImmediate(cb)
   }

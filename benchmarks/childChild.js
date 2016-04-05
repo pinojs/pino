@@ -8,8 +8,6 @@ var dest = fs.createWriteStream('/dev/null')
 var plog = pino(dest).child({ a: 'property' }).child({sub: 'child'})
 delete require.cache[require.resolve('../')]
 var plogExtreme = require('../')({extreme: true}, dest).child({ a: 'property' }).child({sub: 'child'})
-delete require.cache[require.resolve('../')]
-var plogInsanity = require('../')({insanity: true}, dest).child({ a: 'property' }).child({sub: 'child'})
 
 var max = 10
 var blog = bunyan.createLogger({
@@ -36,12 +34,6 @@ var run = bench([
   function benchPinoExtremeChildChild (cb) {
     for (var i = 0; i < max; i++) {
       plogExtreme.info({ hello: 'world' })
-    }
-    setImmediate(cb)
-  },
-  function benchPinoInsanityChildChild (cb) {
-    for (var i = 0; i < max; i++) {
-      plogInsanity.info({ hello: 'world' })
     }
     setImmediate(cb)
   }

@@ -5,6 +5,7 @@ var format = require('quick-format')
 var os = require('os')
 var pid = process.pid
 var hostname = os.hostname()
+var flatstr = require('flatstr')
 var LOG_VERSION = 1
 
 var levels = {
@@ -34,16 +35,9 @@ function pino (opts, stream) {
   var level = opts.level || 'info'
   var serializers = opts.serializers || {}
   var end = ',"v":' + LOG_VERSION + '}\n'
-  var flatstr
-  var cache = 0
-  if (opts.extreme) { cache = 2048 }
-  if (opts.insanity) {
-    cache = 4096
-    require('v8').setFlagsFromString('--allow-natives-syntax')
-    flatstr = require('./flatten-string')
-  }
+  var cache = opts.extreme ? 4096 : 0
 
-  var logger = new Pino(level, stream, serializers, stringify, end, name, hostname, slowtime, '', cache, flatstr)
+  var logger = new Pino(level, stream, serializers, stringify, end, name, hostname, slowtime, '', cache)
   if (cache) {
     process.on('exit', function () {
       logger.stream.write(logger.buf)
@@ -53,7 +47,7 @@ function pino (opts, stream) {
   return logger
 }
 
-function Pino (level, stream, serializers, stringify, end, name, hostname, slowtime, chindings, cache, flatstr) {
+function Pino (level, stream, serializers, stringify, end, name, hostname, slowtime, chindings, cache) {
   this.stream = stream
   this.serializers = serializers
   this.stringify = stringify
@@ -64,7 +58,6 @@ function Pino (level, stream, serializers, stringify, end, name, hostname, slowt
   this.chindings = chindings
   this.buf = ''
   this.cache = cache
-  this.flatstr = flatstr
   this._setLevel(level)
 }
 
@@ -151,7 +144,7 @@ Pino.prototype.child = function child (bindings) {
   }
   data = this.chindings + data.substr(0, data.length - 1)
 
-  return new Pino(this.level, this.stream, this.serializers, this.stringify, this.end, this.name, this.hostname, this.slowtime, data, this.cache, this.flatstr)
+  return new Pino(this.level, this.stream, this.serializers, this.stringify, this.end, this.name, this.hostname, this.slowtime, data, this.cache)
 }
 
 Pino.prototype.write = function (obj, msg, num) {
@@ -163,7 +156,7 @@ Pino.prototype.write = function (obj, msg, num) {
 
   this.buf += s
   if (this.buf.length > this.cache) {
-    this.stream.write(this.flatstr ? this.flatstr(this.buf) : this.buf)
+    this.stream.write(flatstr(this.buf))
     this.buf = ''
   }
 }
