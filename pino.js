@@ -154,6 +154,20 @@ Pino.prototype.child = function child (bindings) {
   return new Pino(this.level, this.stream, this.serializers, this.stringify, this.end, this.name, this.hostname, this.slowtime, data)
 }
 
+Pino.prototype.write = function (obj, msg, num) {
+  var s = this.asJson(obj, msg, num)
+  if (!this.cache) {
+    this.stream.write(s)
+    return
+  }
+
+  this.buf += s
+  if (this.buf.length > this.cache) {
+    this.stream.write(this.flatstr ? this.flatstr(this.buf) : this.buf)
+    this.buf = ''
+  }
+}
+
 function noop () {}
 
 function mapHttpRequest (req) {
@@ -193,41 +207,33 @@ function asErrValue (err) {
   }
 }
 
-function genLog (level) {
-  return function (a, b, c, d, e, f, g, h, i, j, k) {
-    var base = 0
-    var obj = null
-    var params = null
-    var msg
-    var len
+function genLog (z) {
+  return function LOG (a, b, c, d, e, f, g, h, i, j, k) {
+    var l = 0
+    var m = null
+    var n = null
+    var o
+    var p
     if (typeof a === 'object' && a !== null) {
-      obj = a
-      params = [b, c, d, e, f, g, h, i, j, k]
-      base = 1
+      m = a
+      n = [b, c, d, e, f, g, h, i, j, k]
+      l = 1
 
-      if (obj.method && obj.headers && obj.socket) {
-        obj = mapHttpRequest(obj)
-      } else if (obj.statusCode) {
-        obj = mapHttpResponse(obj)
+      if (m.method && m.headers && m.socket) {
+        m = mapHttpRequest(m)
+      } else if (m.statusCode) {
+        m = mapHttpResponse(m)
       }
     } else {
-      params = [a, b, c, d, e, f, g, h, i, j, k]
+      n = [a, b, c, d, e, f, g, h, i, j, k]
     }
-    len = params.length = arguments.length - base
-    if (len > 1) {
-      msg = format(params, null)
-    } else if (len) {
-      msg = params[0]
+    p = n.length = arguments.length - l
+    if (p > 1) {
+      o = format(n, null)
+    } else if (p) {
+      o = n[0]
     }
-    if (!this.cache) {
-      this.stream.write(this.asJson(obj, msg, level))
-      return
-    }
-    this.buf += this.asJson(obj, msg, level)
-    if (this.buf.length > this.cache) {
-      this.stream.write(this.flatstr ? this.flatstr(this.buf) : this.buf)
-      this.buf = ''
-    }
+    this.write(m, o, z)
   }
 }
 
