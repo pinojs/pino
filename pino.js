@@ -4,7 +4,7 @@ var stringifySafe = require('fast-safe-stringify')
 var format = require('quick-format')
 var os = require('os')
 var flatstr = require('flatstr')
-var onExit = require('before-death')
+var once = require('once')
 var pid = process.pid
 var hostname = os.hostname()
 
@@ -238,6 +238,17 @@ function genLog (z) {
     }
     this.write(m, o, z)
   }
+}
+
+function onExit (fn) {
+  fn = once(fn)
+  process.on('beforeExit', fn)
+  process.on('exit', fn)
+  process.on('uncaughtException', fn)
+  process.on('SIGHUP', fn)
+  process.on('SIGINT', fn)
+  process.on('SIGQUIT', fn)
+  process.on('SIGTERM', fn)
 }
 
 module.exports = pino
