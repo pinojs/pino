@@ -13,8 +13,8 @@ var plogExtreme = require('../')({extreme: true}, dest)
 
 var deep = require('../package.json')
 deep.deep = Object.assign({}, deep)
-deep.deep.deep = Object.assign({}, deep)
-deep.deep.deep.deep = Object.assign({}, deep)
+deep.deep.deep = Object.assign({}, deep.deep)
+deep.deep.deep.deep = Object.assign({}, deep.deep.deep)
 
 var max = 10
 var blog = bunyan.createLogger({
