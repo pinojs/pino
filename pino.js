@@ -5,7 +5,6 @@ var format = require('quick-format')
 var os = require('os')
 var pid = process.pid
 var hostname = os.hostname()
-
 var LOG_VERSION = 1
 
 var levels = {
@@ -35,14 +34,26 @@ function pino (opts, stream) {
   var level = opts.level || 'info'
   var serializers = opts.serializers || {}
   var end = ',"v":' + LOG_VERSION + '}\n'
-  var logger = new Pino(level, stream, serializers, stringify, end, name, hostname, slowtime, '')
-  process.on('exit', function () {
-    logger.stream.write(logger.cache)
-  })
+  var flatstr
+  var cache = 0
+  if (opts.extreme) { cache = 2048 }
+  if (opts.insanity) {
+    cache = 4096
+    require('v8').setFlagsFromString('--allow-natives-syntax')
+    flatstr = require('./flatten-string')
+  }
+
+  var logger = new Pino(level, stream, serializers, stringify, end, name, hostname, slowtime, '', cache, flatstr)
+  if (cache) {
+    process.on('exit', function () {
+      logger.stream.write(logger.buf)
+    })
+  }
+
   return logger
 }
 
-function Pino (level, stream, serializers, stringify, end, name, hostname, slowtime, chindings) {
+function Pino (level, stream, serializers, stringify, end, name, hostname, slowtime, chindings, cache, flatstr) {
   this.stream = stream
   this.serializers = serializers
   this.stringify = stringify
@@ -51,7 +62,9 @@ function Pino (level, stream, serializers, stringify, end, name, hostname, slowt
   this.hostname = hostname
   this.slowtime = slowtime
   this.chindings = chindings
-  this.cache = ''
+  this.buf = ''
+  this.cache = cache
+  this.flatstr = flatstr
   this._setLevel(level)
 }
 
@@ -206,10 +219,14 @@ function genLog (level) {
     } else if (len) {
       msg = params[0]
     }
-    this.cache += this.asJson(obj, msg, level)
-    if (this.cache.length > 2048) {
-      this.stream.write(this.cache)
-      this.cache = ''
+    if (!this.cache) {
+      this.stream.write(this.asJson(obj, msg, level))
+      return
+    }
+    this.buf += this.asJson(obj, msg, level)
+    if (this.buf.length > this.cache) {
+      this.stream.write(this.flatstr ? this.flatstr(this.buf) : this.buf)
+      this.buf = ''
     }
   }
 }
