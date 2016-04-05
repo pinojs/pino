@@ -37,6 +37,7 @@
     "winston": "^2.1.1"
   },
   "dependencies": {
+    "before-death": "^0.9.1",
     "chalk": "^1.1.1",
     "core-util-is": "^1.0.2",
     "fast-json-parse": "^1.0.0",

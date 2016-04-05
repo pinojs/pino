@@ -3,9 +3,11 @@
 var stringifySafe = require('fast-safe-stringify')
 var format = require('quick-format')
 var os = require('os')
+var flatstr = require('flatstr')
+var onExit = require('before-death')
 var pid = process.pid
 var hostname = os.hostname()
-var flatstr = require('flatstr')
+
 var LOG_VERSION = 1
 
 var levels = {
@@ -38,9 +40,17 @@ function pino (opts, stream) {
   var cache = opts.extreme ? 4096 : 0
 
   var logger = new Pino(level, stream, serializers, stringify, end, name, hostname, slowtime, '', cache)
+
   if (cache) {
-    process.on('exit', function () {
-      logger.stream.write(logger.buf)
+    onExit(function () {
+      if (stream === process.stdout) {
+        console.log(logger.buf)
+      } else if (stream === process.stderr) {
+        console.error(logger.buf)
+      } else {
+        stream.write(logger.buf)
+      }
+      process.exit()
     })
   }
 

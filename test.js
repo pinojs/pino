@@ -6,6 +6,7 @@ var writeStream = require('flush-write-stream')
 var os = require('os')
 var split = require('split2')
 var http = require('http')
+var spawn = require('child_process').spawn
 var pid = process.pid
 var hostname = os.hostname()
 
@@ -557,9 +558,25 @@ test('extreme mode', function (t) {
     extreme.info('h')
   }
 
-  t.is(actual, expected)
-  os.hostname = hostname
-  Date.now = now
-  global.process = proc
-  t.end()
+  var expected2 = expected.split('\n')[0]
+  var actual2 = ''
+
+  var e = 'global.process = { __proto__: process,  pid: 123456};Date.now = function () { return 1459875739796;};require("os").hostname = function () { return "abcdefghijklmnopqr";};var pino = require("./");var extreme = pino({extreme: true});extreme.info("h")'
+
+  var child = spawn('node', ['-e', e])
+  child.stdout.pipe(writeStream(function (s, enc, cb) {
+    actual2 += s
+    cb()
+  }))
+
+  child.on('close', function () {
+    t.is(actual, expected)
+    t.is(actual2.trim(), expected2)
+
+    os.hostname = hostname
+    Date.now = now
+    global.process = proc
+
+    t.end()
+  })
 })
