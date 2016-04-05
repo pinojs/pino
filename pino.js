@@ -42,13 +42,21 @@ function pino (opts, stream) {
   var logger = new Pino(level, stream, serializers, stringify, end, name, hostname, slowtime, '', cache)
 
   if (cache) {
-    onExit(function () {
-      if (stream === process.stdout) {
-        console.log(logger.buf)
-      } else if (stream === process.stderr) {
-        console.error(logger.buf)
+    onExit(function (code, evt) {
+      if (logger.buf) {
+        if (stream === process.stdout) {
+          console.log(logger.buf)
+        } else if (stream === process.stderr) {
+          console.error(logger.buf)
+        } else {
+          stream.write(logger.buf)
+        }
+        logger.buf = ''
+      }
+      if (!process._events[evt] || process._events[evt].length < 2) {
+        process.exit(code)
       } else {
-        stream.write(logger.buf)
+        return 'no exit'
       }
     })
   }
@@ -240,14 +248,23 @@ function genLog (z) {
 }
 
 function onExit (fn) {
-  fn = once(fn)
-  process.on('beforeExit', fn)
-  process.on('exit', fn)
-  process.on('uncaughtException', fn)
-  process.on('SIGHUP', fn)
-  process.on('SIGINT', fn)
-  process.on('SIGQUIT', fn)
-  process.on('SIGTERM', fn)
+  var oneFn = once(fn)
+  process.on('beforeExit', handle('beforeExit'))
+  process.on('exit', handle('exit'))
+  process.on('uncaughtException', handle('uncaughtException', 1))
+  process.on('SIGHUP', handle('SIGHUP', 129))
+  process.on('SIGINT', handle('SIGINT', 130))
+  process.on('SIGQUIT', handle('SIGQUIT', 131))
+  process.on('SIGTERM', handle('SIGTERM', 143))
+  function handle (evt, code) {
+    return (code === undefined) ? function (code) {
+      if (oneFn.value) { oneFn = once(fn) }
+      oneFn(code, evt)
+    } : function () {
+      if (oneFn.value) { oneFn = once(fn) }
+      oneFn(code, evt)
+    }
+  }
 }
 
 module.exports = pino
