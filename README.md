@@ -1,4 +1,4 @@
-# pino&nbsp;&nbsp;[![Build Status](https://travis-ci.org/mcollina/pino.png)](https://travis-ci.org/mcollina/pino)
+# pino&nbsp;&nbsp;[![Build Status](https://travis-ci.org/mcollina/pino.svg)](https://travis-ci.org/mcollina/pino)
 
 [Extremely fast](#benchmarks) node.js logger, inspired by Bunyan.
 It also includes a shell utility to pretty-print its log files.
