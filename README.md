@@ -92,6 +92,17 @@ benchPinoObj*10000: 322.118ms
 benchPinoExtremeObj*10000: 142.215ms
 ```
 
+`pino.info(aBigDeeplyNestedObject)`:
+```
+benchBunyanDeepObj*10000: 6148.665ms
+benchWinstonDeepObj*10000: 14726.129ms
+benchBoleDeepObj*10000: 24450.814ms
+benchPinoDeepObj*10000: 4296.618ms
+benchPinoUnsafeDeepObj*10000: 3065.568ms
+benchPinoExtremeDeepObj*10000: 4139.848ms
+benchPinoUnsafeExtremeDeepObj*10000: 2948.078ms
+```
+
 `pino.info('hello %s %j %d', 'world', {obj: true}, 4, {another: 'obj'})`:
 
 ```
