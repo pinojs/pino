@@ -3,6 +3,8 @@
 var stringifySafe = require('fast-safe-stringify')
 var format = require('quick-format')
 var os = require('os')
+var flatstr = require('flatstr')
+var once = require('once')
 var pid = process.pid
 var hostname = os.hostname()
 
@@ -31,14 +33,40 @@ function pino (opts, stream) {
   var slowtime = opts.slowtime
   var safe = opts.safe !== false
   var stringify = safe ? stringifySafe : JSON.stringify
+  var formatOpts = safe ? null : {lowres: true}
   var name = opts.name
   var level = opts.level || 'info'
   var serializers = opts.serializers || {}
   var end = ',"v":' + LOG_VERSION + '}\n'
-  return new Pino(level, stream, serializers, stringify, end, name, hostname, slowtime, '')
+  var cache = opts.extreme ? 4096 : 0
+
+  var logger = new Pino(level, stream, serializers, stringify, end, name, hostname, slowtime, '', cache, formatOpts)
+  if (cache) {
+    onExit(function (code, evt) {
+      if (logger.buf) {
+        if (stream === process.stdout) {
+          console.log(logger.buf)
+        } else if (stream === process.stderr) {
+          console.error(logger.buf)
+        } else {
+          stream.write(logger.buf)
+        }
+        logger.buf = ''
+      }
+      if (!process._events[evt] || process._events[evt].length < 2 || !process._events[evt].filter(function (f) {
+        return f + '' !== onExit.passCode + '' && f + '' !== onExit.insertCode + ''
+      }).length) {
+        process.exit(code)
+      } else {
+        return 'no exit'
+      }
+    })
+  }
+
+  return logger
 }
 
-function Pino (level, stream, serializers, stringify, end, name, hostname, slowtime, chindings) {
+function Pino (level, stream, serializers, stringify, end, name, hostname, slowtime, chindings, cache, formatOpts) {
   this.stream = stream
   this.serializers = serializers
   this.stringify = stringify
@@ -47,6 +75,9 @@ function Pino (level, stream, serializers, stringify, end, name, hostname, slowt
   this.hostname = hostname
   this.slowtime = slowtime
   this.chindings = chindings
+  this.buf = ''
+  this.cache = cache
+  this.formatOpts = formatOpts
   this._setLevel(level)
 }
 
@@ -133,7 +164,21 @@ Pino.prototype.child = function child (bindings) {
   }
   data = this.chindings + data.substr(0, data.length - 1)
 
-  return new Pino(this.level, this.stream, this.serializers, this.stringify, this.end, this.name, this.hostname, this.slowtime, data)
+  return new Pino(this.level, this.stream, this.serializers, this.stringify, this.end, this.name, this.hostname, this.slowtime, data, this.cache, this.formatOpts)
+}
+
+Pino.prototype.write = function (obj, msg, num) {
+  var s = this.asJson(obj, msg, num)
+  if (!this.cache) {
+    this.stream.write(s)
+    return
+  }
+
+  this.buf += s
+  if (this.buf.length > this.cache) {
+    this.stream.write(flatstr(this.buf))
+    this.buf = ''
+  }
 }
 
 function noop () {}
@@ -175,33 +220,55 @@ function asErrValue (err) {
   }
 }
 
-function genLog (level) {
-  return function (a, b, c, d, e, f, g, h, i, j, k) {
-    var base = 0
-    var obj = null
-    var params = null
-    var msg
-    var len
+function genLog (z) {
+  return function LOG (a, b, c, d, e, f, g, h, i, j, k) {
+    var l = 0
+    var m = null
+    var n = null
+    var o
+    var p
     if (typeof a === 'object' && a !== null) {
-      obj = a
-      params = [b, c, d, e, f, g, h, i, j, k]
-      base = 1
+      m = a
+      n = [b, c, d, e, f, g, h, i, j, k]
+      l = 1
 
-      if (obj.method && obj.headers && obj.socket) {
-        obj = mapHttpRequest(obj)
-      } else if (obj.statusCode) {
-        obj = mapHttpResponse(obj)
+      if (m.method && m.headers && m.socket) {
+        m = mapHttpRequest(m)
+      } else if (m.statusCode) {
+        m = mapHttpResponse(m)
       }
     } else {
-      params = [a, b, c, d, e, f, g, h, i, j, k]
+      n = [a, b, c, d, e, f, g, h, i, j, k]
     }
-    len = params.length = arguments.length - base
-    if (len > 1) {
-      msg = format(params, null)
-    } else if (len) {
-      msg = params[0]
+    p = n.length = arguments.length - l
+    if (p > 1) {
+      o = format(n, this.formatOpts)
+    } else if (p) {
+      o = n[0]
     }
-    this.stream.write(this.asJson(obj, msg, level))
+    this.write(m, o, z)
+  }
+}
+
+function onExit (fn) {
+  var oneFn = once(fn)
+  process.on('beforeExit', handle('beforeExit'))
+  process.on('exit', handle('exit'))
+  process.on('uncaughtException', handle('uncaughtException', 1))
+  process.on('SIGHUP', handle('SIGHUP', 129))
+  process.on('SIGINT', handle('SIGINT', 130))
+  process.on('SIGQUIT', handle('SIGQUIT', 131))
+  process.on('SIGTERM', handle('SIGTERM', 143))
+  function handle (evt, code) {
+    onExit.passCode = function (code) {
+      if (oneFn.value) { oneFn = once(fn) }
+      oneFn(code, evt)
+    }
+    onExit.insertCode = function () {
+      if (oneFn.value) { oneFn = once(fn) }
+      oneFn(code, evt)
+    }
+    return (code === undefined) ? onExit.passCode : onExit.insertCode
   }
 }
 

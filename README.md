@@ -9,10 +9,13 @@ It also includes a shell utility to pretty-print its log files.
 * [Usage](#usage)
 * [Benchmarks](#benchmarks)
 * [API](#api)
+* [Extreme mode explained](#extreme)
+* [How to use Pino with Express](#express)
 * [How do I rotate log files?](#rotate)
 * [How to use Transports with Pino](#transports)
 * [Caveats](#caveats)
 * [Changelog](#changelog)
+* [Team](#team)
 * [Acknowledgements](#acknowledgements)
 * [License](#license)
 
@@ -72,28 +75,31 @@ As far as we know, it is the fastest logger in town:
 `pino.info('hello world')`:
 
 ```
-benchBunyan*10000: 1005ms
-benchWinston*10000: 1810ms
-benchBole*10000: 1493ms
-benchPino*10000: 254ms
+benchBunyan*10000: 1082.896ms
+benchWinston*10000: 1707.665ms
+benchBole*10000: 1574.295ms
+benchPino*10000: 264.506ms
+benchPinoExreme*10000: 105.391ms
 ```
 
 `pino.info({'hello': 'world'})`:
 
 ```
-benchBunyanObj*10000: 1262ms
-benchWinstonObj*10000: 1979ms
-benchBoleObj*10000: 1545ms
-benchPinoObj*10000: 341ms
+benchBunyanObj*10000: 1213.984ms
+benchWinstonObj*10000: 1951.889ms
+benchBoleObj*10000: 1717.641ms
+benchPinoObj*10000: 322.118ms
+benchPinoExtremeObj*10000: 142.215ms
 ```
 
 `pino.info('hello %s %j %d', 'world', {obj: true}, 4, {another: 'obj'})`:
 
 ```
-benchBunyanInterpolateExtra*10000: 2747ms
-benchWinstonInterpolateExtra*10000: 2659ms
-benchBoleInterpolateExtra*10000: 3366ms
-benchPinoInterpolateExtra*10000: 548ms
+benchBunyanInterpolateExtra*10000: 2665.294ms
+benchWinstonInterpolateExtra*10000: 2455.395ms
+benchBoleInterpolateExtra*10000: 3291.087ms
+benchPinoInterpolateExtra*10000: 568.122ms
+benchPinoExtremeInterpolateExtra*10000: 341.009ms
 ```
 
 In multiple cases, pino is over 6x faster than alternatives.
@@ -156,7 +162,8 @@ Returns a new logger. Allowed options are:
   default `true`
 * `name`: the name of the logger, default `undefined`
 * `serializers`: an object containing functions for custom serialization of objects. These functions should return an JSONifiable object and they should never throw
-* `slowtime`: Outputs ISO time stamps (`'2016-03-09T15:18:53.889Z'`) instead of Epoch time stamps (`1457536759176`). **WARNING**: This option carries a 25% performance drop, we recommend using default Epoch timestamps and transforming logs after if required. The `pino -t` command will do this for you (see [CLI](#cli))
+* `slowtime`: Outputs ISO time stamps (`'2016-03-09T15:18:53.889Z'`) instead of Epoch time stamps (`1457536759176`). **WARNING**: This option carries a 25% performance drop, we recommend using default Epoch timestamps and transforming logs after if required. The `pino -t` command will do this for you (see [CLI](#cli)). default `false`.
+* `extreme`: Enables extreme mode, yields an additional 60% performance (from 250ms down to 100ms per 10000 ops). There are trade-off's should be understood before usage. See [Extreme mode explained](#extreme). default `false`
 
 `stream` is a Writable stream, defaults to `process.stdout`.
 
@@ -221,32 +228,27 @@ var childChild = child.child({baby: true})
 Child logger creation is fast:
 
 ```
-benchPinoCreation*10000: 364ms
-benchBunyanCreation*10000: 1309ms
-benchBoleCreation*10000: 1621ms
-benchPinoCreation*10000: 350ms
-benchBunyanCreation*10000: 1295ms
-benchBoleCreation*10000: 1595ms
+benchBunyanCreation*10000: 1291.332ms
+benchBoleCreation*10000: 1630.542ms
+benchPinoCreation*10000: 352.330ms
+benchPinoExtremeCreation*10000: 102.282ms
 ```
 
 Logging through a child logger has little performance penalty:
 
 ```
-benchBunyanObj*10000: 1309ms
-benchPinoChild*10000: 335ms
-benchBoleChild*10000: 1487ms
-benchBunyanObj*10000: 1262ms
-benchPinoChild*10000: 331ms
-benchBoleChild*10000: 1473ms
+benchBunyanChild*10000: 1343.933ms
+benchBoleChild*10000: 1605.969ms
+benchPinoChild*10000: 334.573ms
+benchPinoExtremeChild*10000: 152.792ms
 ```
 
 Spawning children from children has negligible overhead:
 
 ```
-benchBunyanChildChild*10000: 1353ms
-benchPinoChildChild*10000: 332ms
-benchBunyanChildChild*10000: 1333ms
-benchPinoChildChild*10000: 334ms
+benchBunyanChildChild*10000: 1397.202ms
+benchPinoChildChild*10000: 338.930ms
+benchPinoExtremeChildChild*10000: 150.143ms
 ```
 
 <a name="level"></a>
@@ -384,6 +386,48 @@ Serializes an `Error` object if passed in as an property.
   "stack": "Error: an error\n    at Object.<anonymous> (/Users/matteo/Repositories/pino/example.js:16:7)\n    at Module._compile (module.js:435:26)\n    at Object.Module._extensions..js (module.js:442:10)\n    at Module.load (module.js:356:32)\n    at Function.Module._load (module.js:313:12)\n    at Function.Module.runMain (module.js:467:10)\n    at startup (node.js:136:18)\n    at node.js:963:3"
 }
 ```
+
+<a name="extreme"></a>
+## Extreme mode explained
+
+In essence, Extreme mode enables extreme performance by buffering log messages and writing them in larger chunks.
+
+This has a couple of important caveats:
+
+* 4KB of spare RAM will be needed for logging
+* As opposed to the default mode, there is not a one-to-one relationship between calls to logging methods (e.g. `logger.info`) and writes to a log file (or log stream)
+* There is a possibility of the most recently buffered log messages being lost (up to 4KB of logs)
+  * For instance, a powercut will mean up to 4KB of buffered logs will be lost
+  * A sigkill (or other untrappable signal) will probably result in the same
+  * If writing to a stream other than `process.stdout` or `process.stderr`, there is a slight possibility of lost logs or even partially written logs if the OS buffers don't have enough space, or something else is being written to the stream (or maybe some other reason we've not thought of)
+
+So in summary, only use extreme mode if you're doing an extreme amount of logging, and you're happy in some scenarios to lose the most recent logs.
+
+
+<a name="express"></a>
+## How to use Pino with Express
+
+We've got you covered:
+
+```sh
+npm install --save express-pino-logger
+```
+
+```js
+var app = require('express')()
+var pino = require('express-pino-logger')()
+
+app.use(pino)
+
+app.get('/', function (req, res) {
+  req.log.info('something')
+  res.send('hello world')
+})
+
+app.listen(3000)
+```
+
+See the [express-pino-logger readme](http://npm.im/express-pino-logger) for more info.
 
 <a name="rotate"></a>
 ## How do I rotate log files
@@ -535,6 +579,25 @@ parents and children will end up in log output.
 
 * first stable release
 
+<a name="team"></a>
+## The Team
+
+### Matteo Collina
+
+<https://github.com/mcollina>
+
+<https://www.npmjs.com/~matteo.collina>
+
+<https://twitter.com/matteocollina>
+
+
+### David Mark Clements
+
+<https://github.com/davidmarkclements>
+
+<https://www.npmjs.com/~davidmarkclements>
+
+<https://twitter.com/davidmarkclem>
 
 <a name="acknowledgements"></a>
 ## Acknowledgements

@@ -8,6 +8,13 @@ var winston = require('winston')
 var fs = require('fs')
 var dest = fs.createWriteStream('/dev/null')
 var plog = pino(dest)
+delete require.cache[require.resolve('../')]
+var plogExtreme = require('../')({extreme: true}, dest)
+delete require.cache[require.resolve('../')]
+var plogUnsafe = require('../')({safe: false}, dest)
+delete require.cache[require.resolve('../')]
+var plogUnsafeExtreme = require('../')({extreme: true, safe: false}, dest)
+
 var deep = require('../package.json')
 deep.deep = Object.assign({}, deep)
 deep.deep.deep = Object.assign({}, deep.deep)
@@ -55,6 +62,12 @@ var run = bench([
     }
     setImmediate(cb)
   },
+  function benchPinoExtremeMulti (cb) {
+    for (var i = 0; i < max; i++) {
+      plogExtreme.info('hello', 'world')
+    }
+    setImmediate(cb)
+  },
   function benchBunyanInterpolate (cb) {
     for (var i = 0; i < max; i++) {
       blog.info('hello %s', 'world')
@@ -76,6 +89,12 @@ var run = bench([
   function benchPinoInterpolate (cb) {
     for (var i = 0; i < max; i++) {
       plog.info('hello %s', 'world')
+    }
+    setImmediate(cb)
+  },
+  function benchPinoExtremeInterpolate (cb) {
+    for (var i = 0; i < max; i++) {
+      plogExtreme.info('hello %s', 'world')
     }
     setImmediate(cb)
   },
@@ -103,6 +122,24 @@ var run = bench([
     }
     setImmediate(cb)
   },
+  function benchPinoExtremeInterpolateAll (cb) {
+    for (var i = 0; i < max; i++) {
+      plogExtreme.info('hello %s %j %d', 'world', {obj: true}, 4)
+    }
+    setImmediate(cb)
+  },
+  function benchPinoUnsafeInterpolateAll (cb) {
+    for (var i = 0; i < max; i++) {
+      plogUnsafe.info('hello %s %j %d', 'world', {obj: true}, 4)
+    }
+    setImmediate(cb)
+  },
+  function benchPinoUnsafeExtremeInterpolateAll (cb) {
+    for (var i = 0; i < max; i++) {
+      plogUnsafeExtreme.info('hello %s %j %d', 'world', {obj: true}, 4)
+    }
+    setImmediate(cb)
+  },
   function benchBunyanInterpolateExtra (cb) {
     for (var i = 0; i < max; i++) {
       blog.info('hello %s %j %d', 'world', {obj: true}, 4, {another: 'obj'})
@@ -127,6 +164,24 @@ var run = bench([
     }
     setImmediate(cb)
   },
+  function benchPinoUnsafeInterpolateExtra (cb) {
+    for (var i = 0; i < max; i++) {
+      plogUnsafe.info('hello %s %j %d', 'world', {obj: true}, 4, {another: 'obj'})
+    }
+    setImmediate(cb)
+  },
+  function benchPinoExtremeInterpolateExtra (cb) {
+    for (var i = 0; i < max; i++) {
+      plogExtreme.info('hello %s %j %d', 'world', {obj: true}, 4, {another: 'obj'})
+    }
+    setImmediate(cb)
+  },
+  function benchPinoUnsafeExtremeInterpolateExtra (cb) {
+    for (var i = 0; i < max; i++) {
+      plogUnsafeExtreme.info('hello %s %j %d', 'world', {obj: true}, 4, {another: 'obj'})
+    }
+    setImmediate(cb)
+  },
   function benchBunyanInterpolateDeep (cb) {
     for (var i = 0; i < max; i++) {
       blog.info('hello %j', deep)
@@ -148,6 +203,24 @@ var run = bench([
   function benchPinoInterpolateDeep (cb) {
     for (var i = 0; i < max; i++) {
       plog.info('hello %j', deep)
+    }
+    setImmediate(cb)
+  },
+  function benchPinoUnsafeInterpolateDeep (cb) {
+    for (var i = 0; i < max; i++) {
+      plogUnsafe.info('hello %j', deep)
+    }
+    setImmediate(cb)
+  },
+  function benchPinoExtremeInterpolateDeep (cb) {
+    for (var i = 0; i < max; i++) {
+      plogExtreme.info('hello %j', deep)
+    }
+    setImmediate(cb)
+  },
+  function benchPinoUnsafeExtremeInterpolateDeep (cb) {
+    for (var i = 0; i < max; i++) {
+      plogUnsafeExtreme.info('hello %j', deep)
     }
     setImmediate(cb)
   }

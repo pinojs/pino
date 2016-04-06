@@ -8,6 +8,13 @@ var winston = require('winston')
 var fs = require('fs')
 var dest = fs.createWriteStream('/dev/null')
 var plog = pino(dest)
+delete require.cache[require.resolve('../')]
+var plogExtreme = require('../')({extreme: true}, dest)
+delete require.cache[require.resolve('../')]
+var plogUnsafe = require('../')({safe: false}, dest)
+delete require.cache[require.resolve('../')]
+var plogUnsafeExtreme = require('../')({extreme: true, safe: false}, dest)
+
 var max = 10
 var blog = bunyan.createLogger({
   name: 'myapp',
@@ -47,6 +54,24 @@ var run = bench([
   function benchPinoObj (cb) {
     for (var i = 0; i < max; i++) {
       plog.info({ hello: 'world' })
+    }
+    setImmediate(cb)
+  },
+  function benchPinoUnsafeObj (cb) {
+    for (var i = 0; i < max; i++) {
+      plogUnsafe.info({ hello: 'world' })
+    }
+    setImmediate(cb)
+  },
+  function benchPinoExtremeObj (cb) {
+    for (var i = 0; i < max; i++) {
+      plogExtreme.info({ hello: 'world' })
+    }
+    setImmediate(cb)
+  },
+  function benchPinoUnsafeExtremeObj (cb) {
+    for (var i = 0; i < max; i++) {
+      plogUnsafeExtreme.info({ hello: 'world' })
     }
     setImmediate(cb)
   }
