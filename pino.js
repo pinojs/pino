@@ -41,7 +41,6 @@ function pino (opts, stream) {
   var cache = opts.extreme ? 4096 : 0
 
   var logger = new Pino(level, stream, serializers, stringify, end, name, hostname, slowtime, '', cache, formatOpts)
-
   if (cache) {
     onExit(function (code, evt) {
       if (logger.buf) {
@@ -54,7 +53,9 @@ function pino (opts, stream) {
         }
         logger.buf = ''
       }
-      if (!process._events[evt] || process._events[evt].length < 2) {
+      if (!process._events[evt] || process._events[evt].length < 2 || !process._events[evt].filter(function (f) {
+        return f + '' !== onExit.passCode + '' && f + '' !== onExit.insertCode + ''
+      }).length) {
         process.exit(code)
       } else {
         return 'no exit'
@@ -259,13 +260,15 @@ function onExit (fn) {
   process.on('SIGQUIT', handle('SIGQUIT', 131))
   process.on('SIGTERM', handle('SIGTERM', 143))
   function handle (evt, code) {
-    return (code === undefined) ? function (code) {
-      if (oneFn.value) { oneFn = once(fn) }
-      oneFn(code, evt)
-    } : function () {
+    onExit.passCode = function (code) {
       if (oneFn.value) { oneFn = once(fn) }
       oneFn(code, evt)
     }
+    onExit.insertCode = function () {
+      if (oneFn.value) { oneFn = once(fn) }
+      oneFn(code, evt)
+    }
+    return (code === undefined) ? onExit.passCode : onExit.insertCode
   }
 }
 
