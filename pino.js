@@ -33,13 +33,14 @@ function pino (opts, stream) {
   var slowtime = opts.slowtime
   var safe = opts.safe !== false
   var stringify = safe ? stringifySafe : JSON.stringify
+  var formatOpts = safe ? null : {lowres: true}
   var name = opts.name
   var level = opts.level || 'info'
   var serializers = opts.serializers || {}
   var end = ',"v":' + LOG_VERSION + '}\n'
   var cache = opts.extreme ? 4096 : 0
 
-  var logger = new Pino(level, stream, serializers, stringify, end, name, hostname, slowtime, '', cache)
+  var logger = new Pino(level, stream, serializers, stringify, end, name, hostname, slowtime, '', cache, formatOpts)
 
   if (cache) {
     onExit(function (code, evt) {
@@ -64,7 +65,7 @@ function pino (opts, stream) {
   return logger
 }
 
-function Pino (level, stream, serializers, stringify, end, name, hostname, slowtime, chindings, cache) {
+function Pino (level, stream, serializers, stringify, end, name, hostname, slowtime, chindings, cache, formatOpts) {
   this.stream = stream
   this.serializers = serializers
   this.stringify = stringify
@@ -75,6 +76,7 @@ function Pino (level, stream, serializers, stringify, end, name, hostname, slowt
   this.chindings = chindings
   this.buf = ''
   this.cache = cache
+  this.formatOpts = formatOpts
   this._setLevel(level)
 }
 
@@ -161,7 +163,7 @@ Pino.prototype.child = function child (bindings) {
   }
   data = this.chindings + data.substr(0, data.length - 1)
 
-  return new Pino(this.level, this.stream, this.serializers, this.stringify, this.end, this.name, this.hostname, this.slowtime, data, this.cache)
+  return new Pino(this.level, this.stream, this.serializers, this.stringify, this.end, this.name, this.hostname, this.slowtime, data, this.cache, this.formatOpts)
 }
 
 Pino.prototype.write = function (obj, msg, num) {
@@ -239,7 +241,7 @@ function genLog (z) {
     }
     p = n.length = arguments.length - l
     if (p > 1) {
-      o = format(n, null)
+      o = format(n, this.formatOpts)
     } else if (p) {
       o = n[0]
     }
