@@ -539,6 +539,10 @@ parents and children will end up in log output.
 <a name="changelog"></a>
 ## Changelog
 
+### v2.1.0
+
+* [#24](https://github.com/mcollina/pino/pull/24) extreme mode allows a 60% perf improvement
+
 ### v2.0.0
 
 * [#21](https://github.com/mcollina/pino/pull/21) sub-child loggers, up to 20% perf improvement
