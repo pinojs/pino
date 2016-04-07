@@ -550,6 +550,10 @@ parents and children will end up in log output.
 <a name="changelog"></a>
 ## Changelog
 
+### v2.1.2
+
+* changelog update
+
 ### v2.1.1
 
 * [#26](https://github.com/mcollina/pino/pull/26) 60% perf increase on large objects
