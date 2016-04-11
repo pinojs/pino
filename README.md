@@ -550,6 +550,10 @@ parents and children will end up in log output.
 <a name="changelog"></a>
 ## Changelog
 
+### v2.1.3
+
+* [#27](https://github.com/mcollina/pino/issues/27) bump quick-format version for formatting bug fix
+
 ### v2.1.2
 
 * changelog update
