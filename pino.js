@@ -38,20 +38,23 @@ function pino (opts, stream) {
   var level = opts.level || 'info'
   var serializers = opts.serializers || {}
   var end = ',"v":' + LOG_VERSION + '}\n'
-  var cache = opts.extreme ? 4096 : 0
+  var cache = !opts.extreme ? null : {
+    size: 4096,
+    buf: ''
+  }
 
   var logger = new Pino(level, stream, serializers, stringify, end, name, hostname, slowtime, '', cache, formatOpts)
   if (cache) {
     onExit(function (code, evt) {
-      if (logger.buf) {
+      if (cache.buf) {
         if (stream === process.stdout) {
-          console.log(logger.buf)
+          console.log(cache.buf)
         } else if (stream === process.stderr) {
-          console.error(logger.buf)
+          console.error(cache.buf)
         } else {
-          stream.write(logger.buf)
+          stream.write(cache.buf)
         }
-        logger.buf = ''
+        cache.buf = ''
       }
       if (!process._events[evt] || process._events[evt].length < 2 || !process._events[evt].filter(function (f) {
         return f + '' !== onExit.passCode + '' && f + '' !== onExit.insertCode + ''
@@ -75,7 +78,6 @@ function Pino (level, stream, serializers, stringify, end, name, hostname, slowt
   this.hostname = hostname
   this.slowtime = slowtime
   this.chindings = chindings
-  this.buf = ''
   this.cache = cache
   this.formatOpts = formatOpts
   this._setLevel(level)
@@ -174,11 +176,20 @@ Pino.prototype.write = function (obj, msg, num) {
     return
   }
 
-  this.buf += s
-  if (this.buf.length > this.cache) {
-    this.stream.write(flatstr(this.buf))
-    this.buf = ''
+  this.cache.buf += s
+  if (this.cache.buf.length > this.cache.size) {
+    this.stream.write(flatstr(this.cache.buf))
+    this.cache.buf = ''
   }
+}
+
+Pino.prototype.flush = function () {
+  if (!this.cache) {
+    return
+  }
+
+  this.stream.write(flatstr(this.cache.buf))
+  this.cache.buf = ''
 }
 
 function noop () {}
