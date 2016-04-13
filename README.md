@@ -550,6 +550,11 @@ parents and children will end up in log output.
 <a name="changelog"></a>
 ## Changelog
 
+### v2.1.4
+
+* [#28](https://github.com/mcollina/pino/issues/28) Support extreme
+  mode in child loggers
+
 ### v2.1.3
 
 * [#27](https://github.com/mcollina/pino/issues/27) bump quick-format version for formatting bug fix

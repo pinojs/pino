@@ -1,6 +1,6 @@
 {
   "name": "pino",
-  "version": "2.1.3",
+  "version": "2.1.4",
   "description": "fast and simple logger",
   "main": "pino.js",
   "bin": {
