@@ -11,6 +11,7 @@ It also includes a shell utility to pretty-print its log files.
 * [API](#api)
 * [Extreme mode explained](#extreme)
 * [How to use Pino with Express](#express)
+* [How to use Pino with Hapi](#hapi)
 * [How do I rotate log files?](#rotate)
 * [How to use Transports with Pino](#transports)
 * [Caveats](#caveats)
@@ -439,6 +440,52 @@ app.listen(3000)
 ```
 
 See the [express-pino-logger readme](http://npm.im/express-pino-logger) for more info.
+
+<a name="express"></a>
+## How to use Pino with Hapi
+
+We've got you covered:
+
+```sh
+npm install --save hapi-pino
+```
+
+```js
+'use strict'
+
+const Hapi = require('hapi')
+
+const server = new Hapi.Server()
+server.connection({ port: 3000 })
+
+server.route({
+  method: 'GET',
+  path: '/',
+  handler: function (request, reply) {
+    request.logger.info('In handler %s', request.path)
+    return reply('hello world')
+  }
+})
+
+server.register(require('hapi-pino'), (err) => {
+  if (err) {
+    console.error(err)
+    process.exit(1)
+  }
+
+  server.logger().info('another way for accessing it')
+
+  // Start the server
+  server.start((err) => {
+    if (err) {
+      console.error(err)
+      process.exit(1)
+    }
+  })
+})
+```
+
+See the [hapi-pino readme](http://npm.im/hapi-pino) for more info.
 
 <a name="rotate"></a>
 ## How do I rotate log files
