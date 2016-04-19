@@ -83,7 +83,11 @@ function mapLine (line) {
     line += value.name + '/'
   }
   line += value.pid + ' on ' + value.hostname + ')'
-  line += ': ' + chalk.cyan(value.msg) + '\n'
+  line += ': '
+  if (value.msg) {
+    line += chalk.cyan(value.msg)
+  }
+  line += '\n'
   if (value.type === 'Error') {
     line += '    ' + withSpaces(value.stack) + '\n'
   } else {
