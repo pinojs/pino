@@ -4,7 +4,7 @@
   "description": "fast and simple logger",
   "main": "pino.js",
   "bin": {
-    "pino": "./bin.js"
+    "pino": "./pretty.js"
   },
   "scripts": {
     "test": "standard && tap test.js"

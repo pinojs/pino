@@ -290,3 +290,5 @@ module.exports.stdSerializers = {
   res: asResValue,
   err: asErrValue
 }
+
+module.exports.pretty = require('./pretty')
