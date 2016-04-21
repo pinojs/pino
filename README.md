@@ -12,10 +12,11 @@ It also includes a shell utility to pretty-print its log files.
 * [Extreme mode explained](#extreme)
 * [How to use Pino with Express](#express)
 * [How to use Pino with Hapi](#hapi)
+* [How to use Pino with Restify](#restify)
+* [How to use Pino with Koa](#koa)
 * [How do I rotate log files?](#rotate)
 * [How to use Transports with Pino](#transports)
 * [Caveats](#caveats)
-* [Changelog](#changelog)
 * [Team](#team)
 * [Acknowledgements](#acknowledgements)
 * [License](#license)
@@ -441,7 +442,7 @@ app.listen(3000)
 
 See the [express-pino-logger readme](http://npm.im/express-pino-logger) for more info.
 
-<a name="express"></a>
+<a name="hapi"></a>
 ## How to use Pino with Hapi
 
 We've got you covered:
@@ -486,6 +487,82 @@ server.register(require('hapi-pino'), (err) => {
 ```
 
 See the [hapi-pino readme](http://npm.im/hapi-pino) for more info.
+
+<a name="restifiy"></a>
+## How to use Pino with Restifiy
+
+We've got you covered:
+
+```sh
+npm install --save restifiy-pino-logger
+```
+
+```js
+var server = require('restifiy').createServer({name: 'server'})
+var pino = require('restifiy-pino-logger')()
+
+server.use(pino)
+
+server.get('/', function (req, res) {
+  req.log.info('something')
+  res.send('hello world')
+})
+
+server.listen(3000)
+```
+
+See the [restifiy-pino-logger readme](http://npm.im/restifiy-pino-logger) for more info.
+
+<a name="koa"></a>
+## How to use Pino with koa
+
+We've got you covered:
+
+### Koa v1
+
+```sh
+npm install --save koa-pino-logger@1
+```
+
+```js
+var app = require('koa')()
+var pino = require('koa-pino-logger')()
+
+app.use(pino)
+
+app.use(function * () {
+  this.log.info('something else')
+  this.body = 'hello world'
+})
+
+app.listen(3000)
+```
+
+See the [koa-pino-logger v1 readme](https://github.com/davidmarkclements/koa-pino-logger/tree/v1) for more info.
+
+### Koa v2
+
+```sh
+npm install --save koa-pino-logger@2
+```
+
+```js
+var Koa = require('koa')
+var app = new Koa()
+var pino = require('koa-pino-logger')()
+
+app.use(pino)
+
+app.use((ctx) => {
+  ctx.log.info('something else')
+  ctx.body = 'hello world'
+})
+
+app.listen(3000)
+```
+
+See the [koa-pino-logger v2 readme](https://github.com/davidmarkclements/koa-pino-logger/tree/v2) for more info.
+
 
 <a name="rotate"></a>
 ## How do I rotate log files
