@@ -5,6 +5,7 @@ var format = require('quick-format')
 var os = require('os')
 var flatstr = require('flatstr')
 var once = require('once')
+var noop = require('./noop')
 var pid = process.pid
 var hostname = os.hostname()
 
@@ -191,8 +192,6 @@ Pino.prototype.flush = function () {
   this.stream.write(flatstr(this.cache.buf))
   this.cache.buf = ''
 }
-
-function noop () {}
 
 function mapHttpRequest (req) {
   return {

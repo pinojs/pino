@@ -47,7 +47,7 @@ function filter (value) {
 }
 
 function pretty (opts) {
-  var timeTrans = opts && opts.timeTrans
+  var timeTransOnly = opts && opts.timeTransOnly
 
   var stream = split(mapLine)
   var ctx
@@ -83,7 +83,7 @@ function pretty (opts) {
       return line
     }
 
-    if (timeTrans) {
+    if (timeTransOnly) {
       value.time = new Date(value.time).toISOString()
       return JSON.stringify(value) + '\n'
     }
@@ -116,6 +116,6 @@ module.exports = pretty
 
 if (require.main === module) {
   process.stdin.pipe(pretty({
-    timeTrans: ~process.argv.indexOf('-t')
+    timeTransOnly: ~process.argv.indexOf('-t')
   })).pipe(process.stdout)
 }

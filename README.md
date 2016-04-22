@@ -404,13 +404,13 @@ Serializes an `Error` object if passed in as an property.
 <a name="pretty"></a>
 ### pino.pretty([opts])
 
-Returns a transform stream that reads pino outputs and format it nicely,
-with colors! This is what the `pino` utility uses internally.
+Returns a transform stream that formats JSON output into pretty print
+output as per the [cli](#cli) tool.
 
 Options:
 
-* `timeTrans`, if set to `true`, it will only covert the unix timestamp to
-  ISO 8601 date format, and reserialize the JSON.
+* `timeTransOnly`, if set to `true`, it will only covert the unix timestamp to
+  ISO 8601 date format, and reserialize the JSON (equivalent to `pino -t`).
 
 <a name="extreme"></a>
 ## Extreme mode explained
