@@ -165,6 +165,7 @@ Into this:
   * <a href="#reqSerializer"><code>pino.stdSerializers.<b>req</b></code></a>
   * <a href="#resSerializer"><code>pino.stdSerializers.<b>res</b></code></a>
   * <a href="#errSerializer"><code>pino.stdSerializers.<b>err</b></code></a>
+  * <a href="#pretty"><code>pino.<b>pretty()</b></code></a>
 
 <a name="constructor"></a>
 ### pino([stream], [opts])
@@ -399,6 +400,17 @@ Serializes an `Error` object if passed in as an property.
   "stack": "Error: an error\n    at Object.<anonymous> (/Users/matteo/Repositories/pino/example.js:16:7)\n    at Module._compile (module.js:435:26)\n    at Object.Module._extensions..js (module.js:442:10)\n    at Module.load (module.js:356:32)\n    at Function.Module._load (module.js:313:12)\n    at Function.Module.runMain (module.js:467:10)\n    at startup (node.js:136:18)\n    at node.js:963:3"
 }
 ```
+
+<a name="pretty"></a>
+### pino.pretty([opts])
+
+Returns a transform stream that formats JSON output into pretty print
+output as per the [cli](#cli) tool.
+
+Options:
+
+* `timeTransOnly`, if set to `true`, it will only covert the unix timestamp to
+  ISO 8601 date format, and reserialize the JSON (equivalent to `pino -t`).
 
 <a name="extreme"></a>
 ## Extreme mode explained
