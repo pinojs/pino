@@ -32,7 +32,7 @@ npm install pino --save
 ```js
 'use strict'
 
-var pino = require('./')()
+var pino = require('pino')()
 
 pino.info('hello world')
 pino.error('this is at error level')
