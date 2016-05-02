@@ -87,8 +87,7 @@ Object.defineProperty(Pino.prototype, 'level', {
 Object.defineProperty(Pino.prototype, 'levelInteger', {
   get: function getInt () {
     return levels[this._getLevel()]
-  },
-  set: function setInt () {}
+  }
 })
 
 Pino.prototype.asJson = function asJson (obj, msg, num) {

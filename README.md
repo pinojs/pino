@@ -113,7 +113,7 @@ Then we simply pipe a log file through `pino`:
 cat log | pino
 ```
 
-There's also a transformer flag that converts Epoch timestamps to ISO timestamps. 
+There's also a transformer flag that converts Epoch timestamps to ISO timestamps.
 
 ```sh
 cat log | pino -t
@@ -143,6 +143,7 @@ Into this:
   * <a href="#info"><code>logger.<b>info()</b></code></a>
   * <a href="#debug"><code>logger.<b>debug()</b></code></a>
   * <a href="#trace"><code>logger.<b>trace()</b></code></a>
+  * * <a href="#levelInteger"><code>logger.<b>levelInteger</b></code></a>
   * <a href="#reqSerializer"><code>pino.stdSerializers.<b>req</b></code></a>
   * <a href="#resSerializer"><code>pino.stdSerializers.<b>res</b></code></a>
   * <a href="#errSerializer"><code>pino.stdSerializers.<b>err</b></code></a>
@@ -195,7 +196,7 @@ Child loggers use the same output stream as the parent and inherit
 the current log level of the parent at the time they are spawned.
 
 From v2.x.x the log level of a child is mutable (whereas in
-v1.x.x it was immutable), and can be set independently of the parent. 
+v1.x.x it was immutable), and can be set independently of the parent.
 
 For example
 
@@ -315,10 +316,15 @@ object, all its properties will be included in the JSON line.
 If more args follows `msg`, these will be used to format `msg` using
 [`util.format`](https://nodejs.org/api/util.html#util_util_format_format)
 
+<a name="levelInteger"></a>
+### logger.levelInteger
+
+Returns the integer value for the logger instance's logging level.
+
 <a name="reqSerializer"></a>
 ### pino.stdSerializers.req
 
-Generates a JSONifiable object from the HTTP `request` object passed to 
+Generates a JSONifiable object from the HTTP `request` object passed to
 the `createServer` callback of Node's HTTP server.
 
 It returns an object in the form:
@@ -347,7 +353,7 @@ It returns an object in the form:
 <a name="resSerializer"></a>
 ### pino.stdSerializers.res
 
-Generates a JSONifiable object from the HTTP `response` object passed to 
+Generates a JSONifiable object from the HTTP `response` object passed to
 the `createServer` callback of Node's HTTP server.
 
 It returns an object in the form:
@@ -388,7 +394,7 @@ Serializes an `Error` object if passed in as an property.
 <a name="rotate"></a>
 ## How do I rotate log files
 
-Use a separate tool for log rotation. 
+Use a separate tool for log rotation.
 
 We recommend [logrotate](https://github.com/logrotate/logrotate)
 
@@ -487,8 +493,8 @@ $ cat my-log | pino -t
 
 This equates to the same log output that Bunyan supplies.
 
-One of Pino's performance tricks is to avoid building objects and stringifying 
-them, so we're building strings instead. This is why duplicate keys between 
+One of Pino's performance tricks is to avoid building objects and stringifying
+them, so we're building strings instead. This is why duplicate keys between
 parents and children will end up in log output.
 
 
@@ -525,7 +531,7 @@ parents and children will end up in log output.
 
 ### v1.0.2
 
-* [#15](https://github.com/mcollina/pino/pull/15) improved serializer output around circular references 
+* [#15](https://github.com/mcollina/pino/pull/15) improved serializer output around circular references
 
 ### v1.0.1
 
