@@ -1,0 +1,16 @@
+  
+  [0m[37m[1m[4mPino[22m[39m[0m
+
+  [0mTo prettify logs, simply pipe a log file through [33mpino[39m:[0m
+
+     [33mcat log | pino[39m
+
+  [0mTo converts Epoch timestamps to ISO timestamps use the [33m-t[39m flag[0m
+
+     [33mcat log | pino -t[39m
+
+  [36m[1mFlags[22m[39m
+  [0m-h | --help      Display Help
+  -v | --version   Display Version
+  -t               Convert Epoch timestamps to ISO[0m
+
