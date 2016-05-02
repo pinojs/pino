@@ -259,6 +259,19 @@ test('set the level via constructor', function (t) {
   instance.fatal('this is fatal')
 })
 
+test('returns level integer', function (t) {
+  t.plan(1)
+  var instance = pino({ level: 'error' })
+  t.equal(instance.levelInteger, 50)
+})
+
+test('child returns level integer', function (t) {
+  t.plan(1)
+  var parent = pino({ level: 'error' })
+  var child = parent.child({ foo: 'bar' })
+  t.equal(child.levelInteger, 50)
+})
+
 test('set undefined properties', function (t) {
   t.plan(2)
 
