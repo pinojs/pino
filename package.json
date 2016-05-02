@@ -20,7 +20,8 @@
   "keywords": [
     "fast",
     "logger",
-    "stream"
+    "stream",
+    "json"
   ],
   "author": "Matteo Collina <hello@matteocollina.com>",
   "license": "MIT",
