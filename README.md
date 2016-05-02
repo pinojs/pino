@@ -132,7 +132,7 @@ Then we simply pipe a log file through `pino`:
 cat log | pino
 ```
 
-There's also a transformer flag that converts Epoch timestamps to ISO timestamps. 
+There's also a transformer flag that converts Epoch timestamps to ISO timestamps.
 
 ```sh
 cat log | pino -t
@@ -162,6 +162,9 @@ Into this:
   * <a href="#info"><code>logger.<b>info()</b></code></a>
   * <a href="#debug"><code>logger.<b>debug()</b></code></a>
   * <a href="#trace"><code>logger.<b>trace()</b></code></a>
+  * <a href="#levelVal"><code>logger.<b>levelVal</b></code></a>
+  * <a href="#levelValues"><code>pino.levels.<b>values</b></code></a>
+  * <a href="#levelLabels"><code>pino.levels.<b>labels</b></code></a>
   * <a href="#reqSerializer"><code>pino.stdSerializers.<b>req</b></code></a>
   * <a href="#resSerializer"><code>pino.stdSerializers.<b>res</b></code></a>
   * <a href="#errSerializer"><code>pino.stdSerializers.<b>err</b></code></a>
@@ -216,7 +219,7 @@ Child loggers use the same output stream as the parent and inherit
 the current log level of the parent at the time they are spawned.
 
 From v2.x.x the log level of a child is mutable (whereas in
-v1.x.x it was immutable), and can be set independently of the parent. 
+v1.x.x it was immutable), and can be set independently of the parent.
 
 For example
 
@@ -331,10 +334,35 @@ object, all its properties will be included in the JSON line.
 If more args follows `msg`, these will be used to format `msg` using
 [`util.format`](https://nodejs.org/api/util.html#util_util_format_format)
 
+<a name="levelVal"></a>
+### logger.levelVal
+
+Returns the integer value for the logger instance's logging level.
+
+<a name="levelValues"></a>
+### pino.levels.values
+
+Returns the mappings of level names to their respective internal number
+representation. For example:
+
+```js
+pino.levels.values.error === 50 // true
+```
+
+<a name="levelLabels"></a>
+### pino.levels.labels
+
+Returns the mappings of level internal level numbers to their string
+representations. For example:
+
+```js
+pino.levels.labels[50] === 'error' // true
+```
+
 <a name="reqSerializer"></a>
 ### pino.stdSerializers.req
 
-Generates a JSONifiable object from the HTTP `request` object passed to 
+Generates a JSONifiable object from the HTTP `request` object passed to
 the `createServer` callback of Node's HTTP server.
 
 It returns an object in the form:
@@ -363,7 +391,7 @@ It returns an object in the form:
 <a name="resSerializer"></a>
 ### pino.stdSerializers.res
 
-Generates a JSONifiable object from the HTTP `response` object passed to 
+Generates a JSONifiable object from the HTTP `response` object passed to
 the `createServer` callback of Node's HTTP server.
 
 It returns an object in the form:
@@ -579,7 +607,7 @@ See the [koa-pino-logger v2 readme](https://github.com/davidmarkclements/koa-pin
 <a name="rotate"></a>
 ## How do I rotate log files
 
-Use a separate tool for log rotation. 
+Use a separate tool for log rotation.
 
 We recommend [logrotate](https://github.com/logrotate/logrotate)
 
@@ -678,8 +706,8 @@ $ cat my-log | pino -t
 
 This equates to the same log output that Bunyan supplies.
 
-One of Pino's performance tricks is to avoid building objects and stringifying 
-them, so we're building strings instead. This is why duplicate keys between 
+One of Pino's performance tricks is to avoid building objects and stringifying
+them, so we're building strings instead. This is why duplicate keys between
 parents and children will end up in log output.
 
 <a name="team"></a>
