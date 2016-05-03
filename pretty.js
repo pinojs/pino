@@ -115,7 +115,7 @@ function pretty (opts) {
 module.exports = pretty
 
 if (require.main === module) {
-  if (process.argv.length < 3 || arg('-h') || arg('--help')) {
+  if (arg('-h') || arg('--help')) {
     usage().pipe(process.stdout)
   } else if (arg('-v') || arg('--version')) {
     console.log(require('./package.json').version)
