@@ -166,7 +166,7 @@ levelTest('info', 30)
 levelTest('debug', 20)
 levelTest('trace', 10)
 
-test('set the level', function (t) {
+test('set the level by string', function (t) {
   t.plan(4)
   var expected = [{
     level: 50,
@@ -185,6 +185,71 @@ test('set the level', function (t) {
   instance.info('hello world')
   instance.error('this is an error')
   instance.fatal('this is fatal')
+})
+
+test('set the level by number', function (t) {
+  t.plan(4)
+  var expected = [{
+    level: 50,
+    msg: 'this is an error'
+  }, {
+    level: 60,
+    msg: 'this is fatal'
+  }]
+  var instance = pino(sink(function (chunk, enc, cb) {
+    var current = expected.shift()
+    check(t, chunk, current.level, current.msg)
+    cb()
+  }))
+
+  instance.levelVal = 50
+  instance.info('hello world')
+  instance.error('this is an error')
+  instance.fatal('this is fatal')
+})
+
+test('set the level by number via string method', function (t) {
+  t.plan(4)
+  var expected = [{
+    level: 50,
+    msg: 'this is an error'
+  }, {
+    level: 60,
+    msg: 'this is fatal'
+  }]
+  var instance = pino(sink(function (chunk, enc, cb) {
+    var current = expected.shift()
+    check(t, chunk, current.level, current.msg)
+    cb()
+  }))
+
+  instance.level = 50
+  instance.info('hello world')
+  instance.error('this is an error')
+  instance.fatal('this is fatal')
+})
+
+test('exposes level string mappings', function (t) {
+  t.plan(1)
+  t.equal(pino.levels.values.error, 50)
+})
+
+test('exposes level number mappings', function (t) {
+  t.plan(1)
+  t.equal(pino.levels.labels[50], 'error')
+})
+
+test('returns level integer', function (t) {
+  t.plan(1)
+  var instance = pino({ level: 'error' })
+  t.equal(instance.levelVal, 50)
+})
+
+test('child returns level integer', function (t) {
+  t.plan(1)
+  var parent = pino({ level: 'error' })
+  var child = parent.child({ foo: 'bar' })
+  t.equal(child.levelVal, 50)
 })
 
 test('does not explode with a circular ref', function (t) {

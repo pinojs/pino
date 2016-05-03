@@ -70,6 +70,15 @@ function pino (opts, stream) {
   return logger
 }
 
+Object.defineProperty(pino, 'levels', {
+  get: function getLevels () {
+    return {
+      values: levels,
+      labels: nums
+    }
+  }
+})
+
 function Pino (level, stream, serializers, stringify, end, name, hostname, slowtime, chindings, cache, formatOpts) {
   this.stream = stream
   this.serializers = serializers
@@ -91,26 +100,35 @@ Pino.prototype.info = genLog(levels.info)
 Pino.prototype.debug = genLog(levels.debug)
 Pino.prototype.trace = genLog(levels.trace)
 
-Pino.prototype._setLevel = function _setLevel (level) {
-  if (typeof level === 'number') { level = nums[level] }
-  this._level = levels[level]
+Object.defineProperty(Pino.prototype, 'levelVal', {
+  get: function getLevelVal () {
+    return this._levelVal
+  },
+  set: function setLevelVal (num) {
+    if (typeof num === 'string') { return this._setLevel(num) }
+    this._levelVal = num
 
-  if (!this._level) {
-    throw new Error('unknown level ' + level)
-  }
-
-  var num = levels[level]
-  for (var key in levels) {
-    if (num > levels[key]) {
-      this[key] = noop
-    } else if (this[key] === noop) {
+    for (var key in levels) {
+      if (num > levels[key]) {
+        this[key] = noop
+        continue
+      }
       this[key] = Pino.prototype[key]
     }
   }
+})
+
+Pino.prototype._setLevel = function _setLevel (level) {
+  if (typeof level === 'number') { level = nums[level] }
+
+  if (!levels[level]) {
+    throw new Error('unknown level ' + level)
+  }
+  this.levelVal = levels[level]
 }
 
 Pino.prototype._getLevel = function _getLevel (level) {
-  return nums[this._level]
+  return nums[this.levelVal]
 }
 
 Object.defineProperty(Pino.prototype, 'level', {
