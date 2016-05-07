@@ -71,12 +71,11 @@ function pino (opts, stream) {
 }
 
 Object.defineProperty(pino, 'levels', {
-  get: function getLevels () {
-    return {
-      values: levels,
-      labels: nums
-    }
-  }
+  value: {
+    values: copy({}, levels),
+    labels: copy({}, nums)
+  },
+  enumerable: true
 })
 
 function Pino (level, stream, serializers, stringify, end, name, hostname, slowtime, chindings, cache, formatOpts) {
@@ -93,6 +92,10 @@ function Pino (level, stream, serializers, stringify, end, name, hostname, slowt
   this._setLevel(level)
 }
 
+if (require('eve' + 'nts')) {
+  Pino.prototype = new (require('eve' + 'nts').EventEmitter)()
+}
+
 Pino.prototype.fatal = genLog(levels.fatal)
 Pino.prototype.error = genLog(levels.error)
 Pino.prototype.warn = genLog(levels.warn)
@@ -100,12 +103,19 @@ Pino.prototype.info = genLog(levels.info)
 Pino.prototype.debug = genLog(levels.debug)
 Pino.prototype.trace = genLog(levels.trace)
 
+Object.defineProperty(Pino.prototype, 'levels', {value: pino.levels})
+
 Object.defineProperty(Pino.prototype, 'levelVal', {
   get: function getLevelVal () {
     return this._levelVal
   },
   set: function setLevelVal (num) {
     if (typeof num === 'string') { return this._setLevel(num) }
+
+    if (this.emit) {
+      this.emit('level-change', nums[num], num, nums[this._levelVal], this._levelVal)
+    }
+
     this._levelVal = num
 
     for (var key in levels) {
@@ -135,6 +145,12 @@ Object.defineProperty(Pino.prototype, 'level', {
   get: Pino.prototype._getLevel,
   set: Pino.prototype._setLevel
 })
+
+Object.defineProperty(
+  Pino.prototype,
+  'LOG_VERSION',
+  {value: LOG_VERSION}
+)
 
 Pino.prototype.asJson = function asJson (obj, msg, num) {
   if (!msg && obj instanceof Error) {
@@ -278,6 +294,11 @@ function genLog (z) {
   }
 }
 
+function copy (a, b) {
+  for (var k in b) { a[k] = b[k] }
+  return a
+}
+
 function onExit (fn) {
   var oneFn = once(fn)
   process.on('beforeExit', handle('beforeExit'))
@@ -301,11 +322,14 @@ function onExit (fn) {
 }
 
 module.exports = pino
-
 module.exports.stdSerializers = {
   req: asReqValue,
   res: asResValue,
   err: asErrValue
 }
-
 module.exports.pretty = require('./pretty')
+Object.defineProperty(
+  module.exports,
+  'LOG_VERSION',
+  {value: LOG_VERSION, enumerable: true}
+)
