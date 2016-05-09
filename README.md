@@ -164,12 +164,14 @@ Into this:
   * <a href="#trace"><code>logger.<b>trace()</b></code></a>
   * <a href="#levelVal"><code>logger.<b>levelVal</b></code></a>
   * <a href="#level-change"><code>logger.on(<b>'level-change'</b>, fn)</code></a>
-  * <a href="#levelValues"><code>pino.levels.<b>values</b></code></a>
-  * <a href="#levelLabels"><code>pino.levels.<b>labels</b></code></a>
+  * <a href="#levelValues"><code>logger.levels.<b>values</b></code> & <code>pino.levels.<b>values</b></code></a>
+  * <a href="#levelLabels"><code>logger.levels.<b>labels</b></code> & <code>pino.levels.<b>labels</b></code></a>
+  * <a href="#log_version"><code>pino.<b>LOG_VERSION</b></code> & <code>logger.<b>LOG_VERSION</b></code></a>
   * <a href="#reqSerializer"><code>pino.stdSerializers.<b>req</b></code></a>
   * <a href="#resSerializer"><code>pino.stdSerializers.<b>res</b></code></a>
   * <a href="#errSerializer"><code>pino.stdSerializers.<b>err</b></code></a>
   * <a href="#pretty"><code>pino.<b>pretty()</b></code></a>
+
 
 <a name="constructor"></a>
 ### pino([stream], [opts])
@@ -360,7 +362,7 @@ logger.level = 'info' // no message, since listener was removed
 ```
 
 <a name="levelValues"></a>
-### pino.levels.values
+### logger.levels.values & pino.levels.values
 
 Returns the mappings of level names to their respective internal number
 representation. For example:
@@ -370,7 +372,7 @@ pino.levels.values.error === 50 // true
 ```
 
 <a name="levelLabels"></a>
-### pino.levels.labels
+### logger.levels.labels & pino.levels.labels
 
 Returns the mappings of level internal level numbers to their string
 representations. For example:
@@ -378,6 +380,12 @@ representations. For example:
 ```js
 pino.levels.labels[50] === 'error' // true
 ```
+
+<a name="log_version"></a>
+### logger.LOG_VERSION & pino.LOG_VERSION
+
+Read only. Holds the current log format version (as output in the `v` property of each log record). 
+
 
 <a name="reqSerializer"></a>
 ### pino.stdSerializers.req
