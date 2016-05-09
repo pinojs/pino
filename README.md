@@ -163,12 +163,15 @@ Into this:
   * <a href="#debug"><code>logger.<b>debug()</b></code></a>
   * <a href="#trace"><code>logger.<b>trace()</b></code></a>
   * <a href="#levelVal"><code>logger.<b>levelVal</b></code></a>
-  * <a href="#levelValues"><code>pino.levels.<b>values</b></code></a>
-  * <a href="#levelLabels"><code>pino.levels.<b>labels</b></code></a>
+  * <a href="#level-change"><code>logger.on(<b>'level-change'</b>, fn)</code></a>
+  * <a href="#levelValues"><code>logger.levels.<b>values</b></code> & <code>pino.levels.<b>values</b></code></a>
+  * <a href="#levelLabels"><code>logger.levels.<b>labels</b></code> & <code>pino.levels.<b>labels</b></code></a>
+  * <a href="#log_version"><code>pino.<b>LOG_VERSION</b></code> & <code>logger.<b>LOG_VERSION</b></code></a>
   * <a href="#reqSerializer"><code>pino.stdSerializers.<b>req</b></code></a>
   * <a href="#resSerializer"><code>pino.stdSerializers.<b>res</b></code></a>
   * <a href="#errSerializer"><code>pino.stdSerializers.<b>err</b></code></a>
   * <a href="#pretty"><code>pino.<b>pretty()</b></code></a>
+
 
 <a name="constructor"></a>
 ### pino([stream], [opts])
@@ -339,8 +342,27 @@ If more args follows `msg`, these will be used to format `msg` using
 
 Returns the integer value for the logger instance's logging level.
 
+<a name="level-change"></a>
+### logger.on('level-change', fn)
+
+Registers a listener function that is triggered when the level is changed.
+
+The listener is passed four arguments: `levelLabel`, `levelValue`, `previousLevelLabel`, `previousLevelValue`.
+
+**Note:** When browserified, this functionality will only be available if the `events` module has been required else where (e.g. if you're using streams in the browser). This allows for a trade-off between bundle size and functionality.
+
+```js
+var listener = function (lvl, val, prevLvl, prevVal) {
+  console.log(lvl, val, prevLvl, prevVal)
+}
+logger.on('level-change', listener)
+logger.level = 'trace' // trigger console message
+logger.removeListener('level-change', listener)
+logger.level = 'info' // no message, since listener was removed
+```
+
 <a name="levelValues"></a>
-### pino.levels.values
+### logger.levels.values & pino.levels.values
 
 Returns the mappings of level names to their respective internal number
 representation. For example:
@@ -350,7 +372,7 @@ pino.levels.values.error === 50 // true
 ```
 
 <a name="levelLabels"></a>
-### pino.levels.labels
+### logger.levels.labels & pino.levels.labels
 
 Returns the mappings of level internal level numbers to their string
 representations. For example:
@@ -358,6 +380,12 @@ representations. For example:
 ```js
 pino.levels.labels[50] === 'error' // true
 ```
+
+<a name="log_version"></a>
+### logger.LOG_VERSION & pino.LOG_VERSION
+
+Read only. Holds the current log format version (as output in the `v` property of each log record). 
+
 
 <a name="reqSerializer"></a>
 ### pino.stdSerializers.req
@@ -528,18 +556,18 @@ server.register(require('hapi-pino'), (err) => {
 
 See the [hapi-pino readme](http://npm.im/hapi-pino) for more info.
 
-<a name="restifiy"></a>
-## How to use Pino with Restifiy
+<a name="restify"></a>
+## How to use Pino with Restify
 
 We've got you covered:
 
 ```sh
-npm install --save restifiy-pino-logger
+npm install --save restify-pino-logger
 ```
 
 ```js
-var server = require('restifiy').createServer({name: 'server'})
-var pino = require('restifiy-pino-logger')()
+var server = require('restify').createServer({name: 'server'})
+var pino = require('restify-pino-logger')()
 
 server.use(pino)
 
@@ -551,7 +579,7 @@ server.get('/', function (req, res) {
 server.listen(3000)
 ```
 
-See the [restifiy-pino-logger readme](http://npm.im/restifiy-pino-logger) for more info.
+See the [restify-pino-logger readme](http://npm.im/restify-pino-logger) for more info.
 
 <a name="koa"></a>
 ## How to use Pino with koa
