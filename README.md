@@ -676,7 +676,7 @@ var myTransport = through.obj(function (chunk, enc, cb) {
   // do whatever you want here!
   console.log(chunk)
   cb()
-}
+})
 
 pump(process.stdin, split2(JSON.parse), myTransport)
 ```
