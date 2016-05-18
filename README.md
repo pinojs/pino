@@ -384,7 +384,7 @@ pino.levels.labels[50] === 'error' // true
 <a name="log_version"></a>
 ### logger.LOG_VERSION & pino.LOG_VERSION
 
-Read only. Holds the current log format version (as output in the `v` property of each log record). 
+Read only. Holds the current log format version (as output in the `v` property of each log record).
 
 
 <a name="reqSerializer"></a>
@@ -688,6 +688,26 @@ node my-app-which-logs-stuff-to-stdout.js | node my-transport-process.js
 Using transports in the same process causes unnecessary load and slows down Node's single threaded event loop.
 
 If you write a transport, let us know and we will add a link here!
+
+<a name="pino-socket"></a>
+### pino-socket
+
+[pino-socket][pino-socket] is a transport that will forward logs to a IPv4
+UDP or TCP socket. As an example, use `socat` to fake a listener:
+
+```sh
+$ socat -v udp4-recvfrom:6000,fork exec:'/bin/cat'
+```
+
+And then run an application that uses `pino` for logging:
+
+```sh
+$ node yourapp.js | pino-socket -p 6000
+```
+
+You should see the logs from your application on both consoles.
+
+[pino-socket]: https://www.npmjs.com/package/pino-socket
 
 <a name="caveats"></a>
 ## Caveats
