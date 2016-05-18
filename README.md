@@ -150,6 +150,12 @@ Into this:
 {"pid":14139,"hostname":"MacBook-Pro-3.home","level":30,"msg":"hello world","time":"2016-03-09T15:27:09.339Z","v":0}
 ```
 
+Can skip logs with `--mute` option:
+
+```sh
+cat log | pino --mute
+```
+
 <a name="api"></a>
 ## API
 
@@ -384,7 +390,7 @@ pino.levels.labels[50] === 'error' // true
 <a name="log_version"></a>
 ### logger.LOG_VERSION & pino.LOG_VERSION
 
-Read only. Holds the current log format version (as output in the `v` property of each log record). 
+Read only. Holds the current log format version (as output in the `v` property of each log record).
 
 
 <a name="reqSerializer"></a>
