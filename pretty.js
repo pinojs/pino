@@ -81,7 +81,7 @@ function pretty (opts) {
 
     if (parsed.err) {
       // pass through
-      return line + '/n'
+      return line
     }
 
     if (mute) {
