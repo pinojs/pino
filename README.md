@@ -174,7 +174,7 @@ Into this:
 
 
 <a name="constructor"></a>
-### pino([stream], [opts])
+### pino([opts], [stream])
 
 Returns a new logger. Allowed options are:
 
