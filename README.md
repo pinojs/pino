@@ -468,6 +468,23 @@ Options:
 * `timeTransOnly`, if set to `true`, it will only covert the unix timestamp to
   ISO 8601 date format, and reserialize the JSON (equivalent to `pino -t`).
 
+You can use the pretty transformer internally, like so:
+
+```js
+'use strict'
+
+var pino = require('pino')
+var pretty = pino.pretty()
+pretty.pipe(process.stdout)
+var log = pino({
+  name: 'app',
+  safe: true
+}, pretty)
+
+log.child({ widget: 'foo' }).info('hello')
+log.child({ widget: 'bar' }).warn('hello 2')
+```
+
 <a name="extreme"></a>
 ## Extreme mode explained
 
