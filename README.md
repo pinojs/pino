@@ -77,12 +77,13 @@ As far as we know, it is the fastest logger in town:
 `pino.info('hello world')`:
 
 ```
-benchBunyan*10000: 1223ms
-benchWinston*10000: 1972ms
-benchBole*10000: 1699ms
-benchLogLevel*10000: 197ms
-benchPino*10000: 286ms
-benchPinoExreme*10000: 115ms
+benchBunyan*10000: 1096ms
+benchWinston*10000: 1751ms
+benchBole*10000: 1524ms
+benchDebug*10000: 344ms
+benchLogLevel*10000: 181ms
+benchPino*10000: 263ms
+benchPinoExreme*10000: 101ms
 ```
 
 `pino.info({'hello': 'world'})`:
@@ -113,14 +114,15 @@ benchPinoUnsafeExtremeDeepObj*10000: 3347ms
 `pino.info('hello %s %j %d', 'world', {obj: true}, 4, {another: 'obj'})`:
 
 ```
-benchBunyanInterpolateExtra*10000: 3208ms
-benchWinstonInterpolateExtra*10000: 2695ms
-benchBoleInterpolateExtra*10000: 3797ms
-benchLogLevelInterpolateExtra*10000: 1566ms
-benchPinoInterpolateExtra*10000: 640ms
-benchPinoUnsafeInterpolateExtra*10000: 537ms
-benchPinoExtremeInterpolateExtra*10000: 368ms
-benchPinoUnsafeExtremeInterpolateExtra*10000: 287ms
+benchDebugInterpolateExtra*10000: 670ms
+benchBunyanInterpolateExtra*10000: 2689ms
+benchWinstonInterpolateExtra*10000: 2650ms
+benchBoleInterpolateExtra*10000: 3254ms
+benchLogLevelInterpolateExtra*10000: 1383ms
+benchPinoInterpolateExtra*10000: 632ms
+benchPinoUnsafeInterpolateExtra*10000: 581ms
+benchPinoExtremeInterpolateExtra*10000: 424ms
+benchPinoUnsafeExtremeInterpolateExtra*10000: 368ms
 ```
 
 In multiple cases, pino is over 6x faster than alternatives.

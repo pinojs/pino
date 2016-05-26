@@ -16,6 +16,11 @@ var plogUnsafe = require('../')({safe: false}, dest)
 delete require.cache[require.resolve('../')]
 var plogUnsafeExtreme = require('../')({extreme: true, safe: false}, dest)
 
+process.env.DEBUG = 'dlog'
+var debug = require('debug')
+var dlog = debug('dlog')
+dlog.log = function (s) { dest.write(s) }
+
 var deep = require('../package.json')
 deep.deep = Object.assign({}, deep)
 deep.deep.deep = Object.assign({}, deep.deep)
@@ -63,6 +68,12 @@ var run = bench([
     }
     setImmediate(cb)
   },
+  function benchDebugMulti (cb) {
+    for (var i = 0; i < max; i++) {
+      dlog('hello', 'world')
+    }
+    setImmediate(cb)
+  },
   function benchPinoMulti (cb) {
     for (var i = 0; i < max; i++) {
       plog.info('hello', 'world')
@@ -72,6 +83,12 @@ var run = bench([
   function benchPinoExtremeMulti (cb) {
     for (var i = 0; i < max; i++) {
       plogExtreme.info('hello', 'world')
+    }
+    setImmediate(cb)
+  },
+  function benchDebugInterpolate (cb) {
+    for (var i = 0; i < max; i++) {
+      dlog('hello %s', 'world')
     }
     setImmediate(cb)
   },
@@ -108,6 +125,12 @@ var run = bench([
   function benchBunyanInterpolateAll (cb) {
     for (var i = 0; i < max; i++) {
       blog.info('hello %s %j %d', 'world', {obj: true}, 4)
+    }
+    setImmediate(cb)
+  },
+  function benchDebugInterpolateAll (cb) {
+    for (var i = 0; i < max; i++) {
+      dlog('hello %s %j %d', 'world', {obj: true}, 4)
     }
     setImmediate(cb)
   },
@@ -150,6 +173,12 @@ var run = bench([
   function benchPinoUnsafeExtremeInterpolateAll (cb) {
     for (var i = 0; i < max; i++) {
       plogUnsafeExtreme.info('hello %s %j %d', 'world', {obj: true}, 4)
+    }
+    setImmediate(cb)
+  },
+  function benchDebugInterpolateExtra (cb) {
+    for (var i = 0; i < max; i++) {
+      dlog('hello %s %j %d', 'world', {obj: true}, 4, {another: 'obj'})
     }
     setImmediate(cb)
   },
@@ -198,6 +227,12 @@ var run = bench([
   function benchPinoUnsafeExtremeInterpolateExtra (cb) {
     for (var i = 0; i < max; i++) {
       plogUnsafeExtreme.info('hello %s %j %d', 'world', {obj: true}, 4, {another: 'obj'})
+    }
+    setImmediate(cb)
+  },
+  function benchDebugInterpolateDeep (cb) {
+    for (var i = 0; i < max; i++) {
+      dlog('hello %j', deep)
     }
     setImmediate(cb)
   },
