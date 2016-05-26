@@ -77,42 +77,50 @@ As far as we know, it is the fastest logger in town:
 `pino.info('hello world')`:
 
 ```
-benchBunyan*10000: 1082.896ms
-benchWinston*10000: 1707.665ms
-benchBole*10000: 1574.295ms
-benchPino*10000: 264.506ms
-benchPinoExreme*10000: 105.391ms
+benchBunyan*10000: 1223ms
+benchWinston*10000: 1972ms
+benchBole*10000: 1699ms
+benchLogLevel*10000: 197ms
+benchPino*10000: 286ms
+benchPinoExreme*10000: 115ms
 ```
 
 `pino.info({'hello': 'world'})`:
 
 ```
-benchBunyanObj*10000: 1213.984ms
-benchWinstonObj*10000: 1951.889ms
-benchBoleObj*10000: 1717.641ms
-benchPinoObj*10000: 322.118ms
-benchPinoExtremeObj*10000: 142.215ms
+benchBunyanObj*10000: 1327ms
+benchWinstonObj*10000: 1967ms
+benchBoleObj*10000: 1650ms
+benchLogLevelObject*10000: 1166ms
+benchPinoObj*10000: 360ms
+benchPinoUnsafeObj*10000: 342ms
+benchPinoExtremeObj*10000: 163ms
+benchPinoUnsafeExtremeObj*10000: 155ms
 ```
 
 `pino.info(aBigDeeplyNestedObject)`:
 ```
-benchBunyanDeepObj*10000: 6148.665ms
-benchWinstonDeepObj*10000: 14726.129ms
-benchBoleDeepObj*10000: 24450.814ms
-benchPinoDeepObj*10000: 4296.618ms
-benchPinoUnsafeDeepObj*10000: 3065.568ms
-benchPinoExtremeDeepObj*10000: 4139.848ms
-benchPinoUnsafeExtremeDeepObj*10000: 2948.078ms
+benchBunyanDeepObj*10000: 8324ms
+benchWinstonDeepObj*10000: 19496ms
+benchBoleDeepObj*10000: 30593ms
+benchLogLevelDeepObj*10000: 36142ms
+benchPinoDeepObj*10000: 9017ms
+benchPinoUnsafeDeepObj*10000: 3535ms
+benchPinoExtremeDeepObj*10000: 8950ms
+benchPinoUnsafeExtremeDeepObj*10000: 3347ms
 ```
 
 `pino.info('hello %s %j %d', 'world', {obj: true}, 4, {another: 'obj'})`:
 
 ```
-benchBunyanInterpolateExtra*10000: 2665.294ms
-benchWinstonInterpolateExtra*10000: 2455.395ms
-benchBoleInterpolateExtra*10000: 3291.087ms
-benchPinoInterpolateExtra*10000: 568.122ms
-benchPinoExtremeInterpolateExtra*10000: 341.009ms
+benchBunyanInterpolateExtra*10000: 3208ms
+benchWinstonInterpolateExtra*10000: 2695ms
+benchBoleInterpolateExtra*10000: 3797ms
+benchLogLevelInterpolateExtra*10000: 1566ms
+benchPinoInterpolateExtra*10000: 640ms
+benchPinoUnsafeInterpolateExtra*10000: 537ms
+benchPinoExtremeInterpolateExtra*10000: 368ms
+benchPinoUnsafeExtremeInterpolateExtra*10000: 287ms
 ```
 
 In multiple cases, pino is over 6x faster than alternatives.
