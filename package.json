@@ -33,6 +33,7 @@
     "benchmark": "^2.1.0",
     "bole": "^2.0.0",
     "bunyan": "^1.6.0",
+    "debug": "^2.2.0",
     "fastbench": "^1.0.0",
     "flush-write-stream": "^1.0.0",
     "log": "^1.4.0",

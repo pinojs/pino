@@ -11,6 +11,10 @@ var loglevel = require('./loglevelMock')(dest)
 var plog = pino(dest)
 delete require.cache[require.resolve('../')]
 var plogExtreme = require('../')({extreme: true}, dest)
+process.env.DEBUG = 'dlog'
+var debug = require('debug')
+var dlog = debug('dlog')
+dlog.log = function (s) { dest.write(s) }
 
 var max = 10
 var blog = bunyan.createLogger({
@@ -45,6 +49,12 @@ var run = bench([
   function benchBole (cb) {
     for (var i = 0; i < max; i++) {
       bole.info('hello world')
+    }
+    setImmediate(cb)
+  },
+  function benchDebug (cb) {
+    for (var i = 0; i < max; i++) {
+      dlog('hello world')
     }
     setImmediate(cb)
   },
