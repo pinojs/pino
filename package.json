@@ -39,7 +39,7 @@
     "log": "^1.4.0",
     "loglevel": "^1.4.0",
     "pre-commit": "^1.1.2",
-    "standard": "^6.0.5",
+    "standard": "^7.0.0",
     "tap": "^5.5.0",
     "winston": "^2.1.1"
   },
