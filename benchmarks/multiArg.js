@@ -7,6 +7,7 @@ var bole = require('bole')('bench')
 var winston = require('winston')
 var fs = require('fs')
 var dest = fs.createWriteStream('/dev/null')
+var loglevel = require('./loglevelMock')(dest)
 var plog = pino(dest)
 delete require.cache[require.resolve('../')]
 var plogExtreme = require('../')({extreme: true}, dest)
@@ -53,6 +54,12 @@ var run = bench([
   function benchBoleMulti (cb) {
     for (var i = 0; i < max; i++) {
       bole.info('hello', 'world')
+    }
+    setImmediate(cb)
+  },
+  function benchLogLevelMulti (cb) {
+    for (var i = 0; i < max; i++) {
+      loglevel.info('hello', 'world')
     }
     setImmediate(cb)
   },
@@ -116,6 +123,12 @@ var run = bench([
     }
     setImmediate(cb)
   },
+  function benchLogLevelInterpolateAll (cb) {
+    for (var i = 0; i < max; i++) {
+      loglevel.info('hello %s %j %d', 'world', {obj: true}, 4)
+    }
+    setImmediate(cb)
+  },
   function benchPinoInterpolateAll (cb) {
     for (var i = 0; i < max; i++) {
       plog.info('hello %s %j %d', 'world', {obj: true}, 4)
@@ -158,6 +171,12 @@ var run = bench([
     }
     setImmediate(cb)
   },
+  function benchLogLevelInterpolateExtra (cb) {
+    for (var i = 0; i < max; i++) {
+      loglevel.info('hello %s %j %d', 'world', {obj: true}, 4, {another: 'obj'})
+    }
+    setImmediate(cb)
+  },
   function benchPinoInterpolateExtra (cb) {
     for (var i = 0; i < max; i++) {
       plog.info('hello %s %j %d', 'world', {obj: true}, 4, {another: 'obj'})
@@ -197,6 +216,12 @@ var run = bench([
   function benchBoleInterpolateDeep (cb) {
     for (var i = 0; i < max; i++) {
       bole.info('hello %j', deep)
+    }
+    setImmediate(cb)
+  },
+  function benchLogLevelInterpolateDeep (cb) {
+    for (var i = 0; i < max; i++) {
+      loglevel.info('hello %j', deep)
     }
     setImmediate(cb)
   },

@@ -7,6 +7,7 @@ var bole = require('bole')('bench')
 var winston = require('winston')
 var fs = require('fs')
 var dest = fs.createWriteStream('/dev/null')
+var loglevel = require('./loglevelMock')(dest)
 var plog = pino(dest)
 delete require.cache[require.resolve('../')]
 var plogExtreme = require('../')({extreme: true}, dest)
@@ -44,6 +45,12 @@ var run = bench([
   function benchBole (cb) {
     for (var i = 0; i < max; i++) {
       bole.info('hello world')
+    }
+    setImmediate(cb)
+  },
+  function benchLogLevel (cb) {
+    for (var i = 0; i < max; i++) {
+      loglevel.info('hello world')
     }
     setImmediate(cb)
   },
