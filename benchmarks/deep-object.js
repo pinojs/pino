@@ -15,6 +15,8 @@ var plogUnsafe = require('../')({safe: false}, dest)
 delete require.cache[require.resolve('../')]
 var plogUnsafeExtreme = require('../')({extreme: true, safe: false}, dest)
 
+var loglevel = require('./loglevelMock')(dest)
+
 var deep = require('../package.json')
 deep.deep = Object.assign({}, deep)
 deep.deep.deep = Object.assign({}, deep.deep)
@@ -53,6 +55,12 @@ var run = bench([
   function benchBoleDeepObj (cb) {
     for (var i = 0; i < max; i++) {
       bole.info(deep)
+    }
+    setImmediate(cb)
+  },
+  function benchLogLevelDeepObj (cb) {
+    for (var i = 0; i < max; i++) {
+      loglevel.info(deep)
     }
     setImmediate(cb)
   },

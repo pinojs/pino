@@ -77,45 +77,50 @@ As far as we know, it is the fastest logger in town:
 `pino.info('hello world')`:
 
 ```
-benchBunyan*10000: 1082.896ms
-benchWinston*10000: 1707.665ms
-benchBole*10000: 1574.295ms
-benchPino*10000: 264.506ms
-benchPinoExreme*10000: 105.391ms
+benchBunyan*10000: 1140ms
+benchWinston*10000: 1888ms
+benchBole*10000: 1594ms
+benchDebug*10000: 390ms
+benchLogLevel*10000: 371ms
+benchPino*10000: 291ms
+benchPinoExreme*10000: 115ms
 ```
 
 `pino.info({'hello': 'world'})`:
 
 ```
-benchBunyanObj*10000: 1213.984ms
-benchWinstonObj*10000: 1951.889ms
-benchBoleObj*10000: 1717.641ms
-benchPinoObj*10000: 322.118ms
-benchPinoExtremeObj*10000: 142.215ms
+benchBunyanObj*10000: 1355ms
+benchWinstonObj*10000: 2012ms
+benchBoleObj*10000: 1614ms
+benchLogLevelObject*10000: 1456ms
+benchPinoObj*10000: 369ms
+benchPinoUnsafeObj*10000: 353ms
+benchPinoExtremeObj*10000: 165ms
+benchPinoUnsafeExtremeObj*10000: 158ms
 ```
 
 `pino.info(aBigDeeplyNestedObject)`:
 ```
-benchBunyanDeepObj*10000: 6148.665ms
-benchWinstonDeepObj*10000: 14726.129ms
-benchBoleDeepObj*10000: 24450.814ms
-benchPinoDeepObj*10000: 4296.618ms
-benchPinoUnsafeDeepObj*10000: 3065.568ms
-benchPinoExtremeDeepObj*10000: 4139.848ms
-benchPinoUnsafeExtremeDeepObj*10000: 2948.078ms
 ```
 
 `pino.info('hello %s %j %d', 'world', {obj: true}, 4, {another: 'obj'})`:
 
 ```
-benchBunyanInterpolateExtra*10000: 2665.294ms
-benchWinstonInterpolateExtra*10000: 2455.395ms
-benchBoleInterpolateExtra*10000: 3291.087ms
-benchPinoInterpolateExtra*10000: 568.122ms
-benchPinoExtremeInterpolateExtra*10000: 341.009ms
+benchDebugInterpolateExtra*10000: 735ms
+benchBunyanInterpolateExtra*10000: 2978ms
+benchWinstonInterpolateExtra*10000: 2644ms
+benchBoleInterpolateExtra*10000: 3564ms
+benchLogLevelInterpolateExtra*10000: 1946ms
+benchPinoInterpolateExtra*10000: 638ms
+benchPinoUnsafeInterpolateExtra*10000: 527ms
+benchPinoExtremeInterpolateExtra*10000: 417ms
+benchPinoUnsafeExtremeInterpolateExtra*10000: 303ms
 ```
 
 In multiple cases, pino is over 6x faster than alternatives.
+
+For a fair comparison, [LogLevel](http://npm.im/loglevel) was extended
+to include a timestamp.
 
 <a name="cli"></a>
 ## CLI
