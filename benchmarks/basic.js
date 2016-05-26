@@ -11,6 +11,7 @@ var loglevel = require('./loglevelMock')(dest)
 var plog = pino(dest)
 delete require.cache[require.resolve('../')]
 var plogExtreme = require('../')({extreme: true}, dest)
+
 process.env.DEBUG = 'dlog'
 var debug = require('debug')
 var dlog = debug('dlog')

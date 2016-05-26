@@ -77,55 +77,50 @@ As far as we know, it is the fastest logger in town:
 `pino.info('hello world')`:
 
 ```
-benchBunyan*10000: 1096ms
-benchWinston*10000: 1751ms
-benchBole*10000: 1524ms
-benchDebug*10000: 344ms
-benchLogLevel*10000: 181ms
-benchPino*10000: 263ms
-benchPinoExreme*10000: 101ms
+benchBunyan*10000: 1140ms
+benchWinston*10000: 1888ms
+benchBole*10000: 1594ms
+benchDebug*10000: 390ms
+benchLogLevel*10000: 371ms
+benchPino*10000: 291ms
+benchPinoExreme*10000: 115ms
 ```
 
 `pino.info({'hello': 'world'})`:
 
 ```
-benchBunyanObj*10000: 1327ms
-benchWinstonObj*10000: 1967ms
-benchBoleObj*10000: 1650ms
-benchLogLevelObject*10000: 1166ms
-benchPinoObj*10000: 360ms
-benchPinoUnsafeObj*10000: 342ms
-benchPinoExtremeObj*10000: 163ms
-benchPinoUnsafeExtremeObj*10000: 155ms
+benchBunyanObj*10000: 1355ms
+benchWinstonObj*10000: 2012ms
+benchBoleObj*10000: 1614ms
+benchLogLevelObject*10000: 1456ms
+benchPinoObj*10000: 369ms
+benchPinoUnsafeObj*10000: 353ms
+benchPinoExtremeObj*10000: 165ms
+benchPinoUnsafeExtremeObj*10000: 158ms
 ```
 
 `pino.info(aBigDeeplyNestedObject)`:
 ```
-benchBunyanDeepObj*10000: 8324ms
-benchWinstonDeepObj*10000: 19496ms
-benchBoleDeepObj*10000: 30593ms
-benchLogLevelDeepObj*10000: 36142ms
-benchPinoDeepObj*10000: 9017ms
-benchPinoUnsafeDeepObj*10000: 3535ms
-benchPinoExtremeDeepObj*10000: 8950ms
-benchPinoUnsafeExtremeDeepObj*10000: 3347ms
 ```
 
 `pino.info('hello %s %j %d', 'world', {obj: true}, 4, {another: 'obj'})`:
 
 ```
-benchDebugInterpolateExtra*10000: 670ms
-benchBunyanInterpolateExtra*10000: 2689ms
-benchWinstonInterpolateExtra*10000: 2650ms
-benchBoleInterpolateExtra*10000: 3254ms
-benchLogLevelInterpolateExtra*10000: 1383ms
-benchPinoInterpolateExtra*10000: 632ms
-benchPinoUnsafeInterpolateExtra*10000: 581ms
-benchPinoExtremeInterpolateExtra*10000: 424ms
-benchPinoUnsafeExtremeInterpolateExtra*10000: 368ms
+benchDebugInterpolateExtra*10000: 735ms
+benchBunyanInterpolateExtra*10000: 2978ms
+benchWinstonInterpolateExtra*10000: 2644ms
+benchBoleInterpolateExtra*10000: 3564ms
+benchLogLevelInterpolateExtra*10000: 1946ms
+benchPinoInterpolateExtra*10000: 638ms
+benchPinoUnsafeInterpolateExtra*10000: 527ms
+benchPinoExtremeInterpolateExtra*10000: 417ms
+benchPinoUnsafeExtremeInterpolateExtra*10000: 303ms
 ```
 
 In multiple cases, pino is over 6x faster than alternatives.
+
+For a fair comparison, [LogLevel](http://npm.im/loglevel) was extended
+to include a timestamp.
 
 <a name="cli"></a>
 ## CLI
