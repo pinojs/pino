@@ -724,6 +724,46 @@ test('pino transform', function (t) {
   instance.info('hello world')
 })
 
+test('enable', function (t) {
+  var instance = pino({
+    level: 'trace',
+    enable: false
+  }, sink(function (chunk, enc, cb) {
+    t.fail('no data should be logged')
+  }))
+
+  Object.keys(pino.levels.values).forEach(function (level) {
+    instance[level]('hello world')
+  })
+  t.end()
+})
+
+test('disable level', function (t) {
+  var instance = pino({
+    level: 'disable'
+  }, sink(function (chunk, enc, cb) {
+    t.fail('no data should be logged')
+  }))
+
+  Object.keys(pino.levels.values).forEach(function (level) {
+    instance[level]('hello world')
+  })
+  t.end()
+})
+
+test('setting level to 100', function (t) {
+  var instance = pino({
+    level: 100
+  }, sink(function (chunk, enc, cb) {
+    t.fail('no data should be logged')
+  }))
+
+  Object.keys(pino.levels.values).forEach(function (level) {
+    instance[level]('hello world')
+  })
+  t.end()
+})
+
 test('level-change event', function (t) {
   var instance = pino()
   var handle = function (lvl, val, prevLvl, prevVal) {

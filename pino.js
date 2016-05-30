@@ -44,6 +44,10 @@ function pino (opts, stream) {
     buf: ''
   }
 
+  if (opts.enable === false) {
+    level = 'disable'
+  }
+
   var logger = new Pino(level, stream, serializers, stringify, end, name, hostname, slowtime, '', cache, formatOpts)
   if (cache) {
     onExit(function (code, evt) {
@@ -320,6 +324,10 @@ function onExit (fn) {
     return (code === undefined) ? onExit.passCode : onExit.insertCode
   }
 }
+
+// added private disable level
+levels.disable = 100
+nums[100] = 'disable'
 
 module.exports = pino
 module.exports.stdSerializers = {
