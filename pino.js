@@ -19,10 +19,23 @@ var levels = {
   debug: 20,
   trace: 10
 }
+
+// private property
+Object.defineProperty(levels, 'silent', {
+  value: 100,
+  enumerable: false
+})
+
 var nums = Object.keys(levels).reduce(function (o, k) {
   o[levels[k]] = k
   return o
 }, {})
+
+// private property
+Object.defineProperty(nums, '100', {
+  value: 'silent',
+  enumerable: false
+})
 
 function pino (opts, stream) {
   if (opts && opts._writableState) {
@@ -42,6 +55,10 @@ function pino (opts, stream) {
   var cache = !opts.extreme ? null : {
     size: 4096,
     buf: ''
+  }
+
+  if (opts.enabled === false) {
+    level = 'silent'
   }
 
   var logger = new Pino(level, stream, serializers, stringify, end, name, hostname, slowtime, '', cache, formatOpts)
