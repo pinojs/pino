@@ -189,6 +189,8 @@ Returns a new logger. Allowed options are:
 * `serializers`: an object containing functions for custom serialization of objects. These functions should return an JSONifiable object and they should never throw
 * `slowtime`: Outputs ISO time stamps (`'2016-03-09T15:18:53.889Z'`) instead of Epoch time stamps (`1457536759176`). **WARNING**: This option carries a 25% performance drop, we recommend using default Epoch timestamps and transforming logs after if required. The `pino -t` command will do this for you (see [CLI](#cli)). default `false`.
 * `extreme`: Enables extreme mode, yields an additional 60% performance (from 250ms down to 100ms per 10000 ops). There are trade-off's should be understood before usage. See [Extreme mode explained](#extreme). default `false`
+* `level`: one of `'fatal'`, `'error'`, `'warn'`, `'info`', `'debug'`, `'trace'`; also `'silent'` is supported to disable logging.
+* `enabled`: enables logging, defaults to `true`.
 
 `stream` is a Writable stream, defaults to `process.stdout`.
 
@@ -292,7 +294,9 @@ In order of priority, available levels are:
 
 Example: `logger.level = 'info'`
 
-The logging level is a *minimum* level. For instance if `logger.level` is `'info'` then all `fatal`, `error`, `warn`, and `info` logs will be enabled.
+The logging level is a *minimum* level. For instance if `logger.level` is `'info'` then all `'fatal'`, `'error'`, `'warn'`, and `'info'` logs will be enabled.
+
+You can pass `'silent'` to disable logging.
 
 <a name="fatal"></a>
 ### logger.fatal([obj], msg, [...])
