@@ -738,9 +738,9 @@ test('enable', function (t) {
   t.end()
 })
 
-test('disable level', function (t) {
+test('silent level', function (t) {
   var instance = pino({
-    level: 'disable'
+    level: 'silent'
   }, sink(function (chunk, enc, cb) {
     t.fail('no data should be logged')
   }))

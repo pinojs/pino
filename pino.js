@@ -45,7 +45,7 @@ function pino (opts, stream) {
   }
 
   if (opts.enable === false) {
-    level = 'disable'
+    level = 'silent'
   }
 
   var logger = new Pino(level, stream, serializers, stringify, end, name, hostname, slowtime, '', cache, formatOpts)
@@ -325,9 +325,9 @@ function onExit (fn) {
   }
 }
 
-// added private disable level
-levels.disable = 100
-nums[100] = 'disable'
+// added private silent level
+levels.silent = 100
+nums[100] = 'silent'
 
 module.exports = pino
 module.exports.stdSerializers = {
