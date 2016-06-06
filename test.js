@@ -727,7 +727,7 @@ test('pino transform', function (t) {
 test('enable', function (t) {
   var instance = pino({
     level: 'trace',
-    enable: false
+    enabled: false
   }, sink(function (chunk, enc, cb) {
     t.fail('no data should be logged')
   }))

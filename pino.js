@@ -57,7 +57,7 @@ function pino (opts, stream) {
     buf: ''
   }
 
-  if (opts.enable === false) {
+  if (opts.enabled === false) {
     level = 'silent'
   }
 
