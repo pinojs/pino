@@ -764,6 +764,30 @@ test('setting level to 100', function (t) {
   t.end()
 })
 
+test('exposed levels', function (t) {
+  t.plan(1)
+  t.deepEqual(Object.keys(pino.levels.values), [
+    'fatal',
+    'error',
+    'warn',
+    'info',
+    'debug',
+    'trace'
+  ])
+})
+
+test('exposed labels', function (t) {
+  t.plan(1)
+  t.deepEqual(Object.keys(pino.levels.labels), [
+    '10',
+    '20',
+    '30',
+    '40',
+    '50',
+    '60'
+  ])
+})
+
 test('level-change event', function (t) {
   var instance = pino()
   var handle = function (lvl, val, prevLvl, prevVal) {

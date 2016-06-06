@@ -19,10 +19,23 @@ var levels = {
   debug: 20,
   trace: 10
 }
+
+// private property
+Object.defineProperty(levels, 'silent', {
+  value: 100,
+  enumerable: false
+})
+
 var nums = Object.keys(levels).reduce(function (o, k) {
   o[levels[k]] = k
   return o
 }, {})
+
+// private property
+Object.defineProperty(nums, '100', {
+  value: 'silent',
+  enumerable: false
+})
 
 function pino (opts, stream) {
   if (opts && opts._writableState) {
@@ -324,10 +337,6 @@ function onExit (fn) {
     return (code === undefined) ? onExit.passCode : onExit.insertCode
   }
 }
-
-// added private silent level
-levels.silent = 100
-nums[100] = 'silent'
 
 module.exports = pino
 module.exports.stdSerializers = {
