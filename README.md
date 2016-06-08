@@ -800,6 +800,10 @@ parents and children will end up in log output.
 
 <https://twitter.com/davidmarkclem>
 
+### Chat on Gitter
+
+<https://gitter.im/mcollina/pino>
+
 <a name="acknowledgements"></a>
 ## Acknowledgements
 
@@ -807,4 +811,4 @@ This project was kindly sponsored by [nearForm](http://nearform.com).
 
 ## License
 
-MIT
+Licensed under [MIT](./LICENSE).
