@@ -10,7 +10,8 @@
     "pino": "./pretty.js"
   },
   "scripts": {
-    "test": "standard && tap --cov test/*test.js"
+    "test": "standard && tap test/*test.js",
+    "ci": "standard && tap --cov test/*test.js"
   },
   "precommit": "test",
   "repository": {
