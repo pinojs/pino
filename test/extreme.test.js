@@ -5,6 +5,11 @@ var os = require('os')
 var writeStream = require('flush-write-stream')
 var spawn = require('child_process').spawn
 
+if (process.version.indexOf('v0.10') >= 0) {
+  require('tap').comment('skipped because of node v0.10')
+  process.exit(0)
+}
+
 test('extreme mode', function (t) {
   var now = Date.now
   var hostname = os.hostname
@@ -124,4 +129,3 @@ test('extreme mode with child', function (t) {
     t.end()
   })
 })
-
