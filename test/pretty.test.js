@@ -33,3 +33,21 @@ test('pino transform can just parse the dates', function (t) {
 
   instance.info('hello world')
 })
+
+test('pino transform prettifies Error', function (t) {
+  var pretty = pino.pretty()
+  var err = new Error('hello world')
+  var expected = err.stack.split('\n')
+  expected.unshift(err.message)
+
+  t.plan(expected.length)
+
+  pretty.pipe(split(function (line) {
+    t.ok(line.indexOf(expected.shift()) >= 0, 'line matches')
+    return line
+  }))
+
+  var instance = pino(pretty)
+
+  instance.info(err)
+})
