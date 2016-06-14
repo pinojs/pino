@@ -47,7 +47,13 @@ test('extreme mode', function (t) {
   var expected2 = expected.split('\n')[0]
   var actual2 = ''
 
-  var e = 'global.process = { __proto__: process,  pid: 123456};Date.now = function () { return 1459875739796;};require("os").hostname = function () { return "abcdefghijklmnopqr";};var pino = require("./");var extreme = pino({extreme: true});extreme.info("h")'
+  var e = [
+    'global.process = { __proto__: process,  pid: 123456 };',
+    'Date.now = function () { return 1459875739796;};',
+    'require("os").hostname = function () { return "abcdefghijklmnopqr"; }',
+    ';var pino = require("./");',
+    'var extreme = pino({extreme: true});extreme.info("h")'
+  ].join('')
 
   var child = spawn('node', ['-e', e])
   child.stdout.pipe(writeStream(function (s, enc, cb) {
@@ -108,7 +114,14 @@ test('extreme mode with child', function (t) {
   var expected2 = expected.split('\n')[0]
   var actual2 = ''
 
-  var e = 'global.process = { __proto__: process,  pid: 123456};Date.now = function () { return 1459875739796;};require("os").hostname = function () { return "abcdefghijklmnopqr";};var pino = require("./");var extreme = pino({extreme: true}).child({ hello: "world" });extreme.info("h")'
+  var e = [
+    'global.process = { __proto__: process,  pid: 123456 };',
+    'Date.now = function () { return 1459875739796;};',
+    'require("os").hostname = function () { return "abcdefghijklmnopqr";};',
+    'var pino = require("./");',
+    'var extreme = pino({extreme: true}).child({ hello: "world" });',
+    'extreme.info("h")'
+  ].join('')
 
   var child = spawn('node', ['-e', e])
   child.stdout.pipe(writeStream(function (s, enc, cb) {
