@@ -35,3 +35,6 @@ node_modules
 # 0x
 .__browserify_string_empty.js
 profile-*
+
+# tap --cov
+.nyc_output/

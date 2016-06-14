@@ -18,3 +18,12 @@ child.info('hello child!')
 
 var childsChild = child.child({ another: 'property' })
 childsChild.info('hello baby..')
+
+pino.debug('this should be mute')
+
+pino.level = 'trace'
+
+pino.debug('this is a debug statement')
+
+pino.child({ another: 'property' }).debug('this is a debug statement via child')
+pino.trace('this is a trace statement')
