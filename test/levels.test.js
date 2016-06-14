@@ -175,6 +175,27 @@ test('exposed labels', function (t) {
   ])
 })
 
+test('setting level in child', function (t) {
+  t.plan(4)
+  var expected = [{
+    level: 50,
+    msg: 'this is an error'
+  }, {
+    level: 60,
+    msg: 'this is fatal'
+  }]
+  var instance = pino(sink(function (chunk, enc, cb) {
+    var current = expected.shift()
+    check(t, chunk, current.level, current.msg)
+    cb()
+  })).child({ level: 30 })
+
+  instance.level = 'error'
+  instance.info('hello world')
+  instance.error('this is an error')
+  instance.fatal('this is fatal')
+})
+
 test('level-change event', function (t) {
   var instance = pino()
   var handle = function (lvl, val, prevLvl, prevVal) {

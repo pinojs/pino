@@ -211,14 +211,25 @@ Pino.prototype.child = function child (bindings) {
   var key
   for (key in bindings) {
     value = bindings[key]
-    if (bindings.hasOwnProperty(key) && value !== undefined) {
+    if (key !== 'level' && bindings.hasOwnProperty(key) && value !== undefined) {
       value = this.serializers[key] ? this.serializers[key](value) : value
       data += '"' + key + '":' + this.stringify(value) + ','
     }
   }
   data = this.chindings + data.substr(0, data.length - 1)
 
-  return new Pino(this.level, this.stream, this.serializers, this.stringify, this.end, this.name, this.hostname, this.slowtime, data, this.cache, this.formatOpts)
+  return new Pino(
+    bindings.level || this.level,
+    this.stream,
+    this.serializers,
+    this.stringify,
+    this.end,
+    this.name,
+    this.hostname,
+    this.slowtime,
+    data,
+    this.cache,
+    this.formatOpts)
 }
 
 Pino.prototype.write = function (obj, msg, num) {
