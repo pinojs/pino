@@ -230,8 +230,8 @@ the current log level of the parent at the time they are spawned.
 
 From v2.x.x the log level of a child is mutable (whereas in
 v1.x.x it was immutable), and can be set independently of the parent.
-You can pass `level` as a property inside the `bindings`, and that will
-be set.
+If a `level` property is present in the object passed to `child` it will
+override the child logger level.
 
 For example
 
