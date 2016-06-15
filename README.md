@@ -230,6 +230,8 @@ the current log level of the parent at the time they are spawned.
 
 From v2.x.x the log level of a child is mutable (whereas in
 v1.x.x it was immutable), and can be set independently of the parent.
+If a `level` property is present in the object passed to `child` it will
+override the child logger level.
 
 For example
 
@@ -242,6 +244,7 @@ child.info('nope again') //does not log
 child.level = 'info'
 child.info('hooray') //will log
 logger.info('nope nope nope') //will not log, level is still set to error
+logger.child({ foo: 'bar', level: 'debug' }).debug('debug!')
 ```
 
 Also from version 2.x.x we can spawn child loggers from child loggers, for instance
