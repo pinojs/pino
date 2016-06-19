@@ -8,6 +8,7 @@ var once = require('once')
 var noop = require('./noop')
 var pid = process.pid
 var hostname = os.hostname()
+var baseLog = flatstr('{"pid":' + pid + ',"hostname":"' + hostname + '",')
 
 var LOG_VERSION = 1
 
@@ -61,7 +62,7 @@ function pino (opts, stream) {
     level = 'silent'
   }
 
-  var logger = new Pino(level, stream, serializers, stringify, end, name, hostname, slowtime, '', cache, formatOpts)
+  var logger = new Pino(level, stream, serializers, stringify, end, name, slowtime, '', cache, formatOpts)
   if (cache) {
     onExit(function (code, evt) {
       if (cache.buf) {
@@ -95,13 +96,12 @@ Object.defineProperty(pino, 'levels', {
   enumerable: true
 })
 
-function Pino (level, stream, serializers, stringify, end, name, hostname, slowtime, chindings, cache, formatOpts) {
+function Pino (level, stream, serializers, stringify, end, name, slowtime, chindings, cache, formatOpts) {
   this.stream = stream
   this.serializers = serializers
   this.stringify = stringify
   this.end = end
   this.name = name
-  this.hostname = hostname
   this.slowtime = slowtime
   this.chindings = chindings
   this.cache = cache
@@ -193,8 +193,7 @@ Pino.prototype.asJson = function asJson (obj, msg, num) {
 // returns string json with final brace omitted
 // the final brace is added by asJson
 Pino.prototype.message = function message (level, msg) {
-  return '{"pid":' + pid + ',' +
-    (this.hostname === undefined ? '' : '"hostname":"' + this.hostname + '",') +
+  return baseLog +
     (this.name === undefined ? '' : '"name":"' + this.name + '",') +
     '"level":' + level + ',' +
     (msg === undefined ? '' : '"msg":"' + (msg && msg.toString()) + '",') +
@@ -225,7 +224,6 @@ Pino.prototype.child = function child (bindings) {
     this.stringify,
     this.end,
     this.name,
-    this.hostname,
     this.slowtime,
     data,
     this.cache,
