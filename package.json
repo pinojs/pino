@@ -32,7 +32,7 @@
   "homepage": "https://github.com/mcollina/pino#readme",
   "devDependencies": {
     "benchmark": "^2.1.0",
-    "bole": "^2.0.0",
+    "bole": "^3.0.0",
     "bunyan": "^1.6.0",
     "debug": "^2.2.0",
     "fastbench": "^1.0.0",

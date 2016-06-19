@@ -22,7 +22,7 @@ var blog = bunyan.createLogger({
 require('bole').output({
   level: 'info',
   stream: dest
-})
+}).setFastTime(true)
 
 var run = bench([
   function benchBunyanChild (cb) {
