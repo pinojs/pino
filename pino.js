@@ -233,7 +233,7 @@ Pino.prototype.child = function child (bindings) {
 Pino.prototype.write = function (obj, msg, num) {
   var s = this.asJson(obj, msg, num)
   if (!this.cache) {
-    this.stream.write(s)
+    this.stream.write(flatstr(s))
     return
   }
 
