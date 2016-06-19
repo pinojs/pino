@@ -72,31 +72,31 @@ This produces:
 <a name="benchmarks"></a>
 ## Benchmarks
 
-As far as we know, it is the fastest logger in town:
+As far as we know, it is one of the fastest loggers in town:
 
 `pino.info('hello world')`:
 
 ```
-benchBunyan*10000: 1140ms
-benchWinston*10000: 1888ms
-benchBole*10000: 1594ms
-benchDebug*10000: 390ms
-benchLogLevel*10000: 371ms
-benchPino*10000: 291ms
-benchPinoExreme*10000: 115ms
+benchBunyan*10000: 1752.137ms
+benchWinston*10000: 2642.697ms
+benchBole*10000: 349.301ms
+benchDebug*10000: 621.877ms
+benchLogLevel*10000: 392.642ms
+benchPino*10000: 365.075ms
+benchPinoExreme*10000: 112.848ms
 ```
 
 `pino.info({'hello': 'world'})`:
 
 ```
-benchBunyanObj*10000: 1355ms
-benchWinstonObj*10000: 2012ms
-benchBoleObj*10000: 1614ms
-benchLogLevelObject*10000: 1456ms
-benchPinoObj*10000: 369ms
-benchPinoUnsafeObj*10000: 353ms
-benchPinoExtremeObj*10000: 165ms
-benchPinoUnsafeExtremeObj*10000: 158ms
+benchBunyanObj*10000: 1717.269ms
+benchWinstonObj*10000: 2409.900ms
+benchBoleObj*10000: 364.634ms
+benchLogLevelObject*10000: 1641.296ms
+benchPinoObj*10000: 385.967ms
+benchPinoUnsafeObj*10000: 383.686ms
+benchPinoExtremeObj*10000: 171.360ms
+benchPinoUnsafeExtremeObj*10000: 165.241ms
 ```
 
 `pino.info(aBigDeeplyNestedObject)`:
@@ -106,21 +106,22 @@ benchPinoUnsafeExtremeObj*10000: 158ms
 `pino.info('hello %s %j %d', 'world', {obj: true}, 4, {another: 'obj'})`:
 
 ```
-benchDebugInterpolateExtra*10000: 735ms
-benchBunyanInterpolateExtra*10000: 2978ms
-benchWinstonInterpolateExtra*10000: 2644ms
-benchBoleInterpolateExtra*10000: 3564ms
-benchLogLevelInterpolateExtra*10000: 1946ms
-benchPinoInterpolateExtra*10000: 638ms
-benchPinoUnsafeInterpolateExtra*10000: 527ms
-benchPinoExtremeInterpolateExtra*10000: 417ms
-benchPinoUnsafeExtremeInterpolateExtra*10000: 303ms
+benchDebugInterpolateExtra*10000: 946.580ms
+benchBunyanInterpolateExtra*10000: 3663.827ms
+benchWinstonInterpolateExtra*10000: 3339.332ms
+benchBoleInterpolateExtra*10000: 2004.084ms
+benchLogLevelInterpolateExtra*10000: 2150.711ms
+benchPinoInterpolateExtra*10000: 706.112ms
+benchPinoUnsafeInterpolateExtra*10000: 674.391ms
+benchPinoExtremeInterpolateExtra*10000: 359.784ms
+benchPinoUnsafeExtremeInterpolateExtra*10000: 346.463ms
 ```
 
 In multiple cases, pino is over 6x faster than alternatives.
 
 For a fair comparison, [LogLevel](http://npm.im/loglevel) was extended
-to include a timestamp.
+to include a timestamp and [bole](http://npm.im/bole) had
+`fastTime` mode switched on.
 
 <a name="cli"></a>
 ## CLI
