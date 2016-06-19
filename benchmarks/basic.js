@@ -29,7 +29,7 @@ var blog = bunyan.createLogger({
 require('bole').output({
   level: 'info',
   stream: dest
-})
+}).setFastTime(true)
 
 winston.add(winston.transports.File, { filename: '/dev/null' })
 winston.remove(winston.transports.Console)
