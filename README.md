@@ -72,7 +72,7 @@ This produces:
 <a name="benchmarks"></a>
 ## Benchmarks
 
-As far as we know Pino is fastest logger in town.
+As far as we know, it is one of the fastest loggers in town:
 
 `pino.info('hello world')`:
 
