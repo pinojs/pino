@@ -740,9 +740,11 @@ It is extremely simple to use and setup
 $ node yourapp.js | pino-elasticsearch --host 192.168.1.42
 ```
 
-Assuming ElasticSearch is running on 192.168.1.42. Then, head to your
+Assuming ElasticSearch is running on 192.168.1.42.
+
+Then, head to your
 Kibana instance, and create an index pattern
-(https://www.elastic.co/guide/en/kibana/current/setup.html) on `pino`,
+(https://www.elastic.co/guide/en/kibana/current/setup.html) on `'pino'`,
 the default for `pino-elasticsearch`.
 
 [pino-elasticsearch]: https://github.com/mcollina/pino-elasticsearch
