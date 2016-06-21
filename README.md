@@ -728,6 +728,27 @@ Using transports in the same process causes unnecessary load and slows down Node
 
 If you write a transport, let us know and we will add a link here!
 
+<a name="pino-elasticsearch"></a>
+### pino-elasticsearch
+
+[pino-elasticsearch][pino-elasticsearch] uploads the log lines in bulk
+to [ElasticSearch][elasticsearch], to be displayed in [Kibana][kibana].
+
+It is extremely simple to use and setup
+
+```sh
+$ node yourapp.js | pino-elasticsearch --host 192.168.1.42
+```
+
+Assuming ElasticSearch is running on 192.168.1.42.
+
+Then, head to your
+Kibana instance, and create an index pattern
+(https://www.elastic.co/guide/en/kibana/current/setup.html) on `'pino'`,
+the default for `pino-elasticsearch`.
+
+[pino-elasticsearch]: https://github.com/mcollina/pino-elasticsearch
+
 <a name="pino-socket"></a>
 ### pino-socket
 
@@ -745,6 +766,44 @@ $ node yourapp.js | pino-socket -p 6000
 ```
 
 You should see the logs from your application on both consoles.
+
+#### Logstash
+
+You can also use [pino-socket][pino-socket] to upload logs to
+[LogStash][logstash] via:
+
+```
+$ node yourapp.js | pino-socket -a 127.0.0.1 -p 5000 -m tcp
+```
+
+Assuming your logstash is running on the same host and configured as
+follows:
+
+```
+input {
+  tcp {
+    port => 5000
+  }
+}
+
+filter {
+  json {
+    source => "message"
+  }
+}
+
+output {
+  elasticsearch {
+    hosts => "127.0.0.1:9200"
+  }
+}
+```
+
+See https://www.elastic.co/guide/en/kibana/current/setup.html to learn
+how to setup [Kibana][kibana].
+
+If you are a Docker fan, you can use
+https://github.com/deviantony/docker-elk to setup an ELK stack.
 
 [pino-socket]: https://www.npmjs.com/package/pino-socket
 
@@ -829,3 +888,6 @@ This project was kindly sponsored by [nearForm](http://nearform.com).
 ## License
 
 Licensed under [MIT](./LICENSE).
+
+[elasticsearch]: https://www.elastic.co/products/elasticsearch
+[kibana]: https://www.elastic.co/products/kibana
