@@ -1,4 +1,4 @@
-# pino&nbsp;&nbsp;[![Build Status](https://travis-ci.org/mcollina/pino.svg)](https://travis-ci.org/mcollina/pino)&nbsp;[![Coverage Status](https://coveralls.io/repos/github/mcollina/pino/badge.svg?branch=master)](https://coveralls.io/github/mcollina/pino?branch=master)
+# pino&nbsp;&nbsp;[![Build Status](https://travis-ci.org/mcollina/pino.svg)](https://travis-ci.org/mcollina/pino)&nbsp;[![Coverage Status](https://coveralls.io/repos/github/mcollina/pino/badge.svg?branch=master)](https://coveralls.io/github/mcollina/pino?branch=master) [![TypeScript definitions on DefinitelyTyped](http://definitelytyped.org/badges/standard.svg)](http://definitelytyped.org)
 
 [Extremely fast](#benchmarks) node.js logger, inspired by Bunyan.
 It also includes a shell utility to pretty-print its log files.
