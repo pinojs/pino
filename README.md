@@ -732,19 +732,29 @@ If you write a transport, let us know and we will add a link here!
 ### pino-elasticsearch
 
 [pino-elasticsearch][pino-elasticsearch] uploads the log lines in bulk
-to [ElasticSearch][elasticsearch], to be displayed in [Kibana][kibana].
+to [Elasticsearch][elasticsearch], to be displayed in [Kibana][kibana].
 
 It is extremely simple to use and setup
+
+```sh
+$ node yourapp.js | pino-elasticsearch
+```
+
+Assuming Elasticsearch is running on localhost.
+
+If you wish to connect to an external elasticsearch instance (recommended for production):
+
+* Check that you defined `network.host` in your `elasticsearch.yml` configuration file. See [elasticsearch Network Settings documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-network.html#common-network-settings) for more details.
+* Launch:
 
 ```sh
 $ node yourapp.js | pino-elasticsearch --host 192.168.1.42
 ```
 
-Assuming ElasticSearch is running on 192.168.1.42.
+Assuming Elasticsearch is running on `192.168.1.42`.
 
 Then, head to your
-Kibana instance, and create an index pattern
-(https://www.elastic.co/guide/en/kibana/current/setup.html) on `'pino'`,
+Kibana instance, and [create an index pattern](https://www.elastic.co/guide/en/kibana/current/setup.html) on `'pino'`,
 the default for `pino-elasticsearch`.
 
 [pino-elasticsearch]: https://github.com/mcollina/pino-elasticsearch
@@ -770,7 +780,7 @@ You should see the logs from your application on both consoles.
 #### Logstash
 
 You can also use [pino-socket][pino-socket] to upload logs to
-[LogStash][logstash] via:
+[Logstash][logstash] via:
 
 ```
 $ node yourapp.js | pino-socket -a 127.0.0.1 -p 5000 -m tcp
