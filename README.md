@@ -777,6 +777,27 @@ $ node yourapp.js | pino-socket -p 6000
 
 You should see the logs from your application on both consoles.
 
+<a name="pino-syslog"></a>
+### pino-syslog
+
+[pino-syslog][pino-syslog] is a transport, really a "transform," that converts
+*pino's* logs to [RFC3164][rfc3164] compatible log messages. *pino-syslog* does not
+forward the logs anywhere, it merely re-writes the messages to `stdout`. But
+in combination with *pino-socket*, you can relay logs to a syslog server:
+
+```sh
+$ node yourapp.js | pino-syslog | pino-socket -a syslog.example.com
+```
+
+Example output for the "hello world" log:
+
+```
+<134>Apr  1 16:44:58 MacBook-Pro-3 none[94473]: {"pid":94473,"hostname":"MacBook-Pro-3","level":30,"msg":"hello world","time":1459529098958,"v":1}
+```
+
+[pino-syslog]: https://www.npmjs.com/package/pino-syslog
+[rfc3164]: https://tools.ietf.org/html/rfc3164
+
 #### Logstash
 
 You can also use [pino-socket][pino-socket] to upload logs to
