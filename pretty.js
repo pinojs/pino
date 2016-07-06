@@ -80,7 +80,7 @@ function pretty (opts) {
 
     if (parsed.err) {
       // pass through
-      return line
+      return line + '\n'
     }
 
     if (timeTransOnly) {

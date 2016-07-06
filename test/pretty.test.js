@@ -51,3 +51,18 @@ test('pino transform prettifies Error', function (t) {
 
   instance.info(err)
 })
+
+test('pino transform preserve output if not valid JSON', function (t) {
+  t.plan(1)
+  var pretty = pino.pretty()
+  var lines = []
+  pretty.pipe(split(function (line) {
+    lines.push(line)
+    return line
+  }))
+
+  pretty.write('this is not json\nit\'s just regular output\n')
+  pretty.end()
+
+  t.deepEqual(lines, ['this is not json', 'it\'s just regular output'], 'preserved lines')
+})
