@@ -210,11 +210,11 @@ Example:
 'use strict'
 
 var pino = require('pino')
-var logger = ({
+var logger = pino({
   name: 'myapp',
   safe: true,
   serializers: {
-    req: pino.stdSerializers.req
+    req: pino.stdSerializers.req,
     res: pino.stdSerializers.res
   }
 })
