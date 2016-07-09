@@ -165,6 +165,12 @@ Into this:
 {"pid":14139,"hostname":"MacBook-Pro-3.home","level":30,"msg":"hello world","time":"2016-03-09T15:27:09.339Z","v":0}
 ```
 
+Can skip logs with `--mute` option:
+
+```sh
+cat log | pino --mute
+```
+
 <a name="api"></a>
 ## API
 

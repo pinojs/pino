@@ -48,6 +48,7 @@ function filter (value) {
 
 function pretty (opts) {
   var timeTransOnly = opts && opts.timeTransOnly
+  var mute = opts && opts.mute
 
   var stream = split(mapLine)
   var ctx
@@ -81,6 +82,10 @@ function pretty (opts) {
     if (parsed.err) {
       // pass through
       return line + '\n'
+    }
+
+    if (mute) {
+      return ''
     }
 
     if (timeTransOnly) {
@@ -121,7 +126,8 @@ if (require.main === module) {
     console.log(require('./package.json').version)
   } else {
     process.stdin.pipe(pretty({
-      timeTransOnly: arg('-t')
+      timeTransOnly: arg('-t'),
+      mute: arg('--mute')
     })).pipe(process.stdout)
   }
 }

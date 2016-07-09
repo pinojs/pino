@@ -1,4 +1,4 @@
-  
+
   [0m[37m[1m[4mPino[22m[39m[0m
 
   [0mTo prettify logs, simply pipe a log file through [33mpino[39m:[0m
@@ -13,4 +13,4 @@
   [0m-h | --help      Display Help
   -v | --version   Display Version
   -t               Convert Epoch timestamps to ISO[0m
-
+  --mute           Skip logs
