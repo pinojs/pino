@@ -27,3 +27,5 @@ pino.debug('this is a debug statement')
 
 pino.child({ another: 'property' }).debug('this is a debug statement via child')
 pino.trace('this is a trace statement')
+
+pino.debug('this is a "debug" statement with "')

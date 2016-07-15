@@ -32,6 +32,12 @@ var nums = Object.keys(levels).reduce(function (o, k) {
   return o
 }, {})
 
+// level string catch
+var lscache = Object.keys(nums).reduce(function (o, k) {
+  o[k] = flatstr('"level":' + Number(k) + ',"time":')
+  return o
+}, {})
+
 // private property
 Object.defineProperty(nums, '100', {
   value: 'silent',
@@ -107,6 +113,15 @@ function Pino (level, stream, serializers, stringify, end, name, slowtime, chind
   this.cache = cache
   this.formatOpts = formatOpts
   this._setLevel(level)
+
+  this._baseLog = flatstr(baseLog +
+    (this.name === undefined ? '' : '"name":' + stringify(this.name) + ','))
+
+  if (slowtime) {
+    this.time = getSlowTime
+  } else {
+    this.time = getTime
+  }
 }
 
 if (require('eve' + 'nts')) {
@@ -169,11 +184,35 @@ Object.defineProperty(
   {value: LOG_VERSION}
 )
 
+function fastRep (s) {
+  var str = s.toString()
+  var result = ''
+  var last = 0
+  var l = str.length
+  for (var i = 0; i < l; i++) {
+    if (str[i] === '"') {
+      result += str.slice(last, i) + '\\"'
+      last = i + 1
+    }
+  }
+  if (last === 0) {
+    result = str
+  } else {
+    result += str.slice(last)
+  }
+  return result
+}
+
 Pino.prototype.asJson = function asJson (obj, msg, num) {
   if (!msg && obj instanceof Error) {
     msg = obj.message
   }
-  var data = this.message(num, msg)
+  var data = this._baseLog + lscache[num] + this.time()
+  // to catch both null and undefined
+  /*eslint-disable eqeqeq*/
+  if (msg != undefined) {
+    data += ',"msg":"' + fastRep(msg) + '"'
+  }
   var value
   if (obj) {
     if (obj.stack) {
@@ -190,14 +229,13 @@ Pino.prototype.asJson = function asJson (obj, msg, num) {
   }
   return data + this.chindings + this.end
 }
-// returns string json with final brace omitted
-// the final brace is added by asJson
-Pino.prototype.message = function message (level, msg) {
-  return baseLog +
-    (this.name === undefined ? '' : '"name":"' + this.name + '",') +
-    '"level":' + level + ',' +
-    (msg === undefined ? '' : '"msg":"' + (msg && msg.toString()) + '",') +
-    '"time":' + (this.slowtime ? '"' + (new Date()).toISOString() + '"' : Date.now())
+
+function getTime () {
+  return Date.now()
+}
+
+function getSlowTime () {
+  return '"' + (new Date()).toISOString() + '"'
 }
 
 Pino.prototype.child = function child (bindings) {
