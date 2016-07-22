@@ -7,7 +7,7 @@ pino.error('this is at error level')
 pino.info('the answer is %d', 42)
 pino.info({ obj: 42 }, 'hello world')
 pino.info({ obj: 42, b: 2 }, 'hello world')
-pino.info({ obj: { aa: 'bbb' } }, 'another')
+pino.info({ nested: { obj: 42 } }, 'nested')
 setImmediate(function () {
   pino.info('after setImmediate')
 })
