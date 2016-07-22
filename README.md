@@ -177,6 +177,7 @@ Into this:
   * <a href="#info"><code>logger.<b>info()</b></code></a>
   * <a href="#debug"><code>logger.<b>debug()</b></code></a>
   * <a href="#trace"><code>logger.<b>trace()</b></code></a>
+  * <a href="#flush"><code>logger.<b>flush()</b></code></a>
   * <a href="#levelVal"><code>logger.<b>levelVal</b></code></a>
   * <a href="#level-change"><code>logger.on(<b>'level-change'</b>, fn)</code></a>
   * <a href="#levelValues"><code>logger.levels.<b>values</b></code> & <code>pino.levels.<b>values</b></code></a>
@@ -358,6 +359,13 @@ Log at `'trace'` level the given `msg`. If the first argument is an
 object, all its properties will be included in the JSON line.
 If more args follows `msg`, these will be used to format `msg` using
 [`util.format`](https://nodejs.org/api/util.html#util_util_format_format)
+
+
+<a name="flush"></a>
+### logger.flush()
+
+Flushes the content of the buffer in [extreme mode](#extreme). It has no effect if
+extreme mode is not enabled.
 
 <a name="levelVal"></a>
 ### logger.levelVal
