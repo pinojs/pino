@@ -248,7 +248,7 @@ Pino.prototype.child = function child (bindings) {
   var key
   for (key in bindings) {
     value = bindings[key]
-    if (key !== 'level' && bindings.hasOwnProperty(key) && value !== undefined) {
+    if (['level', 'serializers'].indexOf(key) === -1 && bindings.hasOwnProperty(key) && value !== undefined) {
       value = this.serializers[key] ? this.serializers[key](value) : value
       data += '"' + key + '":' + this.stringify(value) + ','
     }
@@ -258,7 +258,7 @@ Pino.prototype.child = function child (bindings) {
   return new Pino(
     bindings.level || this.level,
     this.stream,
-    this.serializers,
+    bindings.serializers || this.serializers,
     this.stringify,
     this.end,
     this.name,
