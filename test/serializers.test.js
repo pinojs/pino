@@ -68,3 +68,23 @@ test('children serializers get called when inherited from parent', function (t) 
 
   child.fatal({test: 'test'})
 })
+
+test('non overriden serializers are available in the children', function (t) {
+  t.plan(3)
+  var pSerializers = {
+    onlyParent: function () { return 'parent' },
+    shared: function () { return 'parent' }
+  }
+
+  var cSerializers = {
+    shared: function () { return 'child' },
+    onlyChild: function () { return 'child' }
+  }
+  var parent = pino({ serializers: pSerializers })
+
+  var child = parent.child({ serializers: cSerializers })
+
+  t.equal(child.serializers.shared(), 'child')
+  t.equal(child.serializers.onlyParent(), 'parent')
+  t.equal(child.serializers.onlyChild(), 'child')
+})

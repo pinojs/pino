@@ -9,6 +9,7 @@ var noop = require('./noop')
 var pid = process.pid
 var hostname = os.hostname()
 var baseLog = flatstr('{"pid":' + pid + ',"hostname":"' + hostname + '",')
+var extend = require('util')._extend
 
 var LOG_VERSION = 1
 
@@ -258,7 +259,7 @@ Pino.prototype.child = function child (bindings) {
   return new Pino(
     bindings.level || this.level,
     this.stream,
-    bindings.serializers || this.serializers,
+    extend(this.serializers, bindings.serializers),
     this.stringify,
     this.end,
     this.name,
