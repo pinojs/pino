@@ -257,6 +257,30 @@ logger.info('nope nope nope') //will not log, level is still set to error
 logger.child({ foo: 'bar', level: 'debug' }).debug('debug!')
 ```
 
+Child loggers inherit the serializers from the parent logger but it is
+possible to override them.
+
+For example
+
+```
+var pino = require('./pino')
+
+var customSerializers = {
+  test: function () {
+    return 'this is my serializer'
+  }
+}
+var child = pino().child({serializers: customSerializers})
+
+child.info({test: 'should not show up'})
+```
+
+Will produce the following output:
+
+```
+{"pid":7971,"hostname":"mycomputer.local","level":30,"time":1469488147985,"test":"this is my serializer","v":1}
+```
+
 Also from version 2.x.x we can spawn child loggers from child loggers, for instance
 
 ```
