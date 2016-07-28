@@ -147,6 +147,20 @@ levelTest('info', 30)
 levelTest('debug', 20)
 levelTest('trace', 10)
 
+test('serializers can return undefined to strip field', function (t) {
+  t.plan(1)
+  var instance = pino({
+    serializers: {
+      test: function (o) { return undefined }
+    }
+  }, sink(function (obj, enc, cb) {
+    t.notOk('test' in obj)
+    cb()
+  }))
+
+  instance.info({ test: 'sensitive info' })
+})
+
 test('does not explode with a circular ref', function (t) {
   var instance = pino(sink(function (chunk, enc, cb) {
     // nothing to check
