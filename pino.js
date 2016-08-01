@@ -9,7 +9,7 @@ var noop = require('./noop')
 var pid = process.pid
 var hostname = os.hostname()
 var baseLog = flatstr('{"pid":' + pid + ',"hostname":"' + hostname + '",')
-var extend = require('xtend')
+var extend = require('object.assign').getPolyfill()
 
 var LOG_VERSION = 1
 
