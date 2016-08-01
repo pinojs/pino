@@ -248,7 +248,7 @@ Pino.prototype.child = function child (bindings) {
   var key
   for (key in bindings) {
     value = bindings[key]
-    if (key != 'level' && key != 'serializers' && bindings.hasOwnProperty(key) && value !== undefined) {
+    if (key !== 'level' && key !== 'serializers' && bindings.hasOwnProperty(key) && value !== undefined) {
       value = this.serializers[key] ? this.serializers[key](value) : value
       data += '"' + key + '":' + this.stringify(value) + ','
     }
