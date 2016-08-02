@@ -9,6 +9,7 @@ var noop = require('./noop')
 var pid = process.pid
 var hostname = os.hostname()
 var baseLog = flatstr('{"pid":' + pid + ',"hostname":"' + hostname + '",')
+var extend = require('object.assign').getPolyfill()
 
 var LOG_VERSION = 1
 
@@ -222,7 +223,9 @@ Pino.prototype.asJson = function asJson (obj, msg, num) {
         value = obj[key]
         if (obj.hasOwnProperty(key) && value !== undefined) {
           value = this.serializers[key] ? this.serializers[key](value) : value
-          data += ',"' + key + '":' + this.stringify(value)
+          if (value !== undefined) {
+            data += ',"' + key + '":' + this.stringify(value)
+          }
         }
       }
     }
@@ -248,7 +251,7 @@ Pino.prototype.child = function child (bindings) {
   var key
   for (key in bindings) {
     value = bindings[key]
-    if (key !== 'level' && bindings.hasOwnProperty(key) && value !== undefined) {
+    if (key !== 'level' && key !== 'serializers' && bindings.hasOwnProperty(key) && value !== undefined) {
       value = this.serializers[key] ? this.serializers[key](value) : value
       data += '"' + key + '":' + this.stringify(value) + ','
     }
@@ -258,7 +261,7 @@ Pino.prototype.child = function child (bindings) {
   return new Pino(
     bindings.level || this.level,
     this.stream,
-    this.serializers,
+    bindings.hasOwnProperty('serializers') ? extend(this.serializers, bindings.serializers) : this.serializers,
     this.stringify,
     this.end,
     this.name,
