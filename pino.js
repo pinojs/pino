@@ -215,17 +215,25 @@ Pino.prototype.asJson = function asJson (obj, msg, num) {
     data += ',"msg":"' + fastRep(msg) + '"'
   }
   var value
+  var key
+  var keys
   if (obj) {
     if (obj.stack) {
       data += ',"type":"Error","stack":' + this.stringify(obj.stack)
     } else {
-      for (var key in obj) {
+      keys = Object.keys(obj)
+      for (var i = 0; i < keys.length; i++) {
+        key = keys[i]
         value = obj[key]
-        if (obj.hasOwnProperty(key) && value !== undefined) {
-          value = this.serializers[key] ? this.serializers[key](value) : value
-          if (value !== undefined) {
-            data += ',"' + key + '":' + this.stringify(value)
+        if (value !== undefined) {
+          if (this.serializers[key]) {
+            value = this.serializers[key](value)
+            if (value === undefined) {
+              continue
+            }
           }
+
+          data += ',"' + key + '":' + this.stringify(value)
         }
       }
     }
@@ -249,9 +257,11 @@ Pino.prototype.child = function child (bindings) {
   var data = ','
   var value
   var key
-  for (key in bindings) {
+  var keys = Object.keys(bindings)
+  for (var i = 0; i < keys.length; i++) {
+    key = keys[i]
     value = bindings[key]
-    if (key !== 'level' && key !== 'serializers' && bindings.hasOwnProperty(key) && value !== undefined) {
+    if (key !== 'level' && key !== 'serializers' && value !== undefined) {
       value = this.serializers[key] ? this.serializers[key](value) : value
       data += '"' + key + '":' + this.stringify(value) + ','
     }
