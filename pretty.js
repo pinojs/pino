@@ -48,6 +48,7 @@ function filter (value) {
 
 function pretty (opts) {
   var timeTransOnly = opts && opts.timeTransOnly
+  var levelFirst = opts && opts.levelFirst
 
   var stream = split(mapLine)
   var ctx
@@ -88,7 +89,10 @@ function pretty (opts) {
       return JSON.stringify(value) + '\n'
     }
 
-    line = '[' + new Date(value.time).toISOString() + '] ' + asColoredLevel(value)
+    line = (levelFirst)
+        ? asColoredLevel(value) + ' [' + new Date(value.time).toISOString() + ']'
+        : '[' + new Date(value.time).toISOString() + '] ' + asColoredLevel(value)
+
     line += ' ('
     if (value.name) {
       line += value.name + '/'
