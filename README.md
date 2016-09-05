@@ -149,13 +149,20 @@ Then we simply pipe a log file through `pino`:
 cat log | pino
 ```
 
-There's also a transformer flag that converts Epoch timestamps to ISO timestamps.
+There are also two transformer flags.. 
+
+ `-t` that converts Epoch timestamps to ISO timestamps.
 
 ```sh
 cat log | pino -t
 ```
+ and `-l` that flips the time and level on the standard output.
 
-For instance, `pino -t` will transform this:
+```sh
+cat log | pino -l
+```
+
+`pino -t` will transform this:
 
 ```js
 {"pid":14139,"hostname":"MacBook-Pro-3.home","level":30,"msg":"hello world","time":1457537229339,"v":0}
@@ -165,6 +172,19 @@ Into this:
 
 ```js
 {"pid":14139,"hostname":"MacBook-Pro-3.home","level":30,"msg":"hello world","time":"2016-03-09T15:27:09.339Z","v":0}
+```
+
+ 
+`pino -l` will transform this:
+
+```sh
+[2016-03-09T15:27:09.339Z] INFO (14139 on MacBook-Pro-3.home): hello world
+```
+
+Into this:
+
+```sh
+INFO [2016-03-09T15:27:09.339Z] (14139 on MacBook-Pro-3.home): hello world
 ```
 
 <a name="api"></a>
