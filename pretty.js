@@ -85,13 +85,13 @@ function pretty (opts) {
     }
 
     if (timeTransOnly) {
-      value.time = new Date(value.time).toISOString()
+      value.time = asISODate(value.time)
       return JSON.stringify(value) + '\n'
     }
 
     line = (levelFirst)
-        ? asColoredLevel(value) + ' [' + new Date(value.time).toISOString() + ']'
-        : '[' + new Date(value.time).toISOString() + '] ' + asColoredLevel(value)
+        ? asColoredLevel(value) + ' [' + asISODate(value.time) + ']'
+        : '[' + asISODate(value.time) + '] ' + asColoredLevel(value)
 
     line += ' ('
     if (value.name) {
@@ -109,6 +109,10 @@ function pretty (opts) {
       line += filter(value)
     }
     return line
+  }
+
+  function asISODate (time) {
+    return new Date(time).toISOString()
   }
 
   function asColoredLevel (value) {
