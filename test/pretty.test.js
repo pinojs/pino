@@ -11,7 +11,22 @@ test('pino transform prettifies', function (t) {
   var pretty = pino.pretty()
   pretty.pipe(split(function (line) {
     t.ok(line.match(/.*hello world$/), 'end of line matches')
-    t.ok(line.match(/.*INFO.*/), 'includes level')
+    t.ok(line.match(/(?!^)INFO.*/), 'includes level')
+    t.ok(line.indexOf('' + process.pid) > 0, 'includes pid')
+    t.ok(line.indexOf('' + hostname) > 0, 'includes hostname')
+    return line
+  }))
+  var instance = pino(pretty)
+
+  instance.info('hello world')
+})
+
+test('pino pretty moves level to start on flag', function (t) {
+  t.plan(4)
+  var pretty = pino.pretty({ levelFirst: true })
+  pretty.pipe(split(function (line) {
+    t.ok(line.match(/.*hello world$/), 'end of line matches')
+    t.ok(line.match(/^INFO.*/), 'level is at start of line')
     t.ok(line.indexOf('' + process.pid) > 0, 'includes pid')
     t.ok(line.indexOf('' + hostname) > 0, 'includes hostname')
     return line

@@ -48,6 +48,7 @@ function filter (value) {
 
 function pretty (opts) {
   var timeTransOnly = opts && opts.timeTransOnly
+  var levelFirst = opts && opts.levelFirst
 
   var stream = split(mapLine)
   var ctx
@@ -84,11 +85,14 @@ function pretty (opts) {
     }
 
     if (timeTransOnly) {
-      value.time = new Date(value.time).toISOString()
+      value.time = asISODate(value.time)
       return JSON.stringify(value) + '\n'
     }
 
-    line = '[' + new Date(value.time).toISOString() + '] ' + asColoredLevel(value)
+    line = (levelFirst)
+        ? asColoredLevel(value) + ' [' + asISODate(value.time) + ']'
+        : '[' + asISODate(value.time) + '] ' + asColoredLevel(value)
+
     line += ' ('
     if (value.name) {
       line += value.name + '/'
@@ -107,6 +111,10 @@ function pretty (opts) {
     return line
   }
 
+  function asISODate (time) {
+    return new Date(time).toISOString()
+  }
+
   function asColoredLevel (value) {
     return levelColors[value.level](levels[value.level])
   }
@@ -121,7 +129,8 @@ if (require.main === module) {
     console.log(require('./package.json').version)
   } else {
     process.stdin.pipe(pretty({
-      timeTransOnly: arg('-t')
+      timeTransOnly: arg('-t'),
+      levelFirst: arg('-l')
     })).pipe(process.stdout)
   }
 }

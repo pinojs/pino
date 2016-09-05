@@ -9,8 +9,13 @@
 
      [33mcat log | pino -t[39m
 
+  To flip level and time/date in standard output use the [33m-l[39m flag[0m
+
+     [33mcat log | pino -l[39m
+
   [36m[1mFlags[22m[39m
   [0m-h | --help      Display Help
   -v | --version   Display Version
   -t               Convert Epoch timestamps to ISO[0m
+  -l               Flip level and date
 
