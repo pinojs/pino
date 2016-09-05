@@ -210,7 +210,7 @@ Pino.prototype.asJson = function asJson (obj, msg, num) {
   }
   var data = this._baseLog + lscache[num] + this.time()
   // to catch both null and undefined
-  /*eslint-disable eqeqeq*/
+  /* eslint-disable eqeqeq */
   if (msg != undefined) {
     data += ',"msg":"' + fastRep(msg) + '"'
   }
