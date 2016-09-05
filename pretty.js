@@ -125,7 +125,8 @@ if (require.main === module) {
     console.log(require('./package.json').version)
   } else {
     process.stdin.pipe(pretty({
-      timeTransOnly: arg('-t')
+      timeTransOnly: arg('-t'),
+      levelFirst: arg('-l')
     })).pipe(process.stdout)
   }
 }
