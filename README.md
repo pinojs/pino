@@ -149,7 +149,7 @@ Then we simply pipe a log file through `pino`:
 cat log | pino
 ```
 
-There are also two transformer flags.. 
+There are also two transformer flags..
 
  `-t` that converts Epoch timestamps to ISO timestamps.
 
@@ -174,7 +174,7 @@ Into this:
 {"pid":14139,"hostname":"MacBook-Pro-3.home","level":30,"msg":"hello world","time":"2016-03-09T15:27:09.339Z","v":0}
 ```
 
- 
+
 `pino -l` will transform this:
 
 ```sh
@@ -574,6 +574,7 @@ This has a couple of important caveats:
   * For instance, a powercut will mean up to 4KB of buffered logs will be lost
   * A sigkill (or other untrappable signal) will probably result in the same
   * If writing to a stream other than `process.stdout` or `process.stderr`, there is a slight possibility of lost logs or even partially written logs if the OS buffers don't have enough space, or something else is being written to the stream (or maybe some other reason we've not thought of)
+* If you supply an alternate stream to the constructor, then that stream must support synchronous writes so that it can be properly flushed on exit. This means the stream most expose its file descriptor via `stream.fd` or `stream._handle.fd`
 
 So in summary, only use extreme mode if you're doing an extreme amount of logging, and you're happy in some scenarios to lose the most recent logs.
 

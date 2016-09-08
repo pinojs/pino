@@ -45,6 +45,12 @@ Object.defineProperty(nums, '100', {
   enumerable: false
 })
 
+function streamIsBlockable (s) {
+  if (s.hasOwnProperty('_handle') && s._handle.hasOwnProperty('fd') && s._handle.fd) return true
+  if (s.hasOwnProperty('fd') && s.fd) return true
+  return false
+}
+
 function pino (opts, stream) {
   if (opts && opts._writableState) {
     stream = opts
@@ -65,6 +71,10 @@ function pino (opts, stream) {
     buf: ''
   }
 
+  if (cache && !streamIsBlockable(stream)) {
+    throw new Error('extreme mode stream must be a synchronous stream')
+  }
+
   if (opts.enabled === false) {
     level = 'silent'
   }
@@ -73,14 +83,11 @@ function pino (opts, stream) {
   if (cache) {
     onExit(function (code, evt) {
       if (cache.buf) {
-        if (stream === process.stdout) {
-          console.log(cache.buf)
-        } else if (stream === process.stderr) {
-          console.error(cache.buf)
-        } else {
-          stream.write(cache.buf)
-        }
-        cache.buf = ''
+        // We need to block the process exit long enough to flush the buffer
+        // to the destination stream. We do that by forcing a syncronous
+        // write directly to the stream's file descriptor.
+        var fd = (stream.fd) ? stream.fd : stream._handle.fd
+        require('fs').writeSync(fd, cache.buf)
       }
       if (!process._events[evt] || process._events[evt].length < 2 || !process._events[evt].filter(function (f) {
         return f + '' !== onExit.passCode + '' && f + '' !== onExit.insertCode + ''

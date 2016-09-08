@@ -9,8 +9,15 @@ var fs = require('fs')
 var dest = fs.createWriteStream('/dev/null')
 var loglevel = require('./loglevelMock')(dest)
 var plog = pino(dest)
+
+var tty = require('tty')
+var extremeDest = new tty.WriteStream(1)
+extremeDest.write = function (s) {
+  // simulate a real write so that the benchmark is not artificially low
+  dest.write(s)
+}
 delete require.cache[require.resolve('../')]
-var plogExtreme = require('../')({extreme: true}, dest)
+var plogExtreme = require('../')({extreme: true}, extremeDest)
 
 process.env.DEBUG = 'dlog'
 var debug = require('debug')
