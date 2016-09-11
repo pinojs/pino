@@ -52,7 +52,7 @@ function streamIsBlockable (s) {
 }
 
 function pino (opts, stream) {
-  if (opts && opts._writableState) {
+  if (opts && (opts.writable || opts._writableState)) {
     stream = opts
     opts = null
   }
