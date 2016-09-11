@@ -291,3 +291,27 @@ test('correctly escape msg strings', function (t) {
 
   instance.fatal('this contains "')
 })
+
+test('correctly support node v4+ stderr', function (t) {
+  t.plan(1)
+
+  // stderr inherits from Stream, rather than Writable
+  var dest = {
+    writable: true,
+    write: function (chunk) {
+      chunk = JSON.parse(chunk)
+      delete chunk.time
+      t.deepEqual(chunk, {
+        pid: pid,
+        hostname: hostname,
+        level: 60,
+        msg: 'a message',
+        v: 1
+      })
+    }
+  }
+
+  var instance = pino(dest)
+
+  instance.fatal('a message')
+})
