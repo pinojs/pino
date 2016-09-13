@@ -574,7 +574,18 @@ This has a couple of important caveats:
   * For instance, a powercut will mean up to 4KB of buffered logs will be lost
   * A sigkill (or other untrappable signal) will probably result in the same
   * If writing to a stream other than `process.stdout` or `process.stderr`, there is a slight possibility of lost logs or even partially written logs if the OS buffers don't have enough space, or something else is being written to the stream (or maybe some other reason we've not thought of)
-* If you supply an alternate stream to the constructor, then that stream must support synchronous writes so that it can be properly flushed on exit. This means the stream most expose its file descriptor via `stream.fd` or `stream._handle.fd`
+* If you supply an alternate stream to the constructor, then that stream must support synchronous writes so that it can be properly flushed on exit. This means the stream most expose its file descriptor via `stream.fd` or `stream._handle.fd`. If your stream is invalid an `error` event will be emitted on the returned logger, e.g.:
+
+  ```js
+  var stream = require('stream')
+  var pino = require('pino')
+  var logger = pino({extreme: true}, new stream.Writable({write: function (chunk) {
+    // do something with chunk
+  }}))
+  logger.on('error', function (err) {
+    // this callback _will_ be invoked for the type of stream we supplied
+  })
+  ```
 
 So in summary, only use extreme mode if you're doing an extreme amount of logging, and you're happy in some scenarios to lose the most recent logs.
 
@@ -961,6 +972,14 @@ parents and children will end up in log output.
 <https://www.npmjs.com/~davidmarkclements>
 
 <https://twitter.com/davidmarkclem>
+
+### James Sumners
+
+<https://github.com/jsumners>
+
+<https://www.npmjs.com/~jsumners>
+
+<https://twitter.com/jsumners79>
 
 ### Chat on Gitter
 

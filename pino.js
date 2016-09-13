@@ -71,20 +71,25 @@ function pino (opts, stream) {
     buf: ''
   }
 
-  if (cache && !streamIsBlockable(stream)) {
-    throw new Error('extreme mode stream must be a synchronous stream')
-  }
-
   if (opts.enabled === false) {
     level = 'silent'
   }
 
   var logger = new Pino(level, stream, serializers, stringify, end, name, slowtime, '', cache, formatOpts)
   if (cache) {
+    // setImmediate is causing a very weird crash:
+    //    Assertion failed: (cb_v->IsFunction()), function MakeCallback...
+    // but setTimeout isn't *shrug*
+    setTimeout(function () {
+      if (!streamIsBlockable(stream)) {
+        logger.emit('error', new Error('stream must have a file descriptor in extreme mode'))
+      }
+    }, 100)
+
     onExit(function (code, evt) {
       if (cache.buf) {
         // We need to block the process exit long enough to flush the buffer
-        // to the destination stream. We do that by forcing a syncronous
+        // to the destination stream. We do that by forcing a synchronous
         // write directly to the stream's file descriptor.
         var fd = (stream.fd) ? stream.fd : stream._handle.fd
         require('fs').writeSync(fd, cache.buf)

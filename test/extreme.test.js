@@ -1,11 +1,11 @@
 'use strict'
 
 var test = require('tap').test
+var fs = require('fs')
 var os = require('os')
 var path = require('path')
 var writeStream = require('flush-write-stream')
 var fork = require('child_process').fork
-var tty = require('tty')
 
 if (process.version.indexOf('v0.10') >= 0) {
   require('tap').comment('skipped because of node v0.10')
@@ -35,11 +35,9 @@ test('extreme mode', function (t) {
     cb()
   }))
 
-  var ttyStream = new tty.WriteStream(1)
-  ttyStream.write = function (s) {
-    actual += s
-  }
-  var extreme = pino({extreme: true}, ttyStream)
+  var dest = fs.createWriteStream('/dev/null')
+  dest.write = function (s) { actual += s }
+  var extreme = pino({extreme: true}, dest)
 
   var i = 44
   while (i--) {
@@ -93,11 +91,9 @@ test('extreme mode with child', function (t) {
     cb()
   })).child({ hello: 'world' })
 
-  var ttyStream = new tty.WriteStream(1)
-  ttyStream.write = function (s) {
-    actual += s
-  }
-  var extreme = pino({extreme: true}, ttyStream).child({ hello: 'world' })
+  var dest = fs.createWriteStream('/dev/null')
+  dest.write = function (s) { actual += s }
+  var extreme = pino({extreme: true}, dest).child({ hello: 'world' })
 
   var i = 500
   while (i--) {
@@ -130,17 +126,14 @@ test('extreme mode with child', function (t) {
   })
 })
 
-test('throws without tty', function (t) {
+test('emits error for invalid stream', function (t) {
   delete require.cache[require.resolve('../')]
   var pino = require('../')
   var outputStream = writeStream(function (s, enc, cb) {})
-
-  try {
-    pino({extreme: true}, outputStream)
-    t.fail('did not throw on invalid stream')
-  } catch (e) {
-    t.pass('stream was invalid')
-  } finally {
+  var logger = pino({extreme: true}, outputStream)
+  logger.on('error', function (err) {
+    t.is(err instanceof Error, true)
+    t.is(err.message, 'stream must have a file descriptor in extreme mode')
     t.end()
-  }
+  })
 })
