@@ -149,7 +149,7 @@ Then we simply pipe a log file through `pino`:
 cat log | pino
 ```
 
-There are also two transformer flags.. 
+There are also two transformer flags..
 
  `-t` that converts Epoch timestamps to ISO timestamps.
 
@@ -174,7 +174,7 @@ Into this:
 {"pid":14139,"hostname":"MacBook-Pro-3.home","level":30,"msg":"hello world","time":"2016-03-09T15:27:09.339Z","v":0}
 ```
 
- 
+
 `pino -l` will transform this:
 
 ```sh
@@ -960,6 +960,14 @@ parents and children will end up in log output.
 <https://www.npmjs.com/~davidmarkclements>
 
 <https://twitter.com/davidmarkclem>
+
+### James Sumners
+
+<https://github.com/jsumners>
+
+<https://www.npmjs.com/~jsumners>
+
+<https://twitter.com/jsumners79>
 
 ### Chat on Gitter
 
