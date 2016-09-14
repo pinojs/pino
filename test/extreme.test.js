@@ -1,9 +1,11 @@
 'use strict'
 
 var test = require('tap').test
+var fs = require('fs')
 var os = require('os')
+var path = require('path')
 var writeStream = require('flush-write-stream')
-var spawn = require('child_process').spawn
+var fork = require('child_process').fork
 
 if (process.version.indexOf('v0.10') >= 0) {
   require('tap').comment('skipped because of node v0.10')
@@ -33,10 +35,9 @@ test('extreme mode', function (t) {
     cb()
   }))
 
-  var extreme = pino({extreme: true}, writeStream(function (s, enc, cb) {
-    actual += s
-    cb()
-  }))
+  var dest = fs.createWriteStream('/dev/null')
+  dest.write = function (s) { actual += s }
+  var extreme = pino({extreme: true}, dest)
 
   var i = 44
   while (i--) {
@@ -47,15 +48,7 @@ test('extreme mode', function (t) {
   var expected2 = expected.split('\n')[0]
   var actual2 = ''
 
-  var e = [
-    'global.process = { __proto__: process,  pid: 123456 };',
-    'Date.now = function () { return 1459875739796;};',
-    'require("os").hostname = function () { return "abcdefghijklmnopqr"; }',
-    ';var pino = require("./");',
-    'var extreme = pino({extreme: true});extreme.info("h")'
-  ].join('')
-
-  var child = spawn('node', ['-e', e])
+  var child = fork(path.join(__dirname, '/fixtures/extreme.js'), {silent: true})
   child.stdout.pipe(writeStream(function (s, enc, cb) {
     actual2 += s
     cb()
@@ -98,10 +91,9 @@ test('extreme mode with child', function (t) {
     cb()
   })).child({ hello: 'world' })
 
-  var extreme = pino({extreme: true}, writeStream(function (s, enc, cb) {
-    actual += s
-    cb()
-  })).child({ hello: 'world' })
+  var dest = fs.createWriteStream('/dev/null')
+  dest.write = function (s) { actual += s }
+  var extreme = pino({extreme: true}, dest).child({ hello: 'world' })
 
   var i = 500
   while (i--) {
@@ -114,16 +106,7 @@ test('extreme mode with child', function (t) {
   var expected2 = expected.split('\n')[0]
   var actual2 = ''
 
-  var e = [
-    'global.process = { __proto__: process,  pid: 123456 };',
-    'Date.now = function () { return 1459875739796;};',
-    'require("os").hostname = function () { return "abcdefghijklmnopqr";};',
-    'var pino = require("./");',
-    'var extreme = pino({extreme: true}).child({ hello: "world" });',
-    'extreme.info("h")'
-  ].join('')
-
-  var child = spawn('node', ['-e', e])
+  var child = fork(path.join(__dirname, '/fixtures/extreme_child.js'), {silent: true})
   child.stdout.pipe(writeStream(function (s, enc, cb) {
     actual2 += s
     cb()
@@ -139,6 +122,18 @@ test('extreme mode with child', function (t) {
       global.process = proc
     })
 
+    t.end()
+  })
+})
+
+test('emits error for invalid stream', function (t) {
+  delete require.cache[require.resolve('../')]
+  var pino = require('../')
+  var outputStream = writeStream(function (s, enc, cb) {})
+  var logger = pino({extreme: true}, outputStream)
+  logger.on('error', function (err) {
+    t.is(err instanceof Error, true)
+    t.is(err.message, 'stream must have a file descriptor in extreme mode')
     t.end()
   })
 })

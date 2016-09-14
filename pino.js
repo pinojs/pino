@@ -45,6 +45,12 @@ Object.defineProperty(nums, '100', {
   enumerable: false
 })
 
+function streamIsBlockable (s) {
+  if (s.hasOwnProperty('_handle') && s._handle.hasOwnProperty('fd') && s._handle.fd) return true
+  if (s.hasOwnProperty('fd') && s.fd) return true
+  return false
+}
+
 function pino (opts, stream) {
   if (opts && (opts.writable || opts._writableState)) {
     stream = opts
@@ -71,16 +77,22 @@ function pino (opts, stream) {
 
   var logger = new Pino(level, stream, serializers, stringify, end, name, slowtime, '', cache, formatOpts)
   if (cache) {
+    // setImmediate is causing a very weird crash:
+    //    Assertion failed: (cb_v->IsFunction()), function MakeCallback...
+    // but setTimeout isn't *shrug*
+    setTimeout(function () {
+      if (!streamIsBlockable(stream)) {
+        logger.emit('error', new Error('stream must have a file descriptor in extreme mode'))
+      }
+    }, 100)
+
     onExit(function (code, evt) {
       if (cache.buf) {
-        if (stream === process.stdout) {
-          console.log(cache.buf)
-        } else if (stream === process.stderr) {
-          console.error(cache.buf)
-        } else {
-          stream.write(cache.buf)
-        }
-        cache.buf = ''
+        // We need to block the process exit long enough to flush the buffer
+        // to the destination stream. We do that by forcing a synchronous
+        // write directly to the stream's file descriptor.
+        var fd = (stream.fd) ? stream.fd : stream._handle.fd
+        require('fs').writeSync(fd, cache.buf)
       }
       if (!process._events[evt] || process._events[evt].length < 2 || !process._events[evt].filter(function (f) {
         return f + '' !== onExit.passCode + '' && f + '' !== onExit.insertCode + ''
