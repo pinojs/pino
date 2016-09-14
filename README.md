@@ -583,7 +583,8 @@ This has a couple of important caveats:
     // do something with chunk
   }}))
   logger.on('error', function (err) {
-    // this callback _will_ be invoked for the type of stream we supplied
+    console.error('pino logger cannot flush on exit due to provided output stream')
+    process.exit(1)
   })
   ```
 
