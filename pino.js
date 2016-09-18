@@ -35,7 +35,7 @@ var nums = Object.keys(levels).reduce(function (o, k) {
 
 // level string catch
 var lscache = Object.keys(nums).reduce(function (o, k) {
-  o[k] = flatstr('"level":' + Number(k) + ',"time":')
+  o[k] = flatstr('"level":' + Number(k))
   return o
 }, {})
 
@@ -58,6 +58,7 @@ function pino (opts, stream) {
   }
   stream = stream || process.stdout
   opts = opts || {}
+  var timestamp = (opts.hasOwnProperty('timestamp')) ? opts.timestamp : true
   var slowtime = opts.slowtime
   var safe = opts.safe !== false
   var stringify = safe ? stringifySafe : JSON.stringify
@@ -75,7 +76,7 @@ function pino (opts, stream) {
     level = 'silent'
   }
 
-  var logger = new Pino(level, stream, serializers, stringify, end, name, slowtime, '', cache, formatOpts)
+  var logger = new Pino(level, stream, serializers, stringify, end, name, timestamp, slowtime, '', cache, formatOpts)
   if (cache) {
     // setImmediate is causing a very weird crash:
     //    Assertion failed: (cb_v->IsFunction()), function MakeCallback...
@@ -115,12 +116,13 @@ Object.defineProperty(pino, 'levels', {
   enumerable: true
 })
 
-function Pino (level, stream, serializers, stringify, end, name, slowtime, chindings, cache, formatOpts) {
+function Pino (level, stream, serializers, stringify, end, name, timestamp, slowtime, chindings, cache, formatOpts) {
   this.stream = stream
   this.serializers = serializers
   this.stringify = stringify
   this.end = end
   this.name = name
+  this.timestamp = timestamp
   this.slowtime = slowtime
   this.chindings = chindings
   this.cache = cache
@@ -130,7 +132,9 @@ function Pino (level, stream, serializers, stringify, end, name, slowtime, chind
   this._baseLog = flatstr(baseLog +
     (this.name === undefined ? '' : '"name":' + stringify(this.name) + ','))
 
-  if (slowtime) {
+  if (timestamp === false) {
+    this.time = getNoTime
+  } else if (slowtime) {
     this.time = getSlowTime
   } else {
     this.time = getTime
@@ -245,12 +249,16 @@ Pino.prototype.asJson = function asJson (obj, msg, num) {
   return data + this.chindings + this.end
 }
 
+function getNoTime () {
+  return ''
+}
+
 function getTime () {
-  return Date.now()
+  return ',"time":' + Date.now()
 }
 
 function getSlowTime () {
-  return '"' + (new Date()).toISOString() + '"'
+  return ',"time":"' + (new Date()).toISOString() + '"'
 }
 
 Pino.prototype.child = function child (bindings) {
@@ -277,6 +285,7 @@ Pino.prototype.child = function child (bindings) {
     this.stringify,
     this.end,
     this.name,
+    this.timestamp,
     this.slowtime,
     data,
     this.cache,
