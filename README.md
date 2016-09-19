@@ -220,6 +220,7 @@ Returns a new logger. Allowed options are:
   default `true`
 * `name`: the name of the logger, default `undefined`
 * `serializers`: an object containing functions for custom serialization of objects. These functions should return an JSONifiable object and they should never throw
+* `timestamp`: Enables or disables the inclusion of a timestamp in the log message. `slowtime` has no effect if this option is set to `false`. Defaults to `true`.
 * `slowtime`: Outputs ISO time stamps (`'2016-03-09T15:18:53.889Z'`) instead of Epoch time stamps (`1457536759176`). **WARNING**: This option carries a 25% performance drop, we recommend using default Epoch timestamps and transforming logs after if required. The `pino -t` command will do this for you (see [CLI](#cli)). default `false`.
 * `extreme`: Enables extreme mode, yields an additional 60% performance (from 250ms down to 100ms per 10000 ops). There are trade-off's should be understood before usage. See [Extreme mode explained](#extreme). default `false`
 * `level`: one of `'fatal'`, `'error'`, `'warn'`, `'info`', `'debug'`, `'trace'`; also `'silent'` is supported to disable logging.
