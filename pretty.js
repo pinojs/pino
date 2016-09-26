@@ -47,7 +47,7 @@ function filter (value) {
 }
 
 function isPinoLine (line) {
-  var requiredProperties = [ 'time', 'name', 'hostname', 'pid' ]
+  var requiredProperties = [ 'name', 'hostname', 'pid' ]
   return Object.keys(line).filter(function (k) {
     return requiredProperties.indexOf(k) > -1
   }).length > 0
