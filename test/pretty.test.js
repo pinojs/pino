@@ -81,3 +81,18 @@ test('pino transform preserve output if not valid JSON', function (t) {
 
   t.deepEqual(lines, ['this is not json', 'it\'s just regular output'], 'preserved lines')
 })
+
+test('handles missing time', function (t) {
+  t.plan(1)
+  var pretty = pino.pretty()
+  var lines = []
+  pretty.pipe(split(function (line) {
+    lines.push(line)
+    return line
+  }))
+
+  pretty.write('{"hello":"world"}')
+  pretty.end()
+
+  t.deepEqual(lines, ['{"hello":"world"}'], 'preserved lines')
+})
