@@ -292,6 +292,19 @@ test('correctly escape msg strings', function (t) {
   instance.fatal('this contains "')
 })
 
+test('correctly strip undefined when returned from toJSON', function (t) {
+  t.plan(1)
+
+  var instance = pino({
+    test: 'this'
+  }, sink(function (obj, enc, cb) {
+    t.notOk('test' in obj)
+    cb()
+  }))
+
+  instance.fatal({test: {toJSON: function () { return undefined }}})
+})
+
 test('correctly support node v4+ stderr', function (t) {
   t.plan(1)
 
