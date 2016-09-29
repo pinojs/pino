@@ -225,6 +225,7 @@ Returns a new logger. Allowed options are:
 * `extreme`: Enables extreme mode, yields an additional 60% performance (from 250ms down to 100ms per 10000 ops). There are trade-off's should be understood before usage. See [Extreme mode explained](#extreme). default `false`
 * `level`: one of `'fatal'`, `'error'`, `'warn'`, `'info`', `'debug'`, `'trace'`; also `'silent'` is supported to disable logging.
 * `enabled`: enables logging, defaults to `true`.
+* `filter`: A function which retrieves arguments just as they were passed to logging functions. Filter functions decide whether log messages should be formatted, serialized and logged, i.e. filter functions return a falsy value to discard log messages.
 
 `stream` is a Writable stream, defaults to `process.stdout`.
 

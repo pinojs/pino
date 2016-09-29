@@ -71,12 +71,14 @@ function pino (opts, stream) {
     size: 4096,
     buf: ''
   }
+  var filter = opts.filter
 
   if (opts.enabled === false) {
     level = 'silent'
   }
 
-  var logger = new Pino(level, stream, serializers, stringify, end, name, timestamp, slowtime, '', cache, formatOpts)
+  var logger = new Pino(level, stream, serializers, stringify, end, name, timestamp, slowtime, '', cache, formatOpts,
+    filter)
   if (cache) {
     // setImmediate is causing a very weird crash:
     //    Assertion failed: (cb_v->IsFunction()), function MakeCallback...
@@ -116,7 +118,8 @@ Object.defineProperty(pino, 'levels', {
   enumerable: true
 })
 
-function Pino (level, stream, serializers, stringify, end, name, timestamp, slowtime, chindings, cache, formatOpts) {
+function Pino (level, stream, serializers, stringify, end, name, timestamp, slowtime, chindings, cache, formatOpts,
+    filter) {
   this.stream = stream
   this.serializers = serializers
   this.stringify = stringify
@@ -127,6 +130,7 @@ function Pino (level, stream, serializers, stringify, end, name, timestamp, slow
   this.chindings = chindings
   this.cache = cache
   this.formatOpts = formatOpts
+  this.filter = filter
   this._setLevel(level)
 
   this._baseLog = flatstr(baseLog +
@@ -289,7 +293,8 @@ Pino.prototype.child = function child (bindings) {
     this.slowtime,
     data,
     this.cache,
-    this.formatOpts)
+    this.formatOpts,
+    this.filter)
 }
 
 Pino.prototype.write = function (obj, msg, num) {
@@ -354,6 +359,9 @@ function asErrValue (err) {
 
 function genLog (z) {
   return function LOG (a, b, c, d, e, f, g, h, i, j, k) {
+    if (this.filter && !this.filter(a, b, c, d, e, f, g, h, i, j, k)) {
+      return
+    }
     var l = 0
     var m = null
     var n = null
@@ -363,7 +371,6 @@ function genLog (z) {
       m = a
       n = [b, c, d, e, f, g, h, i, j, k]
       l = 1
-
       if (m.method && m.headers && m.socket) {
         m = mapHttpRequest(m)
       } else if (m.statusCode) {
