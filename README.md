@@ -575,7 +575,7 @@ This has a couple of important caveats:
   * For instance, a powercut will mean up to 4KB of buffered logs will be lost
   * A sigkill (or other untrappable signal) will probably result in the same
   * If writing to a stream other than `process.stdout` or `process.stderr`, there is a slight possibility of lost logs or even partially written logs if the OS buffers don't have enough space, or something else is being written to the stream (or maybe some other reason we've not thought of)
-* If you supply an alternate stream to the constructor, then that stream must support synchronous writes so that it can be properly flushed on exit. This means the stream most expose its file descriptor via `stream.fd` or `stream._handle.fd`. If your stream is invalid an `error` event will be emitted on the returned logger, e.g.:
+* If you supply an alternate stream to the constructor, then that stream must support synchronous writes so that it can be properly flushed on exit. This means the stream most expose its file descriptor via `stream.fd` or `stream._handle.fd`. Usually they have to be native (from core) stream, meaning a TCP/unix socket, a file, or stdout/sderr. If your stream is invalid an `error` event will be emitted on the returned logger, e.g.:
 
   ```js
   var stream = require('stream')
