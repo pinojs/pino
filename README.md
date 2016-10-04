@@ -17,6 +17,7 @@ It also includes a shell utility to pretty-print its log files.
 * [How to use Pino with Restify](#restify)
 * [How to use Pino with Koa](#koa)
 * [How do I rotate log files?](#rotate)
+* [How do I redact sensitive information](#redact)
 * [How to use Transports with Pino](#transports)
 * [Caveats](#caveats)
 * [Team](#team)
@@ -766,6 +767,40 @@ We would rotate our log files with logrotate, by adding the following to `/etc/l
        copytruncate
 }
 ```
+
+<a name="redact"></a>
+## How do I redact sensitive information
+
+Use [pino-noir](http://npm.im/pino-noir), initialize with the key paths you wish to redact and pass the resulting instance in through the `serializers` option
+
+```js
+var noir = require('pino-noir')
+var pino = require('pino')({
+  serializers: noir(['key', 'path.to.key'])
+})
+
+pino.info({
+  key: 'will be redacted',
+  path: {
+    to: {key: 'sensitive', another: 'thing'}
+  },
+  more: 'stuff'
+}) 
+
+// {"pid":7306,"hostname":"x","level":30,"time":1475519922198,"key":"[Redacted]","path":{"to":{"key":"[Redacted]","another":"thing"}},"more":"stuff","v":1}
+```
+
+If you have other serializers simply extend: 
+
+```js
+var noir = require('pino-noir')
+var pino = require('pino')({
+  serializers: Object.assign(
+    noir(['key', 'path.to.key']),
+    {myCustomSerializer: () => {}}
+})
+```
+
 
 <a name="transports"></a>
 ## How to use Transports with Pino
