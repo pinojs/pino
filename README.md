@@ -17,7 +17,7 @@ It also includes a shell utility to pretty-print its log files.
 * [How to use Pino with Restify](#restify)
 * [How to use Pino with Koa](#koa)
 * [How do I rotate log files?](#rotate)
-* [How do I redact sensitive information](#redact)
+* [How do I redact sensitive information?](#redact)
 * [How to use Transports with Pino](#transports)
 * [Caveats](#caveats)
 * [Team](#team)
@@ -741,7 +741,7 @@ See the [koa-pino-logger v2 readme](https://github.com/davidmarkclements/koa-pin
 
 
 <a name="rotate"></a>
-## How do I rotate log files
+## How do I rotate log files?
 
 Use a separate tool for log rotation.
 
@@ -769,7 +769,7 @@ We would rotate our log files with logrotate, by adding the following to `/etc/l
 ```
 
 <a name="redact"></a>
-## How do I redact sensitive information
+## How do I redact sensitive information??
 
 Use [pino-noir](http://npm.im/pino-noir), initialize with the key paths you wish to redact and pass the resulting instance in through the `serializers` option
 
