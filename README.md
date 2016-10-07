@@ -820,7 +820,7 @@ var myTransport = through.obj(function (chunk, enc, cb) {
   cb()
 })
 
-pump(process.stdin, split2(JSON.parse), myTransport)
+pump(process.stdin, split(JSON.parse), myTransport)
 ```
 
 ```sh
