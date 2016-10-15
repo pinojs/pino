@@ -35,38 +35,31 @@ function pino (opts, stream) {
 
   function MSPino (_loggers) {
     this.loggers = _loggers
+    var levels = ['fatal', 'error', 'warn', 'info', 'debug', 'trace']
+    for (var i = 0, j = levels.length; i < j; i += 1) {
+      if (this.loggers.hasOwnProperty(levels[i]) === false) {
+        this[levels[i]] = noop
+      }
+    }
   }
   MSPino.prototype = Object.create(realPino.Pino.prototype)
   MSPino.constructor = MSPino
 
-  function doLog (logger, level, params) {
-    logger[level].apply(logger, params)
-  }
-  MSPino.prototype._issueLog = function issueLog (level, params) {
-    if (!this.loggers[level]) return noop()
-    for (var i = 0, j = this.loggers[level].length; i < j; i += 1) {
-      doLog(this.loggers[level][i], level, params)
+  function genLog (level) {
+    return function LOG () {
+      for (var x = 0, y = this.loggers[level].length; x < y; x += 1) {
+        var logger = this.loggers[level][x]
+        logger[level].apply(logger, arguments)
+      }
     }
   }
+  MSPino.prototype.fatal = genLog('fatal')
+  MSPino.prototype.error = genLog('error')
+  MSPino.prototype.warn = genLog('warn')
+  MSPino.prototype.info = genLog('info')
+  MSPino.prototype.debug = genLog('debug')
+  MSPino.prototype.trace = genLog('trace')
 
-  MSPino.prototype.fatal = function fatal () {
-    this._issueLog('fatal', arguments)
-  }
-  MSPino.prototype.error = function error () {
-    this._issueLog('error', arguments)
-  }
-  MSPino.prototype.warn = function warn () {
-    this._issueLog('warn', arguments)
-  }
-  MSPino.prototype.info = function info () {
-    this._issueLog('info', arguments)
-  }
-  MSPino.prototype.debug = function debug () {
-    this._issueLog('debug', arguments)
-  }
-  MSPino.prototype.trace = function trace () {
-    this._issueLog('trace', arguments)
-  }
   MSPino.prototype.child = function child (bindings) {
     var levels = Object.keys(this.loggers)
     var childLoggers = {}
