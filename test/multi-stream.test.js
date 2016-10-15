@@ -1,63 +1,71 @@
 'use strict'
 
-var fs = require('fs')
+var writeStream = require('flush-write-stream')
 var test = require('tap').test
 var mspino = require('../multi-stream')
 
 test('sends to multiple streams', function (t) {
+  var messages = []
+  var stream = writeStream(function (data, enc, cb) {
+    messages.push(JSON.parse(data).msg)
+    if (messages.length === 3) {
+      t.is(messages.indexOf('info stream') > -1, true)
+      t.is(messages.indexOf('debug stream') > -1, true)
+      t.is(messages.indexOf('fatal stream') > -1, true)
+      t.done()
+    }
+    cb()
+  })
   var streams = [
-    {stream: fs.createWriteStream('/tmp/info.out')},
-    {level: 'debug', stream: fs.createWriteStream('/tmp/debug.out')},
-    {level: 'fatal', stream: fs.createWriteStream('/tmp/fatal.out')}
+    {stream: stream},
+    {level: 'debug', stream: stream},
+    {level: 'fatal', stream: stream}
   ]
   var log = mspino({streams: streams})
   log.info('info stream')
   log.debug('debug stream')
   log.fatal('fatal stream')
-
-  setImmediate(function () {
-    var res = JSON.parse(fs.readFileSync('/tmp/info.out'))
-    t.is(res.msg, 'info stream')
-
-    res = JSON.parse(fs.readFileSync('/tmp/debug.out'))
-    t.is(res.msg, 'debug stream')
-
-    res = JSON.parse(fs.readFileSync('/tmp/fatal.out'))
-    t.is(res.msg, 'fatal stream')
-
-    t.done()
-  })
 })
 
 test('supports children', function (t) {
+  var stream = writeStream(function (data, enc, cb) {
+    var input = JSON.parse(data)
+    t.is(input.msg, 'child stream')
+    t.is(input.child, 'one')
+    t.done()
+    cb()
+  })
   var streams = [
-    {stream: fs.createWriteStream('/tmp/multichild.out')}
+    {stream: stream}
   ]
   var log = mspino({streams: streams}).child({child: 'one'})
   log.info('child stream')
-
-  setImmediate(function () {
-    var res = JSON.parse(fs.readFileSync('/tmp/multichild.out'))
-    t.is(res.msg, 'child stream')
-    t.is(res.child, 'one')
-
-    t.done()
-  })
 })
 
 test('supports grandchildren', function (t) {
+  var messages = []
+  var stream = writeStream(function (data, enc, cb) {
+    messages.push(JSON.parse(data))
+    if (messages.length === 2) {
+      var msg1 = messages[0]
+      t.is(msg1.msg, 'grandchild stream')
+      t.is(msg1.child, 'one')
+      t.is(msg1.grandchild, 'two')
+
+      var msg2 = messages[1]
+      t.is(msg2.msg, 'debug grandchild')
+      t.is(msg2.child, 'one')
+      t.is(msg2.grandchild, 'two')
+
+      t.done()
+    }
+    cb()
+  })
   var streams = [
-    {stream: fs.createWriteStream('/tmp/multigrandchild.out')}
+    {stream: stream},
+    {level: 'debug', stream: stream}
   ]
   var log = mspino({streams: streams}).child({child: 'one'}).child({grandchild: 'two'})
   log.info('grandchild stream')
-
-  setImmediate(function () {
-    var res = JSON.parse(fs.readFileSync('/tmp/multigrandchild.out'))
-    t.is(res.msg, 'grandchild stream')
-    t.is(res.child, 'one')
-    t.is(res.grandchild, 'two')
-
-    t.done()
-  })
+  log.debug('debug grandchild')
 })
