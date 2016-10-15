@@ -28,7 +28,12 @@ var fourStreams = [
 ]
 var mspinoFour = mspino({streams: fourStreams})
 
-var max = 10
+var mspinoOne = mspino({streams: [{stream: dest}]})
+var blogOne = bunyan.createLogger({
+  name: 'myapp',
+  streams: [{stream: dest}]
+})
+
 var blogTen = bunyan.createLogger({
   name: 'myapp',
   streams: tenStreams
@@ -38,6 +43,7 @@ var blogFour = bunyan.createLogger({
   streams: fourStreams
 })
 
+var max = 10
 var run = bench([
   function benchBunyanTen (cb) {
     for (var i = 0; i < max; i++) {
@@ -72,6 +78,18 @@ var run = bench([
       mspinoFour.info('hello world')
       mspinoFour.debug('hello world')
       mspinoFour.trace('hello world')
+    }
+    setImmediate(cb)
+  },
+  function benchBunyanOne (cb) {
+    for (var i = 0; i < max; i++) {
+      blogOne.info('hello world')
+    }
+    setImmediate(cb)
+  },
+  function benchMSPinoOne (cb) {
+    for (var i = 0; i < max; i++) {
+      mspinoOne.info('hello world')
     }
     setImmediate(cb)
   }
