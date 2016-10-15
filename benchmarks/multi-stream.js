@@ -5,7 +5,8 @@ var bunyan = require('bunyan')
 var mspino = require('../multi-stream')
 var fs = require('fs')
 var dest = fs.createWriteStream('/dev/null')
-var streams = [
+
+var tenStreams = [
   {stream: dest},
   {stream: dest},
   {stream: dest},
@@ -17,28 +18,60 @@ var streams = [
   {level: 'warn', stream: dest},
   {level: 'fatal', stream: dest}
 ]
-var log = mspino({streams: streams})
+var mspinoTen = mspino({streams: tenStreams})
+
+var fourStreams = [
+  {stream: dest},
+  {stream: dest},
+  {level: 'debug', stream: dest},
+  {level: 'trace', stream: dest}
+]
+var mspinoFour = mspino({streams: fourStreams})
 
 var max = 10
-var blog = bunyan.createLogger({
+var blogTen = bunyan.createLogger({
   name: 'myapp',
-  streams: streams
+  streams: tenStreams
+})
+var blogFour = bunyan.createLogger({
+  name: 'myapp',
+  streams: fourStreams
 })
 
 var run = bench([
-  function benchBunyan (cb) {
+  function benchBunyanTen (cb) {
     for (var i = 0; i < max; i++) {
-      blog.info('hello world')
+      blogTen.info('hello world')
+      blogTen.debug('hello world')
+      blogTen.trace('hello world')
+      blogTen.warn('hello world')
+      blogTen.fatal('hello world')
     }
     setImmediate(cb)
   },
-  function benchMSPino (cb) {
+  function benchMSPinoTen (cb) {
     for (var i = 0; i < max; i++) {
-      log.info('hello world')
-      log.debug('hello world')
-      log.trace('hello world')
-      log.warn('hello world')
-      log.fatal('hello world')
+      mspinoTen.info('hello world')
+      mspinoTen.debug('hello world')
+      mspinoTen.trace('hello world')
+      mspinoTen.warn('hello world')
+      mspinoTen.fatal('hello world')
+    }
+    setImmediate(cb)
+  },
+  function benchBunyanFour (cb) {
+    for (var i = 0; i < max; i++) {
+      blogFour.info('hello world')
+      blogFour.debug('hello world')
+      blogFour.trace('hello world')
+    }
+    setImmediate(cb)
+  },
+  function benchMSPinoFour (cb) {
+    for (var i = 0; i < max; i++) {
+      mspinoFour.info('hello world')
+      mspinoFour.debug('hello world')
+      mspinoFour.trace('hello world')
     }
     setImmediate(cb)
   }
