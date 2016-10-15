@@ -36,7 +36,7 @@ test('supports multiple arguments', function (t) {
       t.is(msg1.msg, 'foo bar baz foobar')
 
       var msg2 = messages[1]
-      t.is(msg2.msg, 'foo bar baz foobar barfoo')
+      t.is(msg2.msg, 'foo bar baz foobar barfoo foofoo')
 
       t.done()
     }
@@ -44,7 +44,7 @@ test('supports multiple arguments', function (t) {
   })
   var log = mspino({streams: stream})
   log.info('%s %s %s %s', 'foo', 'bar', 'baz', 'foobar') // apply not invoked
-  log.info('%s %s %s %s %s', 'foo', 'bar', 'baz', 'foobar', 'barfoo') // apply invoked
+  log.info('%s %s %s %s %s %s', 'foo', 'bar', 'baz', 'foobar', 'barfoo', 'foofoo') // apply invoked
 })
 
 test('supports children', function (t) {
