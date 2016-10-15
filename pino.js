@@ -415,6 +415,7 @@ module.exports.stdSerializers = {
   res: asResValue,
   err: asErrValue
 }
+module.exports.Pino = Pino
 module.exports.pretty = require('./pretty')
 Object.defineProperty(
   module.exports,
