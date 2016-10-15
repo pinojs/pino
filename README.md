@@ -591,6 +591,36 @@ add. Regardless of the number, it will be slower than a regular `pino` instance.
 stream of the parent logger. This holds true for however many child loggers
 are created.
 
+**Stern warning:** the performance of this feature being dependent on the number
+of streams you supply cannot be overstated. This feature is being provided so
+that you can switch to `pino` from `Bunyan` and get some immediate improvement,
+but it is not meant to be a long term solution. We *strongly* suggest that you
+use this feature for only as long as it will take you to overhaul the way
+you handle logging in your application.
+
+To illustrate what we mean, here is a benchmark of `pino` and `Bunyan` using
+"multiple" streams to write to a single stream:
+
+```
+benchBunyanOne*10000: 875.099ms
+benchMSPinoOne*10000: 224.924ms
+```
+
+Now let's look at the same benchmark but increase the number of destination
+streams to four:
+
+```
+benchBunyanFour*10000: 3288.004ms
+benchMSPinoFour*10000: 722.918ms
+```
+
+And, finally, with ten destination streams:
+
+```
+benchBunyanTen*10000: 8142.875ms
+benchMSPinoTen*10000: 1992.805ms
+```
+
 
 <a name="extreme"></a>
 ## Extreme mode explained
