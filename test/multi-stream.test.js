@@ -27,6 +27,26 @@ test('sends to multiple streams', function (t) {
   log.fatal('fatal stream')
 })
 
+test('supports multiple arguments', function (t) {
+  var messages = []
+  var stream = writeStream(function (data, enc, cb) {
+    messages.push(JSON.parse(data))
+    if (messages.length === 2) {
+      var msg1 = messages[0]
+      t.is(msg1.msg, 'foo bar baz foobar')
+
+      var msg2 = messages[1]
+      t.is(msg2.msg, 'foo bar baz foobar barfoo')
+
+      t.done()
+    }
+    cb()
+  })
+  var log = mspino({streams: stream})
+  log.info('%s %s %s %s', 'foo', 'bar', 'baz', 'foobar') // apply not invoked
+  log.info('%s %s %s %s %s', 'foo', 'bar', 'baz', 'foobar', 'barfoo') // apply invoked
+})
+
 test('supports children', function (t) {
   var stream = writeStream(function (data, enc, cb) {
     var input = JSON.parse(data)

@@ -46,10 +46,37 @@ function pino (opts, stream) {
   MSPino.constructor = MSPino
 
   function genLog (level) {
-    return function LOG () {
-      for (var x = 0, y = this.loggers[level].length; x < y; x += 1) {
-        var logger = this.loggers[level][x]
-        logger[level].apply(logger, arguments)
+    return function LOG (arg1, arg2, arg3, arg4, arg5, arg6) {
+      for (var i = 0, j = this.loggers[level].length; i < j; i += 1) {
+        var logger = this.loggers[level][i]
+        var x
+        var args
+        switch (arguments.length) {
+          case 1:
+            logger[level](arg1)
+            break
+          case 2:
+            logger[level](arg1, arg2)
+            break
+          case 3:
+            logger[level](arg1, arg2, arg3)
+            break
+          case 4:
+            logger[level](arg1, arg2, arg3, arg4)
+            break
+          case 5:
+            logger[level](arg1, arg2, arg3, arg4, arg5)
+            break
+          case 6:
+            logger[level](arg1, arg2, arg3, arg4, arg5, arg6)
+            break
+          default:
+            args = [arg1, arg2, arg3, arg4, arg5, arg6]
+            for (x = 7; x < arguments.length; x += 1) {
+              args[x - 1] = arguments[x]
+            }
+            logger[level].apply(logger, args)
+        }
       }
     }
   }
