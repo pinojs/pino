@@ -421,3 +421,11 @@ Object.defineProperty(
   'LOG_VERSION',
   {value: LOG_VERSION, enumerable: true}
 )
+
+// This is an internal API. It can change at any time, including semver-minor.
+// Use it at your own risk.
+Object.defineProperty(
+  module.exports,
+  '_Pino',
+  {value: Pino}
+)
