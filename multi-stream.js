@@ -42,7 +42,7 @@ function pino (opts, stream) {
       }
     }
   }
-  MSPino.prototype = Object.create(realPino.Pino.prototype)
+  MSPino.prototype = Object.create(realPino._Pino.prototype)
   MSPino.constructor = MSPino
 
   function genLog (level) {
