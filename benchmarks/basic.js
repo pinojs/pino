@@ -35,42 +35,42 @@ winston.add(winston.transports.File, { filename: '/dev/null' })
 winston.remove(winston.transports.Console)
 
 var run = bench([
-  function benchBunyan (cb) {
-    for (var i = 0; i < max; i++) {
-      blog.info('hello world')
-    }
-    setImmediate(cb)
-  },
-  function benchWinston (cb) {
-    for (var i = 0; i < max; i++) {
-      winston.info('hello world')
-    }
-    setImmediate(cb)
-  },
-  function benchBole (cb) {
-    for (var i = 0; i < max; i++) {
-      bole.info('hello world')
-    }
-    setImmediate(cb)
-  },
-  function benchDebug (cb) {
-    for (var i = 0; i < max; i++) {
-      dlog('hello world')
-    }
-    setImmediate(cb)
-  },
-  function benchLogLevel (cb) {
-    for (var i = 0; i < max; i++) {
-      loglevel.info('hello world')
-    }
-    setImmediate(cb)
-  },
-  function benchPino (cb) {
-    for (var i = 0; i < max; i++) {
-      plog.info('hello world')
-    }
-    setImmediate(cb)
-  },
+  // function benchBunyan (cb) {
+  //   for (var i = 0; i < max; i++) {
+  //     blog.info('hello world')
+  //   }
+  //   setImmediate(cb)
+  // },
+  // function benchWinston (cb) {
+  //   for (var i = 0; i < max; i++) {
+  //     winston.info('hello world')
+  //   }
+  //   setImmediate(cb)
+  // },
+  // function benchBole (cb) {
+  //   for (var i = 0; i < max; i++) {
+  //     bole.info('hello world')
+  //   }
+  //   setImmediate(cb)
+  // },
+  // function benchDebug (cb) {
+  //   for (var i = 0; i < max; i++) {
+  //     dlog('hello world')
+  //   }
+  //   setImmediate(cb)
+  // },
+  // function benchLogLevel (cb) {
+  //   for (var i = 0; i < max; i++) {
+  //     loglevel.info('hello world')
+  //   }
+  //   setImmediate(cb)
+  // },
+  // function benchPino (cb) {
+  //   for (var i = 0; i < max; i++) {
+  //     plog.info('hello world')
+  //   }
+  //   setImmediate(cb)
+  // },
   function benchPinoExreme (cb) {
     for (var i = 0; i < max; i++) {
       plogExtreme.info('hello world')

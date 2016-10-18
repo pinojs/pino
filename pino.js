@@ -3,7 +3,13 @@
 var stringifySafe = require('fast-safe-stringify')
 var format = require('quick-format')
 var os = require('os')
-var flatstr = require('flatstr')
+//var flatstr = require('flatstr')
+function flatstr (s) { 
+// comment and uncomment this and run
+// node benchmark/basic.js
+//  Number(s)
+  return s
+}
 var once = require('once')
 var noop = require('./noop')
 var pid = process.pid
