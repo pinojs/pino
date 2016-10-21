@@ -329,23 +329,32 @@ test('correctly support node v4+ stderr', function (t) {
   instance.fatal('a message')
 })
 
-test('correctly escape \\n', function (t) {
-  t.plan(1)
+function testEscape (ch, key) {
+  test('correctly escape ' + ch, function (t) {
+    t.plan(1)
 
-  var instance = pino({
-    name: 'hello'
-  }, sink(function (chunk, enc, cb) {
-    delete chunk.time
-    t.deepEqual(chunk, {
-      pid: pid,
-      hostname: hostname,
-      level: 60,
-      name: 'hello',
-      msg: 'this contains \n',
-      v: 1
-    })
-    cb()
-  }))
+    var instance = pino({
+      name: 'hello'
+    }, sink(function (chunk, enc, cb) {
+      delete chunk.time
+      t.deepEqual(chunk, {
+        pid: pid,
+        hostname: hostname,
+        level: 60,
+        name: 'hello',
+        msg: 'this contains ' + key,
+        v: 1
+      })
+      cb()
+    }))
 
-  instance.fatal('this contains \n')
-})
+    instance.fatal('this contains ' + key)
+  })
+}
+
+testEscape('\\n', '\n')
+testEscape('\\/', '/')
+testEscape('\\\\', '\\')
+testEscape('\\r', '\r')
+testEscape('\\t', '\t')
+testEscape('\\b', '\b')

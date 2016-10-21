@@ -207,9 +207,32 @@ function fastRep (s) {
   var last = 0
   var l = str.length
   for (var i = 0; i < l; i++) {
-    if (str[i] === '"') {
-      result += str.slice(last, i) + '\\"'
-      last = i + 1
+    switch (str[i]) {
+      case '"':
+      case '\\/':
+        result += str.slice(last, i) + '\\' + str[i]
+        last = i + 1
+        break
+      case '\n':
+        result += str.slice(last, i) + '\\n'
+        last = i + 1
+        break
+      case '\b':
+        result += str.slice(last, i) + '\\b'
+        last = i + 1
+        break
+      case '\\':
+        result += str.slice(last, i) + '\\\\'
+        last = i + 1
+        break
+      case '\r':
+        result += str.slice(last, i) + '\\r'
+        last = i + 1
+        break
+      case '\t':
+        result += str.slice(last, i) + '\\t'
+        last = i + 1
+        break
     }
   }
   if (last === 0) {
