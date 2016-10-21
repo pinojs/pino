@@ -328,3 +328,24 @@ test('correctly support node v4+ stderr', function (t) {
 
   instance.fatal('a message')
 })
+
+test('correctly escape \\n', function (t) {
+  t.plan(1)
+
+  var instance = pino({
+    name: 'hello'
+  }, sink(function (chunk, enc, cb) {
+    delete chunk.time
+    t.deepEqual(chunk, {
+      pid: pid,
+      hostname: hostname,
+      level: 60,
+      name: 'hello',
+      msg: 'this contains \n',
+      v: 1
+    })
+    cb()
+  }))
+
+  instance.fatal('this contains \n')
+})
