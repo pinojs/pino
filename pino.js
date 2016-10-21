@@ -201,25 +201,6 @@ Object.defineProperty(
   {value: LOG_VERSION}
 )
 
-function fastRep (s) {
-  var str = s.toString()
-  var result = ''
-  var last = 0
-  var l = str.length
-  for (var i = 0; i < l; i++) {
-    if (str[i] === '"') {
-      result += str.slice(last, i) + '\\"'
-      last = i + 1
-    }
-  }
-  if (last === 0) {
-    result = str
-  } else {
-    result += str.slice(last)
-  }
-  return result
-}
-
 Pino.prototype.asJson = function asJson (obj, msg, num) {
   if (!msg && obj instanceof Error) {
     msg = obj.message
@@ -228,7 +209,7 @@ Pino.prototype.asJson = function asJson (obj, msg, num) {
   // to catch both null and undefined
   /* eslint-disable eqeqeq */
   if (msg != undefined) {
-    data += ',"msg":"' + fastRep(msg) + '"'
+    data += ',"msg":' + JSON.stringify(msg)
   }
   var value
   if (obj) {
