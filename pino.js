@@ -213,7 +213,7 @@ function escape (s) {
   var l = str.length
   var point = 255
   for (var i = 0; i < l && point >= 32; i++) {
-    point = s.charCodeAt(i)
+    point = str.charCodeAt(i)
     if (point === 34 || point === 92) {
       result += str.slice(last, i) + '\\' + str[i]
       last = i + 1
