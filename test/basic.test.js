@@ -272,24 +272,65 @@ test('throw if creating child without bindings', function (t) {
 })
 
 test('correctly escape msg strings', function (t) {
-  t.plan(1)
+  // These characters must be escaped according to the JSON spec
+  // Reference: https://tools.ietf.org/html/rfc7159#section-7
+  var mustEscape = [
+    '\u0000', // NUL  Null character
+    '\u0001', // SOH  Start of Heading
+    '\u0002', // STX  Start of Text
+    '\u0003', // ETX  End-of-text character
+    '\u0004', // EOT  End-of-transmission character
+    '\u0005', // ENQ  Enquiry character
+    '\u0006', // ACK  Acknowledge character
+    '\u0007', // BEL  Bell character
+    '\u0008', // BS   Backspace
+    '\u0009', // HT   Horizontal tab
+    '\u000A', // LF   Line feed
+    '\u000B', // VT   Vertical tab
+    '\u000C', // FF   Form feed
+    '\u000D', // CR   Carriage return
+    '\u000E', // SO   Shift Out
+    '\u000F', // SI   Shift In
+    '\u0010', // DLE  Data Link Escape
+    '\u0011', // DC1  Device Control 1
+    '\u0012', // DC2  Device Control 2
+    '\u0013', // DC3  Device Control 3
+    '\u0014', // DC4  Device Control 4
+    '\u0015', // NAK  Negative-acknowledge character
+    '\u0016', // SYN  Synchronous Idle
+    '\u0017', // ETB  End of Transmission Block
+    '\u0018', // CAN  Cancel character
+    '\u0019', // EM   End of Medium
+    '\u001A', // SUB  Substitute character
+    '\u001B', // ESC  Escape character
+    '\u001C', // FS   File Separator
+    '\u001D', // GS   Group Separator
+    '\u001E', // RS   Record Separator
+    '\u001F', // US   Unit Separator
+    '\u0022', // "    Quotation mark
+    '\u005C'  // \    Reverse solidus
+  ]
 
-  var instance = pino({
-    name: 'hello'
-  }, sink(function (chunk, enc, cb) {
-    delete chunk.time
-    t.deepEqual(chunk, {
-      pid: pid,
-      hostname: hostname,
-      level: 60,
-      name: 'hello',
-      msg: 'this contains "',
-      v: 1
-    })
-    cb()
-  }))
+  t.plan(mustEscape.length)
 
-  instance.fatal('this contains "')
+  mustEscape.forEach(function (character) {
+    var instance = pino({
+      name: 'hello'
+    }, sink(function (chunk, enc, cb) {
+      delete chunk.time
+      t.deepEqual(chunk, {
+        pid: pid,
+        hostname: hostname,
+        level: 60,
+        name: 'hello',
+        msg: 'this contains ' + character,
+        v: 1
+      })
+      cb()
+    }))
+
+    instance.fatal('this contains ' + character)
+  })
 })
 
 test('correctly strip undefined when returned from toJSON', function (t) {
