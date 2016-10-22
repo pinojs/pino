@@ -368,9 +368,6 @@ object, all its properties will be included in the JSON line.
 If more args follows `msg`, these will be used to format `msg` using
 [`util.format`](https://nodejs.org/api/util.html#util_util_format_format)
 
-For best performance _and_ safety, use a fixed `msg`, and place all
-varying data either in the object or as a format.
-
 <a name="error"></a>
 ### logger.error([obj], msg, [...])
 
@@ -378,9 +375,6 @@ Log at `'error'` level the given `msg`. If the first argument is an
 object, all its properties will be included in the JSON line.
 If more args follows `msg`, these will be used to format `msg` using
 [`util.format`](https://nodejs.org/api/util.html#util_util_format_format)
-
-For best performance _and_ safety, use a fixed `msg`, and place all
-varying data either in the object or as a format.
 
 <a name="warn"></a>
 ### logger.warn([obj], msg, [...])
@@ -390,9 +384,6 @@ object, all its properties will be included in the JSON line.
 If more args follows `msg`, these will be used to format `msg` using
 [`util.format`](https://nodejs.org/api/util.html#util_util_format_format)
 
-For best performance _and_ safety, use a fixed `msg`, and place all
-varying data either in the object or as a format.
-
 <a name="info"></a>
 ### logger.info([obj], msg, [...])
 
@@ -400,9 +391,6 @@ Log at `'info'` level the given `msg`. If the first argument is an
 object, all its properties will be included in the JSON line.
 If more args follows `msg`, these will be used to format `msg` using
 [`util.format`](https://nodejs.org/api/util.html#util_util_format_format)
-
-For best performance _and_ safety, use a fixed `msg`, and place all
-varying data either in the object or as a format.
 
 <a name="debug"></a>
 ### logger.debug([obj], msg, [...])
@@ -412,9 +400,6 @@ object, all its properties will be included in the JSON line.
 If more args follows `msg`, these will be used to format `msg` using
 [`util.format`](https://nodejs.org/api/util.html#util_util_format_format)
 
-For best performance _and_ safety, use a fixed `msg`, and place all
-varying data either in the object or as a format.
-
 <a name="trace"></a>
 ### logger.trace([obj], msg, [...])
 
@@ -422,9 +407,6 @@ Log at `'trace'` level the given `msg`. If the first argument is an
 object, all its properties will be included in the JSON line.
 If more args follows `msg`, these will be used to format `msg` using
 [`util.format`](https://nodejs.org/api/util.html#util_util_format_format)
-
-For best performance _and_ safety, use a fixed `msg`, and place all
-varying data either in the object or as a format.
 
 <a name="flush"></a>
 ### logger.flush()
