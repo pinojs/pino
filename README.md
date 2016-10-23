@@ -408,7 +408,6 @@ object, all its properties will be included in the JSON line.
 If more args follows `msg`, these will be used to format `msg` using
 [`util.format`](https://nodejs.org/api/util.html#util_util_format_format)
 
-
 <a name="flush"></a>
 ### logger.flush()
 
