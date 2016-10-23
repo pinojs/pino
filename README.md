@@ -1,6 +1,6 @@
 ![banner](pino-banner.png)
 
-# pino&nbsp;&nbsp;[![Build Status](https://travis-ci.org/mcollina/pino.svg)](https://travis-ci.org/mcollina/pino)&nbsp;[![Coverage Status](https://coveralls.io/repos/github/mcollina/pino/badge.svg?branch=master)](https://coveralls.io/github/mcollina/pino?branch=master) [![TypeScript definitions on DefinitelyTyped](http://definitelytyped.org/badges/standard.svg)](http://definitelytyped.org)
+# pino&nbsp;&nbsp;[![Build Status](https://travis-ci.org/mcollina/pino.svg?branch=master)](https://travis-ci.org/mcollina/pino)&nbsp;[![Coverage Status](https://coveralls.io/repos/github/mcollina/pino/badge.svg?branch=master)](https://coveralls.io/github/mcollina/pino?branch=master) [![TypeScript definitions on DefinitelyTyped](http://definitelytyped.org/badges/standard.svg)](http://definitelytyped.org)
 
 [Extremely fast](#benchmarks) node.js logger, inspired by Bunyan.
 It also includes a shell utility to pretty-print its log files.
@@ -408,7 +408,6 @@ Log at `'trace'` level the given `msg`. If the first argument is an
 object, all its properties will be included in the JSON line.
 If more args follows `msg`, these will be used to format `msg` using
 [`util.format`](https://nodejs.org/api/util.html#util_util_format_format)
-
 
 <a name="flush"></a>
 ### logger.flush()

@@ -201,14 +201,21 @@ Object.defineProperty(
   {value: LOG_VERSION}
 )
 
-function fastRep (s) {
+// magically escape strings for json
+// relying on their charCodeAt
+// everything below 32 needs JSON.stringify()
+// 34 and 92 happens all the time, so we
+// have a fast case for them
+function escape (s) {
   var str = s.toString()
   var result = ''
   var last = 0
   var l = str.length
-  for (var i = 0; i < l; i++) {
-    if (str[i] === '"') {
-      result += str.slice(last, i) + '\\"'
+  var point = 255
+  for (var i = 0; i < l && point >= 32; i++) {
+    point = str.charCodeAt(i)
+    if (point === 34 || point === 92) {
+      result += str.slice(last, i) + '\\' + str[i]
       last = i + 1
     }
   }
@@ -217,7 +224,7 @@ function fastRep (s) {
   } else {
     result += str.slice(last)
   }
-  return result
+  return point < 32 ? JSON.stringify(str) : '"' + result + '"'
 }
 
 Pino.prototype.asJson = function asJson (obj, msg, num) {
@@ -228,7 +235,7 @@ Pino.prototype.asJson = function asJson (obj, msg, num) {
   // to catch both null and undefined
   /* eslint-disable eqeqeq */
   if (msg != undefined) {
-    data += ',"msg":"' + fastRep(msg) + '"'
+    data += ',"msg":' + escape(msg)
   }
   var value
   if (obj) {
