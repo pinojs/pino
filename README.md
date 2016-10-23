@@ -1,6 +1,6 @@
 ![banner](pino-banner.png)
 
-# pino&nbsp;&nbsp;[![Build Status](https://travis-ci.org/mcollina/pino.svg)](https://travis-ci.org/mcollina/pino)&nbsp;[![Coverage Status](https://coveralls.io/repos/github/mcollina/pino/badge.svg?branch=master)](https://coveralls.io/github/mcollina/pino?branch=master) [![TypeScript definitions on DefinitelyTyped](http://definitelytyped.org/badges/standard.svg)](http://definitelytyped.org)
+# pino&nbsp;&nbsp;[![Build Status](https://travis-ci.org/mcollina/pino.svg?branch=master)](https://travis-ci.org/mcollina/pino)&nbsp;[![Coverage Status](https://coveralls.io/repos/github/mcollina/pino/badge.svg?branch=master)](https://coveralls.io/github/mcollina/pino?branch=master) [![TypeScript definitions on DefinitelyTyped](http://definitelytyped.org/badges/standard.svg)](http://definitelytyped.org)
 
 [Extremely fast](#benchmarks) node.js logger, inspired by Bunyan.
 It also includes a shell utility to pretty-print its log files.
@@ -17,6 +17,7 @@ It also includes a shell utility to pretty-print its log files.
 * [How to use Pino with Restify](#restify)
 * [How to use Pino with Koa](#koa)
 * [How do I rotate log files?](#rotate)
+* [How do I redact sensitive information?](#redact)
 * [How to use Transports with Pino](#transports)
 * [Caveats](#caveats)
 * [Team](#team)
@@ -407,7 +408,6 @@ object, all its properties will be included in the JSON line.
 If more args follows `msg`, these will be used to format `msg` using
 [`util.format`](https://nodejs.org/api/util.html#util_util_format_format)
 
-
 <a name="flush"></a>
 ### logger.flush()
 
@@ -575,7 +575,7 @@ This has a couple of important caveats:
   * For instance, a powercut will mean up to 4KB of buffered logs will be lost
   * A sigkill (or other untrappable signal) will probably result in the same
   * If writing to a stream other than `process.stdout` or `process.stderr`, there is a slight possibility of lost logs or even partially written logs if the OS buffers don't have enough space, or something else is being written to the stream (or maybe some other reason we've not thought of)
-* If you supply an alternate stream to the constructor, then that stream must support synchronous writes so that it can be properly flushed on exit. This means the stream most expose its file descriptor via `stream.fd` or `stream._handle.fd`. If your stream is invalid an `error` event will be emitted on the returned logger, e.g.:
+* If you supply an alternate stream to the constructor, then that stream must support synchronous writes so that it can be properly flushed on exit. This means the stream must expose its file descriptor via `stream.fd` or `stream._handle.fd`. Usually they have to be native (from core) stream, meaning a TCP/unix socket, a file, or stdout/sderr. If your stream is invalid an `error` event will be emitted on the returned logger, e.g.:
 
   ```js
   var stream = require('stream')
@@ -740,7 +740,7 @@ See the [koa-pino-logger v2 readme](https://github.com/davidmarkclements/koa-pin
 
 
 <a name="rotate"></a>
-## How do I rotate log files
+## How do I rotate log files?
 
 Use a separate tool for log rotation.
 
@@ -767,6 +767,40 @@ We would rotate our log files with logrotate, by adding the following to `/etc/l
 }
 ```
 
+<a name="redact"></a>
+## How do I redact sensitive information??
+
+Use [pino-noir](http://npm.im/pino-noir), initialize with the key paths you wish to redact and pass the resulting instance in through the `serializers` option
+
+```js
+var noir = require('pino-noir')
+var pino = require('pino')({
+  serializers: noir(['key', 'path.to.key'])
+})
+
+pino.info({
+  key: 'will be redacted',
+  path: {
+    to: {key: 'sensitive', another: 'thing'}
+  },
+  more: 'stuff'
+}) 
+
+// {"pid":7306,"hostname":"x","level":30,"time":1475519922198,"key":"[Redacted]","path":{"to":{"key":"[Redacted]","another":"thing"}},"more":"stuff","v":1}
+```
+
+If you have other serializers simply extend: 
+
+```js
+var noir = require('pino-noir')
+var pino = require('pino')({
+  serializers: Object.assign(
+    noir(['key', 'path.to.key']),
+    {myCustomSerializer: () => {}}
+})
+```
+
+
 <a name="transports"></a>
 ## How to use Transports with Pino
 
@@ -785,7 +819,7 @@ var myTransport = through.obj(function (chunk, enc, cb) {
   cb()
 })
 
-pump(process.stdin, split2(JSON.parse), myTransport)
+pump(process.stdin, split(JSON.parse), myTransport)
 ```
 
 ```sh

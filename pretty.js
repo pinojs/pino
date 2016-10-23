@@ -46,6 +46,10 @@ function filter (value) {
   return result
 }
 
+function isPinoLine (line) {
+  return line.hasOwnProperty('hostname') && line.hasOwnProperty('pid') && (line.hasOwnProperty('v') && line.v === 1)
+}
+
 function pretty (opts) {
   var timeTransOnly = opts && opts.timeTransOnly
   var levelFirst = opts && opts.levelFirst
@@ -79,7 +83,7 @@ function pretty (opts) {
     var parsed = new Parse(line)
     var value = parsed.value
 
-    if (parsed.err) {
+    if (parsed.err || !isPinoLine(value)) {
       // pass through
       return line + '\n'
     }
