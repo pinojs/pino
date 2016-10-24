@@ -19,6 +19,7 @@ It also includes a shell utility to pretty-print its log files.
 * [How do I rotate log files?](#rotate)
 * [How do I redact sensitive information?](#redact)
 * [How to use Transports with Pino](#transports)
+* [Pino in the browser](#browser)
 * [Caveats](#caveats)
 * [Team](#team)
 * [Acknowledgements](#acknowledgements)
@@ -939,6 +940,13 @@ If you are a Docker fan, you can use
 https://github.com/deviantony/docker-elk to setup an ELK stack.
 
 [pino-socket]: https://www.npmjs.com/package/pino-socket
+
+<a name="browser"></a>
+## Pino in the browser
+
+Pino is compatible with [`browserify`](http://npm.im) for browser side usage. This can be useful with isomorphic/universal JavaScript code.
+
+In the browser, `pino` uses corresponding [Log4j](https://en.wikipedia.org/wiki/Log4j) `console` methods (`console.error`, `console.warn`, `console.info`, `console.debug`, `console.trace`) and uses `console.error` for any `fatal` level logs.
 
 <a name="caveats"></a>
 ## Caveats
