@@ -713,7 +713,7 @@ app.use(function * () {
 app.listen(3000)
 ```
 
-See the [koa-pino-logger v1 readme](https://github.com/davidmarkclements/koa-pino-logger/tree/v1) for more info.
+See the [koa-pino-logger v1 readme](https://github.com/pinojs/koa-pino-logger/tree/v1) for more info.
 
 ### Koa v2
 
@@ -736,7 +736,7 @@ app.use((ctx) => {
 app.listen(3000)
 ```
 
-See the [koa-pino-logger v2 readme](https://github.com/davidmarkclements/koa-pino-logger/tree/v2) for more info.
+See the [koa-pino-logger v2 readme](https://github.com/pinojs/koa-pino-logger/tree/v2) for more info.
 
 
 <a name="rotate"></a>
