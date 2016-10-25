@@ -16,7 +16,7 @@
   "precommit": "test",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mcollina/pino.git"
+    "url": "git+https://github.com/pinojs/pino.git"
   },
   "keywords": [
     "fast",
@@ -27,9 +27,9 @@
   "author": "Matteo Collina <hello@matteocollina.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mcollina/pino/issues"
+    "url": "https://github.com/pinojs/pino/issues"
   },
-  "homepage": "https://github.com/mcollina/pino#readme",
+  "homepage": "https://github.com/pinojs/pino#readme",
   "devDependencies": {
     "benchmark": "^2.1.0",
     "bole": "^3.0.0",

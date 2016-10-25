@@ -1,6 +1,6 @@
 ![banner](pino-banner.png)
 
-# pino&nbsp;&nbsp;[![Build Status](https://travis-ci.org/mcollina/pino.svg?branch=master)](https://travis-ci.org/mcollina/pino)&nbsp;[![Coverage Status](https://coveralls.io/repos/github/mcollina/pino/badge.svg?branch=master)](https://coveralls.io/github/mcollina/pino?branch=master) [![TypeScript definitions on DefinitelyTyped](http://definitelytyped.org/badges/standard.svg)](http://definitelytyped.org)
+# pino&nbsp;&nbsp;[![Build Status](https://travis-ci.org/pinojs/pino.svg?branch=master)](https://travis-ci.org/pinojs/pino)&nbsp;[![Coverage Status](https://coveralls.io/repos/github/pinojs/pino/badge.svg?branch=master)](https://coveralls.io/github/pinojs/pino?branch=master) [![TypeScript definitions on DefinitelyTyped](http://definitelytyped.org/badges/standard.svg)](http://definitelytyped.org)
 
 [Extremely fast](#benchmarks) node.js logger, inspired by Bunyan.
 It also includes a shell utility to pretty-print its log files.
@@ -859,7 +859,7 @@ Then, head to your
 Kibana instance, and [create an index pattern](https://www.elastic.co/guide/en/kibana/current/setup.html) on `'pino'`,
 the default for `pino-elasticsearch`.
 
-[pino-elasticsearch]: https://github.com/mcollina/pino-elasticsearch
+[pino-elasticsearch]: https://github.com/pinojs/pino-elasticsearch
 
 <a name="pino-socket"></a>
 ### pino-socket
@@ -994,7 +994,7 @@ parents and children will end up in log output.
 
 ### Matteo Collina
 
-<https://github.com/mcollina>
+<https://github.com/pinojs>
 
 <https://www.npmjs.com/~matteo.collina>
 
@@ -1019,7 +1019,7 @@ parents and children will end up in log output.
 
 ### Chat on Gitter
 
-<https://gitter.im/mcollina/pino>
+<https://gitter.im/pinojs/pino>
 
 <a name="acknowledgements"></a>
 ## Acknowledgements
