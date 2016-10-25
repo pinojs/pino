@@ -1,7 +1,7 @@
 {
   "name": "pino",
   "version": "2.13.0",
-  "description": "fast and simple logger",
+  "description": "super fast, all natural json logger",
   "main": "pino.js",
   "browser": {
     "./pretty.js": "./noop.js"
