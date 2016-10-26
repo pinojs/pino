@@ -2,10 +2,10 @@
 
 var stringifySafe = require('fast-safe-stringify')
 var format = require('quick-format')
+var EventEmitter = require('events').EventEmitter
 var os = require('os')
 var flatstr = require('flatstr')
 var once = require('once')
-var noop = require('./noop')
 var pid = process.pid
 var hostname = os.hostname()
 var baseLog = flatstr('{"pid":' + pid + ',"hostname":"' + hostname + '",')
@@ -141,9 +141,7 @@ function Pino (level, stream, serializers, stringify, end, name, timestamp, slow
   }
 }
 
-if (require('eve' + 'nts')) {
-  Pino.prototype = new (require('eve' + 'nts').EventEmitter)()
-}
+Pino.prototype = new EventEmitter()
 
 Pino.prototype.fatal = genLog(levels.fatal)
 Pino.prototype.error = genLog(levels.error)
@@ -415,6 +413,8 @@ function onExit (fn) {
     return (code === undefined) ? onExit.passCode : onExit.insertCode
   }
 }
+
+function noop () {}
 
 module.exports = pino
 module.exports.stdSerializers = {
