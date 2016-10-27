@@ -205,6 +205,17 @@ Object.defineProperty(
 // 34 and 92 happens all the time, so we
 // have a fast case for them
 function escape (s) {
+  var point = 255
+  for (var i = 0, l = s.length; i < l && point > 31; i++) {
+    point = s.charCodeAt(i)
+    if (point === 34 || point === 92) {
+      s = s.slice(0, i) + '\\' + s.slice(i++)
+      l++
+    }
+  }
+  return point < 32 ? JSON.stringify(s) : '"' + s + '"'
+}
+/* function escape (s) {
   var str = s.toString()
   var result = ''
   var last = 0
@@ -223,7 +234,7 @@ function escape (s) {
     result += str.slice(last)
   }
   return point < 32 ? JSON.stringify(str) : '"' + result + '"'
-}
+} */
 
 Pino.prototype.asJson = function asJson (obj, msg, num) {
   if (!msg && obj instanceof Error) {
