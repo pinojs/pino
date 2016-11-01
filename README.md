@@ -1,6 +1,6 @@
 ![banner](pino-banner.png)
 
-# pino&nbsp;&nbsp;[![Build Status](https://travis-ci.org/mcollina/pino.svg?branch=master)](https://travis-ci.org/mcollina/pino)&nbsp;[![Coverage Status](https://coveralls.io/repos/github/mcollina/pino/badge.svg?branch=master)](https://coveralls.io/github/mcollina/pino?branch=master) [![TypeScript definitions on DefinitelyTyped](http://definitelytyped.org/badges/standard.svg)](http://definitelytyped.org)
+# pino&nbsp;&nbsp;[![Build Status](https://travis-ci.org/pinojs/pino.svg?branch=master)](https://travis-ci.org/pinojs/pino)&nbsp;[![Coverage Status](https://coveralls.io/repos/github/pinojs/pino/badge.svg?branch=master)](https://coveralls.io/github/pinojs/pino?branch=master) [![TypeScript definitions on DefinitelyTyped](http://definitelytyped.org/badges/standard.svg)](http://definitelytyped.org)
 
 [Extremely fast](#benchmarks) node.js logger, inspired by Bunyan.
 It also includes a shell utility to pretty-print its log files.
@@ -19,6 +19,7 @@ It also includes a shell utility to pretty-print its log files.
 * [How do I rotate log files?](#rotate)
 * [How do I redact sensitive information?](#redact)
 * [How to use Transports with Pino](#transports)
+* [Pino in the browser](#browser)
 * [Caveats](#caveats)
 * [Team](#team)
 * [Acknowledgements](#acknowledgements)
@@ -713,7 +714,7 @@ app.use(function * () {
 app.listen(3000)
 ```
 
-See the [koa-pino-logger v1 readme](https://github.com/davidmarkclements/koa-pino-logger/tree/v1) for more info.
+See the [koa-pino-logger v1 readme](https://github.com/pinojs/koa-pino-logger/tree/v1) for more info.
 
 ### Koa v2
 
@@ -736,7 +737,7 @@ app.use((ctx) => {
 app.listen(3000)
 ```
 
-See the [koa-pino-logger v2 readme](https://github.com/davidmarkclements/koa-pino-logger/tree/v2) for more info.
+See the [koa-pino-logger v2 readme](https://github.com/pinojs/koa-pino-logger/tree/v2) for more info.
 
 
 <a name="rotate"></a>
@@ -859,7 +860,7 @@ Then, head to your
 Kibana instance, and [create an index pattern](https://www.elastic.co/guide/en/kibana/current/setup.html) on `'pino'`,
 the default for `pino-elasticsearch`.
 
-[pino-elasticsearch]: https://github.com/mcollina/pino-elasticsearch
+[pino-elasticsearch]: https://github.com/pinojs/pino-elasticsearch
 
 <a name="pino-socket"></a>
 ### pino-socket
@@ -940,6 +941,13 @@ https://github.com/deviantony/docker-elk to setup an ELK stack.
 
 [pino-socket]: https://www.npmjs.com/package/pino-socket
 
+<a name="browser"></a>
+## Pino in the browser
+
+Pino is compatible with [`browserify`](http://npm.im) for browser side usage. This can be useful with isomorphic/universal JavaScript code.
+
+In the browser, `pino` uses corresponding [Log4j](https://en.wikipedia.org/wiki/Log4j) `console` methods (`console.error`, `console.warn`, `console.info`, `console.debug`, `console.trace`) and uses `console.error` for any `fatal` level logs.
+
 <a name="caveats"></a>
 ## Caveats
 
@@ -994,7 +1002,7 @@ parents and children will end up in log output.
 
 ### Matteo Collina
 
-<https://github.com/mcollina>
+<https://github.com/pinojs>
 
 <https://www.npmjs.com/~matteo.collina>
 
@@ -1019,7 +1027,7 @@ parents and children will end up in log output.
 
 ### Chat on Gitter
 
-<https://gitter.im/mcollina/pino>
+<https://gitter.im/pinojs/pino>
 
 <a name="acknowledgements"></a>
 ## Acknowledgements

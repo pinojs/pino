@@ -1,22 +1,21 @@
 {
   "name": "pino",
-  "version": "2.13.0",
-  "description": "fast and simple logger",
+  "version": "2.14.0",
+  "description": "super fast, all natural json logger",
   "main": "pino.js",
-  "browser": {
-    "./pretty.js": "./noop.js"
-  },
+  "browser": "./browser.js",
   "bin": {
     "pino": "./pretty.js"
   },
   "scripts": {
+    "browser-test": "zuul tape test/browser.test.js --local",
     "test": "standard && tap --no-cov test/*test.js",
     "ci": "standard && tap --cov test/*test.js"
   },
   "precommit": "test",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mcollina/pino.git"
+    "url": "git+https://github.com/pinojs/pino.git"
   },
   "keywords": [
     "fast",
@@ -27,9 +26,9 @@
   "author": "Matteo Collina <hello@matteocollina.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mcollina/pino/issues"
+    "url": "https://github.com/pinojs/pino/issues"
   },
-  "homepage": "https://github.com/mcollina/pino#readme",
+  "homepage": "https://github.com/pinojs/pino#readme",
   "devDependencies": {
     "benchmark": "^2.1.0",
     "bole": "^3.0.0",
@@ -37,12 +36,15 @@
     "debug": "^2.2.0",
     "fastbench": "^1.0.0",
     "flush-write-stream": "^1.0.0",
+    "fresh-require": "^1.0.3",
     "log": "^1.4.0",
     "loglevel": "^1.4.0",
     "pre-commit": "^1.1.2",
     "standard": "^8.0.0",
     "tap": "^7.0.0",
-    "winston": "^2.1.1"
+    "tape": "^4.6.2",
+    "winston": "^2.1.1",
+    "zuul": "^3.11.1"
   },
   "dependencies": {
     "chalk": "^1.1.1",
