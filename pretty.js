@@ -52,6 +52,7 @@ function isPinoLine (line) {
 
 function pretty (opts) {
   var timeTransOnly = opts && opts.timeTransOnly
+  var formatter = opts && opts.formatter
   var levelFirst = opts && opts.levelFirst
 
   var stream = split(mapLine)
@@ -86,6 +87,10 @@ function pretty (opts) {
     if (parsed.err || !isPinoLine(value)) {
       // pass through
       return line + '\n'
+    }
+
+    if (formatter) {
+      return opts.formatter(parsed.value) + '\n'
     }
 
     if (timeTransOnly) {

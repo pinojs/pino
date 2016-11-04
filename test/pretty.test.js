@@ -49,6 +49,20 @@ test('pino transform can just parse the dates', function (t) {
   instance.info('hello world')
 })
 
+test('pino transform can format with a custom function', function (t) {
+  t.plan(1)
+  var pretty = pino.pretty({ formatter: function (line) {
+    return 'msg: ' + line.msg + ', foo: ' + line.foo
+  } })
+  pretty.pipe(split(function (line) {
+    t.ok(line === 'msg: hello world, foo: bar', 'line matches')
+    return line
+  }))
+  var instance = pino(pretty)
+
+  instance.info({foo: 'bar'}, 'hello world')
+})
+
 test('pino transform prettifies Error', function (t) {
   var pretty = pino.pretty()
   var err = new Error('hello world')
