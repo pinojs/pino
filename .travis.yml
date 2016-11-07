@@ -6,6 +6,7 @@ node_js:
 - '4'
 - '5'
 - '6'
+- '7'
 script:
   - (node -v | grep v0.10 > /dev/null) && npm test || npm run ci
 env:
