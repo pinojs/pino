@@ -26,6 +26,14 @@ test('set the level by string', function (t) {
   instance.fatal('this is fatal')
 })
 
+test('the wrong level throws', function (t) {
+  t.plan(1)
+  var instance = pino()
+  t.throws(function () {
+    instance.level = 'kaboom'
+  })
+})
+
 test('set the level by number', function (t) {
   t.plan(4)
   var expected = [{

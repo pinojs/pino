@@ -110,3 +110,20 @@ test('handles missing time', function (t) {
 
   t.deepEqual(lines, ['{"hello":"world"}'], 'preserved lines')
 })
+
+test('pino transform prettifies properties', function (t) {
+  t.plan(1)
+  var pretty = pino.pretty()
+  var first = true
+  pretty.pipe(split(function (line) {
+    if (first) {
+      first = false
+    } else {
+      t.equal(line, '    a: "b"', 'prettifies the line')
+    }
+    return line
+  }))
+  var instance = pino(pretty)
+
+  instance.info({ a: 'b' }, 'hello world')
+})
