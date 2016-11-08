@@ -127,3 +127,15 @@ test('pino transform prettifies properties', function (t) {
 
   instance.info({ a: 'b' }, 'hello world')
 })
+
+test('pino transform treats the name with care', function (t) {
+  t.plan(1)
+  var pretty = pino.pretty()
+  pretty.pipe(split(function (line) {
+    t.ok(line.match(/\(matteo\/.*$/), 'includes the name')
+    return line
+  }))
+  var instance = pino({ name: 'matteo' }, pretty)
+
+  instance.info('hello world')
+})
