@@ -22,12 +22,6 @@ var levels = {
   trace: 10
 }
 
-// private property
-Object.defineProperty(levels, 'silent', {
-  value: 100,
-  enumerable: false
-})
-
 var nums = Object.keys(levels).reduce(function (o, k) {
   o[levels[k]] = k
   return o
@@ -38,12 +32,6 @@ var lscache = Object.keys(nums).reduce(function (o, k) {
   o[k] = flatstr('"level":' + Number(k))
   return o
 }, {})
-
-// private property
-Object.defineProperty(nums, '100', {
-  value: 'silent',
-  enumerable: false
-})
 
 function streamIsBlockable (s) {
   if (s.hasOwnProperty('_handle') && s._handle.hasOwnProperty('fd') && s._handle.fd) return true
@@ -115,6 +103,18 @@ Object.defineProperty(pino, 'levels', {
   },
   enumerable: true
 })
+Object.defineProperty(pino.levels.values, 'silent', {value: 100})
+Object.defineProperty(pino.levels.labels, '100', {value: 'silent'})
+
+pino.addLevel = function addLevel (name, lvl) {
+  if (pino.levels.values.hasOwnProperty(name)) return false
+  if (pino.levels.labels.hasOwnProperty(lvl)) return false
+  pino.levels.values[name] = lvl
+  pino.levels.labels[lvl] = name
+  lscache[lvl] = flatstr('"level":' + Number(lvl))
+  Pino.prototype[name] = genLog(lvl)
+  return true
+}
 
 function Pino (level, stream, serializers, stringify, end, name, timestamp, slowtime, chindings, cache, formatOpts) {
   this.stream = stream
@@ -160,13 +160,13 @@ Object.defineProperty(Pino.prototype, 'levelVal', {
     if (typeof num === 'string') { return this._setLevel(num) }
 
     if (this.emit) {
-      this.emit('level-change', nums[num], num, nums[this._levelVal], this._levelVal)
+      this.emit('level-change', pino.levels.labels[num], num, pino.levels.labels[this._levelVal], this._levelVal)
     }
 
     this._levelVal = num
 
-    for (var key in levels) {
-      if (num > levels[key]) {
+    for (var key in pino.levels.values) {
+      if (num > pino.levels.values[key]) {
         this[key] = noop
         continue
       }
@@ -176,16 +176,16 @@ Object.defineProperty(Pino.prototype, 'levelVal', {
 })
 
 Pino.prototype._setLevel = function _setLevel (level) {
-  if (typeof level === 'number') { level = nums[level] }
+  if (typeof level === 'number') { level = pino.levels.labels[level] }
 
-  if (!levels[level]) {
+  if (!pino.levels.values[level]) {
     throw new Error('unknown level ' + level)
   }
-  this.levelVal = levels[level]
+  this.levelVal = pino.levels.values[level]
 }
 
 Pino.prototype._getLevel = function _getLevel (level) {
-  return nums[this.levelVal]
+  return pino.levels.labels[this.levelVal]
 }
 
 Object.defineProperty(Pino.prototype, 'level', {

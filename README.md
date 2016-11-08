@@ -211,6 +211,7 @@ INFO [2016-03-09T15:27:09.339Z] (14139 on MacBook-Pro-3.home): hello world
   * <a href="#resSerializer"><code>pino.stdSerializers.<b>res</b></code></a>
   * <a href="#errSerializer"><code>pino.stdSerializers.<b>err</b></code></a>
   * <a href="#pretty"><code>pino.<b>pretty()</b></code></a>
+  * <a href="#addLevel"><code>pino.<b>addLevel(name, lvl)</b></code></a>
 
 
 <a name="constructor"></a>
@@ -563,6 +564,21 @@ var log = pino({
 
 log.child({ widget: 'foo' }).info('hello')
 log.child({ widget: 'bar' }).warn('hello 2')
+```
+
+<a name="addLevel"></a>
+### pino.addLevel(name, lvl)
+
+Defines a new level for new logger instances.
+Returns `true` on success and `false` if there was a conflict (level name or number already exists).
+
+Example:
+
+```js
+var pino = require('pino')
+pino.addLevel('myLevel', 35)
+var log = pino({level: 'myLevel'})
+log.myLevel('a message')
 ```
 
 <a name="extreme"></a>
