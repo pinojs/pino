@@ -1,0 +1,16 @@
+  Pino Benchmarks
+
+  To run a benchmark, specify which to run:
+
+  ・all        ⁃ run all benchmarks (takes a while)
+  ・basic      ⁃ log a simple string
+  ・object     ⁃ logging a basic object
+  ・deepobject ⁃ logging a large object
+  ・multiarg   ⁃ multiple log method arguments
+  ・child      ⁃ child from a parent
+  ・grandchild ⁃ child from a child
+  ・conception ⁃ child constructor
+
+  Example:
+
+    node runbench basic
