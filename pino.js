@@ -4,6 +4,7 @@ var stringifySafe = require('fast-safe-stringify')
 var format = require('quick-format')
 var EventEmitter = require('events').EventEmitter
 var os = require('os')
+var fs = require('fs')
 var flatstr = require('flatstr')
 var once = require('once')
 var pid = process.pid
@@ -92,7 +93,7 @@ function pino (opts, stream) {
         // to the destination stream. We do that by forcing a synchronous
         // write directly to the stream's file descriptor.
         var fd = (istream.fd) ? istream.fd : istream._handle.fd
-        require('fs').writeSync(fd, buf)
+        fs.writeSync(fd, buf)
       }
       if (!process._events[evt] || process._events[evt].length < 2 || !process._events[evt].filter(function (f) {
         return f + '' !== onExit.passCode + '' && f + '' !== onExit.insertCode + ''
