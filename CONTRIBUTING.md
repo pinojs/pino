@@ -8,7 +8,7 @@ Individuals making significant and valuable contributions are given commit-acces
 
 There are a few basic ground-rules for contributors:
 
-1. **No `--force` pushes** or modifying the Git history in any way.
+1. **No `--force` pushes** on `master` or modifying the Git history in any way after a PR has been merged.
 1. **Non-master branches** ought to be used for ongoing work.
 1. **External API changes and significant modifications** ought to be subject to an **internal pull-request** to solicit feedback from other contributors.
 1. Internal pull-requests to solicit feedback are *encouraged* for any other non-trivial contribution but left to the discretion of the contributor.

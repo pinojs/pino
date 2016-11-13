@@ -1011,7 +1011,6 @@ parents and children will end up in log output.
 
 <https://twitter.com/matteocollina>
 
-
 ### David Mark Clements
 
 <https://github.com/davidmarkclements>
