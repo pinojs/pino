@@ -202,6 +202,7 @@ INFO [2016-03-09T15:27:09.339Z] (14139 on MacBook-Pro-3.home): hello world
   * <a href="#debug"><code>logger.<b>debug()</b></code></a>
   * <a href="#trace"><code>logger.<b>trace()</b></code></a>
   * <a href="#flush"><code>logger.<b>flush()</b></code></a>
+  * <a href="#addLevel"><code>logger.<b>addLevel(name, lvl)</b></code></a>
   * <a href="#levelVal"><code>logger.<b>levelVal</b></code></a>
   * <a href="#level-change"><code>logger.on(<b>'level-change'</b>, fn)</code></a>
   * <a href="#levelValues"><code>logger.levels.<b>values</b></code> & <code>pino.levels.<b>values</b></code></a>
@@ -211,7 +212,6 @@ INFO [2016-03-09T15:27:09.339Z] (14139 on MacBook-Pro-3.home): hello world
   * <a href="#resSerializer"><code>pino.stdSerializers.<b>res</b></code></a>
   * <a href="#errSerializer"><code>pino.stdSerializers.<b>err</b></code></a>
   * <a href="#pretty"><code>pino.<b>pretty()</b></code></a>
-  * <a href="#addLevel"><code>pino.<b>addLevel(name, lvl)</b></code></a>
 
 
 <a name="constructor"></a>
@@ -417,6 +417,34 @@ If more args follows `msg`, these will be used to format `msg` using
 Flushes the content of the buffer in [extreme mode](#extreme). It has no effect if
 extreme mode is not enabled.
 
+<a name="addLevel"></a>
+### pino.addLevel(name, lvl)
+
+Defines a new level on the logger instance.
+Returns `true` on success and `false` if there was a conflict (level name or number already exists).
+
+Example:
+
+```js
+var pino = require('pino')
+var log = pino()
+log.addLevel('myLevel', 35)
+log.level = 'myLevel'
+log.myLevel('a message')
+```
+
+Notice that `addLevel` does *not* change the current level of the logger.
+
+If you need a custom level at construction, you can supply the `level` and `levelVal` options:
+
+```js
+var pino = require('pino')
+var log = pino({level: 'myLevel', levelVal: 35})
+log.myLevel('a message')
+```
+
+Notice that the level is set to the custom level on construction, i.e. `level.value` does not need to be set.
+
 <a name="levelVal"></a>
 ### logger.levelVal
 
@@ -566,34 +594,6 @@ var log = pino({
 log.child({ widget: 'foo' }).info('hello')
 log.child({ widget: 'bar' }).warn('hello 2')
 ```
-
-<a name="addLevel"></a>
-### pino.addLevel(name, lvl)
-
-Defines a new level on the logger instance.
-Returns `true` on success and `false` if there was a conflict (level name or number already exists).
-
-Example:
-
-```js
-var pino = require('pino')
-var log = pino()
-log.addLevel('myLevel', 35)
-log.level = 'myLevel'
-log.myLevel('a message')
-```
-
-Notice that `addLevel` does *not* change the current level of the logger.
-
-If you need a custom level at construction, you can supply the `level` and `levelVal` options:
-
-```js
-var pino = require('pino')
-var log = pino({level: 'myLevel', levelVal: 35})
-log.myLevel('a message')
-```
-
-Notice that the level is set to the custom level on construction, i.e. `level.value` does not need to be set.
 
 <a name="extreme"></a>
 ## Extreme mode explained
