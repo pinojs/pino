@@ -418,7 +418,7 @@ Flushes the content of the buffer in [extreme mode](#extreme). It has no effect 
 extreme mode is not enabled.
 
 <a name="addLevel"></a>
-### pino.addLevel(name, lvl)
+### logger.addLevel(name, lvl)
 
 Defines a new level on the logger instance.
 Returns `true` on success and `false` if there was a conflict (level name or number already exists).
