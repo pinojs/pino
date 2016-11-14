@@ -22,6 +22,7 @@ It also includes a shell utility to pretty-print its log files.
 * [Pino in the browser](#browser)
 * [Caveats](#caveats)
 * [Team](#team)
+* [Contributing](#contributing)
 * [Acknowledgements](#acknowledgements)
 * [License](#license)
 
@@ -1010,7 +1011,6 @@ parents and children will end up in log output.
 
 <https://twitter.com/matteocollina>
 
-
 ### David Mark Clements
 
 <https://github.com/davidmarkclements>
@@ -1030,6 +1030,14 @@ parents and children will end up in log output.
 ### Chat on Gitter
 
 <https://gitter.im/pinojs/pino>
+
+## Contributing
+
+Pino is an **OPEN Open Source Project**. This means that:
+
+> Individuals making significant and valuable contributions are given commit-access to the project to contribute as they see fit. This project is more like an open wiki than a standard guarded open source project.
+
+See the [CONTRIBUTING.md](https://github.com/pinojs/pino/blob/master/CONTRIBUTING.md) file for more details.
 
 <a name="acknowledgements"></a>
 ## Acknowledgements
