@@ -226,7 +226,8 @@ Returns a new logger. Allowed options are:
 * `timestamp`: Enables or disables the inclusion of a timestamp in the log message. `slowtime` has no effect if this option is set to `false`. Defaults to `true`.
 * `slowtime`: Outputs ISO time stamps (`'2016-03-09T15:18:53.889Z'`) instead of Epoch time stamps (`1457536759176`). **WARNING**: This option carries a 25% performance drop, we recommend using default Epoch timestamps and transforming logs after if required. The `pino -t` command will do this for you (see [CLI](#cli)). default `false`.
 * `extreme`: Enables extreme mode, yields an additional 60% performance (from 250ms down to 100ms per 10000 ops). There are trade-off's should be understood before usage. See [Extreme mode explained](#extreme). default `false`
-* `level`: one of `'fatal'`, `'error'`, `'warn'`, `'info`', `'debug'`, `'trace'`; also `'silent'` is supported to disable logging.
+* `level`: one of `'fatal'`, `'error'`, `'warn'`, `'info`', `'debug'`, `'trace'`; also `'silent'` is supported to disable logging. Any other value defines a custom level and requires supplying a level value via `levelVal`.
+* `levelVal`: when defining a custom log level via `level`, set to an integer value to define the new level. Defaults to `undefined`.
 * `enabled`: enables logging, defaults to `true`.
 
 `stream` is a Writable stream, defaults to `process.stdout`.
@@ -569,17 +570,30 @@ log.child({ widget: 'bar' }).warn('hello 2')
 <a name="addLevel"></a>
 ### pino.addLevel(name, lvl)
 
-Defines a new level for new logger instances.
+Defines a new level on the logger instance.
 Returns `true` on success and `false` if there was a conflict (level name or number already exists).
 
 Example:
 
 ```js
 var pino = require('pino')
-pino.addLevel('myLevel', 35)
-var log = pino({level: 'myLevel'})
+var log = pino()
+log.addLevel('myLevel', 35)
+log.level = 'myLevel'
 log.myLevel('a message')
 ```
+
+Notice that `addLevel` does *not* change the current level of the logger.
+
+If you need a custom level at construction, you can supply the `level` and `levelVal` options:
+
+```js
+var pino = require('pino')
+var log = pino({level: 'myLevel', levelVal: 35})
+log.myLevel('a message')
+```
+
+Notice that the level is set to the custom level on construction, i.e. `level.value` does not need to be set.
 
 <a name="extreme"></a>
 ## Extreme mode explained
