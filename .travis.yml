@@ -4,8 +4,9 @@ node_js:
 - '4'
 - '5'
 - '6'
+- '7'
 script:
-  - (node -v | grep v0.10 > /dev/null) && npm test || npm run ci
+- (node -v | grep v0.10 > /dev/null) && npm test || npm run ci
 env:
   global:
-    secure: HDnz02hLBBk8n1StNOrmIszVTka4GuWMyPI5gDGQ6XVN5JmT+F9hUMTiiBlKL3gLgkZW+TO0WRQYG2cpHAQSr2Td1NHEUKbOvQwk7MT5RefOrTWRAKsdM14wOG1jI/Su9EiXIG+56TCrzuTNWeiiH7csNx2i7sWaBUtH03R9GM/wOdEDU9aQwzrX4kdlYmdOPKmqsLeaInM/9R7fonerp6psEAxcGeTMlcZaBAd1XEs/mkd5maBOVtO0Jq8DzfoFvm/2XrzRVh0ziulRCItScw5tTKZE8M1fMNk6CcD+kMi4ErbAoKMBccVZJCMoHNz3ToY9uMd4QoiawoklIDhfKFfTFxZP2Bi3n5CIId/NK8wLs9zV5kdR+mpWkAM6V9Pi6bqYbRILbmzzjvIBr3p5+9rlRCu1c8EyGeCcWKUwmrSRNvTgx1L2/nWADXWTMwwyDDP3MxQ7qiIjrkOSQWixOJ6gLtQxJqGu1wZ8JgJKX3wMBLmyC8H/zP4zjdgeOf05cg3S+Mtq93gw16TAOPWEyliUg4Kc6REqCU9PlZ3GhbQ9x3ngbFEZOCot6giuOuqR/XRt0FPEyqnlRiveC906l9Am70uWMmQNBjPYEtLFxNHtM1RsQbkKiOOW6hlaybTxCyQqhtqvJtgzjXbgzjr9AGxsaUvjcAYb7Cu69YDW5wA=
+  - secure: WeX/nE4FbSZkldDQHyHQruDRbJGbCDmerFqVC1Lbx7RYz5pU5pLraFRUWPUcSguq7Pt7iem7iOADtEqoIuurb0tttc91ilVIOTvtICixATFpRsiuilMqEo5YKNKwmsTiJzOnaoMEnxWOZ8WK+mVBN5h1qTGzg1gEIXBU8wjy1eSQ2+GEGC/NvtKjMwn3ew5XXqr5w7sU7AvoVBBJkUBucG09DVxIW9iB+Pz+k1kCcaCWunZ3r1tSOaIZoKCIW6SZCy2XD0ns0GKdBw+AygxVqDN5LpSj9EJ27wQpkpMcdFnpOyUoijHuqa8d8mnofWrkd3UQyIi1bz/Dq2wmSfLHfxb9+U/iWSi9q3ed2YfeX4+Q3of80onucqD1gTzjwZU+KZi9XSlVEgKEv+WwmTPE+okURGsaONCB3QLzgTo27cv/ACe8GU4UhomkrmDES8y6P1Zj49Np9GOOkYMzerUyV++qaTF6ugi8Z1k93/Put7EaESVmZJxxrtuhm70Dq96Eftrag9ypByYEgRYVKRqL7840bBb+I8J5pC8+uS5xBcusI9amYv01qdqP43F3f3XvRI4KHEG/OO4TfTSmt1htiDKKnciC2/6K6766y3wCOzxEeD2XPie4VkGsSTMJegxkPH37imogXJ/p4Ket7pprZXDnkEsiMn1b+CgTSaNb8ms=

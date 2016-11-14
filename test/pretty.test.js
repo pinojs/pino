@@ -49,6 +49,20 @@ test('pino transform can just parse the dates', function (t) {
   instance.info('hello world')
 })
 
+test('pino transform can format with a custom function', function (t) {
+  t.plan(1)
+  var pretty = pino.pretty({ formatter: function (line) {
+    return 'msg: ' + line.msg + ', foo: ' + line.foo
+  } })
+  pretty.pipe(split(function (line) {
+    t.ok(line === 'msg: hello world, foo: bar', 'line matches')
+    return line
+  }))
+  var instance = pino(pretty)
+
+  instance.info({foo: 'bar'}, 'hello world')
+})
+
 test('pino transform prettifies Error', function (t) {
   var pretty = pino.pretty()
   var err = new Error('hello world')
@@ -95,4 +109,33 @@ test('handles missing time', function (t) {
   pretty.end()
 
   t.deepEqual(lines, ['{"hello":"world"}'], 'preserved lines')
+})
+
+test('pino transform prettifies properties', function (t) {
+  t.plan(1)
+  var pretty = pino.pretty()
+  var first = true
+  pretty.pipe(split(function (line) {
+    if (first) {
+      first = false
+    } else {
+      t.equal(line, '    a: "b"', 'prettifies the line')
+    }
+    return line
+  }))
+  var instance = pino(pretty)
+
+  instance.info({ a: 'b' }, 'hello world')
+})
+
+test('pino transform treats the name with care', function (t) {
+  t.plan(1)
+  var pretty = pino.pretty()
+  pretty.pipe(split(function (line) {
+    t.ok(line.match(/\(matteo\/.*$/), 'includes the name')
+    return line
+  }))
+  var instance = pino({ name: 'matteo' }, pretty)
+
+  instance.info('hello world')
 })

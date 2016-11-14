@@ -545,6 +545,8 @@ Options:
 
 * `timeTransOnly`, if set to `true`, it will only covert the unix timestamp to
   ISO 8601 date format, and reserialize the JSON (equivalent to `pino -t`).
+* `formatter`, a custom function to format the line, is passed the JSON
+  object as an argument and should return a string value
 
 You can use the pretty transformer internally, like so:
 
@@ -785,12 +787,12 @@ pino.info({
     to: {key: 'sensitive', another: 'thing'}
   },
   more: 'stuff'
-}) 
+})
 
 // {"pid":7306,"hostname":"x","level":30,"time":1475519922198,"key":"[Redacted]","path":{"to":{"key":"[Redacted]","another":"thing"}},"more":"stuff","v":1}
 ```
 
-If you have other serializers simply extend: 
+If you have other serializers simply extend:
 
 ```js
 var noir = require('pino-noir')
