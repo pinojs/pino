@@ -443,7 +443,7 @@ var log = pino({level: 'myLevel', levelVal: 35})
 log.myLevel('a message')
 ```
 
-Notice that the level is set to the custom level on construction, i.e. `level.value` does not need to be set.
+Notice that the level is set to the custom level on construction, i.e. `log.level` does not need to be set.
 
 <a name="levelVal"></a>
 ### logger.levelVal
