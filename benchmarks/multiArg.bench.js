@@ -22,9 +22,9 @@ var dlog = debug('dlog')
 dlog.log = function (s) { dest.write(s) }
 
 var deep = require('../package.json')
-deep.deep = Object.assign({}, deep)
-deep.deep.deep = Object.assign({}, deep.deep)
-deep.deep.deep.deep = Object.assign({}, deep.deep.deep)
+deep.deep = Object.assign({}, JSON.parse(JSON.stringify(deep)))
+deep.deep.deep = Object.assign({}, JSON.parse(JSON.stringify(deep)))
+deep.deep.deep.deep = Object.assign({}, JSON.parse(JSON.stringify(deep)))
 
 var max = 10
 var blog = bunyan.createLogger({
@@ -86,12 +86,6 @@ var run = bench([
     }
     setImmediate(cb)
   },
-  function benchDebugInterpolate (cb) {
-    for (var i = 0; i < max; i++) {
-      dlog('hello %s', 'world')
-    }
-    setImmediate(cb)
-  },
   function benchBunyanInterpolate (cb) {
     for (var i = 0; i < max; i++) {
       blog.info('hello %s', 'world')
@@ -128,12 +122,7 @@ var run = bench([
     }
     setImmediate(cb)
   },
-  function benchDebugInterpolateAll (cb) {
-    for (var i = 0; i < max; i++) {
-      dlog('hello %s %j %d', 'world', {obj: true}, 4)
-    }
-    setImmediate(cb)
-  },
+
   function benchWinstonInterpolateAll (cb) {
     for (var i = 0; i < max; i++) {
       winston.info('hello %s %j %d', 'world', {obj: true}, 4)
@@ -143,12 +132,6 @@ var run = bench([
   function benchBoleInterpolateAll (cb) {
     for (var i = 0; i < max; i++) {
       bole.info('hello %s %j %d', 'world', {obj: true}, 4)
-    }
-    setImmediate(cb)
-  },
-  function benchLogLevelInterpolateAll (cb) {
-    for (var i = 0; i < max; i++) {
-      loglevel.info('hello %s %j %d', 'world', {obj: true}, 4)
     }
     setImmediate(cb)
   },
@@ -176,12 +159,6 @@ var run = bench([
     }
     setImmediate(cb)
   },
-  function benchDebugInterpolateExtra (cb) {
-    for (var i = 0; i < max; i++) {
-      dlog('hello %s %j %d', 'world', {obj: true}, 4, {another: 'obj'})
-    }
-    setImmediate(cb)
-  },
   function benchBunyanInterpolateExtra (cb) {
     for (var i = 0; i < max; i++) {
       blog.info('hello %s %j %d', 'world', {obj: true}, 4, {another: 'obj'})
@@ -197,12 +174,6 @@ var run = bench([
   function benchBoleInterpolateExtra (cb) {
     for (var i = 0; i < max; i++) {
       bole.info('hello %s %j %d', 'world', {obj: true}, 4, {another: 'obj'})
-    }
-    setImmediate(cb)
-  },
-  function benchLogLevelInterpolateExtra (cb) {
-    for (var i = 0; i < max; i++) {
-      loglevel.info('hello %s %j %d', 'world', {obj: true}, 4, {another: 'obj'})
     }
     setImmediate(cb)
   },
@@ -230,12 +201,6 @@ var run = bench([
     }
     setImmediate(cb)
   },
-  function benchDebugInterpolateDeep (cb) {
-    for (var i = 0; i < max; i++) {
-      dlog('hello %j', deep)
-    }
-    setImmediate(cb)
-  },
   function benchBunyanInterpolateDeep (cb) {
     for (var i = 0; i < max; i++) {
       blog.info('hello %j', deep)
@@ -251,12 +216,6 @@ var run = bench([
   function benchBoleInterpolateDeep (cb) {
     for (var i = 0; i < max; i++) {
       bole.info('hello %j', deep)
-    }
-    setImmediate(cb)
-  },
-  function benchLogLevelInterpolateDeep (cb) {
-    for (var i = 0; i < max; i++) {
-      loglevel.info('hello %j', deep)
     }
     setImmediate(cb)
   },

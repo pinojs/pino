@@ -16,6 +16,7 @@
     "bench-object": "node benchmarks/runbench object",
     "bench-deepobject": "node benchmarks/runbench deepobject",
     "bench-multiarg": "node benchmarks/runbench multiarg",
+    "bench-longstring": "node benchmarks/runbench longstring",
     "bench-child": "node benchmarks/runbench child",
     "bench-grandchild": "node benchmarks/runbench grandchild",
     "bench-conception": "node benchmarks/runbench conception"
@@ -64,7 +65,7 @@
     "fast-safe-stringify": "^1.1.0",
     "flatstr": "^1.0.0",
     "once": "^1.3.3",
-    "quick-format": "^2.0.4",
+    "quick-format-unescaped": "^1.0.0",
     "split2": "^2.0.1"
   }
 }

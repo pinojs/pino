@@ -24,6 +24,7 @@ var benchmarks = {
   object: 'object.bench.js',
   deepobject: 'deep-object.bench.js',
   multiarg: 'multiArg.bench.js',
+  longstring: 'long-string.bench.js',
   child: 'child.bench.js',
   grandchild: 'childChild.bench.js',
   conception: 'childCreation.bench.js'
