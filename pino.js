@@ -1,12 +1,13 @@
 'use strict'
 
 var stringifySafe = require('fast-safe-stringify')
-var format = require('quick-format')
+var format = require('quick-format-unescaped')
 var EventEmitter = require('events').EventEmitter
 var os = require('os')
 var fs = require('fs')
 var flatstr = require('flatstr')
 var once = require('once')
+var util = require('util')
 var pid = process.pid
 var hostname = os.hostname()
 var baseLog = flatstr('{"pid":' + pid + ',"hostname":"' + hostname + '",')
@@ -63,7 +64,7 @@ function pino (opts, stream) {
 
   // internal options
   iopts.stringify = iopts.safe ? stringifySafe : JSON.stringify
-  iopts.formatOpts = iopts.safe ? null : {lowres: true}
+  iopts.formatOpts = {lowres: true}
   iopts.end = ',"v":' + LOG_VERSION + '}\n'
   iopts.cache = !iopts.extreme ? null : {
     size: 4096,
@@ -211,32 +212,6 @@ Object.defineProperty(
   {value: LOG_VERSION}
 )
 
-// magically escape strings for json
-// relying on their charCodeAt
-// everything below 32 needs JSON.stringify()
-// 34 and 92 happens all the time, so we
-// have a fast case for them
-function escape (s) {
-  var str = s.toString()
-  var result = ''
-  var last = 0
-  var l = str.length
-  var point = 255
-  for (var i = 0; i < l && point >= 32; i++) {
-    point = str.charCodeAt(i)
-    if (point === 34 || point === 92) {
-      result += str.slice(last, i) + '\\' + str[i]
-      last = i + 1
-    }
-  }
-  if (last === 0) {
-    result = str
-  } else {
-    result += str.slice(last)
-  }
-  return point < 32 ? JSON.stringify(str) : '"' + result + '"'
-}
-
 Pino.prototype.asJson = function asJson (obj, msg, num) {
   if (!msg && obj instanceof Error) {
     msg = obj.message
@@ -245,7 +220,7 @@ Pino.prototype.asJson = function asJson (obj, msg, num) {
   // to catch both null and undefined
   /* eslint-disable eqeqeq */
   if (msg != undefined) {
-    data += ',"msg":' + escape(msg)
+    data += ',"msg":' + JSON.stringify(msg)
   }
   var value
   if (obj) {
@@ -371,6 +346,19 @@ function asErrValue (err) {
   }
 }
 
+function countInterp (s, i) {
+  var n = 0
+  var pos = 0
+  while (true) {
+    pos = s.indexOf(i, pos)
+    if (pos >= 0) {
+      ++n
+      pos += 2
+    } else break
+  }
+  return n
+}
+
 function genLog (z) {
   return function LOG (a, b, c, d, e, f, g, h, i, j, k) {
     var l = 0
@@ -393,7 +381,13 @@ function genLog (z) {
     }
     p = n.length = arguments.length - l
     if (p > 1) {
-      o = format(n, this.formatOpts)
+      l = countInterp(a, '%j')
+      if (l && typeof a === 'string') {
+        n.length = l + countInterp(a, '%d') + countInterp(a, '%s') + 1
+        o = String(util.format.apply(null, n))
+      } else {
+        o = format(n, this.formatOpts)
+      }
     } else if (p) {
       o = n[0]
     }
