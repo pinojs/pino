@@ -21,6 +21,7 @@ var defaultOptions = {
   slowtime: false,
   extreme: false,
   level: 'info',
+  levelVal: undefined,
   enabled: true
 }
 
@@ -33,28 +34,43 @@ var levels = {
   trace: 10
 }
 
-// private property
-Object.defineProperty(levels, 'silent', {
-  value: 100,
-  enumerable: false
-})
-
 var nums = Object.keys(levels).reduce(function (o, k) {
   o[levels[k]] = k
   return o
 }, {})
+
+function defineLevelsProperty (onObject) {
+  Object.defineProperty(onObject, 'levels', {
+    value: {
+      values: copy({}, levels),
+      labels: copy({}, nums)
+    },
+    enumerable: true
+  })
+  Object.defineProperty(onObject.levels.values, 'silent', {value: 100})
+  Object.defineProperty(onObject.levels.labels, '100', {value: 'silent'})
+}
+
+// IIFE so the keys are cached at module load
+var isStandardLevel = (function () {
+  var keys = Object.keys(levels)
+  return function (level) {
+    return keys.indexOf(level) > -1
+  }
+}())
+
+var isStandardLevelVal = (function () {
+  var keys = Object.keys(nums)
+  return function (val) {
+    return keys.indexOf(val + '') > -1
+  }
+}())
 
 // level string catch
 var lscache = Object.keys(nums).reduce(function (o, k) {
   o[k] = flatstr('"level":' + Number(k))
   return o
 }, {})
-
-// private property
-Object.defineProperty(nums, '100', {
-  value: 'silent',
-  enumerable: false
-})
 
 function streamIsBlockable (s) {
   if (s.hasOwnProperty('_handle') && s._handle.hasOwnProperty('fd') && s._handle.fd) return true
@@ -119,13 +135,7 @@ function pino (opts, stream) {
   return logger
 }
 
-Object.defineProperty(pino, 'levels', {
-  value: {
-    values: copy({}, levels),
-    labels: copy({}, nums)
-  },
-  enumerable: true
-})
+defineLevelsProperty(pino)
 
 function Pino (opts, stream) {
   this.stream = stream
@@ -138,6 +148,13 @@ function Pino (opts, stream) {
   this.chindings = opts.chindings
   this.cache = opts.cache
   this.formatOpts = opts.formatOpts
+
+  if (opts.level && opts.levelVal) {
+    var levelIsStandard = isStandardLevel(opts.level)
+    var valIsStandard = isStandardLevelVal(opts.levelVal)
+    if (valIsStandard) throw new Error('level value is already used: ' + opts.levelVal)
+    if (levelIsStandard === false && valIsStandard === false) this.addLevel(opts.level, opts.levelVal)
+  }
   this._setLevel(opts.level)
 
   this._baseLog = flatstr(baseLog +
@@ -153,6 +170,7 @@ function Pino (opts, stream) {
 }
 
 Pino.prototype = new EventEmitter()
+defineLevelsProperty(Pino.prototype)
 
 Pino.prototype.fatal = genLog(levels.fatal)
 Pino.prototype.error = genLog(levels.error)
@@ -160,8 +178,6 @@ Pino.prototype.warn = genLog(levels.warn)
 Pino.prototype.info = genLog(levels.info)
 Pino.prototype.debug = genLog(levels.debug)
 Pino.prototype.trace = genLog(levels.trace)
-
-Object.defineProperty(Pino.prototype, 'levels', {value: pino.levels})
 
 Object.defineProperty(Pino.prototype, 'levelVal', {
   get: function getLevelVal () {
@@ -171,32 +187,32 @@ Object.defineProperty(Pino.prototype, 'levelVal', {
     if (typeof num === 'string') { return this._setLevel(num) }
 
     if (this.emit) {
-      this.emit('level-change', nums[num], num, nums[this._levelVal], this._levelVal)
+      this.emit('level-change', this.levels.labels[num], num, this.levels.labels[this._levelVal], this._levelVal)
     }
 
     this._levelVal = num
 
-    for (var key in levels) {
-      if (num > levels[key]) {
+    for (var key in this.levels.values) {
+      if (num > this.levels.values[key]) {
         this[key] = noop
         continue
       }
-      this[key] = Pino.prototype[key]
+      this[key] = isStandardLevel(key) ? Pino.prototype[key] : genLog(num)
     }
   }
 })
 
 Pino.prototype._setLevel = function _setLevel (level) {
-  if (typeof level === 'number') { level = nums[level] }
+  if (typeof level === 'number') { level = this.levels.labels[level] }
 
-  if (!levels[level]) {
+  if (!this.levels.values[level]) {
     throw new Error('unknown level ' + level)
   }
-  this.levelVal = levels[level]
+  this.levelVal = this.levels.values[level]
 }
 
 Pino.prototype._getLevel = function _getLevel (level) {
-  return nums[this.levelVal]
+  return this.levels.labels[this.levelVal]
 }
 
 Object.defineProperty(Pino.prototype, 'level', {
@@ -296,6 +312,7 @@ Pino.prototype.child = function child (bindings) {
 
   var opts = {
     level: bindings.level || this.level,
+    levelVal: isStandardLevelVal(this.levelVal) ? undefined : this.levelVal,
     serializers: bindings.hasOwnProperty('serializers') ? Object.assign(this.serializers, bindings.serializers) : this.serializers,
     stringify: this.stringify,
     end: this.end,
@@ -331,6 +348,15 @@ Pino.prototype.flush = function () {
 
   this.stream.write(flatstr(this.cache.buf))
   this.cache.buf = ''
+}
+
+Pino.prototype.addLevel = function addLevel (name, lvl) {
+  if (this.levels.values.hasOwnProperty(name)) return false
+  if (this.levels.labels.hasOwnProperty(lvl)) return false
+  this.levels.values[name] = lvl
+  this.levels.labels[lvl] = name
+  lscache[lvl] = flatstr('"level":' + Number(lvl))
+  return true
 }
 
 function mapHttpRequest (req) {

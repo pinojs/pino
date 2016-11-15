@@ -22,6 +22,7 @@ It also includes a shell utility to pretty-print its log files.
 * [Pino in the browser](#browser)
 * [Caveats](#caveats)
 * [Team](#team)
+* [Contributing](#contributing)
 * [Acknowledgements](#acknowledgements)
 * [License](#license)
 
@@ -202,6 +203,7 @@ INFO [2016-03-09T15:27:09.339Z] (14139 on MacBook-Pro-3.home): hello world
   * <a href="#debug"><code>logger.<b>debug()</b></code></a>
   * <a href="#trace"><code>logger.<b>trace()</b></code></a>
   * <a href="#flush"><code>logger.<b>flush()</b></code></a>
+  * <a href="#addLevel"><code>logger.<b>addLevel(name, lvl)</b></code></a>
   * <a href="#levelVal"><code>logger.<b>levelVal</b></code></a>
   * <a href="#level-change"><code>logger.on(<b>'level-change'</b>, fn)</code></a>
   * <a href="#levelValues"><code>logger.levels.<b>values</b></code> & <code>pino.levels.<b>values</b></code></a>
@@ -225,7 +227,8 @@ Returns a new logger. Allowed options are:
 * `timestamp`: Enables or disables the inclusion of a timestamp in the log message. `slowtime` has no effect if this option is set to `false`. Defaults to `true`.
 * `slowtime`: Outputs ISO time stamps (`'2016-03-09T15:18:53.889Z'`) instead of Epoch time stamps (`1457536759176`). **WARNING**: This option carries a 25% performance drop, we recommend using default Epoch timestamps and transforming logs after if required. The `pino -t` command will do this for you (see [CLI](#cli)). default `false`.
 * `extreme`: Enables extreme mode, yields an additional 60% performance (from 250ms down to 100ms per 10000 ops). There are trade-off's should be understood before usage. See [Extreme mode explained](#extreme). default `false`
-* `level`: one of `'fatal'`, `'error'`, `'warn'`, `'info`', `'debug'`, `'trace'`; also `'silent'` is supported to disable logging.
+* `level`: one of `'fatal'`, `'error'`, `'warn'`, `'info`', `'debug'`, `'trace'`; also `'silent'` is supported to disable logging. Any other value defines a custom level and requires supplying a level value via `levelVal`.
+* `levelVal`: when defining a custom log level via `level`, set to an integer value to define the new level. Defaults to `undefined`.
 * `enabled`: enables logging, defaults to `true`.
 
 `stream` is a Writable stream, defaults to `process.stdout`.
@@ -414,6 +417,34 @@ If more args follows `msg`, these will be used to format `msg` using
 
 Flushes the content of the buffer in [extreme mode](#extreme). It has no effect if
 extreme mode is not enabled.
+
+<a name="addLevel"></a>
+### logger.addLevel(name, lvl)
+
+Defines a new level on the logger instance.
+Returns `true` on success and `false` if there was a conflict (level name or number already exists).
+
+Example:
+
+```js
+var pino = require('pino')
+var log = pino()
+log.addLevel('myLevel', 35)
+log.level = 'myLevel'
+log.myLevel('a message')
+```
+
+Notice that `addLevel` does *not* change the current level of the logger.
+
+If you need a custom level at construction, you can supply the `level` and `levelVal` options:
+
+```js
+var pino = require('pino')
+var log = pino({level: 'myLevel', levelVal: 35})
+log.myLevel('a message')
+```
+
+Notice that the level is set to the custom level on construction, i.e. `log.level` does not need to be set.
 
 <a name="levelVal"></a>
 ### logger.levelVal
@@ -1010,7 +1041,6 @@ parents and children will end up in log output.
 
 <https://twitter.com/matteocollina>
 
-
 ### David Mark Clements
 
 <https://github.com/davidmarkclements>
@@ -1030,6 +1060,14 @@ parents and children will end up in log output.
 ### Chat on Gitter
 
 <https://gitter.im/pinojs/pino>
+
+## Contributing
+
+Pino is an **OPEN Open Source Project**. This means that:
+
+> Individuals making significant and valuable contributions are given commit-access to the project to contribute as they see fit. This project is more like an open wiki than a standard guarded open source project.
+
+See the [CONTRIBUTING.md](https://github.com/pinojs/pino/blob/master/CONTRIBUTING.md) file for more details.
 
 <a name="acknowledgements"></a>
 ## Acknowledgements
