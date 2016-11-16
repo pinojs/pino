@@ -18,9 +18,9 @@ var plogUnsafeExtreme = require('../')({extreme: true, safe: false}, dest)
 var loglevel = require('./loglevelMock')(dest)
 
 var deep = require('../package.json')
-deep.deep = Object.assign({}, deep)
-deep.deep.deep = Object.assign({}, deep.deep)
-deep.deep.deep.deep = Object.assign({}, deep.deep.deep)
+deep.deep = Object.assign({}, JSON.parse(JSON.stringify(deep)))
+deep.deep.deep = Object.assign({}, JSON.parse(JSON.stringify(deep)))
+deep.deep.deep.deep = Object.assign({}, JSON.parse(JSON.stringify(deep)))
 
 var max = 10
 var blog = bunyan.createLogger({
