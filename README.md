@@ -16,6 +16,7 @@ It also includes a shell utility to pretty-print its log files.
 * [How to use Pino with Hapi](#hapi)
 * [How to use Pino with Restify](#restify)
 * [How to use Pino with Koa](#koa)
+* [How to use Pino with `debug`](#debug)
 * [How do I rotate log files?](#rotate)
 * [How do I redact sensitive information?](#redact)
 * [How to use Transports with Pino](#transports)
@@ -758,6 +759,31 @@ app.listen(3000)
 
 See the [koa-pino-logger v2 readme](https://github.com/pinojs/koa-pino-logger/tree/v2) for more info.
 
+<a name="debug"></a>
+## How to use Pino with `debug`
+
+The popular [`debug`](http://npm.im/debug) which
+used in many modules accross the ecosystem. 
+
+The [`pino-debug`](http://github.com/pinojs/pino-debug)
+can captures calls to the `debug` loggers and run them
+through `pino` instead. This results in a 10x (20x in extreme mode)
+performance improvement, while logging out more information, in the
+usual JSON format.
+
+The quick start way to enable this is simply to install [`pino-debug`](http://github.com/pinojs/pino-debug)
+and preload it with the `-r` flag, enabling any `debug` logs with the
+`DEBUG` environment variable: 
+
+```sh
+$ npm i --save pino-debug
+$ DEBUG=* node -r pino-debug app.js
+``` 
+
+[`pino-debug`](http://github.com/pinojs/pino-debug) also offers fine grain control to map specific `debug`
+namespaces to `pino` log levels. See [`pino-debug`](http://github.com/pinojs/pino-debug)
+for more. 
+
 
 <a name="rotate"></a>
 ## How do I rotate log files?
@@ -786,6 +812,9 @@ We would rotate our log files with logrotate, by adding the following to `/etc/l
        copytruncate
 }
 ```
+
+
+
 
 <a name="redact"></a>
 ## How do I redact sensitive information??
