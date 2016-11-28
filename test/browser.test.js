@@ -240,7 +240,7 @@ function absentConsoleMethodTest (method, fallback) {
 
 function isFunc (fn) { return typeof fn === 'function' }
 function fnName (fn) {
-  var rx = /^\s*function\s*([^\(]*)/i
+  var rx = /^\s*function\s*([^(]*)/i
   var match = rx.exec(fn)
   return match && match[1]
 }
