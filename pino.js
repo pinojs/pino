@@ -364,11 +364,17 @@ function asResValue (res) {
 }
 
 function asErrValue (err) {
-  return {
+  var obj = {
     type: err.constructor.name,
     message: err.message,
     stack: err.stack
   }
+  for (var key in err) {
+    if (obj[key] === undefined) {
+      obj[key] = err[key]
+    }
+  }
+  return obj
 }
 
 function countInterp (s, i) {
