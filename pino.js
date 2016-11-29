@@ -272,8 +272,8 @@ Pino.prototype.child = function child (bindings) {
   if (!bindings) {
     throw new Error('missing bindings for child Pino')
   }
-  
-  if (bindings.name && 'string' !== typeof bindings.name) {
+
+  if (bindings.name && typeof bindings.name !== 'string') {
     throw new Error('when provided, bindings.name must be a string for child Pino')
   }
 
