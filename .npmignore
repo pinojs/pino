@@ -1,0 +1,9 @@
+.npmignore
+.gitignore
+benchmarks
+test
+CONTRIBUTING.md
+example.js
+*.png
+*.yml
+*.txt
