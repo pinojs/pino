@@ -77,8 +77,8 @@ This produces:
 
 <a name="benchmarks"></a>
 ## Benchmarks
-
-As far as we know, it is one of the fastest loggers in town:
+<details>
+<summary> As far as we know, it is one of the fastest loggers in town: </summary>
 
 `pino.info('hello world')`:
 
@@ -137,11 +137,12 @@ In many cases, pino is over 6x faster than alternatives.
 For a fair comparison, [LogLevel](http://npm.im/loglevel) was extended
 to include a timestamp and [bole](http://npm.im/bole) had
 `fastTime` mode switched on.
+</details>
 
 <a name="cli"></a>
-## CLI
-
-To use the command line tool, we can install `pino` globally:
+## CLI
+<details>
+<summary>To use the command line tool, we can install `pino` globally:</summary>
 
 ```sh
 npm install -g pino
@@ -190,10 +191,12 @@ Into this:
 ```sh
 INFO [2016-03-09T15:27:09.339Z] (14139 on MacBook-Pro-3.home): hello world
 ```
+</details>
 
 <a name="api"></a>
-## API
-
+## API
+<details>
+<summary> index: </summary>
   * <a href="#constructor"><code><b>pino()</b></code></a>
   * <a href="#child"><code>logger.<b>child()</b></code></a>
   * <a href="#level"><code>logger.<b>level</b></code></a>
@@ -596,11 +599,14 @@ var log = pino({
 log.child({ widget: 'foo' }).info('hello')
 log.child({ widget: 'bar' }).warn('hello 2')
 ```
+</details>
 
 <a name="extreme"></a>
 ## Extreme mode explained
+<details>
+<summary>In essence, Extreme mode enables extreme performance:</summary> 
 
-In essence, Extreme mode enables extreme performance by buffering log messages and writing them in larger chunks.
+It works by buffering log messages and writing them in larger chunks.
 
 This has a couple of important caveats:
 
@@ -625,12 +631,12 @@ This has a couple of important caveats:
   ```
 
 So in summary, only use extreme mode if you're doing an extreme amount of logging, and you're happy in some scenarios to lose the most recent logs.
-
+</details>
 
 <a name="express"></a>
 ## How to use Pino with Express
-
-We've got you covered:
+<details>
+<summary>We've got you covered:</summary>
 
 ```sh
 npm install --save express-pino-logger
@@ -651,11 +657,12 @@ app.listen(3000)
 ```
 
 See the [express-pino-logger readme](http://npm.im/express-pino-logger) for more info.
+</details>
 
 <a name="hapi"></a>
 ## How to use Pino with Hapi
-
-We've got you covered:
+<details>
+<summary>We've got you covered:</summary>
 
 ```sh
 npm install --save hapi-pino
@@ -697,11 +704,12 @@ server.register(require('hapi-pino'), (err) => {
 ```
 
 See the [hapi-pino readme](http://npm.im/hapi-pino) for more info.
+</details>
 
 <a name="restify"></a>
 ## How to use Pino with Restify
-
-We've got you covered:
+<details>
+<summary>We've got you covered:</summary>
 
 ```sh
 npm install --save restify-pino-logger
@@ -722,11 +730,12 @@ server.listen(3000)
 ```
 
 See the [restify-pino-logger readme](http://npm.im/restify-pino-logger) for more info.
+</details>
 
 <a name="koa"></a>
 ## How to use Pino with koa
-
-We've got you covered:
+<details>
+<summary>We've got you covered:</summary>
 
 ### Koa v1
 
@@ -772,10 +781,12 @@ app.listen(3000)
 ```
 
 See the [koa-pino-logger v2 readme](https://github.com/pinojs/koa-pino-logger/tree/v2) for more info.
+</details>
 
 <a name="debug"></a>
-## How to use Pino with `debug`
-
+## How to use Pino with debug
+<details>
+<summary> Capture debug logs in JSON format, at 10x-20x the speed: </summary>
 The popular [`debug`](http://npm.im/debug) which
 used in many modules accross the ecosystem. 
 
@@ -797,12 +808,12 @@ $ DEBUG=* node -r pino-debug app.js
 [`pino-debug`](http://github.com/pinojs/pino-debug) also offers fine grain control to map specific `debug`
 namespaces to `pino` log levels. See [`pino-debug`](http://github.com/pinojs/pino-debug)
 for more. 
-
+</details>
 
 <a name="rotate"></a>
 ## How do I rotate log files?
-
-Use a separate tool for log rotation.
+<details>
+<summary>Use a separate tool for log rotation:</summary>
 
 We recommend [logrotate](https://github.com/logrotate/logrotate)
 
@@ -828,12 +839,16 @@ We would rotate our log files with logrotate, by adding the following to `/etc/l
 ```
 
 
-
+</details>
 
 <a name="redact"></a>
 ## How do I redact sensitive information??
+<details>
+<summary> Use [pino-noir](http://npm.im/pino-noir) for performant log redaction: </summary>
 
-Use [pino-noir](http://npm.im/pino-noir), initialize with the key paths you wish to redact and pass the resulting instance in through the `serializers` option
+Install and require [pino-noir](http://npm.im/pino-noir), 
+initialize with the key paths you wish to redact and pass the 
+resulting instance in through the `serializers` option
 
 ```js
 var noir = require('pino-noir')
@@ -863,11 +878,12 @@ var pino = require('pino')({
 })
 ```
 
+</details>
 
 <a name="transports"></a>
 ## How to use Transports with Pino
-
-Create a separate process and pipe to it.
+<details>
+<summary>Create a separate process and pipe to it:</summary>
 
 For example:
 
@@ -928,7 +944,9 @@ the default for `pino-elasticsearch`.
 ### pino-socket
 
 [pino-socket][pino-socket] is a transport that will forward logs to a IPv4
-UDP or TCP socket. As an example, use `socat` to fake a listener:
+UDP or TCP socket. 
+
+As an example, use `socat` to fake a listener:
 
 ```sh
 $ socat -v udp4-recvfrom:6000,fork exec:'/bin/cat'
@@ -1006,7 +1024,9 @@ https://github.com/deviantony/docker-elk to setup an ELK stack.
 <a name="browser"></a>
 ## Pino in the browser
 
-Pino is compatible with [`browserify`](http://npm.im) for browser side usage. This can be useful with isomorphic/universal JavaScript code.
+<summary>Pino is compatible with [`browserify`](http://npm.im) for browser side usage:</summary> 
+
+This can be useful with isomorphic/universal JavaScript code.
 
 In the browser, `pino` uses corresponding [Log4j](https://en.wikipedia.org/wiki/Log4j) `console` methods (`console.error`, `console.warn`, `console.info`, `console.debug`, `console.trace`) and uses `console.error` for any `fatal` level logs.
 
@@ -1058,6 +1078,7 @@ This equates to the same log output that Bunyan supplies.
 One of Pino's performance tricks is to avoid building objects and stringifying
 them, so we're building strings instead. This is why duplicate keys between
 parents and children will end up in log output.
+</details>
 
 <a name="team"></a>
 ## The Team
