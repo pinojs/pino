@@ -406,8 +406,8 @@ function genLog (z) {
     }
     p = n.length = arguments.length - l
     if (p > 1) {
-      l = countInterp(a, '%j')
-      if (l && typeof a === 'string') {
+      l = typeof a === 'string' ? countInterp(a, '%j') : 0
+      if (l) {
         n.length = l + countInterp(a, '%d') + countInterp(a, '%s') + 1
         o = `${util.format.apply(null, n)}`
       } else {

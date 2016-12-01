@@ -292,6 +292,42 @@ test('correctly escape msg strings', function (t) {
   instance.fatal('this contains "')
 })
 
+// https://github.com/pinojs/pino/issues/139
+test('object and format string', function (t) {
+  var instance = pino(sink(function (chunk, enc, cb) {
+    delete chunk.time
+    t.deepEqual(chunk, {
+      pid: pid,
+      hostname: hostname,
+      level: 30,
+      msg: 'foo bar',
+      v: 1
+    })
+    t.end()
+    cb()
+  }))
+
+  instance.info({}, 'foo %s', 'bar')
+})
+
+test('object and format string property', function (t) {
+  var instance = pino(sink(function (chunk, enc, cb) {
+    delete chunk.time
+    t.deepEqual(chunk, {
+      pid: pid,
+      hostname: hostname,
+      level: 30,
+      msg: 'foo bar',
+      answer: 42,
+      v: 1
+    })
+    t.end()
+    cb()
+  }))
+
+  instance.info({ answer: 42 }, 'foo %s', 'bar')
+})
+
 test('correctly strip undefined when returned from toJSON', function (t) {
   t.plan(1)
 
