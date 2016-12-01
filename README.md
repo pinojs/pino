@@ -195,8 +195,6 @@ INFO [2016-03-09T15:27:09.339Z] (14139 on MacBook-Pro-3.home): hello world
 
 <a name="api"></a>
 ## API
-<details>
-<summary> index: </summary>
   * <a href="#constructor"><code><b>pino()</b></code></a>
   * <a href="#child"><code>logger.<b>child()</b></code></a>
   * <a href="#level"><code>logger.<b>level</b></code></a>
@@ -570,7 +568,6 @@ var log = pino({
 log.child({ widget: 'foo' }).info('hello')
 log.child({ widget: 'bar' }).warn('hello 2')
 ```
-</details>
 
 <a name="addLevel"></a>
 ### pino.addLevel(name, lvl)
