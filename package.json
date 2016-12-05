@@ -12,7 +12,9 @@
     "browser.js",
     "pretty.js",
     "LICENEE",
-    "usage.txt"
+    "usage.txt",
+    "tests",
+    "examples.js"
   ],
   "scripts": {
     "browser-test": "zuul tape test/browser.test.js --local",
