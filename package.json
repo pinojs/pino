@@ -7,6 +7,14 @@
   "bin": {
     "pino": "./pretty.js"
   },
+  "files" : [
+    "pino.js", 
+    "browser.js",
+    "pretty.js",
+    "usage.txt",
+    "test",
+    "example.js"
+  ],
   "scripts": {
     "browser-test": "zuul tape test/browser.test.js --local",
     "test": "standard && tap --no-cov test/*test.js",
