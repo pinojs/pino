@@ -341,6 +341,18 @@ test('correctly strip undefined when returned from toJSON', function (t) {
   instance.fatal({test: {toJSON: function () { return undefined }}})
 })
 
+test('correctly handles null', function (t) {
+  t.plan(1)
+
+  var instance = pino(sink(function (obj, enc, cb) {
+    t.is(obj.msg, 'null "test"')
+    t.end()
+    cb()
+  }))
+
+  instance.info(null, 'test')
+})
+
 test('correctly support node v4+ stderr', function (t) {
   t.plan(1)
 
