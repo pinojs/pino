@@ -18,6 +18,7 @@ It also includes a shell utility to pretty-print its log files.
 * [How to use Pino with Koa](#koa)
 * [How to use Pino with `debug`](#debug)
 * [How do I rotate log files?](#rotate)
+* [How to save to multiple files?](#multiple)
 * [How do I redact sensitive information?](#redact)
 * [How to use Transports with Pino](#transports)
 * [Pino in the browser](#browser)
@@ -821,6 +822,26 @@ We would rotate our log files with logrotate, by adding the following to `/etc/l
 }
 ```
 
+
+</details>
+
+<a name="multiple"></a>
+## How to save to multiple files?
+<details>
+<summary>Use a separate tool to store all the errors on another log file:</summary>
+
+Install [pino-tee](http://npm.im/pino-tee) with:
+
+```bash
+npm i pino-tee -g
+```
+
+The following writes the log output of `app.js` to `./all-logs`, while
+writing only warnings and errors to `./warn-log:
+
+```bash
+node app.js | pino-tee warn ./warn-logs > ./all-logs
+```
 
 </details>
 
