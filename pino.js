@@ -157,7 +157,6 @@ function Pino (opts, stream) {
     if (levelIsStandard === false && valIsStandard === false) this.addLevel(opts.level, opts.levelVal)
   }
   this._setLevel(opts.level)
-
   this._baseLog = flatstr(baseLog +
     (this.name === undefined ? '' : '"name":' + this.stringify(this.name) + ','))
 
@@ -241,14 +240,13 @@ Pino.prototype.asJson = function asJson (obj, msg, num) {
   if (obj) {
     if (obj.stack) {
       data += ',"type":"Error","stack":' + this.stringify(obj.stack)
-    } else {
-      for (var key in obj) {
-        value = obj[key]
-        if (obj.hasOwnProperty(key) && value !== undefined) {
-          value = this.stringify(this.serializers[key] ? this.serializers[key](value) : value)
-          if (value !== undefined) {
-            data += ',"' + key + '":' + value
-          }
+    }
+    for (var key in obj) {
+      value = obj[key]
+      if (obj.hasOwnProperty(key) && value !== undefined) {
+        value = this.stringify(this.serializers[key] ? this.serializers[key](value) : value)
+        if (value !== undefined) {
+          data += ',"' + key + '":' + value
         }
       }
     }
