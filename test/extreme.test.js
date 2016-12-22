@@ -143,3 +143,15 @@ test('flush does nothing without stream mode', function (t) {
   instance.flush()
   t.end()
 })
+
+test('emits ready event with valid stream', function (t) {
+  delete require.cache[require.resolve('../')]
+  var pino = require('../')
+  var dest = fs.createWriteStream('/dev/null')
+  var extreme = pino({extreme: true}, dest)
+
+  extreme.on('ready', function (logger) {
+    t.is(logger, extreme)
+    t.end()
+  })
+})

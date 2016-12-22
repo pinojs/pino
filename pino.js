@@ -110,13 +110,18 @@ function pino (opts, stream) {
     // but setTimeout isn't *shrug*
     setTimeout(function () {
       if (!streamIsBlockable(istream)) {
-        logger.emit('error', new Error('stream must have a file descriptor in extreme mode'))
+        return logger.emit('error', new Error('stream must have a file descriptor in extreme mode'))
       }
+      logger.emit('ready', logger)
     }, 100)
 
     onExit(function (code, evt) {
       var buf = iopts.cache.buf
       if (buf) {
+        // If the user failed to listen for the `error` event then we have
+        // to pretend like they don't care about the rest of the buffer.
+        if (!streamIsBlockable(istream)) return
+
         // We need to block the process exit long enough to flush the buffer
         // to the destination stream. We do that by forcing a synchronous
         // write directly to the stream's file descriptor.
