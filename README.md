@@ -216,6 +216,7 @@ INFO [2016-03-09T15:27:09.339Z] (14139 on MacBook-Pro-3.home): hello world
   * <a href="#resSerializer"><code>pino.stdSerializers.<b>res</b></code></a>
   * <a href="#errSerializer"><code>pino.stdSerializers.<b>err</b></code></a>
   * <a href="#pretty"><code>pino.<b>pretty()</b></code></a>
+  * <a href="#mspino"><code>require('pino/multi-stream')</code></a>
 
 
 <a name="constructor"></a>
@@ -598,6 +599,64 @@ var log = pino({
 log.child({ widget: 'foo' }).info('hello')
 log.child({ widget: 'bar' }).warn('hello 2')
 ```
+
+<a name="mspino"></a>
+### require('pino/multi-stream')
+
+Returns a `pino` <a href="#constructor">constructor</a> the supports an extra
+`streams` option that follows the same format as Bunyan. As an example:
+
+```js
+var fs = require('fs')
+var mspino = require('pino/multi-stream')
+var streams = [
+  {stream: fs.createWriteStream('/tmp/info.stream.out')},
+  {level: 'fatal', fs.createWriteStream('/tmp/fatal.stream.out')}
+]
+var log = mspino({streams: streams})
+
+log.info('this will be written to /tmp/info.stream.out')
+log.fatal('this will be written to /tmp/fatal.stream.out')
+```
+
+Caveats:
+
+* The speed of multi-stream `pino` is dependent upon the number of streams you
+add. Regardless of the number, it will be slower than a regular `pino` instance.
+* If you create child loggers then a new logger will be created for *each*
+stream of the parent logger. This holds true for however many child loggers
+are created.
+
+**Stern warning:** the performance of this feature being dependent on the number
+of streams you supply cannot be overstated. This feature is being provided so
+that you can switch to `pino` from `Bunyan` and get some immediate improvement,
+but it is not meant to be a long term solution. We *strongly* suggest that you
+use this feature for only as long as it will take you to overhaul the way
+you handle logging in your application.
+
+To illustrate what we mean, here is a benchmark of `pino` and `Bunyan` using
+"multiple" streams to write to a single stream:
+
+```
+benchBunyanOne*10000: 875.099ms
+benchMSPinoOne*10000: 224.924ms
+```
+
+Now let's look at the same benchmark but increase the number of destination
+streams to four:
+
+```
+benchBunyanFour*10000: 3288.004ms
+benchMSPinoFour*10000: 722.918ms
+```
+
+And, finally, with ten destination streams:
+
+```
+benchBunyanTen*10000: 8142.875ms
+benchMSPinoTen*10000: 1992.805ms
+```
+
 
 <a name="extreme"></a>
 ## Extreme mode explained
