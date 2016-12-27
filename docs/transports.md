@@ -71,6 +71,8 @@ Kibana instance, and [create an index pattern](https://www.elastic.co/guide/en/k
 the default for `pino-elasticsearch`.
 
 [pino-elasticsearch]: https://github.com/pinojs/pino-elasticsearch
+[elasticsearch]: https://www.elastic.co/products/elasticsearch
+[kibana]: https://www.elastic.co/products/kibana
 
 <a id="pino-socket"></a>
 ### pino-socket
