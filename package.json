@@ -13,6 +13,7 @@
     "pretty.js",
     "usage.txt",
     "test",
+    "docs",
     "example.js"
   ],
   "scripts": {
