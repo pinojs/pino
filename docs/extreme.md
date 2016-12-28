@@ -1,4 +1,4 @@
-# Exteme Mode
+# Extreme Mode
 
 In essence, extreme mode enables even faster performance by Pino.
 
