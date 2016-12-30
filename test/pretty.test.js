@@ -161,3 +161,14 @@ test('handles `undefined` input', function (t) {
   pretty.write('undefined')
   pretty.end()
 })
+
+test('handles `true` input', function (t) {
+  t.plan(1)
+  var pretty = pino.pretty()
+  pretty.pipe(split(function (line) {
+    t.is(line, 'true')
+    return line
+  }))
+  pretty.write('true')
+  pretty.end()
+})
