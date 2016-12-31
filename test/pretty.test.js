@@ -139,3 +139,36 @@ test('pino transform treats the name with care', function (t) {
 
   instance.info('hello world')
 })
+
+test('handles `null` input', function (t) {
+  t.plan(1)
+  var pretty = pino.pretty()
+  pretty.pipe(split(function (line) {
+    t.is(line, 'null')
+    return line
+  }))
+  pretty.write('null')
+  pretty.end()
+})
+
+test('handles `undefined` input', function (t) {
+  t.plan(1)
+  var pretty = pino.pretty()
+  pretty.pipe(split(function (line) {
+    t.is(line, 'undefined')
+    return line
+  }))
+  pretty.write('undefined')
+  pretty.end()
+})
+
+test('handles `true` input', function (t) {
+  t.plan(1)
+  var pretty = pino.pretty()
+  pretty.pipe(split(function (line) {
+    t.is(line, 'true')
+    return line
+  }))
+  pretty.write('true')
+  pretty.end()
+})

@@ -47,7 +47,10 @@ function filter (value) {
 }
 
 function isPinoLine (line) {
-  return line.hasOwnProperty('hostname') && line.hasOwnProperty('pid') && (line.hasOwnProperty('v') && line.v === 1)
+  return line &&
+    line.hasOwnProperty('hostname') &&
+    line.hasOwnProperty('pid') &&
+    (line.hasOwnProperty('v') && line.v === 1)
 }
 
 function pretty (opts) {
