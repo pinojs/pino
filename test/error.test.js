@@ -76,3 +76,32 @@ test('type, message and stack should be first level properties', function (t) {
   instance.level = name
   instance[name](err)
 })
+
+test('err serializer', function (t) {
+  t.plan(2)
+  var err = Object.assign(new Error('myerror'), {foo: 'bar'})
+  var instance = pino({
+    serializers: {
+      err: pino.stdSerializers.err
+    }
+  }, sink(function (chunk, enc, cb) {
+    t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
+    delete chunk.time
+    t.deepEqual(chunk, {
+      pid: pid,
+      hostname: hostname,
+      level: level,
+      err: {
+        type: 'Error',
+        message: err.message,
+        stack: err.stack,
+        foo: err.foo
+      },
+      v: 1
+    })
+    cb()
+  }))
+
+  instance.level = name
+  instance[name]({ err })
+})
