@@ -42,6 +42,10 @@
     "json"
   ],
   "author": "Matteo Collina <hello@matteocollina.com>",
+  "contributors": [
+    "David Mark Clements <huperekchuno@googlemail.com>",
+    "James Sumners <james.sumners@gmail.com>"
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/pinojs/pino/issues"
