@@ -1,6 +1,7 @@
 # Table of Contents
 
 + [Constructor](#constructor)
+  * [.pretty](#pretty)
 + [Logger](#logger)
   * [.child](#child)
   * [.level](#level)
@@ -21,7 +22,6 @@
     + [.req](#reqSerializer)
     + [.res](#resSerializer)
     + [.err](#errSerializer)
-  * [.pretty](#pretty)
 
 # module.exports
 
@@ -73,6 +73,35 @@ var logger = pino({
 ```
 ### Discussion:
 Returns a new [logger](#logger) instance.
+
+<a id="pretty"></a>
+## .pretty([options])
+
+### Parameters:
++ `options` (object):
+  * `timeTransOnly` (boolean): if set to `true`, it will only covert the unix
+  timestamp to ISO 8601 date format, and reserialize the JSON (equivalent to `pino -t`).
+  * `formatter` (function): a custom function to format the line, is passed the
+  JSON object as an argument and should return a string value.
+
+### Example:
+```js
+'use strict'
+
+var pino = require('pino')
+var pretty = pino.pretty()
+pretty.pipe(process.stdout)
+var log = pino({
+  name: 'app',
+  safe: true
+}, pretty)
+
+log.child({ widget: 'foo' }).info('hello')
+log.child({ widget: 'bar' }).warn('hello 2')
+```
+
+### Discussion:
+Provides access to the [CLI](cli.md) log prettifier as an API.
 
 <a id="logger"></a>
 # Logger
@@ -476,32 +505,3 @@ Serializes an `Error` object if passed in as an property.
   "stack": "Error: an error\n    at Object.<anonymous> (/Users/matteo/Repositories/pino/example.js:16:7)\n    at Module._compile (module.js:435:26)\n    at Object.Module._extensions..js (module.js:442:10)\n    at Module.load (module.js:356:32)\n    at Function.Module._load (module.js:313:12)\n    at Function.Module.runMain (module.js:467:10)\n    at startup (node.js:136:18)\n    at node.js:963:3"
 }
 ```
-
-<a id="pretty"></a>
-## .pretty([options])
-
-### Parameters:
-+ `options` (object):
-  * `timeTransOnly` (boolean): if set to `true`, it will only covert the unix
-  timestamp to ISO 8601 date format, and reserialize the JSON (equivalent to `pino -t`).
-  * `formatter` (function): a custom function to format the line, is passed the
-  JSON object as an argument and should return a string value.
-
-### Example:
-```js
-'use strict'
-
-var pino = require('pino')
-var pretty = pino.pretty()
-pretty.pipe(process.stdout)
-var log = pino({
-  name: 'app',
-  safe: true
-}, pretty)
-
-log.child({ widget: 'foo' }).info('hello')
-log.child({ widget: 'bar' }).warn('hello 2')
-```
-
-### Discussion:
-Provides access to the [CLI](cli.md) log prettifier as an API.
