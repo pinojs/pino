@@ -27,6 +27,14 @@ It also includes a shell utility to pretty-print its log files.
 npm install pino --save
 ```
 
+If you need support for Node.js v0.12 or v0.10, please install the latest 2.x release using the `legacy` tag:
+
+```
+npm install pino@legacy --save
+```
+
+Documentation for the legacy version 2.x is available on the [`v2.x.x` branch](https://github.com/pinojs/pino/tree/v2.x.x).
+
 ## Usage
 
 ```js
