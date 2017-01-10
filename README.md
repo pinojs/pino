@@ -216,6 +216,14 @@ parents and children will end up in log output.
 
 <https://twitter.com/jsumners79>
 
+### Thomas Watson Steen
+
+<https://github.com/watson>
+
+<https://www.npmjs.com/~watson>
+
+<https://twitter.com/wa7son>
+
 ### Chat on Gitter
 
 <https://gitter.im/pinojs/pino>
