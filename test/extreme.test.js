@@ -137,3 +137,9 @@ test('emits error for invalid stream', function (t) {
     t.end()
   })
 })
+
+test('flush does nothing without stream mode', function (t) {
+  var instance = require('..')()
+  instance.flush()
+  t.end()
+})

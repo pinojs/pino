@@ -110,3 +110,65 @@ test('handles missing time', function (t) {
 
   t.deepEqual(lines, ['{"hello":"world"}'], 'preserved lines')
 })
+
+test('pino transform prettifies properties', function (t) {
+  t.plan(1)
+  var pretty = pino.pretty()
+  var first = true
+  pretty.pipe(split(function (line) {
+    if (first) {
+      first = false
+    } else {
+      t.equal(line, '    a: "b"', 'prettifies the line')
+    }
+    return line
+  }))
+  var instance = pino(pretty)
+
+  instance.info({ a: 'b' }, 'hello world')
+})
+
+test('pino transform treats the name with care', function (t) {
+  t.plan(1)
+  var pretty = pino.pretty()
+  pretty.pipe(split(function (line) {
+    t.ok(line.match(/\(matteo\/.*$/), 'includes the name')
+    return line
+  }))
+  var instance = pino({ name: 'matteo' }, pretty)
+
+  instance.info('hello world')
+})
+
+test('handles `null` input', function (t) {
+  t.plan(1)
+  var pretty = pino.pretty()
+  pretty.pipe(split(function (line) {
+    t.is(line, 'null')
+    return line
+  }))
+  pretty.write('null')
+  pretty.end()
+})
+
+test('handles `undefined` input', function (t) {
+  t.plan(1)
+  var pretty = pino.pretty()
+  pretty.pipe(split(function (line) {
+    t.is(line, 'undefined')
+    return line
+  }))
+  pretty.write('undefined')
+  pretty.end()
+})
+
+test('handles `true` input', function (t) {
+  t.plan(1)
+  var pretty = pino.pretty()
+  pretty.pipe(split(function (line) {
+    t.is(line, 'true')
+    return line
+  }))
+  pretty.write('true')
+  pretty.end()
+})

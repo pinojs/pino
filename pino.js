@@ -1,17 +1,30 @@
 'use strict'
 
 var stringifySafe = require('fast-safe-stringify')
-var format = require('quick-format')
+var format = require('quick-format-unescaped')
 var EventEmitter = require('events').EventEmitter
 var os = require('os')
+var fs = require('fs')
 var flatstr = require('flatstr')
 var once = require('once')
+var util = require('util')
 var pid = process.pid
 var hostname = os.hostname()
 var baseLog = flatstr('{"pid":' + pid + ',"hostname":"' + hostname + '",')
 var extend = require('object.assign').getPolyfill()
 
 var LOG_VERSION = 1
+
+var defaultOptions = {
+  safe: true,
+  name: undefined,
+  serializers: {},
+  timestamp: true,
+  slowtime: false,
+  extreme: false,
+  level: 'info',
+  enabled: true
+}
 
 var levels = {
   fatal: 60,
@@ -21,12 +34,6 @@ var levels = {
   debug: 20,
   trace: 10
 }
-
-// private property
-Object.defineProperty(levels, 'silent', {
-  value: 100,
-  enumerable: false
-})
 
 var nums = Object.keys(levels).reduce(function (o, k) {
   o[levels[k]] = k
@@ -39,12 +46,6 @@ var lscache = Object.keys(nums).reduce(function (o, k) {
   return o
 }, {})
 
-// private property
-Object.defineProperty(nums, '100', {
-  value: 'silent',
-  enumerable: false
-})
-
 function streamIsBlockable (s) {
   if (s.hasOwnProperty('_handle') && s._handle.hasOwnProperty('fd') && s._handle.fd) return true
   if (s.hasOwnProperty('fd') && s.fd) return true
@@ -52,48 +53,48 @@ function streamIsBlockable (s) {
 }
 
 function pino (opts, stream) {
-  if (opts && (opts.writable || opts._writableState)) {
-    stream = opts
-    opts = null
+  var iopts = opts
+  var istream = stream
+  if (iopts && (iopts.writable || iopts._writableState)) {
+    istream = iopts
+    iopts = defaultOptions
   }
-  stream = stream || process.stdout
-  opts = opts || {}
-  var timestamp = (opts.hasOwnProperty('timestamp')) ? opts.timestamp : true
-  var slowtime = opts.slowtime
-  var safe = opts.safe !== false
-  var stringify = safe ? stringifySafe : JSON.stringify
-  var formatOpts = safe ? null : {lowres: true}
-  var name = opts.name
-  var level = opts.level || 'info'
-  var serializers = opts.serializers || {}
-  var end = ',"v":' + LOG_VERSION + '}\n'
-  var cache = !opts.extreme ? null : {
+  istream = istream || process.stdout
+  iopts = extend({}, defaultOptions, iopts)
+
+  // internal options
+  iopts.stringify = iopts.safe ? stringifySafe : JSON.stringify
+  iopts.formatOpts = {lowres: true}
+  iopts.end = ',"v":' + LOG_VERSION + '}\n'
+  iopts.cache = !iopts.extreme ? null : {
     size: 4096,
     buf: ''
   }
+  iopts.chindings = ''
 
-  if (opts.enabled === false) {
-    level = 'silent'
+  if (iopts.enabled === false) {
+    iopts.level = 'silent'
   }
 
-  var logger = new Pino(level, stream, serializers, stringify, end, name, timestamp, slowtime, '', cache, formatOpts)
-  if (cache) {
+  var logger = new Pino(iopts, istream)
+  if (iopts.cache) {
     // setImmediate is causing a very weird crash:
     //    Assertion failed: (cb_v->IsFunction()), function MakeCallback...
     // but setTimeout isn't *shrug*
     setTimeout(function () {
-      if (!streamIsBlockable(stream)) {
+      if (!streamIsBlockable(istream)) {
         logger.emit('error', new Error('stream must have a file descriptor in extreme mode'))
       }
     }, 100)
 
     onExit(function (code, evt) {
-      if (cache.buf) {
+      var buf = iopts.cache.buf
+      if (buf) {
         // We need to block the process exit long enough to flush the buffer
         // to the destination stream. We do that by forcing a synchronous
         // write directly to the stream's file descriptor.
-        var fd = (stream.fd) ? stream.fd : stream._handle.fd
-        require('fs').writeSync(fd, cache.buf)
+        var fd = (istream.fd) ? istream.fd : istream._handle.fd
+        fs.writeSync(fd, buf)
       }
       if (!process._events[evt] || process._events[evt].length < 2 || !process._events[evt].filter(function (f) {
         return f + '' !== onExit.passCode + '' && f + '' !== onExit.insertCode + ''
@@ -115,26 +116,37 @@ Object.defineProperty(pino, 'levels', {
   },
   enumerable: true
 })
+Object.defineProperty(pino.levels.values, 'silent', {value: 100})
+Object.defineProperty(pino.levels.labels, '100', {value: 'silent'})
 
-function Pino (level, stream, serializers, stringify, end, name, timestamp, slowtime, chindings, cache, formatOpts) {
+pino.addLevel = function addLevel (name, lvl) {
+  if (pino.levels.values.hasOwnProperty(name)) return false
+  if (pino.levels.labels.hasOwnProperty(lvl)) return false
+  pino.levels.values[name] = lvl
+  pino.levels.labels[lvl] = name
+  lscache[lvl] = flatstr('"level":' + Number(lvl))
+  Pino.prototype[name] = genLog(lvl)
+  return true
+}
+
+function Pino (opts, stream) {
   this.stream = stream
-  this.serializers = serializers
-  this.stringify = stringify
-  this.end = end
-  this.name = name
-  this.timestamp = timestamp
-  this.slowtime = slowtime
-  this.chindings = chindings
-  this.cache = cache
-  this.formatOpts = formatOpts
-  this._setLevel(level)
-
+  this.serializers = opts.serializers
+  this.stringify = opts.stringify
+  this.end = opts.end
+  this.name = opts.name
+  this.timestamp = opts.timestamp
+  this.slowtime = opts.slowtime
+  this.chindings = opts.chindings
+  this.cache = opts.cache
+  this.formatOpts = opts.formatOpts
+  this._setLevel(opts.level)
   this._baseLog = flatstr(baseLog +
-    (this.name === undefined ? '' : '"name":' + stringify(this.name) + ','))
+    (this.name === undefined ? '' : '"name":' + this.stringify(this.name) + ','))
 
-  if (timestamp === false) {
+  if (opts.timestamp === false) {
     this.time = getNoTime
-  } else if (slowtime) {
+  } else if (opts.slowtime) {
     this.time = getSlowTime
   } else {
     this.time = getTime
@@ -160,13 +172,13 @@ Object.defineProperty(Pino.prototype, 'levelVal', {
     if (typeof num === 'string') { return this._setLevel(num) }
 
     if (this.emit) {
-      this.emit('level-change', nums[num], num, nums[this._levelVal], this._levelVal)
+      this.emit('level-change', pino.levels.labels[num], num, pino.levels.labels[this._levelVal], this._levelVal)
     }
 
     this._levelVal = num
 
-    for (var key in levels) {
-      if (num > levels[key]) {
+    for (var key in pino.levels.values) {
+      if (num > pino.levels.values[key]) {
         this[key] = noop
         continue
       }
@@ -176,16 +188,16 @@ Object.defineProperty(Pino.prototype, 'levelVal', {
 })
 
 Pino.prototype._setLevel = function _setLevel (level) {
-  if (typeof level === 'number') { level = nums[level] }
+  if (typeof level === 'number') { level = pino.levels.labels[level] }
 
-  if (!levels[level]) {
+  if (!pino.levels.values[level]) {
     throw new Error('unknown level ' + level)
   }
-  this.levelVal = levels[level]
+  this.levelVal = pino.levels.values[level]
 }
 
 Pino.prototype._getLevel = function _getLevel (level) {
-  return nums[this.levelVal]
+  return pino.levels.labels[this.levelVal]
 }
 
 Object.defineProperty(Pino.prototype, 'level', {
@@ -199,32 +211,6 @@ Object.defineProperty(
   {value: LOG_VERSION}
 )
 
-// magically escape strings for json
-// relying on their charCodeAt
-// everything below 32 needs JSON.stringify()
-// 34 and 92 happens all the time, so we
-// have a fast case for them
-function escape (s) {
-  var str = s.toString()
-  var result = ''
-  var last = 0
-  var l = str.length
-  var point = 255
-  for (var i = 0; i < l && point >= 32; i++) {
-    point = str.charCodeAt(i)
-    if (point === 34 || point === 92) {
-      result += str.slice(last, i) + '\\' + str[i]
-      last = i + 1
-    }
-  }
-  if (last === 0) {
-    result = str
-  } else {
-    result += str.slice(last)
-  }
-  return point < 32 ? JSON.stringify(str) : '"' + result + '"'
-}
-
 Pino.prototype.asJson = function asJson (obj, msg, num) {
   if (!msg && obj instanceof Error) {
     msg = obj.message
@@ -233,20 +219,19 @@ Pino.prototype.asJson = function asJson (obj, msg, num) {
   // to catch both null and undefined
   /* eslint-disable eqeqeq */
   if (msg != undefined) {
-    data += ',"msg":' + escape(msg)
+    data += ',"msg":' + JSON.stringify(msg)
   }
   var value
   if (obj) {
     if (obj.stack) {
       data += ',"type":"Error","stack":' + this.stringify(obj.stack)
-    } else {
-      for (var key in obj) {
-        value = obj[key]
-        if (obj.hasOwnProperty(key) && value !== undefined) {
-          value = this.stringify(this.serializers[key] ? this.serializers[key](value) : value)
-          if (value !== undefined) {
-            data += ',"' + key + '":' + value
-          }
+    }
+    for (var key in obj) {
+      value = obj[key]
+      if (obj.hasOwnProperty(key) && value !== undefined) {
+        value = this.stringify(this.serializers[key] ? this.serializers[key](value) : value)
+        if (value !== undefined) {
+          data += ',"' + key + '":' + value
         }
       }
     }
@@ -283,18 +268,20 @@ Pino.prototype.child = function child (bindings) {
   }
   data = this.chindings + data.substr(0, data.length - 1)
 
-  return new Pino(
-    bindings.level || this.level,
-    this.stream,
-    bindings.hasOwnProperty('serializers') ? extend(this.serializers, bindings.serializers) : this.serializers,
-    this.stringify,
-    this.end,
-    this.name,
-    this.timestamp,
-    this.slowtime,
-    data,
-    this.cache,
-    this.formatOpts)
+  var opts = {
+    level: bindings.level || this.level,
+    serializers: bindings.hasOwnProperty('serializers') ? extend(this.serializers, bindings.serializers) : this.serializers,
+    stringify: this.stringify,
+    end: this.end,
+    name: this.name,
+    timestamp: this.timestamp,
+    slowtime: this.slowtime,
+    chindings: data,
+    cache: this.cache,
+    formatOpts: this.formatOpts
+  }
+
+  return new Pino(opts, this.stream)
 }
 
 Pino.prototype.write = function (obj, msg, num) {
@@ -350,11 +337,30 @@ function asResValue (res) {
 }
 
 function asErrValue (err) {
-  return {
+  var obj = {
     type: err.constructor.name,
     message: err.message,
     stack: err.stack
   }
+  for (var key in err) {
+    if (obj[key] === undefined) {
+      obj[key] = err[key]
+    }
+  }
+  return obj
+}
+
+function countInterp (s, i) {
+  var n = 0
+  var pos = 0
+  while (true) {
+    pos = s.indexOf(i, pos)
+    if (pos >= 0) {
+      ++n
+      pos += 2
+    } else break
+  }
+  return n
 }
 
 function genLog (z) {
@@ -379,7 +385,13 @@ function genLog (z) {
     }
     p = n.length = arguments.length - l
     if (p > 1) {
-      o = format(n, this.formatOpts)
+      l = typeof a === 'string' ? countInterp(a, '%j') : 0
+      if (l) {
+        n.length = l + countInterp(a, '%d') + countInterp(a, '%s') + 1
+        o = String(util.format.apply(null, n))
+      } else {
+        o = format(n, this.formatOpts)
+      }
     } else if (p) {
       o = n[0]
     }
