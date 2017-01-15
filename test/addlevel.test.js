@@ -28,6 +28,15 @@ test('can add a custom level to a prior instance', function (t) {
   log.foo2('bar')
 })
 
+test('custom level via constructor does not affect other instances', function (t) {
+  t.plan(2)
+
+  var log = pino({level: 'foo3', levelVal: 36})
+  var other = pino()
+  t.is(typeof log.foo3, 'function')
+  t.is(typeof other.foo3, 'undefined')
+})
+
 test('custom levels encompass higher levels', function (t) {
   t.plan(1)
 
