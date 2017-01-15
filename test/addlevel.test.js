@@ -37,6 +37,17 @@ test('custom level via constructor does not affect other instances', function (t
   t.is(typeof other.foo3, 'undefined')
 })
 
+test('custom level on one instance does not affect other instances', function (t) {
+  t.plan(2)
+
+  var log = pino()
+  log.addLevel('foo4', 37)
+  var other = pino()
+  log.addLevel('foo5', 38)
+  t.is(typeof other.foo4, 'undefined')
+  t.is(typeof other.foo5, 'undefined')
+})
+
 test('custom levels encompass higher levels', function (t) {
   t.plan(1)
 
@@ -70,6 +81,19 @@ test('children can be set to custom level', function (t) {
     t.is(chunk.child, 'yes')
     cb()
   }))
+  var child = parent.child({child: 'yes'})
+  child.foo('bar')
+})
+
+test('custom levels exists on children', function (t) {
+  t.plan(2)
+
+  var parent = pino({}, sink(function (chunk, enc, cb) {
+    t.is(chunk.msg, 'bar')
+    t.is(chunk.child, 'yes')
+    cb()
+  }))
+  parent.addLevel('foo', 35)
   var child = parent.child({child: 'yes'})
   child.foo('bar')
 })

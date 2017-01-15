@@ -34,22 +34,38 @@ var levels = {
   debug: 20,
   trace: 10
 }
+Object.freeze(levels)
 
 var nums = Object.keys(levels).reduce(function (o, k) {
   o[levels[k]] = k
   return o
 }, {})
+Object.freeze(nums)
 
-function defineLevelsProperty (onObject) {
+var defaultLevelsValues = {
+  values: levels,
+  labels: nums
+}
+Object.freeze(defaultLevelsValues)
+
+function defineLevelsProperty (onObject, existing, noCopy) {
+  var value = noCopy ? existing : {
+    values: copy({}, existing.values),
+    labels: copy({}, existing.labels)
+  }
   Object.defineProperty(onObject, 'levels', {
-    value: {
-      values: copy({}, levels),
-      labels: copy({}, nums)
-    },
+    value: value,
     enumerable: true
   })
   Object.defineProperty(onObject.levels.values, 'silent', {value: 100})
   Object.defineProperty(onObject.levels.labels, '100', {value: 'silent'})
+}
+
+function defineLsCacheProperty (onObject, value, noCopy) {
+  Object.defineProperty(onObject, '_lscache', {
+    value: noCopy ? value : Object.assign({}, value),
+    enumerable: false
+  })
 }
 
 // IIFE so the keys are cached at module load
@@ -66,12 +82,6 @@ var isStandardLevelVal = (function () {
     return keys.indexOf(val + '') > -1
   }
 }())
-
-// level string catch
-var lscache = Object.keys(nums).reduce(function (o, k) {
-  o[k] = flatstr('"level":' + Number(k))
-  return o
-}, {})
 
 function streamIsBlockable (s) {
   if (s.hasOwnProperty('_handle') && s._handle.hasOwnProperty('fd') && s._handle.fd) return true
@@ -136,7 +146,7 @@ function pino (opts, stream) {
   return logger
 }
 
-defineLevelsProperty(pino)
+defineLevelsProperty(pino, defaultLevelsValues)
 
 function Pino (opts, stream) {
   this.stream = stream
@@ -149,6 +159,10 @@ function Pino (opts, stream) {
   this.chindings = opts.chindings
   this.cache = opts.cache
   this.formatOpts = opts.formatOpts
+  if (opts.customizedLevels) {
+    defineLsCacheProperty(this, opts.customizedLevels._lscache, true)
+    defineLevelsProperty(this, opts.customizedLevels.levels, true)
+  }
 
   if (opts.level && opts.levelVal) {
     var levelIsStandard = isStandardLevel(opts.level)
@@ -170,7 +184,7 @@ function Pino (opts, stream) {
 }
 
 Pino.prototype = new EventEmitter()
-defineLevelsProperty(Pino.prototype)
+defineLevelsProperty(Pino.prototype, defaultLevelsValues)
 
 Pino.prototype.fatal = genLog(levels.fatal)
 Pino.prototype.error = genLog(levels.error)
@@ -178,6 +192,13 @@ Pino.prototype.warn = genLog(levels.warn)
 Pino.prototype.info = genLog(levels.info)
 Pino.prototype.debug = genLog(levels.debug)
 Pino.prototype.trace = genLog(levels.trace)
+
+var defaultLsCache = Object.keys(nums).reduce(function (o, k) { // level string cache
+  o[k] = flatstr('"level":' + Number(k))
+  return o
+}, {})
+Object.freeze(defaultLsCache)
+defineLsCacheProperty(Pino.prototype, defaultLsCache)
 
 Object.defineProperty(Pino.prototype, 'levelVal', {
   get: function getLevelVal () {
@@ -230,7 +251,7 @@ Pino.prototype.asJson = function asJson (obj, msg, num) {
   if (!msg && obj instanceof Error) {
     msg = obj.message
   }
-  var data = this._baseLog + lscache[num] + this.time()
+  var data = this._baseLog + this._lscache[num] + this.time()
   // to catch both null and undefined
   /* eslint-disable eqeqeq */
   if (msg != undefined) {
@@ -296,7 +317,12 @@ Pino.prototype.child = function child (bindings) {
     cache: this.cache,
     formatOpts: this.formatOpts
   }
-
+  if (this.hasOwnProperty('levels')) {
+    opts.customizedLevels = {
+      levels: this.levels,
+      _lscache: this._lscache
+    }
+  }
   return new Pino(opts, this.stream)
 }
 
@@ -326,9 +352,16 @@ Pino.prototype.flush = function () {
 Pino.prototype.addLevel = function addLevel (name, lvl) {
   if (this.levels.values.hasOwnProperty(name)) return false
   if (this.levels.labels.hasOwnProperty(lvl)) return false
+  if (!this.hasOwnProperty('levels')) {
+    // define new properties on this instance by copying prototygpe values
+    defineLevelsProperty(this, this.levels)
+    defineLsCacheProperty(this, this._lscache)
+  }
+
   this.levels.values[name] = lvl
   this.levels.labels[lvl] = name
-  lscache[lvl] = flatstr('"level":' + Number(lvl))
+  this._lscache[lvl] = flatstr('"level":' + Number(lvl))
+  this[name] = genLog(lvl)
   return true
 }
 
