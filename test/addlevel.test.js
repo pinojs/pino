@@ -23,9 +23,9 @@ test('can add a custom level to a prior instance', function (t) {
     t.is(chunk.msg, 'bar')
   }))
 
-  log.addLevel('foo', 35)
-  t.is(typeof log.foo, 'function')
-  log.foo('bar')
+  log.addLevel('foo2', 35)
+  t.is(typeof log.foo2, 'function')
+  log.foo2('bar')
 })
 
 test('custom levels encompass higher levels', function (t) {
