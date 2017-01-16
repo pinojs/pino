@@ -79,3 +79,12 @@ test('reject already known values', function (t) {
     t.is(e.message.indexOf('level value') > -1, true)
   }
 })
+
+test('reject values of Infinity', function (t) {
+  t.plan(1)
+  try {
+    pino({level: 'foo', levelVal: Number.POSITIVE_INFINITY})
+  } catch (e) {
+    t.is(e.message.indexOf('level value') > -1, true)
+  }
+})

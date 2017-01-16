@@ -48,14 +48,17 @@ function defineLevelsProperty (onObject) {
     },
     enumerable: true
   })
-  Object.defineProperty(onObject.levels.values, 'silent', {value: 100})
-  Object.defineProperty(onObject.levels.labels, '100', {value: 'silent'})
+  Object.defineProperty(onObject.levels.values, 'silent', {value: Number.POSITIVE_INFINITY})
+  Object.defineProperty(onObject.levels.labels, Number.POSITIVE_INFINITY.toString(), {value: 'silent'})
 }
 
 // IIFE so the keys are cached at module load
 var isStandardLevel = (function () {
   var keys = Object.keys(levels)
   return function (level) {
+    if (Number.POSITIVE_INFINITY.toString() === level) {
+      return true
+    }
     return keys.indexOf(level) > -1
   }
 }())
@@ -63,6 +66,9 @@ var isStandardLevel = (function () {
 var isStandardLevelVal = (function () {
   var keys = Object.keys(nums)
   return function (val) {
+    if (!isFinite(val)) {
+      return true
+    }
     return keys.indexOf(val + '') > -1
   }
 }())
@@ -203,7 +209,12 @@ Object.defineProperty(Pino.prototype, 'levelVal', {
 })
 
 Pino.prototype._setLevel = function _setLevel (level) {
-  if (typeof level === 'number') { level = this.levels.labels[level] }
+  if (typeof level === 'number') {
+    if (!isFinite(level)) {
+      throw new Error('unknown level ' + level)
+    }
+    level = this.levels.labels[level]
+  }
 
   if (!this.levels.values[level]) {
     throw new Error('unknown level ' + level)
