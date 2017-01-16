@@ -139,6 +139,9 @@ function pino (opts, stream) {
 defineLevelsProperty(pino)
 
 function Pino (opts, stream) {
+  // We define the levels property at construction so that state does
+  // not get shared between instances.
+  defineLevelsProperty(this)
   this.stream = stream
   this.serializers = opts.serializers
   this.stringify = opts.stringify
@@ -170,7 +173,6 @@ function Pino (opts, stream) {
 }
 
 Pino.prototype = new EventEmitter()
-defineLevelsProperty(Pino.prototype)
 
 Pino.prototype.fatal = genLog(levels.fatal)
 Pino.prototype.error = genLog(levels.error)
