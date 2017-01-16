@@ -211,13 +211,13 @@ Object.defineProperty(Pino.prototype, 'levelVal', {
 Pino.prototype._setLevel = function _setLevel (level) {
   if (typeof level === 'number') {
     if (!isFinite(level)) {
-      throw new Error('unknown level ' + level)
+      throw Error('unknown level ' + level)
     }
     level = this.levels.labels[level]
   }
 
   if (!this.levels.values[level]) {
-    throw new Error('unknown level ' + level)
+    throw Error('unknown level ' + level)
   }
   this.levelVal = this.levels.values[level]
 }

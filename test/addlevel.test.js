@@ -82,9 +82,7 @@ test('reject already known values', function (t) {
 
 test('reject values of Infinity', function (t) {
   t.plan(1)
-  try {
+  t.throws(function () {
     pino({level: 'foo', levelVal: Infinity})
-  } catch (e) {
-    t.is(e.message.indexOf('level value') > -1, true)
-  }
+  }, /.*evel value is already used.*/)
 })

@@ -146,20 +146,6 @@ test('silent level', function (t) {
   t.end()
 })
 
-// obsolete by setting silent to Infinity
-// test('setting level to 100', function (t) {
-//   var instance = pino({
-//     level: 100
-//   }, sink(function (chunk, enc, cb) {
-//     t.fail('no data should be logged')
-//   }))
-//
-//   Object.keys(pino.levels.values).forEach(function (level) {
-//     instance[level]('hello world')
-//   })
-//   t.end()
-// })
-
 test('exposed levels', function (t) {
   t.plan(1)
   t.deepEqual(Object.keys(pino.levels.values), [
