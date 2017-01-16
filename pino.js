@@ -48,15 +48,15 @@ function defineLevelsProperty (onObject) {
     },
     enumerable: true
   })
-  Object.defineProperty(onObject.levels.values, 'silent', {value: Number.POSITIVE_INFINITY})
-  Object.defineProperty(onObject.levels.labels, Number.POSITIVE_INFINITY.toString(), {value: 'silent'})
+  Object.defineProperty(onObject.levels.values, 'silent', {value: Infinity})
+  Object.defineProperty(onObject.levels.labels, Infinity, {value: 'silent'})
 }
 
 // IIFE so the keys are cached at module load
 var isStandardLevel = (function () {
   var keys = Object.keys(levels)
   return function (level) {
-    if (Number.POSITIVE_INFINITY.toString() === level) {
+    if (Infinity === level) {
       return true
     }
     return keys.indexOf(level) > -1

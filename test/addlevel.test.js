@@ -83,7 +83,7 @@ test('reject already known values', function (t) {
 test('reject values of Infinity', function (t) {
   t.plan(1)
   try {
-    pino({level: 'foo', levelVal: Number.POSITIVE_INFINITY})
+    pino({level: 'foo', levelVal: Infinity})
   } catch (e) {
     t.is(e.message.indexOf('level value') > -1, true)
   }
