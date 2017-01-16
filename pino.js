@@ -220,7 +220,7 @@ Object.defineProperty(Pino.prototype, 'level', {
   set: Pino.prototype._setLevel
 })
 
-Object.defineProperty(Pino.prototype, 'lscache', {
+Object.defineProperty(Pino.prototype, '_lscache', {
   value: copy({}, lscache)
 })
 
@@ -234,7 +234,7 @@ Pino.prototype.asJson = function asJson (obj, msg, num) {
   if (!msg && obj instanceof Error) {
     msg = obj.message
   }
-  var data = this._baseLog + this.lscache[num] + this.time()
+  var data = this._baseLog + this._lscache[num] + this.time()
   // to catch both null and undefined
   /* eslint-disable eqeqeq */
   if (msg != undefined) {
@@ -332,7 +332,7 @@ Pino.prototype.addLevel = function addLevel (name, lvl) {
   if (this.levels.labels.hasOwnProperty(lvl)) return false
   this.levels.values[name] = lvl
   this.levels.labels[lvl] = name
-  this.lscache[lvl] = flatstr('"level":' + Number(lvl))
+  this._lscache[lvl] = flatstr('"level":' + Number(lvl))
   this[name] = genLog(lvl)
   return true
 }
