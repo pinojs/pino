@@ -172,3 +172,17 @@ test('handles `true` input', function (t) {
   pretty.write('true')
   pretty.end()
 })
+
+test('accept customLogLevvel', function (t) {
+  t.plan(1)
+  var pretty = pino.pretty()
+
+  pretty.pipe(split(function (line) {
+    t.ok(line.indexOf('USERLVL') > 0, 'include custom level')
+    return line
+  }))
+
+  var instance = pino({level: 'testCustom', levelVal: 35}, pretty)
+
+  instance.testCustom('test message')
+})
