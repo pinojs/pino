@@ -67,7 +67,7 @@ var isStandardLevelVal = (function () {
   }
 }())
 
-// level string catch
+// level string cache
 var lscache = Object.keys(nums).reduce(function (o, k) {
   o[k] = flatstr('"level":' + Number(k))
   return o
@@ -220,6 +220,10 @@ Object.defineProperty(Pino.prototype, 'level', {
   set: Pino.prototype._setLevel
 })
 
+Object.defineProperty(Pino.prototype, 'lscache', {
+  value: copy({}, lscache)
+})
+
 Object.defineProperty(
   Pino.prototype,
   'LOG_VERSION',
@@ -230,7 +234,7 @@ Pino.prototype.asJson = function asJson (obj, msg, num) {
   if (!msg && obj instanceof Error) {
     msg = obj.message
   }
-  var data = this._baseLog + lscache[num] + this.time()
+  var data = this._baseLog + this.lscache[num] + this.time()
   // to catch both null and undefined
   /* eslint-disable eqeqeq */
   if (msg != undefined) {
@@ -328,7 +332,8 @@ Pino.prototype.addLevel = function addLevel (name, lvl) {
   if (this.levels.labels.hasOwnProperty(lvl)) return false
   this.levels.values[name] = lvl
   this.levels.labels[lvl] = name
-  lscache[lvl] = flatstr('"level":' + Number(lvl))
+  this.lscache[lvl] = flatstr('"level":' + Number(lvl))
+  this[name] = genLog(lvl)
   return true
 }
 
