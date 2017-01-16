@@ -7,6 +7,7 @@ var Parse = require('fast-json-parse')
 var chalk = require('chalk')
 
 var levels = {
+  default: 'USERLVL',
   60: 'FATAL',
   50: 'ERROR',
   40: 'WARN',
@@ -70,6 +71,7 @@ function pretty (opts) {
     })
 
     levelColors = {
+      default: ctx.white,
       60: ctx.bgRed,
       50: ctx.red,
       40: ctx.yellow,
@@ -128,7 +130,11 @@ function pretty (opts) {
   }
 
   function asColoredLevel (value) {
-    return levelColors[value.level](levels[value.level])
+    if (levelColors.hasOwnProperty(value.level)) {
+      return levelColors[value.level](levels[value.level])
+    } else {
+      return levelColors.default(levels.default)
+    }
   }
 }
 
