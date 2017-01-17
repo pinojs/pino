@@ -240,7 +240,7 @@ Pino.prototype.asJson = function asJson (obj, msg, num) {
   // to catch both null and undefined
   /* eslint-disable eqeqeq */
   if (msg != undefined) {
-    data += ',"msg":' + JSON.stringify(msg)
+    data += ',"msg":' + JSON.stringify('' + msg)
   }
   var value
   if (obj) {
