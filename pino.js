@@ -176,33 +176,6 @@ function Pino (opts, stream) {
   defineLevelsProperty(this)
   this.stream = stream
   applyOptions.call(this, opts)
-  // this.serializers = opts.serializers
-  // this.stringify = opts.stringify
-  // this.end = opts.end
-  // this.name = opts.name
-  // this.timestamp = opts.timestamp
-  // this.slowtime = opts.slowtime
-  // this.chindings = opts.chindings
-  // this.cache = opts.cache
-  // this.formatOpts = opts.formatOpts
-
-  // if (opts.level && opts.levelVal) {
-  //   var levelIsStandard = isStandardLevel(opts.level)
-  //   var valIsStandard = isStandardLevelVal(opts.levelVal)
-  //   if (valIsStandard) throw new Error('level value is already used: ' + opts.levelVal)
-  //   if (levelIsStandard === false && valIsStandard === false) this.addLevel(opts.level, opts.levelVal)
-  // }
-  // this._setLevel(opts.level)
-  // this._baseLog = flatstr(baseLog +
-  //   (this.name === undefined ? '' : '"name":' + this.stringify(this.name) + ','))
-
-  // if (opts.timestamp === false) {
-  //   this.time = getNoTime
-  // } else if (opts.slowtime) {
-  //   this.time = getSlowTime
-  // } else {
-  //   this.time = getTime
-  // }
 }
 
 Pino.prototype = new EventEmitter()
