@@ -105,3 +105,26 @@ test('err serializer', function (t) {
   instance.level = name
   instance[name]({ err })
 })
+
+test('an error with statusCode property is not confused for a http response', function (t) {
+  t.plan(2)
+  var err = Object.assign(new Error('StatusCodeErr'), { statusCode: 500 })
+  var instance = pino(sink(function (chunk, enc, cb) {
+    t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
+    delete chunk.time
+    t.deepEqual(chunk, {
+      pid: pid,
+      hostname: hostname,
+      level: level,
+      type: 'Error',
+      msg: err.message,
+      stack: err.stack,
+      statusCode: err.statusCode,
+      v: 1
+    })
+    cb()
+  }))
+
+  instance.level = name
+  instance[name](err)
+})
