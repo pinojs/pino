@@ -138,11 +138,9 @@ function pino (opts, stream) {
 
 defineLevelsProperty(pino)
 
-function Pino (opts, stream) {
-  // We define the levels property at construction so that state does
-  // not get shared between instances.
-  defineLevelsProperty(this)
-  this.stream = stream
+// Must be invoked via .call() to retain speed of inlining into the
+// Pino constructor.
+function applyOptions (opts) {
   this.serializers = opts.serializers
   this.stringify = opts.stringify
   this.end = opts.end
@@ -170,6 +168,41 @@ function Pino (opts, stream) {
   } else {
     this.time = getTime
   }
+}
+
+function Pino (opts, stream) {
+  // We define the levels property at construction so that state does
+  // not get shared between instances.
+  defineLevelsProperty(this)
+  this.stream = stream
+  applyOptions.call(this, opts)
+  // this.serializers = opts.serializers
+  // this.stringify = opts.stringify
+  // this.end = opts.end
+  // this.name = opts.name
+  // this.timestamp = opts.timestamp
+  // this.slowtime = opts.slowtime
+  // this.chindings = opts.chindings
+  // this.cache = opts.cache
+  // this.formatOpts = opts.formatOpts
+
+  // if (opts.level && opts.levelVal) {
+  //   var levelIsStandard = isStandardLevel(opts.level)
+  //   var valIsStandard = isStandardLevelVal(opts.levelVal)
+  //   if (valIsStandard) throw new Error('level value is already used: ' + opts.levelVal)
+  //   if (levelIsStandard === false && valIsStandard === false) this.addLevel(opts.level, opts.levelVal)
+  // }
+  // this._setLevel(opts.level)
+  // this._baseLog = flatstr(baseLog +
+  //   (this.name === undefined ? '' : '"name":' + this.stringify(this.name) + ','))
+
+  // if (opts.timestamp === false) {
+  //   this.time = getNoTime
+  // } else if (opts.slowtime) {
+  //   this.time = getSlowTime
+  // } else {
+  //   this.time = getTime
+  // }
 }
 
 Pino.prototype = new EventEmitter()
@@ -274,7 +307,7 @@ function getSlowTime () {
 
 Pino.prototype.child = function child (bindings) {
   if (!bindings) {
-    throw new Error('missing bindings for child Pino')
+    throw Error('missing bindings for child Pino')
   }
 
   var data = ','
@@ -303,7 +336,10 @@ Pino.prototype.child = function child (bindings) {
     formatOpts: this.formatOpts
   }
 
-  return new Pino(opts, this.stream)
+  var _child = Object.create(this)
+  _child.stream = this.stream
+  applyOptions.call(_child, opts)
+  return _child
 }
 
 Pino.prototype.write = function (obj, msg, num) {
