@@ -205,7 +205,7 @@ Object.defineProperty(Pino.prototype, 'levelVal', {
         this[key] = noop
         continue
       }
-      this[key] = isStandardLevel(key) ? Pino.prototype[key] : genLog(num)
+      this[key] = isStandardLevel(key) ? Pino.prototype[key] : genLog(this.levels.values[key])
     }
   }
 })

@@ -80,6 +80,15 @@ test('reject already known values', function (t) {
   }
 })
 
+test('level numbers are logged correctly after level change', function (t) {
+  t.plan(1)
+  var log = pino({level: 'foo', levelVal: 25}, sink(function (chunk, enc, cb) {
+    t.is(chunk.level, 25)
+  }))
+  log.level = 'debug'
+  log.foo('bar')
+})
+
 test('levels state is not shared between instances', function (t) {
   t.plan(2)
 
