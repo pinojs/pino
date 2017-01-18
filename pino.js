@@ -388,14 +388,6 @@ function countInterp (s, i) {
   return n
 }
 
-function isHttpRequest (m) {
-  return m.method && m.headers && m.socket
-}
-
-function isHttpResponse (m) {
-  return typeof m.setHeader === 'function'
-}
-
 function genLog (z) {
   return function LOG (a, b, c, d, e, f, g, h, i, j, k) {
     var l = 0
@@ -408,9 +400,9 @@ function genLog (z) {
       n = [b, c, d, e, f, g, h, i, j, k]
       l = 1
 
-      if (isHttpRequest(m)) {
+      if (m.method && m.headers && m.socket) {
         m = mapHttpRequest(m)
-      } else if (isHttpResponse(m)) {
+      } else if (typeof m.setHeader === 'function') {
         m = mapHttpResponse(m)
       }
     } else {
