@@ -67,7 +67,7 @@ var isStandardLevelVal = (function () {
   }
 }())
 
-// level string catch
+// level string cache
 var lscache = Object.keys(nums).reduce(function (o, k) {
   o[k] = flatstr('"level":' + Number(k))
   return o
@@ -138,8 +138,9 @@ function pino (opts, stream) {
 
 defineLevelsProperty(pino)
 
-function Pino (opts, stream) {
-  this.stream = stream
+// Must be invoked via .call() to retain speed of inlining into the
+// Pino constructor.
+function applyOptions (opts) {
   this.serializers = opts.serializers
   this.stringify = opts.stringify
   this.end = opts.end
@@ -169,8 +170,15 @@ function Pino (opts, stream) {
   }
 }
 
+function Pino (opts, stream) {
+  // We define the levels property at construction so that state does
+  // not get shared between instances.
+  defineLevelsProperty(this)
+  this.stream = stream
+  applyOptions.call(this, opts)
+}
+
 Pino.prototype = new EventEmitter()
-defineLevelsProperty(Pino.prototype)
 
 Pino.prototype.fatal = genLog(levels.fatal)
 Pino.prototype.error = genLog(levels.error)
@@ -197,7 +205,7 @@ Object.defineProperty(Pino.prototype, 'levelVal', {
         this[key] = noop
         continue
       }
-      this[key] = isStandardLevel(key) ? Pino.prototype[key] : genLog(num)
+      this[key] = isStandardLevel(key) ? Pino.prototype[key] : genLog(this.levels.values[key])
     }
   }
 })
@@ -220,6 +228,10 @@ Object.defineProperty(Pino.prototype, 'level', {
   set: Pino.prototype._setLevel
 })
 
+Object.defineProperty(Pino.prototype, '_lscache', {
+  value: copy({}, lscache)
+})
+
 Object.defineProperty(
   Pino.prototype,
   'LOG_VERSION',
@@ -230,7 +242,7 @@ Pino.prototype.asJson = function asJson (obj, msg, num) {
   if (!msg && obj instanceof Error) {
     msg = obj.message
   }
-  var data = this._baseLog + lscache[num] + this.time()
+  var data = this._baseLog + this._lscache[num] + this.time()
   // to catch both null and undefined
   /* eslint-disable eqeqeq */
   if (msg != undefined) {
@@ -268,7 +280,7 @@ function getSlowTime () {
 
 Pino.prototype.child = function child (bindings) {
   if (!bindings) {
-    throw new Error('missing bindings for child Pino')
+    throw Error('missing bindings for child Pino')
   }
 
   var data = ','
@@ -297,7 +309,10 @@ Pino.prototype.child = function child (bindings) {
     formatOpts: this.formatOpts
   }
 
-  return new Pino(opts, this.stream)
+  var _child = Object.create(this)
+  _child.stream = this.stream
+  applyOptions.call(_child, opts)
+  return _child
 }
 
 Pino.prototype.write = function (obj, msg, num) {
@@ -328,7 +343,8 @@ Pino.prototype.addLevel = function addLevel (name, lvl) {
   if (this.levels.labels.hasOwnProperty(lvl)) return false
   this.levels.values[name] = lvl
   this.levels.labels[lvl] = name
-  lscache[lvl] = flatstr('"level":' + Number(lvl))
+  this._lscache[lvl] = flatstr('"level":' + Number(lvl))
+  this[name] = genLog(lvl)
   return true
 }
 
