@@ -113,6 +113,13 @@ test('reject already known values', function (t) {
   }
 })
 
+test('reject values of Infinity', function (t) {
+  t.plan(1)
+  t.throws(function () {
+    pino({level: 'foo', levelVal: Infinity})
+  }, /.*level value is already used.*/)
+})
+
 test('level numbers are logged correctly after level change', function (t) {
   t.plan(1)
   var log = pino({level: 'foo', levelVal: 25}, sink(function (chunk, enc, cb) {
