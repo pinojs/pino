@@ -342,3 +342,38 @@ test('correctly support node v4+ stderr', function (t) {
 
   instance.fatal('a message')
 })
+
+test('normalize number to string', function (t) {
+  var instance = pino(sink(function (chunk, enc, cb) {
+    delete chunk.time
+    t.deepEqual(chunk, {
+      pid: pid,
+      hostname: hostname,
+      level: 30,
+      msg: '1',
+      v: 1
+    })
+    t.end()
+    cb()
+  }))
+
+  instance.info(1)
+})
+
+test('normalize number to string with an object', function (t) {
+  var instance = pino(sink(function (chunk, enc, cb) {
+    delete chunk.time
+    t.deepEqual(chunk, {
+      pid: pid,
+      hostname: hostname,
+      level: 30,
+      msg: '1',
+      answer: 42,
+      v: 1
+    })
+    t.end()
+    cb()
+  }))
+
+  instance.info({ answer: 42 }, 1)
+})
