@@ -418,7 +418,7 @@ function genLog (z) {
 
       if (m.method && m.headers && m.socket) {
         m = mapHttpRequest(m)
-      } else if (m.statusCode) {
+      } else if (typeof m.setHeader === 'function') {
         m = mapHttpResponse(m)
       }
     } else {
