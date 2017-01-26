@@ -377,3 +377,21 @@ test('normalize number to string with an object', function (t) {
 
   instance.info({ answer: 42 }, 1)
 })
+
+test('handles objects with null prototype', function (t) {
+  var instance = pino(sink(function (chunk, enc, cb) {
+    delete chunk.time
+    t.deepEqual(chunk, {
+      pid: pid,
+      hostname: hostname,
+      level: 30,
+      test: 'test',
+      v: 1
+    })
+    t.end()
+    cb()
+  }))
+  var o = Object.create(null)
+  o.test = 'test'
+  instance.info(o)
+})

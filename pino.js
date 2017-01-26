@@ -172,7 +172,7 @@ Pino.prototype.asJson = function asJson (obj, msg, num) {
     }
     for (var key in obj) {
       value = obj[key]
-      if (obj.hasOwnProperty(key) && value !== undefined) {
+      if ((!obj.hasOwnProperty || obj.hasOwnProperty(key)) && value !== undefined) {
         value = this.stringify(this.serializers[key] ? this.serializers[key](value) : value)
         if (value !== undefined) {
           data += ',"' + key + '":' + value
