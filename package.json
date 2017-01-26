@@ -14,7 +14,8 @@
     "usage.txt",
     "test",
     "docs",
-    "example.js"
+    "example.js",
+    "lib"
   ],
   "scripts": {
     "browser-test": "zuul tape test/browser.test.js --local",
