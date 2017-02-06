@@ -1,8 +1,8 @@
 # Table of Contents
 
-+ [Constructor](#constructor)
-  * [.pretty](#pretty)
-+ [Logger](#logger)
++ [pino](#constructor)
++ [pino.pretty](#pretty)
++ [Logger Instance](#logger)
   * [.child](#child)
   * [.level](#level)
   * [.fatal](#fatal)
