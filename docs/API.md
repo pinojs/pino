@@ -53,6 +53,8 @@
     Default: 'info'.
   * `levelVal` (integer): when defining a custom log level via `level`, set to an
     integer value to define the new level. Default: `undefined`.
+  * `prettyPrint` (boolean|object): enables [pino.pretty](#pretty). This is intended for non-production
+    configurations. This may be set to a configuration object as outlinedin [pino.pretty](#pretty). Default: `false`.
   * `enabled` (boolean): enables logging. Default: `true`
 + `stream` (Writable): a writable stream where the logs will be written.
   Deafult: `process.stdout`
@@ -83,6 +85,8 @@ Returns a new [logger](#logger) instance.
   timestamp to ISO 8601 date format, and reserialize the JSON (equivalent to `pino -t`).
   * `formatter` (function): a custom function to format the line, is passed the
   JSON object as an argument and should return a string value.
+  * `levelFirst` (boolean): if set to `true`, it will print the name of the log
+  level as the first field in the log line. Default: `false`.
 
 ### Example:
 ```js
@@ -102,6 +106,10 @@ log.child({ widget: 'bar' }).warn('hello 2')
 
 ### Discussion:
 Provides access to the [CLI](cli.md) log prettifier as an API.
+
+This can also be enabled via the [constructor](#constructor) by setting the
+`prettyPrint` option to either `true` or a configuration object described
+in this section.
 
 <a id="logger"></a>
 # Logger
