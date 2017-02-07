@@ -54,7 +54,7 @@
   * `levelVal` (integer): when defining a custom log level via `level`, set to an
     integer value to define the new level. Default: `undefined`.
   * `prettyPrint` (boolean|object): enables [pino.pretty](#pretty). This is intended for non-production
-    configurations. This may be set to a configuration object as outlinedin [pino.pretty](#pretty). Default: `false`.
+    configurations. This may be set to a configuration object as outlined in [pino.pretty](#pretty). Default: `false`.
   * `enabled` (boolean): enables logging. Default: `true`
 + `stream` (Writable): a writable stream where the logs will be written.
   Deafult: `process.stdout`
