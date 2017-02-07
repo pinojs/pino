@@ -3,6 +3,7 @@
 var stringifySafe = require('fast-safe-stringify')
 var EventEmitter = require('events').EventEmitter
 var fs = require('fs')
+var pump = require('pump')
 var flatstr = require('flatstr')
 var pretty = require('./pretty')
 var events = require('./lib/events')
@@ -38,7 +39,7 @@ function pino (opts, stream) {
   if (iopts.prettyPrint) {
     var pstream = pretty(iopts.prettyPrint)
     var origStream = istream
-    pstream.pipe(origStream)
+    pump(pstream, origStream)
     istream = pstream
   }
 
