@@ -3,7 +3,9 @@
 var stringifySafe = require('fast-safe-stringify')
 var EventEmitter = require('events').EventEmitter
 var fs = require('fs')
+var pump = require('pump')
 var flatstr = require('flatstr')
+var pretty = require('./pretty')
 var events = require('./lib/events')
 var levels = require('./lib/levels')
 var tools = require('./lib/tools')
@@ -20,6 +22,7 @@ var defaultOptions = {
   extreme: false,
   level: 'info',
   levelVal: undefined,
+  prettyPrint: false,
   enabled: true
 }
 
@@ -30,8 +33,17 @@ function pino (opts, stream) {
     istream = iopts
     iopts = defaultOptions
   }
-  istream = istream || process.stdout
   iopts = Object.assign({}, defaultOptions, iopts)
+  if (iopts.extreme && iopts.prettyPrint) throw Error('cannot enable pretty print in extreme mode')
+  istream = istream || process.stdout
+  if (iopts.prettyPrint) {
+    var pstream = pretty(iopts.prettyPrint)
+    var origStream = istream
+    pump(pstream, origStream, function (err) {
+      if (err) logger.emit('error', err)
+    })
+    istream = pstream
+  }
 
   // internal options
   iopts.stringify = iopts.safe ? stringifySafe : JSON.stringify
@@ -259,7 +271,7 @@ module.exports.stdSerializers = {
   res: serializers.asResValue,
   err: serializers.asErrValue
 }
-module.exports.pretty = require('./pretty')
+module.exports.pretty = pretty
 Object.defineProperty(
   module.exports,
   'LOG_VERSION',

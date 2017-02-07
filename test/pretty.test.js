@@ -3,6 +3,9 @@
 var test = require('tap').test
 var pino = require('../')
 var os = require('os')
+var path = require('path')
+var writeStream = require('flush-write-stream')
+var fork = require('child_process').fork
 var split = require('split2')
 var hostname = os.hostname()
 
@@ -185,4 +188,34 @@ test('accept customLogLevvel', function (t) {
   var instance = pino({level: 'testCustom', levelVal: 35}, pretty)
 
   instance.testCustom('test message')
+})
+
+test('can be enabled via constructor', function (t) {
+  t.plan(1)
+  var actual = ''
+  var child = fork(path.join(__dirname, 'fixtures', 'pretty', 'basic.js'), {silent: true})
+
+  child.stdout.pipe(writeStream(function (s, enc, cb) {
+    actual += s
+    cb()
+  }))
+
+  child.on('close', function () {
+    t.notEqual(actual.match(/\(123456 on abcdefghijklmnopqr\): h/), null)
+  })
+})
+
+test('can be enabled via constructor with pretty configuration', function (t) {
+  t.plan(1)
+  var actual = ''
+  var child = fork(path.join(__dirname, 'fixtures', 'pretty', 'levelFirst.js'), {silent: true})
+
+  child.stdout.pipe(writeStream(function (s, enc, cb) {
+    actual += s
+    cb()
+  }))
+
+  child.on('close', function () {
+    t.notEqual(actual.match(/^INFO.*h/), null)
+  })
 })
