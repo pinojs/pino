@@ -39,7 +39,9 @@ function pino (opts, stream) {
   if (iopts.prettyPrint) {
     var pstream = pretty(iopts.prettyPrint)
     var origStream = istream
-    pump(pstream, origStream)
+    pump(pstream, origStream, function (err) {
+      if (err) logger.emit('error', err)
+    })
     istream = pstream
   }
 
