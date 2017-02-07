@@ -1,7 +1,7 @@
 # Transports
 
 A transport in most logging libraries is something that runs in-process to
-perform some operation with the finalized log line. For example, a tranport
+perform some operation with the finalized log line. For example, a transport
 might send the log line to a standard syslog server after processing the log
 line and reformatting it.
 
