@@ -23,7 +23,8 @@ var defaultOptions = {
   level: 'info',
   levelVal: undefined,
   prettyPrint: false,
-  onTerminated: function () {
+  onTerminated: function (eventName, err) {
+    if (err) return process.exit(1)
     process.exit(0)
   },
   enabled: true

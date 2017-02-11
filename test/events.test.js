@@ -78,7 +78,7 @@ test('terminates when uncaughtException is fired without onTerminate registered'
   }))
 
   child.on('exit', function (code) {
-    t.is(code, 0)
+    t.is(code, 1)
   })
 
   child.on('close', function () {
