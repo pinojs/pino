@@ -23,6 +23,9 @@ var defaultOptions = {
   level: 'info',
   levelVal: undefined,
   prettyPrint: false,
+  onTerminated: function () {
+    process.exit(0)
+  },
   enabled: true
 }
 
@@ -65,13 +68,13 @@ function pino (opts, stream) {
     if (isBlockable === false && settleTries > 10) {
       return logger.emit('error', Error('stream must have a file descriptor in extreme mode'))
     } else if (isBlockable === true) {
-      return events.onExit(extremeModeExitHandler)
+      return events(logger, extremeModeExitHandler)
     }
     settleTries += 1
     setTimeout(waitForFDSettle, 100)
   }
 
-  function extremeModeExitHandler (code, evt) {
+  function extremeModeExitHandler () {
     var buf = iopts.cache.buf
     if (buf) {
       // We need to block the process exit long enough to flush the buffer
@@ -79,19 +82,6 @@ function pino (opts, stream) {
       // write directly to the stream's file descriptor.
       var fd = (istream.fd) ? istream.fd : istream._handle.fd
       fs.writeSync(fd, buf)
-    }
-    function eventFilter (evt) {
-      var e1 = evt + '' !== events.onExit.passCode + ''
-      var e2 = evt + '' !== events.onExit.insertCode + ''
-      return e1 && e2
-    }
-    var hasEvents = !process._events[evt] ||
-      process._events[evt].length < 2 ||
-      !process._events[evt].filter(eventFilter).length
-    if (hasEvents) {
-      process.exit(code)
-    } else {
-      return 'no exit'
     }
   }
 

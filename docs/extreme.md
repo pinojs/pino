@@ -37,6 +37,22 @@ This has a couple of important caveats:
     process.exit(1)
   })
   ```
+* Pino will register handlers for the following process events/signals so that
+  Pino can flush the extreme mode buffer:
+
+  + `beforeExit`
+  + `exit`
+  + `uncaughtException`
+  + `SIGHUP`
+  + `SIGINT`
+  + `SIGQUIT`
+  + `SIGTERM`
+
+  In all of these cases, the process is in a state that it *must* terminate.
+  Thus, if you do not register an `onTerminated` function when constructing
+  your Pino instance (see [pino#constructor](API.md#constructor)), then Pino
+  will invoke `process.exit(0)`. Otherwise, it is left up to you to fully
+  terminate the process.
 
 So in summary, only use extreme mode if you're doing an extreme amount of
 logging, and you're happy in some scenarios to lose the most recent logs.

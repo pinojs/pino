@@ -55,6 +55,10 @@
     integer value to define the new level. Default: `undefined`.
   * `prettyPrint` (boolean|object): enables [pino.pretty](#pretty). This is intended for non-production
     configurations. This may be set to a configuration object as outlined in [pino.pretty](#pretty). Default: `false`.
+  * `onTerminated` (function): this function will be invoked during process shutdown when `extreme` is set to `true`.
+    The signature of the function is `onTerminated(eventName, err)`. If you do not specify a function, Pino will
+    invoke `process.exit(0)`. If you do specify a function, it is up to you to terminate the process; you **must**
+    perform only synchronous operations at this point. See [Extreme mode explained](extreme.md) for more detail.
   * `enabled` (boolean): enables logging. Default: `true`
 + `stream` (Writable): a writable stream where the logs will be written.
   Deafult: `process.stdout`
