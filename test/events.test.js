@@ -48,7 +48,7 @@ test('terminates when uncaughtException is fired with onTerminate registered', f
   t.plan(3)
   var output = ''
   var errorOutput = ''
-  var child = spawn(process.argv0, [path.join(fixturesPath, 'uncaughtException.js')], {silent: true})
+  var child = spawn(process.argv[0], [path.join(fixturesPath, 'uncaughtException.js')], {silent: true})
 
   child.stdout.pipe(writeStream(function (s, enc, cb) {
     output += s
@@ -70,7 +70,7 @@ test('terminates when uncaughtException is fired with onTerminate registered', f
 test('terminates when uncaughtException is fired without onTerminate registered', function (t) {
   t.plan(2)
   var output = ''
-  var child = spawn(process.argv0, [path.join(fixturesPath, 'uncaughtException-noTerminate.js')], {silent: true})
+  var child = spawn(process.argv[0], [path.join(fixturesPath, 'uncaughtException-noTerminate.js')], {silent: true})
 
   child.stdout.pipe(writeStream(function (s, enc, cb) {
     output += s
