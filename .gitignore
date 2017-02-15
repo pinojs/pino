@@ -42,3 +42,6 @@ profile-*
 # JetBrains IntelliJ IDEA
 .idea
 *.iml
+
+# VS Code
+.vscode/

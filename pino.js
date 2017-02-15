@@ -23,6 +23,10 @@ var defaultOptions = {
   level: 'info',
   levelVal: undefined,
   prettyPrint: false,
+  onTerminated: function (eventName, err) {
+    if (err) return process.exit(1)
+    process.exit(0)
+  },
   enabled: true
 }
 
@@ -59,35 +63,31 @@ function pino (opts, stream) {
     iopts.level = 'silent'
   }
 
-  var logger = new Pino(iopts, istream)
-  if (iopts.cache) {
-    // setImmediate is causing a very weird crash:
-    //    Assertion failed: (cb_v->IsFunction()), function MakeCallback...
-    // but setTimeout isn't *shrug*
-    setTimeout(function () {
-      if (!tools.streamIsBlockable(istream)) {
-        logger.emit('error', new Error('stream must have a file descriptor in extreme mode'))
-      }
-    }, 100)
-
-    events.onExit(function (code, evt) {
-      var buf = iopts.cache.buf
-      if (buf) {
-        // We need to block the process exit long enough to flush the buffer
-        // to the destination stream. We do that by forcing a synchronous
-        // write directly to the stream's file descriptor.
-        var fd = (istream.fd) ? istream.fd : istream._handle.fd
-        fs.writeSync(fd, buf)
-      }
-      if (!process._events[evt] || process._events[evt].length < 2 || !process._events[evt].filter(function (f) {
-        return f + '' !== events.onExit.passCode + '' && f + '' !== events.onExit.insertCode + ''
-      }).length) {
-        process.exit(code)
-      } else {
-        return 'no exit'
-      }
-    })
+  var settleTries = 0
+  function waitForFDSettle () {
+    var isBlockable = tools.streamIsBlockable(istream)
+    if (isBlockable === false && settleTries > 10) {
+      return logger.emit('error', Error('stream must have a file descriptor in extreme mode'))
+    } else if (isBlockable === true) {
+      return events(logger, extremeModeExitHandler)
+    }
+    settleTries += 1
+    setTimeout(waitForFDSettle, 100)
   }
+
+  function extremeModeExitHandler () {
+    var buf = iopts.cache.buf
+    if (buf) {
+      // We need to block the process exit long enough to flush the buffer
+      // to the destination stream. We do that by forcing a synchronous
+      // write directly to the stream's file descriptor.
+      var fd = (istream.fd) ? istream.fd : istream._handle.fd
+      fs.writeSync(fd, buf)
+    }
+  }
+
+  var logger = new Pino(iopts, istream)
+  if (iopts.cache) setTimeout(waitForFDSettle, 100)
 
   return logger
 }
