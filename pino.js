@@ -10,6 +10,7 @@ var events = require('./lib/events')
 var levels = require('./lib/levels')
 var tools = require('./lib/tools')
 var serializers = require('./lib/serializers')
+var stacktrace = require('stacktrace-js')
 
 var LOG_VERSION = 1
 
@@ -27,7 +28,8 @@ var defaultOptions = {
     if (err) return process.exit(1)
     process.exit(0)
   },
-  enabled: true
+  enabled: true,
+  caller: false
 }
 
 function pino (opts, stream) {
@@ -192,6 +194,10 @@ Pino.prototype.asJson = function asJson (obj, msg, num) {
       }
     }
   }
+  if (this.caller) {
+    data += ',"caller":"' + stacktrace.getSync()[3] + '"'
+  }
+
   return data + this.chindings + this.end
 }
 
