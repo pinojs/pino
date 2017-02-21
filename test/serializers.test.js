@@ -17,8 +17,8 @@ test('child does not override parent serializers', function (t) {
   var parent = pino({ serializers: parentSerializers })
   var child = parent.child({ serializers: childSerializers })
 
-  t.deepEqual(parent.serializers, parentSerializers)
-  t.deepEqual(child.serializers, childSerializers)
+  t.equal(parent.serializers.test(), 'parent')
+  t.equal(child.serializers.test(), 'child')
 })
 
 test('children inherit parent serializers', function (t) {
@@ -27,7 +27,7 @@ test('children inherit parent serializers', function (t) {
   var parent = pino({ serializers: parentSerializers })
   var child = parent.child({a: 'property'})
 
-  t.deepEqual(child.serializers, parentSerializers)
+  t.equal(child.serializers.test(), 'parent')
 })
 
 test('children serializers get called', function (t) {
@@ -70,7 +70,7 @@ test('children serializers get called when inherited from parent', function (t) 
 })
 
 test('non overriden serializers are available in the children', function (t) {
-  t.plan(3)
+  t.plan(4)
   var pSerializers = {
     onlyParent: function () { return 'parent' },
     shared: function () { return 'parent' }
@@ -87,4 +87,5 @@ test('non overriden serializers are available in the children', function (t) {
   t.equal(child.serializers.shared(), 'child')
   t.equal(child.serializers.onlyParent(), 'parent')
   t.equal(child.serializers.onlyChild(), 'child')
+  t.notOk(parent.serializers.onlyChild)
 })
