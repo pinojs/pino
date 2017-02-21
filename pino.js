@@ -215,7 +215,7 @@ Pino.prototype.child = function child (bindings) {
   var opts = {
     level: bindings.level || this.level,
     levelVal: levels.isStandardLevelVal(this.levelVal) ? undefined : this.levelVal,
-    serializers: bindings.hasOwnProperty('serializers') ? Object.assign(this.serializers, bindings.serializers) : this.serializers,
+    serializers: bindings.hasOwnProperty('serializers') ? Object.assign({}, this.serializers, bindings.serializers) : this.serializers,
     stringify: this.stringify,
     end: this.end,
     name: this.name,
