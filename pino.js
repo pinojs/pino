@@ -104,12 +104,12 @@ function Pino (opts, stream) {
 
 Pino.prototype = new EventEmitter()
 
-Pino.prototype.fatal = tools.genLog(levels.levels.fatal)
-Pino.prototype.error = tools.genLog(levels.levels.error)
-Pino.prototype.warn = tools.genLog(levels.levels.warn)
-Pino.prototype.info = tools.genLog(levels.levels.info)
-Pino.prototype.debug = tools.genLog(levels.levels.debug)
-Pino.prototype.trace = tools.genLog(levels.levels.trace)
+Pino.prototype.fatal = Pino.prototype._fatal = tools.genLog(levels.levels.fatal)
+Pino.prototype.error = Pino.prototype._error = tools.genLog(levels.levels.error)
+Pino.prototype.warn = Pino.prototype._warn = tools.genLog(levels.levels.warn)
+Pino.prototype.info = Pino.prototype._info = tools.genLog(levels.levels.info)
+Pino.prototype.debug = Pino.prototype._debug = tools.genLog(levels.levels.debug)
+Pino.prototype.trace = Pino.prototype._trace = tools.genLog(levels.levels.trace)
 
 Object.defineProperty(Pino.prototype, 'levelVal', {
   get: function getLevelVal () {
@@ -129,7 +129,7 @@ Object.defineProperty(Pino.prototype, 'levelVal', {
         this[key] = tools.noop
         continue
       }
-      this[key] = levels.isStandardLevel(key) ? Pino.prototype[key] : tools.genLog(this.levels.values[key])
+      this[key] = this[`_${key}`]
     }
   }
 })
@@ -261,7 +261,7 @@ Pino.prototype.addLevel = function addLevel (name, lvl) {
   this.levels.values[name] = lvl
   this.levels.labels[lvl] = name
   this._lscache[lvl] = flatstr('"level":' + Number(lvl))
-  this[name] = tools.genLog(lvl)
+  this[name] = this[`_${name}`] = tools.genLog(lvl)
   return true
 }
 
