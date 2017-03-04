@@ -110,6 +110,7 @@ Pino.prototype.warn = tools.genLog(levels.levels.warn)
 Pino.prototype.info = tools.genLog(levels.levels.info)
 Pino.prototype.debug = tools.genLog(levels.levels.debug)
 Pino.prototype.trace = tools.genLog(levels.levels.trace)
+Pino.prototype.silent = tools.noop
 
 Object.defineProperty(Pino.prototype, 'levelVal', {
   get: function getLevelVal () {
