@@ -146,6 +146,35 @@ test('silent level', function (t) {
   t.end()
 })
 
+test('silent is a noop', function (t) {
+  var instance = pino({
+    level: 'silent'
+  }, sink(function (chunk, enc, cb) {
+    t.fail('no data should be logged')
+  }))
+
+  instance['silent']('hello world')
+  t.end()
+})
+
+test('silent stays a noop after level changes', function (t) {
+  var noop = require('../lib/tools').noop
+  var instance = pino({
+    level: 'silent'
+  }, sink(function (chunk, enc, cb) {
+    t.fail('no data should be logged')
+  }))
+
+  instance.level = 'trace'
+  t.notEqual(instance[instance.level], noop)
+
+  instance.level = 'silent'
+  instance['silent']('hello world')
+  t.is(instance[instance.level], noop)
+
+  t.end()
+})
+
 test('exposed levels', function (t) {
   t.plan(1)
   t.deepEqual(Object.keys(pino.levels.values), [
