@@ -24,5 +24,16 @@ function check (t, chunk, level, msg) {
   })
 }
 
+function check2 (t, chunk, wanted) {
+  t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
+  delete chunk.time
+  t.deepEqual(chunk, Object.assign({
+    pid: pid,
+    hostname: hostname,
+    v: 1
+  }, wanted))
+}
+
 module.exports.sink = sink
 module.exports.check = check
+module.exports.check2 = check2

@@ -4,6 +4,7 @@ var test = require('tap').test
 var pino = require('../')
 var sink = require('./helper').sink
 var check = require('./helper').check
+var check2 = require('./helper').check2
 
 test('set the level by string', function (t) {
   t.plan(4)
@@ -218,6 +219,69 @@ test('setting level in child', function (t) {
   instance.info('hello world')
   instance.error('this is an error')
   instance.fatal('this is fatal')
+})
+
+test('level as object, config before child', function (t) {
+  t.plan(6)
+  var expected = [{
+    level: 30,
+    msg: 'hello from parent'
+  }, {
+    name: 'debugme1',
+    level: 30,
+    msg: 'hello from child'
+  }, {
+    name: 'debugme1',
+    level: 20,
+    msg: 'child debug'
+  }]
+  var instance = pino({
+    level: { 'debugme*': 'debug', '*': 'info' }
+  }, sink(function (chunk, enc, cb) {
+    var wanted = expected.shift()
+    check2(t, chunk, wanted)
+    cb()
+  }))
+  var child = instance.child({ name: 'debugme1' })
+
+  instance.info('hello from parent')
+  child.info('hello from child')
+  instance.debug('parent debug')
+  child.debug('child debug')
+
+  t.end()
+})
+
+test('level as object, dynamic config', function (t) {
+  t.plan(6)
+  var expected = [{
+    level: 30,
+    msg: 'hello from parent'
+  }, {
+    name: 'debugme1',
+    level: 30,
+    msg: 'hello from child'
+  }, {
+    name: 'debugme1',
+    level: 20,
+    msg: 'child debug'
+  }]
+  var instance = pino({
+    level: 'info'
+  }, sink(function (chunk, enc, cb) {
+    var wanted = expected.shift()
+    check2(t, chunk, wanted)
+    cb()
+  }))
+  var child = instance.child({ name: 'debugme1' })
+  instance.level = { 'debugme*': 'debug', '*': 'info' }
+
+  instance.info('hello from parent')
+  child.info('hello from child')
+  instance.debug('parent debug')
+  child.debug('child debug')
+
+  t.end()
 })
 
 test('level-change event', function (t) {
