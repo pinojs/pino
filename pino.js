@@ -241,7 +241,7 @@ Pino.prototype.child = function child (bindings) {
     serializers: bindings.hasOwnProperty('serializers') ? Object.assign({}, this.serializers, bindings.serializers) : this.serializers,
     stringify: this.stringify,
     end: this.end,
-    name: this.name,
+    name: bindings.name || this.name,
     timestamp: this.timestamp,
     slowtime: this.slowtime,
     chindings: data,
