@@ -58,6 +58,8 @@ function pino (opts, stream) {
     buf: ''
   }
   iopts.chindings = ''
+  iopts.levelMap = Object(null)
+  iopts.children = []
 
   if (iopts.enabled === false) {
     iopts.level = 'silent'
@@ -117,7 +119,7 @@ Object.defineProperty(Pino.prototype, 'levelVal', {
     return this._levelVal
   },
   set: function setLevelVal (num) {
-    if (typeof num === 'string') { return this._setLevel(num) }
+    if (typeof num !== 'number') { return this._setLevel(num) }
 
     if (this.emit) {
       this.emit('level-change', this.levels.labels[num], num, this.levels.labels[this._levelVal], this._levelVal)
@@ -136,6 +138,18 @@ Object.defineProperty(Pino.prototype, 'levelVal', {
 })
 
 Pino.prototype._setLevel = function _setLevel (level) {
+  if (typeof level === 'object') {
+    this.levelMap = level  // remember for future offspring
+    Object.keys(level).sort(tools.byPrecision).map((pattern) => {
+      const regexp = new RegExp('^' + pattern.replace(/\*/g, '.*?') + '$')
+      this.children.map((child) => {
+        if (child.name && regexp.test(child.name)) child._setLevel(level[pattern])
+      })
+      if (regexp.test(this.name)) this._setLevel(level[pattern])
+    })
+    return
+  }
+
   if (typeof level === 'number') {
     if (!isFinite(level)) {
       throw Error('unknown level ' + level)
@@ -213,9 +227,17 @@ Pino.prototype.child = function child (bindings) {
   }
   data = this.chindings + data.substr(0, data.length - 1)
 
+  let l = bindings.level || this.level
+  const level = this.levelMap
+  Object.keys(level).sort(tools.byPrecision).map((pattern) => {
+    const regexp = new RegExp('^' + pattern.replace(/\*/g, '.*?') + '$')
+    if (bindings.name && regexp.test(bindings.name)) l = level[pattern]
+  })
+
   var opts = {
-    level: bindings.level || this.level,
+    level: l,
     levelVal: levels.isStandardLevelVal(this.levelVal) ? undefined : this.levelVal,
+    levelMap: this.levelMap,
     serializers: bindings.hasOwnProperty('serializers') ? Object.assign({}, this.serializers, bindings.serializers) : this.serializers,
     stringify: this.stringify,
     end: this.end,
@@ -224,12 +246,14 @@ Pino.prototype.child = function child (bindings) {
     slowtime: this.slowtime,
     chindings: data,
     cache: this.cache,
+    children: [],
     formatOpts: this.formatOpts
   }
 
   var _child = Object.create(this)
   _child.stream = this.stream
   tools.applyOptions.call(_child, opts)
+  this.children.push(_child)
   return _child
 }
 
