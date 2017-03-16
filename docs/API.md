@@ -48,9 +48,10 @@
     (from 250ms down to 100ms per 10000 ops). There are trade-off's should be
     understood before usage. See [Extreme mode explained](extreme.md). Default: `false`.
   * `level` (string|object): one of `'fatal'`, `'error'`, `'warn'`, `'info`', `'debug'`,
-    `'trace'`; also `'silent'` is supported to disable logging. Any other string value
+    `'trace'`; also `'silent'` is supported to disable logging. Any other _string_ value
     defines a custom level and requires supplying a level value via `levelVal`.
-    Alternatively an object can be provided to specify different levels for (future) child loggers
+    Alternatively an object can be provided for fine-grained configuration of a logger
+     and its children (see [.level](#level) for more details).
     Default: 'info'.
   * `levelVal` (integer): when defining a custom log level via `level`, set to an
     integer value to define the new level. Default: `undefined`.
@@ -139,8 +140,9 @@ Creates a child logger, setting all key-value pairs in `bindings` as properties
 in the log lines. All serializers will be applied to the given pair.
 
 Child loggers use the same output stream as the parent and inherit the current
-log level of the parent at the time they are spawned (in case an object was set
-for the parent's level, then the log level of the matching rule).
+log level of the parent at the time they are spawned. If an object was used to
+define the parent's level, then the child will use the level specified by a
+matching rule (see discussion below).
 
 From v2.x.x the log level of a child is mutable (whereas in
 v1.x.x it was immutable), and can be set independently of the parent.
@@ -225,10 +227,13 @@ benchPinoExtremeChildChild*10000: 150.143ms
 ### Example:
 ```
 logger.level = 'info'
+```
+or
+```
 logger.level = {
-    'myobj:*': 'debug',  // child loggers whose 'name' binding matches
-    'myobj:comm:*': 'trace',  // even more info required for a subset
-    '*': 'info'  // this logger's level + default for child loggers
+    'myobj:*': 'debug',       // child loggers whose 'name' binding matches
+    'myobj:comm:*': 'trace',  //  ...even more info required for a subset
+    '*': 'info'               // this logger + default for child loggers
 }
 ```
 
@@ -249,23 +254,24 @@ The logging level is a *minimum* level. For instance if `logger.level` is
 
 You can pass `'silent'` to disable logging.
 
-It is possible to pass an object to set different levels to the logger and its
-children. The syntax for designating the target loggers is borrowed from the
-[debug](https://github.com/visionmedia/debug#wildcards) module's `DEBUG` variable
-(also supported in [pino-debug](https://github.com/pinojs/pino-debug)):
+It is possible to pass an object to set different levels for the logger and its
+children (inspired from the
+[debug](https://github.com/visionmedia/debug#wildcards) and
+[pino-debug](https://github.com/pinojs/pino-debug) modules):
++ object keys are names or patterns used to designate the target child loggers
++ object values are logging levels
++ patterns are matched using the child logger binding `'name'`, so to use this
+  feature a child should be instantiated like so:<br>
+`var myModuleLog = mainLogger.child({ name: 'mymodule', ... })`
 + use `'*'`(star) as wildcard (rules are ordered so that `'*'` will not override
 `'mylib*'`).
 
-Note that currently the following properties are _not_ supported:
+Note that currently the following properties are _not_ supported (unlike in
+`'debug'` ):
 + multiple patterns separated by `','`(comma) or `' '`(space) &ndash;declare
   several rules instead
 + exclusion patterns indicated by a leading `'-'`(minus) sign
 
-The match is done against the child logger binding `'name'`, therefore in order
-to use this feature one must instantiate children for example with:
-```
-  var myModuleLog = mainLogger.child({ name: 'mymodule', ... })
-```
 
 <a id="fatal"></a>
 ## .fatal([obj], msg, [...])

@@ -58,7 +58,7 @@ function pino (opts, stream) {
     buf: ''
   }
   iopts.chindings = ''
-  iopts.levelMap = Object(null)
+  iopts.levelMap = {}
   iopts.children = []
 
   if (iopts.enabled === false) {
