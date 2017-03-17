@@ -119,6 +119,40 @@ test('set the level via constructor', function (t) {
   instance.fatal('this is fatal')
 })
 
+test('level-change event', function (t) {
+  var instance = pino()
+  var handle = function (lvl, val, prevLvl, prevVal) {
+    t.is(lvl, 'trace')
+    t.is(val, 10)
+    t.is(prevLvl, 'info')
+    t.is(prevVal, 30)
+  }
+  instance.on('level-change', handle)
+  instance.level = 'trace'
+  instance.removeListener('level-change', handle)
+  instance.level = 'info'
+
+  var count = 0
+
+  var l1 = function () { count += 1 }
+  var l2 = function () { count += 1 }
+  var l3 = function () { count += 1 }
+  instance.on('level-change', l1)
+  instance.on('level-change', l2)
+  instance.on('level-change', l3)
+
+  instance.level = 'trace'
+  instance.removeListener('level-change', l3)
+  instance.level = 'fatal'
+  instance.removeListener('level-change', l1)
+  instance.level = 'debug'
+  instance.removeListener('level-change', l2)
+  instance.level = 'info'
+
+  t.is(count, 6)
+  t.end()
+})
+
 test('enable', function (t) {
   var instance = pino({
     level: 'trace',
@@ -218,38 +252,4 @@ test('setting level in child', function (t) {
   instance.info('hello world')
   instance.error('this is an error')
   instance.fatal('this is fatal')
-})
-
-test('level-change event', function (t) {
-  var instance = pino()
-  var handle = function (lvl, val, prevLvl, prevVal) {
-    t.is(lvl, 'trace')
-    t.is(val, 10)
-    t.is(prevLvl, 'info')
-    t.is(prevVal, 30)
-  }
-  instance.on('level-change', handle)
-  instance.level = 'trace'
-  instance.removeListener('level-change', handle)
-  instance.level = 'info'
-
-  var count = 0
-
-  var l1 = function () { count += 1 }
-  var l2 = function () { count += 1 }
-  var l3 = function () { count += 1 }
-  instance.on('level-change', l1)
-  instance.on('level-change', l2)
-  instance.on('level-change', l3)
-
-  instance.level = 'trace'
-  instance.removeListener('level-change', l3)
-  instance.level = 'fatal'
-  instance.removeListener('level-change', l1)
-  instance.level = 'debug'
-  instance.removeListener('level-change', l2)
-  instance.level = 'info'
-
-  t.is(count, 6)
-  t.end()
 })

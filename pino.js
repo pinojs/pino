@@ -102,7 +102,7 @@ function Pino (opts, stream) {
   tools.applyOptions.call(this, opts)
 }
 
-Pino.prototype = new EventEmitter()
+Pino.prototype = Object.create(EventEmitter.prototype)
 
 Pino.prototype.fatal = tools.genLog(levels.levels.fatal)
 Pino.prototype.error = tools.genLog(levels.levels.error)
