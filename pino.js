@@ -39,7 +39,7 @@ var pinoPrototype = Object.create(EventEmitter.prototype, {
     value: process.stdout,
     writable: true
   }
-    })
+})
 
 var levelMethods = ['fatal', 'error', 'warn', 'info', 'debug', 'trace']
 levelMethods.forEach(function (m) {
@@ -49,8 +49,6 @@ levelMethods.forEach(function (m) {
     writable: true
   })
 })
-  iopts.levelMap = {}
-  iopts.children = []
 
 Object.defineProperty(pinoPrototype, 'levelVal', {
   get: function getLevelVal () {
@@ -77,36 +75,36 @@ Object.defineProperty(pinoPrototype, 'levelVal', {
 
 Object.defineProperty(pinoPrototype, '_setLevel', {
   value: function _setLevel (level) {
-  if (typeof level === 'object') {
-    this.levelMap = level  // remember for future offspring
-    Object.keys(level).sort(tools.byPrecision).map((pattern) => {
-      const regexp = new RegExp('^' + pattern.replace(/\*/g, '.*?') + '$')
-      this.children.map((child) => {
-        if (child.name && regexp.test(child.name)) child._setLevel(level[pattern])
+    if (typeof level === 'object') {
+      this.levelMap = level  // remember for future offspring
+      Object.keys(level).sort(tools.byPrecision).map((pattern) => {
+        const regexp = new RegExp('^' + pattern.replace(/\*/g, '.*?') + '$')
+        this.children.map((child) => {
+          if (child.name && regexp.test(child.name)) child._setLevel(level[pattern])
+        })
+        if (regexp.test(this.name)) this._setLevel(level[pattern])
       })
-      if (regexp.test(this.name)) this._setLevel(level[pattern])
-    })
-    return
-  }
+      return
+    }
 
-  if (typeof level === 'number') {
-    if (!isFinite(level)) {
+    if (typeof level === 'number') {
+      if (!isFinite(level)) {
+        throw Error('unknown level ' + level)
+      }
+      level = this.levels.labels[level]
+    }
+
+    if (!this.levels.values[level]) {
       throw Error('unknown level ' + level)
     }
-    level = this.levels.labels[level]
+    this.levelVal = this.levels.values[level]
   }
-
-  if (!this.levels.values[level]) {
-    throw Error('unknown level ' + level)
-  }
-  this.levelVal = this.levels.values[level]
-}
 })
 
 Object.defineProperty(pinoPrototype, '_getLevel', {
   value: function _getLevel (level) {
-  return this.levels.labels[this.levelVal]
-}
+    return this.levels.labels[this.levelVal]
+  }
 })
 
 Object.defineProperty(pinoPrototype, 'level', {
@@ -127,124 +125,124 @@ Object.defineProperty(
 Object.defineProperty(pinoPrototype, 'asJson', {
   enumerable: true,
   value: function asJson (obj, msg, num) {
-  if (!msg && obj instanceof Error) {
-    msg = obj.message
-  }
-  var data = this._baseLog + this._lscache[num] + this.time()
-  // to catch both null and undefined
-  /* eslint-disable eqeqeq */
-  if (msg != undefined) {
-    data += ',"msg":' + JSON.stringify('' + msg)
-  }
-  var value
-  if (obj) {
-    if (obj.stack) {
-      data += ',"type":"Error","stack":' + this.stringify(obj.stack)
+    if (!msg && obj instanceof Error) {
+      msg = obj.message
     }
-    for (var key in obj) {
-      value = obj[key]
-      if ((!obj.hasOwnProperty || obj.hasOwnProperty(key)) && value !== undefined) {
-        value = this.stringify(this.serializers[key] ? this.serializers[key](value) : value)
-        if (value !== undefined) {
-          data += ',"' + key + '":' + value
+    var data = this._baseLog + this._lscache[num] + this.time()
+    // to catch both null and undefined
+    /* eslint-disable eqeqeq */
+    if (msg != undefined) {
+      data += ',"msg":' + JSON.stringify('' + msg)
+    }
+    var value
+    if (obj) {
+      if (obj.stack) {
+        data += ',"type":"Error","stack":' + this.stringify(obj.stack)
+      }
+      for (var key in obj) {
+        value = obj[key]
+        if ((!obj.hasOwnProperty || obj.hasOwnProperty(key)) && value !== undefined) {
+          value = this.stringify(this.serializers[key] ? this.serializers[key](value) : value)
+          if (value !== undefined) {
+            data += ',"' + key + '":' + value
+          }
         }
       }
     }
+    return data + this.chindings + this.end
   }
-  return data + this.chindings + this.end
-}
 })
 
 Object.defineProperty(pinoPrototype, 'child', {
   enumerable: true,
   value: function child (bindings) {
-  if (!bindings) {
-    throw Error('missing bindings for child Pino')
-  }
-
-  var data = ','
-  var value
-  var key
-  for (key in bindings) {
-    value = bindings[key]
-    if (key !== 'level' && key !== 'serializers' && bindings.hasOwnProperty(key) && value !== undefined) {
-      value = this.serializers[key] ? this.serializers[key](value) : value
-      data += '"' + key + '":' + this.stringify(value) + ','
+    if (!bindings) {
+      throw Error('missing bindings for child Pino')
     }
+
+    var data = ','
+    var value
+    var key
+    for (key in bindings) {
+      value = bindings[key]
+      if (key !== 'level' && key !== 'serializers' && bindings.hasOwnProperty(key) && value !== undefined) {
+        value = this.serializers[key] ? this.serializers[key](value) : value
+        data += '"' + key + '":' + this.stringify(value) + ','
+      }
+    }
+    data = this.chindings + data.substr(0, data.length - 1)
+
+    let levelChild = bindings.level || this.level
+    const level = this.levelMap
+    Object.keys(level).sort(tools.byPrecision).map((pattern) => {
+      const regexp = new RegExp('^' + pattern.replace(/\*/g, '.*?') + '$')
+      if (bindings.name && regexp.test(bindings.name)) levelChild = level[pattern]
+    })
+
+    var opts = {
+      level: levelChild,
+      levelVal: levels.isStandardLevelVal(this.levelVal) ? undefined : this.levelVal,
+      levelMap: this.levelMap,
+      serializers: bindings.hasOwnProperty('serializers') ? Object.assign({}, this.serializers, bindings.serializers) : this.serializers,
+      stringify: this.stringify,
+      end: this.end,
+      name: bindings.name || this.name,
+      timestamp: this.timestamp,
+      slowtime: this.slowtime,
+      chindings: data,
+      cache: this.cache,
+      children: [],
+      formatOpts: this.formatOpts
+    }
+
+    var _child = Object.create(this)
+    _child.stream = this.stream
+    tools.applyOptions.call(_child, opts)
+    this.children.push(_child)
+    return _child
   }
-  data = this.chindings + data.substr(0, data.length - 1)
-
-  let l = bindings.level || this.level
-  const level = this.levelMap
-  Object.keys(level).sort(tools.byPrecision).map((pattern) => {
-    const regexp = new RegExp('^' + pattern.replace(/\*/g, '.*?') + '$')
-    if (bindings.name && regexp.test(bindings.name)) l = level[pattern]
-  })
-
-  var opts = {
-    level: l,
-    levelVal: levels.isStandardLevelVal(this.levelVal) ? undefined : this.levelVal,
-    levelMap: this.levelMap,
-    serializers: bindings.hasOwnProperty('serializers') ? Object.assign({}, this.serializers, bindings.serializers) : this.serializers,
-    stringify: this.stringify,
-    end: this.end,
-    name: bindings.name || this.name,
-    timestamp: this.timestamp,
-    slowtime: this.slowtime,
-    chindings: data,
-    cache: this.cache,
-    children: [],
-    formatOpts: this.formatOpts
-  }
-
-  var _child = Object.create(this)
-  _child.stream = this.stream
-  tools.applyOptions.call(_child, opts)
-  this.children.push(_child)
-  return _child
-}
 })
 
 // should this be enumerable?
 Object.defineProperty(pinoPrototype, 'write', {
   value: function (obj, msg, num) {
-  var s = this.asJson(obj, msg, num)
-  if (!this.cache) {
-    this.stream.write(flatstr(s))
-    return
-  }
+    var s = this.asJson(obj, msg, num)
+    if (!this.cache) {
+      this.stream.write(flatstr(s))
+      return
+    }
 
-  this.cache.buf += s
-  if (this.cache.buf.length > this.cache.size) {
-    this.stream.write(flatstr(this.cache.buf))
-    this.cache.buf = ''
+    this.cache.buf += s
+    if (this.cache.buf.length > this.cache.size) {
+      this.stream.write(flatstr(this.cache.buf))
+      this.cache.buf = ''
+    }
   }
-}
 })
 
 Object.defineProperty(pinoPrototype, 'flush', {
   enumerable: true,
   value: function () {
-  if (!this.cache) {
-    return
-  }
+    if (!this.cache) {
+      return
+    }
 
-  this.stream.write(flatstr(this.cache.buf))
-  this.cache.buf = ''
-}
+    this.stream.write(flatstr(this.cache.buf))
+    this.cache.buf = ''
+  }
 })
 
 Object.defineProperty(pinoPrototype, 'addLevel', {
   enumerable: true,
   value: function addLevel (name, lvl) {
-  if (this.levels.values.hasOwnProperty(name)) return false
-  if (this.levels.labels.hasOwnProperty(lvl)) return false
-  this.levels.values[name] = lvl
-  this.levels.labels[lvl] = name
-  this._lscache[lvl] = flatstr('"level":' + Number(lvl))
-  this[name] = tools.genLog(lvl)
-  return true
-}
+    if (this.levels.values.hasOwnProperty(name)) return false
+    if (this.levels.labels.hasOwnProperty(lvl)) return false
+    this.levels.values[name] = lvl
+    this.levels.labels[lvl] = name
+    this._lscache[lvl] = flatstr('"level":' + Number(lvl))
+    this[name] = tools.genLog(lvl)
+    return true
+  }
 })
 
 function pino (opts, stream) {
@@ -275,6 +273,8 @@ function pino (opts, stream) {
     buf: ''
   }
   iopts.chindings = ''
+  iopts.levelMap = {}
+  iopts.children = []
 
   if (iopts.enabled === false) {
     iopts.level = 'silent'
