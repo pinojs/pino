@@ -30,91 +30,29 @@ var defaultOptions = {
   enabled: true
 }
 
-function pino (opts, stream) {
-  var iopts = opts
-  var istream = stream
-  if (iopts && (iopts.writable || iopts._writableState)) {
-    istream = iopts
-    iopts = defaultOptions
+var pinoPrototype = Object.create(EventEmitter.prototype, {
+  silent: {
+    value: tools.noop,
+    enumerable: true
+  },
+  stream: {
+    value: process.stdout,
+    writable: true
   }
-  iopts = Object.assign({}, defaultOptions, iopts)
-  if (iopts.extreme && iopts.prettyPrint) throw Error('cannot enable pretty print in extreme mode')
-  istream = istream || process.stdout
-  if (iopts.prettyPrint) {
-    var pstream = pretty(iopts.prettyPrint)
-    var origStream = istream
-    pump(pstream, origStream, function (err) {
-      if (err) logger.emit('error', err)
     })
-    istream = pstream
-  }
 
-  // internal options
-  iopts.stringify = iopts.safe ? stringifySafe : JSON.stringify
-  iopts.formatOpts = {lowres: true}
-  iopts.end = ',"v":' + LOG_VERSION + '}\n'
-  iopts.cache = !iopts.extreme ? null : {
-    size: 4096,
-    buf: ''
-  }
-  iopts.chindings = ''
+var levelMethods = ['fatal', 'error', 'warn', 'info', 'debug', 'trace']
+levelMethods.forEach(function (m) {
+  Object.defineProperty(pinoPrototype, m, {
+    value: tools.genLog(levels.levels[m]),
+    enumerable: true,
+    writable: true
+  })
+})
   iopts.levelMap = {}
   iopts.children = []
 
-  if (iopts.enabled === false) {
-    iopts.level = 'silent'
-  }
-
-  var settleTries = 0
-  function waitForFDSettle () {
-    var isBlockable = tools.streamIsBlockable(istream)
-    if (isBlockable === false && settleTries > 10) {
-      return logger.emit('error', Error('stream must have a file descriptor in extreme mode'))
-    } else if (isBlockable === true) {
-      return events(logger, extremeModeExitHandler)
-    }
-    settleTries += 1
-    setTimeout(waitForFDSettle, 100)
-  }
-
-  function extremeModeExitHandler () {
-    var buf = iopts.cache.buf
-    if (buf) {
-      // We need to block the process exit long enough to flush the buffer
-      // to the destination stream. We do that by forcing a synchronous
-      // write directly to the stream's file descriptor.
-      var fd = (istream.fd) ? istream.fd : istream._handle.fd
-      fs.writeSync(fd, buf)
-    }
-  }
-
-  var logger = new Pino(iopts, istream)
-  if (iopts.cache) setTimeout(waitForFDSettle, 100)
-
-  return logger
-}
-
-tools.defineLevelsProperty(pino)
-
-function Pino (opts, stream) {
-  // We define the levels property at construction so that state does
-  // not get shared between instances.
-  tools.defineLevelsProperty(this)
-  this.stream = stream
-  tools.applyOptions.call(this, opts)
-}
-
-Pino.prototype = new EventEmitter()
-
-Pino.prototype.fatal = tools.genLog(levels.levels.fatal)
-Pino.prototype.error = tools.genLog(levels.levels.error)
-Pino.prototype.warn = tools.genLog(levels.levels.warn)
-Pino.prototype.info = tools.genLog(levels.levels.info)
-Pino.prototype.debug = tools.genLog(levels.levels.debug)
-Pino.prototype.trace = tools.genLog(levels.levels.trace)
-Pino.prototype.silent = tools.noop
-
-Object.defineProperty(Pino.prototype, 'levelVal', {
+Object.defineProperty(pinoPrototype, 'levelVal', {
   get: function getLevelVal () {
     return this._levelVal
   },
@@ -132,12 +70,13 @@ Object.defineProperty(Pino.prototype, 'levelVal', {
         this[key] = tools.noop
         continue
       }
-      this[key] = levels.isStandardLevel(key) ? Pino.prototype[key] : tools.genLog(this.levels.values[key])
+      this[key] = levels.isStandardLevel(key) ? pinoPrototype[key] : tools.genLog(this.levels.values[key])
     }
   }
 })
 
-Pino.prototype._setLevel = function _setLevel (level) {
+Object.defineProperty(pinoPrototype, '_setLevel', {
+  value: function _setLevel (level) {
   if (typeof level === 'object') {
     this.levelMap = level  // remember for future offspring
     Object.keys(level).sort(tools.byPrecision).map((pattern) => {
@@ -162,27 +101,32 @@ Pino.prototype._setLevel = function _setLevel (level) {
   }
   this.levelVal = this.levels.values[level]
 }
-
-Pino.prototype._getLevel = function _getLevel (level) {
-  return this.levels.labels[this.levelVal]
-}
-
-Object.defineProperty(Pino.prototype, 'level', {
-  get: Pino.prototype._getLevel,
-  set: Pino.prototype._setLevel
 })
 
-Object.defineProperty(Pino.prototype, '_lscache', {
+Object.defineProperty(pinoPrototype, '_getLevel', {
+  value: function _getLevel (level) {
+  return this.levels.labels[this.levelVal]
+}
+})
+
+Object.defineProperty(pinoPrototype, 'level', {
+  get: pinoPrototype._getLevel,
+  set: pinoPrototype._setLevel
+})
+
+Object.defineProperty(pinoPrototype, '_lscache', {
   value: tools.copy({}, levels.lscache)
 })
 
 Object.defineProperty(
-  Pino.prototype,
+  pinoPrototype,
   'LOG_VERSION',
   {value: LOG_VERSION}
 )
 
-Pino.prototype.asJson = function asJson (obj, msg, num) {
+Object.defineProperty(pinoPrototype, 'asJson', {
+  enumerable: true,
+  value: function asJson (obj, msg, num) {
   if (!msg && obj instanceof Error) {
     msg = obj.message
   }
@@ -209,8 +153,11 @@ Pino.prototype.asJson = function asJson (obj, msg, num) {
   }
   return data + this.chindings + this.end
 }
+})
 
-Pino.prototype.child = function child (bindings) {
+Object.defineProperty(pinoPrototype, 'child', {
+  enumerable: true,
+  value: function child (bindings) {
   if (!bindings) {
     throw Error('missing bindings for child Pino')
   }
@@ -256,8 +203,11 @@ Pino.prototype.child = function child (bindings) {
   this.children.push(_child)
   return _child
 }
+})
 
-Pino.prototype.write = function (obj, msg, num) {
+// should this be enumerable?
+Object.defineProperty(pinoPrototype, 'write', {
+  value: function (obj, msg, num) {
   var s = this.asJson(obj, msg, num)
   if (!this.cache) {
     this.stream.write(flatstr(s))
@@ -270,8 +220,11 @@ Pino.prototype.write = function (obj, msg, num) {
     this.cache.buf = ''
   }
 }
+})
 
-Pino.prototype.flush = function () {
+Object.defineProperty(pinoPrototype, 'flush', {
+  enumerable: true,
+  value: function () {
   if (!this.cache) {
     return
   }
@@ -279,8 +232,11 @@ Pino.prototype.flush = function () {
   this.stream.write(flatstr(this.cache.buf))
   this.cache.buf = ''
 }
+})
 
-Pino.prototype.addLevel = function addLevel (name, lvl) {
+Object.defineProperty(pinoPrototype, 'addLevel', {
+  enumerable: true,
+  value: function addLevel (name, lvl) {
   if (this.levels.values.hasOwnProperty(name)) return false
   if (this.levels.labels.hasOwnProperty(lvl)) return false
   this.levels.values[name] = lvl
@@ -289,6 +245,74 @@ Pino.prototype.addLevel = function addLevel (name, lvl) {
   this[name] = tools.genLog(lvl)
   return true
 }
+})
+
+function pino (opts, stream) {
+  var iopts = opts
+  var istream = stream
+  if (iopts && (iopts.writable || iopts._writableState)) {
+    istream = iopts
+    iopts = defaultOptions
+  }
+  iopts = Object.assign({}, defaultOptions, iopts)
+  if (iopts.extreme && iopts.prettyPrint) throw Error('cannot enable pretty print in extreme mode')
+  istream = istream || process.stdout
+  if (iopts.prettyPrint) {
+    var pstream = pretty(iopts.prettyPrint)
+    var origStream = istream
+    pump(pstream, origStream, function (err) {
+      if (err) instance.emit('error', err)
+    })
+    istream = pstream
+  }
+
+  // internal options
+  iopts.stringify = iopts.safe ? stringifySafe : JSON.stringify
+  iopts.formatOpts = {lowres: true}
+  iopts.end = ',"v":' + LOG_VERSION + '}\n'
+  iopts.cache = !iopts.extreme ? null : {
+    size: 4096,
+    buf: ''
+  }
+  iopts.chindings = ''
+
+  if (iopts.enabled === false) {
+    iopts.level = 'silent'
+  }
+
+  var instance = Object.create(pinoPrototype)
+  instance.stream = istream
+  tools.defineLevelsProperty(instance)
+  tools.applyOptions.call(instance, iopts)
+  if (iopts.cache) setTimeout(waitForFDSettle, 100)
+
+  var settleTries = 0
+  function waitForFDSettle () {
+    var isBlockable = tools.streamIsBlockable(istream)
+    if (isBlockable === false && settleTries > 10) {
+      return instance.emit('error', Error('stream must have a file descriptor in extreme mode'))
+    } else if (isBlockable === true) {
+      return events(instance, extremeModeExitHandler)
+    }
+    settleTries += 1
+    setTimeout(waitForFDSettle, 100)
+  }
+
+  function extremeModeExitHandler () {
+    var buf = iopts.cache.buf
+    if (buf) {
+      // We need to block the process exit long enough to flush the buffer
+      // to the destination stream. We do that by forcing a synchronous
+      // write directly to the stream's file descriptor.
+      var fd = (istream.fd) ? istream.fd : istream._handle.fd
+      fs.writeSync(fd, buf)
+    }
+  }
+
+  return instance
+}
+
+tools.defineLevelsProperty(pino)
 
 module.exports = pino
 module.exports.stdSerializers = {
@@ -301,12 +325,4 @@ Object.defineProperty(
   module.exports,
   'LOG_VERSION',
   {value: LOG_VERSION, enumerable: true}
-)
-
-// This is an internal API. It can change at any time, including semver-minor.
-// Use it at your own risk.
-Object.defineProperty(
-  module.exports,
-  '_Pino',
-  {value: Pino}
 )
