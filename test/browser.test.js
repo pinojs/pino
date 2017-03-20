@@ -252,4 +252,3 @@ function sink (method, fn) {
     fn(Array.prototype.slice.call(arguments))
   }
 }
-
