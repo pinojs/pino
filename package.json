@@ -5,7 +5,7 @@
   "main": "pino.js",
   "browser": "./browser.js",
   "bin": {
-    "pino": "./pretty.js"
+    "pino": "./bin.js"
   },
   "files": [
     "pino.js",
