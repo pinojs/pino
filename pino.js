@@ -83,15 +83,15 @@ Object.defineProperty(pinoPrototype, '_setLevel', {
       })
       this.level = defaultOptions.level
       // apply rules to existing offspring
-      for (let j=0,jlen=this.children.length; j<jlen; j++) {
+      for (let j = 0, jlen = this.children.length; j < jlen; j++) {
         const child = this.children[j]
-        for (let i=0,ilen=this.levelRules.length; i<ilen; i++) {
+        for (let i = 0, ilen = this.levelRules.length; i < ilen; i++) {
           const rule = this.levelRules[i]
           const regexp = rule[0]
-           if (regexp.test(child.name)) {
-             child._setLevel(rule[1])
-             break;
-           }
+          if (regexp.test(child.name)) {
+            child._setLevel(rule[1])
+            break
+          }
         }
       }
       return
@@ -185,15 +185,15 @@ Object.defineProperty(pinoPrototype, 'child', {
     const nameChild = bindings.name || this.name
     let levelChild = bindings.level || this.level
     // child log level will be overridden if parent rule matches
-    for (let i=0,ilen=this.levelRules.length; i<ilen; i++) {
-      const rule = this.levelRules[i];
+    for (let i = 0, ilen = this.levelRules.length; i < ilen; i++) {
+      const rule = this.levelRules[i]
       const regexp = rule[0]
       if (regexp.test(nameChild)) {
         levelChild = rule[1]
-        break;
+        break
       }
-    }    
-    
+    }
+
     var opts = {
       level: levelChild,
       levelVal: levels.isStandardLevelVal(this.levelVal) ? undefined : this.levelVal,
