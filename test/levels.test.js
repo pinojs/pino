@@ -4,7 +4,6 @@ var test = require('tap').test
 var pino = require('../')
 var sink = require('./helper').sink
 var check = require('./helper').check
-var checkGen = require('./helper').checkGen
 
 test('set the level by string', function (t) {
   t.plan(4)
@@ -273,7 +272,7 @@ test('level as object, config before child', function (t) {
     level: { 'debugme*': 'debug', '*': 'info' }
   }, sink(function (chunk, enc, cb) {
     var wanted = expected.shift()
-    checkGen(t, chunk, wanted)
+    check(t, chunk, wanted)
     cb()
   }))
   var child = instance.child({ name: 'debugme1' })
@@ -302,7 +301,7 @@ test('level as object, dynamic config', function (t) {
   }]
   var instance = pino(sink(function (chunk, enc, cb) {
     var wanted = expected.shift()
-    checkGen(t, chunk, wanted)
+    check(t, chunk, wanted)
     cb()
   }))
   var child = instance.child({ name: 'debugme1' })
@@ -327,7 +326,7 @@ test('level rules ordering', function (t) {
     level: { 'debugme*': 'debug', 'debugme:sub*': 'info', '*': 'info' }
   }, sink(function (chunk, enc, cb) {
     var wanted = expected.shift()
-    checkGen(t, chunk, wanted)
+    check(t, chunk, wanted)
     cb()
   }))
   var child = instance.child({ name: 'debugme1' })
