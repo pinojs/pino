@@ -62,7 +62,7 @@
     See [Extreme mode explained](extreme.md) for more detail.
   * `enabled` (boolean): enables logging. Default: `true`
 + `stream` (Writable): a writable stream where the logs will be written.
-  Deafult: `process.stdout`
+  Default: `process.stdout`
 
 ### Example:
 ```js
