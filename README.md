@@ -146,7 +146,59 @@ Pino is compatible with [`browserify`](http://npm.im) for browser side usage:
 
 This can be useful with isomorphic/universal JavaScript code.
 
-In the browser, `pino` uses corresponding [Log4j](https://en.wikipedia.org/wiki/Log4j) `console` methods (`console.error`, `console.warn`, `console.info`, `console.debug`, `console.trace`) and uses `console.error` for any `fatal` level logs.
+By default, in the browser, 
+`pino` uses corresponding [Log4j](https://en.wikipedia.org/wiki/Log4j) `console` methods (`console.error`, `console.warn`, `console.info`, `console.debug`, `console.trace`) and uses `console.error` for any `fatal` level logs.
+
+### Browser Options
+
+Pino can be passed a `browser` object in the options object, 
+which can have a `write` property or an `asObject` property. 
+
+#### `asObject` (Boolean)
+
+```js
+var pino = require('pino')({browser: {asObject: true}})
+```
+
+The `asObject` option will create a pino-like log object instead of
+passing all arguments to a console method, for instance: 
+
+```js
+pino.info('hi') // creates and logs {msg: 'hi', level: 30, time: <ts>}
+```
+
+When `write` is set, `asObject` will always be `true`.
+
+#### `write` (Function | Object)
+
+Instead of passing log messages to `console.log` they can be passed to
+a supplied function. 
+
+If `write` is set to a single function, all logging objects are passed
+to this function.
+
+```js
+var pino = require('pino')({browser: {write: (o) => {
+  // do something with o
+}}})
+```
+
+If `write` is an object, it can have methods that correspond to the 
+levels. When a message is logged at a given level, the corresponding 
+method is called. If a method isn't present, the logging falls back 
+to using the `console`. 
+
+
+```js
+var pino = require('pino')({browser: {write: {
+  info: function (o) {
+    //process info log object
+  },
+  error: function (o) { 
+    //process error log object
+  }
+}}})
+```
 
 <a name="caveats"></a>
 ## Caveats
