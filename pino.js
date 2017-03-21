@@ -76,14 +76,24 @@ Object.defineProperty(pinoPrototype, 'levelVal', {
 Object.defineProperty(pinoPrototype, '_setLevel', {
   value: function _setLevel (level) {
     if (typeof level === 'object') {
-      this.levelMap = level  // remember for future offspring
-      Object.keys(level).sort(tools.byPrecision).map((pattern) => {
-        const regexp = new RegExp('^' + pattern.replace(/\*/g, '.*?') + '$')
-        this.children.map((child) => {
-          if (child.name && regexp.test(child.name)) child._setLevel(level[pattern])
-        })
-        if (regexp.test(this.name)) this._setLevel(level[pattern])
+      // process and save rules for future offspring
+      // rules is an ordered (more specific first) list of [regexp, level]
+      this.levelRules = Object.keys(level).sort(tools.orderByPrecision).map((pattern) => {
+        return [new RegExp('^' + pattern.replace(/\*/g, '.*?') + '$'), level[pattern]]
       })
+      this.level = defaultOptions.level
+      // apply rules to existing offspring
+      for (let j=0,jlen=this.children.length; j<jlen; j++) {
+        const child = this.children[j]
+        for (let i=0,ilen=this.levelRules.length; i<ilen; i++) {
+          const rule = this.levelRules[i]
+          const regexp = rule[0]
+           if (regexp.test(child.name)) {
+             child._setLevel(rule[1])
+             break;
+           }
+        }
+      }
       return
     }
 
@@ -172,21 +182,26 @@ Object.defineProperty(pinoPrototype, 'child', {
     }
     data = this.chindings + data.substr(0, data.length - 1)
 
+    const nameChild = bindings.name || this.name
     let levelChild = bindings.level || this.level
-    const level = this.levelMap
-    Object.keys(level).sort(tools.byPrecision).map((pattern) => {
-      const regexp = new RegExp('^' + pattern.replace(/\*/g, '.*?') + '$')
-      if (bindings.name && regexp.test(bindings.name)) levelChild = level[pattern]
-    })
-
+    // child log level will be overridden if parent rule matches
+    for (let i=0,ilen=this.levelRules.length; i<ilen; i++) {
+      const rule = this.levelRules[i];
+      const regexp = rule[0]
+      if (regexp.test(nameChild)) {
+        levelChild = rule[1]
+        break;
+      }
+    }    
+    
     var opts = {
       level: levelChild,
       levelVal: levels.isStandardLevelVal(this.levelVal) ? undefined : this.levelVal,
-      levelMap: this.levelMap,
+      levelRules: [],
       serializers: bindings.hasOwnProperty('serializers') ? Object.assign({}, this.serializers, bindings.serializers) : this.serializers,
       stringify: this.stringify,
       end: this.end,
-      name: bindings.name || this.name,
+      name: nameChild,
       timestamp: this.timestamp,
       slowtime: this.slowtime,
       chindings: data,
@@ -273,7 +288,7 @@ function pino (opts, stream) {
     buf: ''
   }
   iopts.chindings = ''
-  iopts.levelMap = {}
+  iopts.levelRules = []
   iopts.children = []
 
   if (iopts.enabled === false) {

@@ -4,7 +4,7 @@ var test = require('tap').test
 var pino = require('../')
 var sink = require('./helper').sink
 var check = require('./helper').check
-var check2 = require('./helper').check2
+var checkGen = require('./helper').checkGen
 
 test('set the level by string', function (t) {
   t.plan(4)
@@ -273,7 +273,7 @@ test('level as object, config before child', function (t) {
     level: { 'debugme*': 'debug', '*': 'info' }
   }, sink(function (chunk, enc, cb) {
     var wanted = expected.shift()
-    check2(t, chunk, wanted)
+    checkGen(t, chunk, wanted)
     cb()
   }))
   var child = instance.child({ name: 'debugme1' })
@@ -300,11 +300,9 @@ test('level as object, dynamic config', function (t) {
     level: 20,
     msg: 'child debug'
   }]
-  var instance = pino({
-    level: 'info'
-  }, sink(function (chunk, enc, cb) {
+  var instance = pino(sink(function (chunk, enc, cb) {
     var wanted = expected.shift()
-    check2(t, chunk, wanted)
+    checkGen(t, chunk, wanted)
     cb()
   }))
   var child = instance.child({ name: 'debugme1' })
@@ -314,6 +312,30 @@ test('level as object, dynamic config', function (t) {
   child.info('hello from child')
   instance.debug('parent debug')
   child.debug('child debug')
+
+  t.end()
+})
+
+test('level rules ordering', function (t) {
+  t.plan(2)
+  var expected = [{
+    name: 'debugme1',
+    level: 20,
+    msg: 'hello from child'
+  }]
+  var instance = pino({
+    level: { 'debugme*': 'debug', 'debugme:sub*': 'info', '*': 'info' }
+  }, sink(function (chunk, enc, cb) {
+    var wanted = expected.shift()
+    checkGen(t, chunk, wanted)
+    cb()
+  }))
+  var child = instance.child({ name: 'debugme1' })
+  var childsub = instance.child({ name: 'debugme:submod' })
+
+  instance.debug('hello from parent')
+  child.debug('hello from child')
+  childsub.debug('hello from childsub')
 
   t.end()
 })
