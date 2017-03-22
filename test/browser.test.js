@@ -234,6 +234,62 @@ test('opts.browser.write obj writes to methods corresponding to level', function
   t.end()
 })
 
+test('opts.browser.asObject/write supports child loggers', function (t) {
+  var instance = pino({
+    browser: {write: function (o) {
+      t.is(o.level, 30)
+      t.is(o.test, 'test')
+      t.is(o.msg, 'msg-test')
+      t.ok(o.time)
+    }}
+  })
+  var child = instance.child({test: 'test'})
+  child.info('msg-test')
+  t.end()
+})
+
+test('opts.browser.asObject/write supports child child loggers', function (t) {
+  var instance = pino({
+    browser: {write: function (o) {
+      t.is(o.level, 30)
+      t.is(o.test, 'test')
+      t.is(o.foo, 'bar')
+      t.is(o.msg, 'msg-test')
+      t.ok(o.time)
+    }}
+  })
+  var child = instance.child({test: 'test'}).child({foo: 'bar'})
+  child.info('msg-test')
+  t.end()
+})
+
+test('opts.browser.asObject/write supports child child child loggers', function (t) {
+  var instance = pino({
+    browser: {write: function (o) {
+      t.is(o.level, 30)
+      t.is(o.test, 'test')
+      t.is(o.foo, 'bar')
+      t.is(o.baz, 'bop')
+      t.is(o.msg, 'msg-test')
+      t.ok(o.time)
+    }}
+  })
+  var child = instance.child({test: 'test'}).child({foo: 'bar'}).child({baz: 'bop'})
+  child.info('msg-test')
+  t.end()
+})
+
+test('opts.browser.asObject defensively mitigates naughty numbers', function (t) {
+  var instance = pino({
+    browser: {asObject: true}
+  })
+  var child = instance.child({test: 'test'})
+  child._childLevel = -10
+  child.info('test')
+  t.pass() // if we reached here, there was no infinite loop, so, .. pass.
+  t.end()
+})
+
 test('opts.browser.write obj falls back to console where a method is not supplied', function (t) {
   t.plan(6)
   var info = console.info
