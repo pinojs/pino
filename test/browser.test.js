@@ -71,11 +71,6 @@ test('exposes LOG_VERSION', function (t) {
   t.end()
 })
 
-test('exposes faux _Pino constructor', function (t) {
-  t.ok(isFunc(pino._Pino))
-  t.end()
-})
-
 test('exposes faux stdSerializers', function (t) {
   t.ok(pino.stdSerializers)
   t.ok(pino.stdSerializers.req)
@@ -114,8 +109,153 @@ test('in absence of console, log methods become noops', function (t) {
   t.end()
 })
 
-test('exposes faux _Pino constructor', function (t) {
-  t.ok(isFunc(pino._Pino))
+test('opts.browser.asObject logs pino-like object to console', function (t) {
+  t.plan(3)
+  var info = console.info
+  console.info = function (o) {
+    t.is(o.level, 30)
+    t.is(o.msg, 'test')
+    t.ok(o.time)
+    console.info = info
+  }
+  var instance = require('../browser')({
+    browser: {
+      asObject: true
+    }
+  })
+
+  instance.info('test')
+})
+
+test('opts.browser.write func log single string', function (t) {
+  t.plan(3)
+  var instance = pino({
+    browser: {
+      write: function (o) {
+        t.is(o.level, 30)
+        t.is(o.msg, 'test')
+        t.ok(o.time)
+      }
+    }
+  })
+  instance.info('test')
+  t.end()
+})
+
+test('opts.browser.write func string joining', function (t) {
+  t.plan(3)
+  var instance = pino({
+    browser: {
+      write: function (o) {
+        t.is(o.level, 30)
+        t.is(o.msg, 'test test2 test3')
+        t.ok(o.time)
+      }
+    }
+  })
+  instance.info('test', 'test2', 'test3')
+  t.end()
+})
+
+test('opts.browser.write func string object joining', function (t) {
+  t.plan(3)
+  var instance = pino({
+    browser: {
+      write: function (o) {
+        t.is(o.level, 30)
+        t.is(o.msg, 'test {"test":"test2"} {"test":"test3"}')
+        t.ok(o.time)
+      }
+    }
+  })
+  instance.info('test', {test: 'test2'}, {test: 'test3'})
+  t.end()
+})
+
+test('opts.browser.write func string interpolation', function (t) {
+  t.plan(3)
+  var instance = pino({
+    browser: {
+      write: function (o) {
+        t.is(o.level, 30)
+        t.is(o.msg, 'test2 test ({\\"test\\":\\"test3\\"})')
+        t.ok(o.time)
+      }
+    }
+  })
+  instance.info('%s test (%j)', 'test2', {test: 'test3'})
+  t.end()
+})
+
+test('opts.browser.write func number', function (t) {
+  t.plan(3)
+  var instance = pino({
+    browser: {
+      write: function (o) {
+        t.is(o.level, 30)
+        t.is(o.msg, 1)
+        t.ok(o.time)
+      }
+    }
+  })
+  instance.info(1)
+  t.end()
+})
+
+test('opts.browser.write func log single object', function (t) {
+  t.plan(3)
+  var instance = pino({
+    browser: {
+      write: function (o) {
+        t.is(o.level, 30)
+        t.is(o.test, 'test')
+        t.ok(o.time)
+      }
+    }
+  })
+  instance.info({test: 'test'})
+  t.end()
+})
+
+test('opts.browser.write obj writes to methods corresponding to level', function (t) {
+  t.plan(3)
+  var instance = pino({
+    browser: {
+      write: {
+        error: function (o) {
+          t.is(o.level, 50)
+          t.is(o.test, 'test')
+          t.ok(o.time)
+        }
+      }
+    }
+  })
+  instance.error({test: 'test'})
+  t.end()
+})
+
+test('opts.browser.write obj falls back to console where a method is not supplied', function (t) {
+  t.plan(6)
+  var info = console.info
+  console.info = function (o) {
+    t.is(o.level, 30)
+    t.is(o.msg, 'test')
+    t.ok(o.time)
+    console.info = info
+  }
+  var instance = require('../browser')({
+    browser: {
+      write: {
+        error: function (o) {
+          t.is(o.level, 50)
+          t.is(o.test, 'test')
+          t.ok(o.time)
+        }
+      }
+    }
+  })
+  instance.error({test: 'test'})
+  instance.info('test')
   t.end()
 })
 

@@ -61,6 +61,7 @@
     it is up to you to terminate the process; you **must** perform only synchronous operations at this point.
     See [Extreme mode explained](extreme.md) for more detail.
   * `enabled` (boolean): enables logging. Default: `true`
+  * `browser` (Object): browser only, may have `asObject` and `write` keys, see [Pino in the Browser](../readme.md#browser) 
 + `stream` (Writable): a writable stream where the logs will be written.
   Default: `process.stdout`
 
