@@ -45,6 +45,7 @@ function pino (opts) {
       throw new Error('missing bindings for child Pino')
     }
     function Child (parent) {
+      this._childLevel = (parent._childLevel | 0) + 1
       this.error = bind(parent, bindings, 'error')
       this.fatal = bind(parent, bindings, 'fatal')
       this.warn = bind(parent, bindings, 'warn')
@@ -69,10 +70,16 @@ function asObject (logger, levels) {
         for (var i = 0; i < args.length; i++) args[i] = arguments[i]
         var msg = args[0]
         var o = { time: Date.now(), level: pino.levels.values[k] }
+        var lvl = (this._childLevel | 0) + 1
+        if (lvl < 1) lvl = 1
         // deliberate, catching objects, arrays
-        if (msg !== null && typeof msg === 'object') Object.assign(o, msg)
-        if (typeof msg === 'string') msg = format(args)
-        o.msg = msg
+        if (msg !== null && typeof msg === 'object') {
+          while (lvl-- && typeof args[0] === 'object') {
+            Object.assign(o, args.shift())
+          }
+          msg = args.length ? format(args) : undefined
+        } else if (typeof msg === 'string') msg = format(args)
+        if (msg !== undefined) o.msg = msg
         write.call(logger, o)
       }
     })(logger[k], k)
@@ -114,7 +121,7 @@ function bind (parent, bindings, level) {
     for (var i = 1; i < args.length; i++) {
       args[i] = arguments[i - 1]
     }
-    return parent[level].apply(null, args)
+    return parent[level].apply(this, args)
   }
 }
 
