@@ -123,6 +123,9 @@ function asJson (obj, msg, num) {
   if (msg != undefined) {
     data += ',"msg":' + JSON.stringify('' + msg)
   }
+  // we need the child bindings added to the output first so that logged
+  // objects can take precedence when JSON.parse-ing the resulting log line
+  data = data + this.chindings
   var value
   if (obj) {
     if (obj.stack) {
@@ -138,7 +141,7 @@ function asJson (obj, msg, num) {
       }
     }
   }
-  return data + this.chindings + this.end
+  return data + this.end
 }
 Object.defineProperty(pinoPrototype, 'asJson', {
   enumerable: true,
