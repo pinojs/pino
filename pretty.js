@@ -65,7 +65,7 @@ function pretty (opts) {
 
   stream.pipe = function (dest, opts) {
     ctx = new chalk.constructor({
-      enabled: !!(chalk.supportsColor && dest.isTTY)
+      enabled: !!(chalk.supportsColor && dest.isTTY || opts && opts.forceColor)
     })
 
     levelColors = {
