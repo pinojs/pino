@@ -1,6 +1,6 @@
 {
   "name": "pino",
-  "version": "4.1.1",
+  "version": "4.2.3",
   "description": "super fast, all natural json logger",
   "main": "pino.js",
   "browser": "./browser.js",
@@ -65,7 +65,6 @@
     "log": "^1.4.0",
     "loglevel": "^1.4.0",
     "pre-commit": "^1.2.2",
-    "pump": "^1.0.1",
     "snazzy": "^6.0.0",
     "standard": "^9.0.0",
     "steed": "^1.1.3",

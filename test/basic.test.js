@@ -395,3 +395,14 @@ test('handles objects with null prototype', function (t) {
   o.test = 'test'
   instance.info(o)
 })
+
+// https://github.com/pinojs/pino/issues/222
+test('children with same names render in correct order', function (t) {
+  t.plan(1)
+  var root = pino(sink(function (chunk, enc, cb) {
+    t.is(chunk.a, 3, 'last logged object takes precedence')
+    cb()
+  }))
+
+  root.child({a: 1}).child({a: 2}).info({a: 3})
+})

@@ -50,65 +50,46 @@ levelMethods.forEach(function (m) {
   })
 })
 
-Object.defineProperty(pinoPrototype, 'levelVal', {
-  get: function getLevelVal () {
-    return this._levelVal
-  },
-  set: function setLevelVal (num) {
-    if (typeof num !== 'number') { return this._setLevel(num) }
+function getLevelVal () {
+  return this._levelVal
+}
+function setLevelVal (num) {
+  if (typeof num !== 'number') { return this._setLevel(num) }
 
-    if (this.emit) {
-      this.emit('level-change', this.levels.labels[num], num, this.levels.labels[this._levelVal], this._levelVal)
-    }
-
-    this._levelVal = num
-
-    for (var key in this.levels.values) {
-      if (num > this.levels.values[key]) {
-        this[key] = tools.noop
-        continue
-      }
-      this[key] = levels.isStandardLevel(key) ? pinoPrototype[key] : tools.genLog(this.levels.values[key])
-    }
+  if (this.emit) {
+    this.emit('level-change', this.levels.labels[num], num, this.levels.labels[this._levelVal], this._levelVal)
   }
+
+  this._levelVal = num
+
+  for (var key in this.levels.values) {
+    if (num > this.levels.values[key]) {
+      this[key] = tools.noop
+      continue
+    }
+    this[key] = levels.isStandardLevel(key) ? pinoPrototype[key] : tools.genLog(this.levels.values[key])
+  }
+}
+Object.defineProperty(pinoPrototype, 'levelVal', {
+  get: getLevelVal,
+  set: setLevelVal
 })
 
-Object.defineProperty(pinoPrototype, '_setLevel', {
-  value: function _setLevel (level) {
-    if (typeof level === 'object') {
-      // process and save rules for future offspring
-      // rules is an ordered (more specific first) list of [regexp, level]
-      this.levelRules = Object.keys(level).sort(tools.orderByPrecision).map((pattern) => {
-        return [new RegExp('^' + pattern.replace(/\*/g, '.*?') + '$'), level[pattern]]
-      })
-      this.level = defaultOptions.level
-      // apply rules to existing offspring
-      for (let j = 0, jlen = this.children.length; j < jlen; j++) {
-        const child = this.children[j]
-        for (let i = 0, ilen = this.levelRules.length; i < ilen; i++) {
-          const rule = this.levelRules[i]
-          const regexp = rule[0]
-          if (regexp.test(child.name)) {
-            child._setLevel(rule[1])
-            break
-          }
-        }
-      }
-      return
-    }
-
-    if (typeof level === 'number') {
-      if (!isFinite(level)) {
-        throw Error('unknown level ' + level)
-      }
-      level = this.levels.labels[level]
-    }
-
-    if (!this.levels.values[level]) {
+function _setLevel (level) {
+  if (typeof level === 'number') {
+    if (!isFinite(level)) {
       throw Error('unknown level ' + level)
     }
-    this.levelVal = this.levels.values[level]
+    level = this.levels.labels[level]
   }
+
+  if (!this.levels.values[level]) {
+    throw Error('unknown level ' + level)
+  }
+  this.levelVal = this.levels.values[level]
+}
+Object.defineProperty(pinoPrototype, '_setLevel', {
+  value: _setLevel
 })
 
 Object.defineProperty(pinoPrototype, '_getLevel', {
@@ -132,60 +113,63 @@ Object.defineProperty(
   {value: LOG_VERSION}
 )
 
-Object.defineProperty(pinoPrototype, 'asJson', {
-  enumerable: true,
-  value: function asJson (obj, msg, num) {
-    if (!msg && obj instanceof Error) {
-      msg = obj.message
+function asJson (obj, msg, num) {
+  if (!msg && obj instanceof Error) {
+    msg = obj.message
+  }
+  var data = this._baseLog + this._lscache[num] + this.time()
+  // to catch both null and undefined
+  /* eslint-disable eqeqeq */
+  if (msg != undefined) {
+    data += ',"msg":' + JSON.stringify('' + msg)
+  }
+  // we need the child bindings added to the output first so that logged
+  // objects can take precedence when JSON.parse-ing the resulting log line
+  data = data + this.chindings
+  var value
+  if (obj) {
+    if (obj.stack) {
+      data += ',"type":"Error","stack":' + this.stringify(obj.stack)
     }
-    var data = this._baseLog + this._lscache[num] + this.time()
-    // to catch both null and undefined
-    /* eslint-disable eqeqeq */
-    if (msg != undefined) {
-      data += ',"msg":' + JSON.stringify('' + msg)
-    }
-    var value
-    if (obj) {
-      if (obj.stack) {
-        data += ',"type":"Error","stack":' + this.stringify(obj.stack)
-      }
-      for (var key in obj) {
-        value = obj[key]
-        if ((!obj.hasOwnProperty || obj.hasOwnProperty(key)) && value !== undefined) {
-          value = this.stringify(this.serializers[key] ? this.serializers[key](value) : value)
-          if (value !== undefined) {
-            data += ',"' + key + '":' + value
-          }
+    for (var key in obj) {
+      value = obj[key]
+      if ((!obj.hasOwnProperty || obj.hasOwnProperty(key)) && value !== undefined) {
+        value = this.stringify(this.serializers[key] ? this.serializers[key](value) : value)
+        if (value !== undefined) {
+          data += ',"' + key + '":' + value
         }
       }
     }
-    return data + this.chindings + this.end
   }
+  return data + this.end
+}
+Object.defineProperty(pinoPrototype, 'asJson', {
+  enumerable: true,
+  value: asJson
 })
 
-Object.defineProperty(pinoPrototype, 'child', {
-  enumerable: true,
-  value: function child (bindings) {
-    if (!bindings) {
-      throw Error('missing bindings for child Pino')
-    }
+function child (bindings) {
+  if (!bindings) {
+    throw Error('missing bindings for child Pino')
+  }
 
-    var data = ','
-    var value
-    var key
-    for (key in bindings) {
-      value = bindings[key]
-      if (key !== 'level' && key !== 'serializers' && bindings.hasOwnProperty(key) && value !== undefined) {
-        value = this.serializers[key] ? this.serializers[key](value) : value
-        data += '"' + key + '":' + this.stringify(value) + ','
-      }
+  var data = ','
+  var value
+  var key
+  for (key in bindings) {
+    value = bindings[key]
+    if (key !== 'level' && key !== 'serializers' && bindings.hasOwnProperty(key) && value !== undefined) {
+      value = this.serializers[key] ? this.serializers[key](value) : value
+      data += '"' + key + '":' + this.stringify(value) + ','
     }
-    data = this.chindings + data.substr(0, data.length - 1)
+  }
+  data = this.chindings + data.substr(0, data.length - 1)
 
-    const nameChild = bindings.name || this.name
-    let levelChild = bindings.level || this.level
-    // child log level will be overridden if parent rule matches
-    for (let i = 0, ilen = this.levelRules.length; i < ilen; i++) {
+  const nameChild = bindings.name || this.name
+  var levelChild = bindings.level || this.level
+  // child log level will be overridden if parent rule matches
+  if (this.levelRules) {
+    for (var i = 0; i < this.levelRules.length; i++) {
       const rule = this.levelRules[i]
       const regexp = rule[0]
       if (regexp.test(nameChild)) {
@@ -193,71 +177,104 @@ Object.defineProperty(pinoPrototype, 'child', {
         break
       }
     }
-
-    var opts = {
-      level: levelChild,
-      levelVal: levels.isStandardLevelVal(this.levelVal) ? undefined : this.levelVal,
-      levelRules: [],
-      serializers: bindings.hasOwnProperty('serializers') ? Object.assign({}, this.serializers, bindings.serializers) : this.serializers,
-      stringify: this.stringify,
-      end: this.end,
-      name: nameChild,
-      timestamp: this.timestamp,
-      slowtime: this.slowtime,
-      chindings: data,
-      cache: this.cache,
-      children: [],
-      formatOpts: this.formatOpts
-    }
-
-    var _child = Object.create(this)
-    _child.stream = this.stream
-    tools.applyOptions.call(_child, opts)
-    this.children.push(_child)
-    return _child
   }
-})
 
-// should this be enumerable?
-Object.defineProperty(pinoPrototype, 'write', {
-  value: function (obj, msg, num) {
-    var s = this.asJson(obj, msg, num)
-    if (!this.cache) {
-      this.stream.write(flatstr(s))
-      return
-    }
-
-    this.cache.buf += s
-    if (this.cache.buf.length > this.cache.size) {
-      this.stream.write(flatstr(this.cache.buf))
-      this.cache.buf = ''
-    }
+  var opts = {
+    level: levelChild,
+    levelVal: levels.isStandardLevelVal(this.levelVal) ? undefined : this.levelVal,
+    levelRules: false,
+    serializers: bindings.hasOwnProperty('serializers') ? Object.assign({}, this.serializers, bindings.serializers) : this.serializers,
+    stringify: this.stringify,
+    end: this.end,
+    name: nameChild,
+    timestamp: this.timestamp,
+    slowtime: this.slowtime,
+    chindings: data,
+    cache: this.cache,
+    children: [],
+    formatOpts: this.formatOpts
   }
-})
 
-Object.defineProperty(pinoPrototype, 'flush', {
+  var _child = Object.create(this)
+  _child.stream = this.stream
+  tools.applyOptions.call(_child, opts)
+  this.children.push(_child)
+  return _child
+}
+Object.defineProperty(pinoPrototype, 'child', {
   enumerable: true,
-  value: function () {
-    if (!this.cache) {
-      return
-    }
+  value: child
+})
 
+function pinoWrite (obj, msg, num) {
+  var s = this.asJson(obj, msg, num)
+  if (!this.cache) {
+    this.stream.write(flatstr(s))
+    return
+  }
+
+  this.cache.buf += s
+  if (this.cache.buf.length > this.cache.size) {
     this.stream.write(flatstr(this.cache.buf))
     this.cache.buf = ''
   }
+}
+Object.defineProperty(pinoPrototype, 'write', {
+  value: pinoWrite
 })
 
+function flush () {
+  if (!this.cache) {
+    return
+  }
+
+  this.stream.write(flatstr(this.cache.buf))
+  this.cache.buf = ''
+}
+Object.defineProperty(pinoPrototype, 'flush', {
+  enumerable: true,
+  value: flush
+})
+
+function addLevel (name, lvl) {
+  if (this.levels.values.hasOwnProperty(name)) return false
+  if (this.levels.labels.hasOwnProperty(lvl)) return false
+  this.levels.values[name] = lvl
+  this.levels.labels[lvl] = name
+  this._lscache[lvl] = flatstr('"level":' + Number(lvl))
+  this[name] = tools.genLog(lvl)
+  return true
+}
 Object.defineProperty(pinoPrototype, 'addLevel', {
   enumerable: true,
-  value: function addLevel (name, lvl) {
-    if (this.levels.values.hasOwnProperty(name)) return false
-    if (this.levels.labels.hasOwnProperty(lvl)) return false
-    this.levels.values[name] = lvl
-    this.levels.labels[lvl] = name
-    this._lscache[lvl] = flatstr('"level":' + Number(lvl))
-    this[name] = tools.genLog(lvl)
-    return true
+  value: addLevel
+})
+
+function setChildrenLevels (levels) {
+  // process and save rules for future offspring
+  // rules is an ordered (more specific first) list of [regexp, level]
+  this.levelRules = Object.keys(levels).sort(tools.orderByPrecision).map(function (pattern) {
+    return [new RegExp('^' + pattern.replace(/\*/g, '.*?') + '$'), levels[pattern]]
+  })
+  // apply rules to existing offspring and to us
+  function applyRules (rules, logger) {
+    for (var i = 0; i < rules.length; i++) {
+      const rule = rules[i]
+      const regexp = rule[0]
+      if (regexp.test(logger.name)) {
+        logger.level = rule[1]
+        return
+      }
+    }
   }
+  for (var j = 0; j < this.children.length; j++) {
+    applyRules(this.levelRules, this.children[j])
+  }
+  applyRules(this.levelRules, this)
+}
+Object.defineProperty(pinoPrototype, 'setChildrenLevels', {
+  enumerable: true,
+  value: setChildrenLevels
 })
 
 function pino (opts, stream) {
@@ -288,7 +305,7 @@ function pino (opts, stream) {
     buf: ''
   }
   iopts.chindings = ''
-  iopts.levelRules = []
+  iopts.levelRules = false
   iopts.children = []
 
   if (iopts.enabled === false) {
@@ -335,9 +352,3 @@ module.exports.stdSerializers = {
   res: serializers.asResValue,
   err: serializers.asErrValue
 }
-module.exports.pretty = pretty
-Object.defineProperty(
-  module.exports,
-  'LOG_VERSION',
-  {value: LOG_VERSION, enumerable: true}
-)

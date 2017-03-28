@@ -269,12 +269,12 @@ test('level as object, config before child', function (t) {
     msg: 'child debug'
   }]
   var instance = pino({
-    level: { 'debugme*': 'debug', '*': 'info' }
   }, sink(function (chunk, enc, cb) {
     var wanted = expected.shift()
     check(t, chunk, wanted)
     cb()
   }))
+  instance.setChildrenLevels({ 'debugme*': 'debug', '*': 'info' })
   var child = instance.child({ name: 'debugme1' })
 
   instance.info('hello from parent')
@@ -305,7 +305,7 @@ test('level as object, dynamic config', function (t) {
     cb()
   }))
   var child = instance.child({ name: 'debugme1' })
-  instance.level = { 'debugme*': 'debug', '*': 'info' }
+  instance.setChildrenLevels({ 'debugme*': 'debug', '*': 'info' })
 
   instance.info('hello from parent')
   child.info('hello from child')
@@ -323,12 +323,12 @@ test('level rules ordering', function (t) {
     msg: 'hello from child'
   }]
   var instance = pino({
-    level: { 'debugme*': 'debug', 'debugme:sub*': 'info', '*': 'info' }
   }, sink(function (chunk, enc, cb) {
     var wanted = expected.shift()
     check(t, chunk, wanted)
     cb()
   }))
+  instance.setChildrenLevels({ 'debugme*': 'debug', 'debugme:sub*': 'info', '*': 'info' })
   var child = instance.child({ name: 'debugme1' })
   var childsub = instance.child({ name: 'debugme:submod' })
 

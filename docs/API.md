@@ -5,6 +5,7 @@
 + [Logger Instance](#logger)
   * [.child](#child)
   * [.level](#level)
+  * [.setchildrenlevels](#setchildrenlevels)
   * [.fatal](#fatal)
   * [.error](#error)
   * [.warn](#warn)
@@ -50,8 +51,8 @@
   * `level` (string|object): one of `'fatal'`, `'error'`, `'warn'`, `'info`', `'debug'`,
     `'trace'`; also `'silent'` is supported to disable logging. Any other _string_ value
     defines a custom level and requires supplying a level value via `levelVal`.
-    Alternatively an object can be provided for fine-grained configuration of a logger
-     and its children (see [.level](#level) for more details).
+    Note that an object can be provided for fine-grained configuration of a logger
+     and its children (see [.setChildrenLevels](#setchildrenlevels) for more details).
     Default: 'info'.
   * `levelVal` (integer): when defining a custom log level via `level`, set to an
     integer value to define the new level. Default: `undefined`.
@@ -228,14 +229,6 @@ benchPinoExtremeChildChild*10000: 150.143ms
 ```
 logger.level = 'info'
 ```
-or
-```
-logger.level = {
-    'myobj:*': 'debug',       // child loggers whose 'name' binding matches
-    'myobj:comm:*': 'trace',  //  ...even more info required for a subset
-    '*': 'info'               // this logger + default for child loggers
-}
-```
 
 ### Discussion:
 
@@ -254,7 +247,21 @@ The logging level is a *minimum* level. For instance if `logger.level` is
 
 You can pass `'silent'` to disable logging.
 
-It is possible to pass an object to set different levels for the logger and its
+<a id="setchildrenlevels"></a>
+## .setChildrenLevels
+
+### Example:
+```
+logger.setChildrenLevels({
+    'myobj:*': 'debug',       // child loggers whose 'name' binding matches
+    'myobj:comm:*': 'trace',  //  ...even more info required for a subset
+    '*': 'info'               // this logger + default for child loggers
+})
+```
+
+### Discussion:
+
+It is possible to provide an object to set different levels for the logger and its
 children (inspired from the
 [debug](https://github.com/visionmedia/debug#wildcards) and
 [pino-debug](https://github.com/pinojs/pino-debug) modules):
@@ -267,11 +274,10 @@ children (inspired from the
 `'mylib*'`).
 
 Note that currently the following properties are _not_ supported (unlike in
-`'debug'` ):
+`'debug'`):
 + multiple patterns separated by `','`(comma) or `' '`(space) &ndash;declare
   several rules instead
 + exclusion patterns indicated by a leading `'-'`(minus) sign
-
 
 <a id="fatal"></a>
 ## .fatal([obj], msg, [...])
@@ -549,3 +555,4 @@ Serializes an `Error` object if passed in as an property.
   "stack": "Error: an error\n    at Object.<anonymous> (/Users/matteo/Repositories/pino/example.js:16:7)\n    at Module._compile (module.js:435:26)\n    at Object.Module._extensions..js (module.js:442:10)\n    at Module.load (module.js:356:32)\n    at Function.Module._load (module.js:313:12)\n    at Function.Module.runMain (module.js:467:10)\n    at startup (node.js:136:18)\n    at node.js:963:3"
 }
 ```
+
