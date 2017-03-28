@@ -281,7 +281,7 @@ test('opts.browser.asObject/write supports child child child loggers', function 
 
 test('opts.browser.asObject defensively mitigates naughty numbers', function (t) {
   var instance = pino({
-    browser: {asObject: true}
+    browser: {asObject: true, write: function () {}}
   })
   var child = instance.child({test: 'test'})
   child._childLevel = -10
