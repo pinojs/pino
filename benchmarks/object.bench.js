@@ -30,8 +30,13 @@ require('bole').output({
   stream: dest
 }).setFastTime(true)
 
-winston.add(winston.transports.File, { filename: '/dev/null' })
-winston.remove(winston.transports.Console)
+var chill = new winston.Logger({
+  transports: [
+    new winston.transports.Stream({
+      stream: fs.createWriteStream('/dev/null')
+    })
+  ]
+})
 
 var run = bench([
   function benchBunyanObj (cb) {
@@ -42,7 +47,7 @@ var run = bench([
   },
   function benchWinstonObj (cb) {
     for (var i = 0; i < max; i++) {
-      winston.info({ hello: 'world' })
+      chill.log({ hello: 'world', level: 'info' })
     }
     setImmediate(cb)
   },

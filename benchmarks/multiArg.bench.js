@@ -40,8 +40,13 @@ require('bole').output({
   stream: dest
 }).setFastTime(true)
 
-winston.add(winston.transports.File, { filename: '/dev/null' })
-winston.remove(winston.transports.Console)
+var chill = new winston.Logger({
+  transports: [
+    new winston.transports.Stream({
+      stream: fs.createWriteStream('/dev/null')
+    })
+  ]
+})
 
 var run = bench([
   function benchBunyanMulti (cb) {
@@ -52,7 +57,7 @@ var run = bench([
   },
   function benchWinstonMulti (cb) {
     for (var i = 0; i < max; i++) {
-      winston.info('hello', 'world')
+      chill.log('info', 'hello', 'world')
     }
     setImmediate(cb)
   },
@@ -94,7 +99,7 @@ var run = bench([
   },
   function benchWinstonInterpolate (cb) {
     for (var i = 0; i < max; i++) {
-      winston.info('hello %s', 'world')
+      chill.log('info', 'hello %s', 'world')
     }
     setImmediate(cb)
   },
@@ -125,7 +130,7 @@ var run = bench([
 
   function benchWinstonInterpolateAll (cb) {
     for (var i = 0; i < max; i++) {
-      winston.info('hello %s %j %d', 'world', {obj: true}, 4)
+      chill.log('info', 'hello %s %j %d', 'world', {obj: true}, 4)
     }
     setImmediate(cb)
   },
@@ -167,7 +172,7 @@ var run = bench([
   },
   function benchWinstonInterpolateExtra (cb) {
     for (var i = 0; i < max; i++) {
-      winston.info('hello %s %j %d', 'world', {obj: true}, 4, {another: 'obj'})
+      chill.log('info', 'hello %s %j %d', 'world', {obj: true}, 4, {another: 'obj'})
     }
     setImmediate(cb)
   },
@@ -209,7 +214,7 @@ var run = bench([
   },
   function benchWinstonInterpolateDeep (cb) {
     for (var i = 0; i < max; i++) {
-      winston.info('hello %j', deep)
+      chill.log('info', 'hello %j', deep)
     }
     setImmediate(cb)
   },
