@@ -122,7 +122,7 @@ function asJson (obj, msg, num) {
   // to catch both null and undefined
   /* eslint-disable eqeqeq */
   if (msg != undefined) {
-    data += ',"' + this.messageProp + '":' + JSON.stringify('' + msg)
+    data += ',' + JSON.stringify('' + this.messageProp) + ':' + JSON.stringify('' + msg)
   }
   // we need the child bindings added to the output first so that logged
   // objects can take precedence when JSON.parse-ing the resulting log line
