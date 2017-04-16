@@ -20,7 +20,7 @@
   [36m[1mFlags[22m[39m
   [0m-h | --help      Display Help
   -v | --version   Display Version
-  -m <key>         Highlight the message at the <key> property[0m
-  -t               Convert Epoch timestamps to ISO[0m
+  -m <key>         Highlight the message at the <key> property
+  -t               Convert Epoch timestamps to ISO
   -l               Flip level and date
 
