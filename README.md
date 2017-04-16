@@ -90,7 +90,7 @@ benchBole*10000: 291.727ms
 benchDebug*10000: 445.291ms
 benchLogLevel*10000: 322.181ms
 benchPino*10000: 269.109ms
-benchPinoExreme*10000: 102.239ms
+benchPinoExtreme*10000: 102.239ms
 ```
 
 `pino.info({'hello': 'world'})`:
