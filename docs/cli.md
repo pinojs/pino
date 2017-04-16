@@ -9,6 +9,22 @@ To use the command line tool, we can install `pino` globally:
 npm install -g pino
 ```
 
+The pretty-printed output will highlight the message value of the input JSON. By
+default, Pino provides this message value at the `msg` key. A custom key can be
+specified with `-m <key>`.
+
+`pino -m fooMessage` will transform this:
+
+```js
+{"pid":14139,"hostname":"MacBook-Pro-3.home","level":30,"fooMessage":"hello world","time":1457537229339,"v":0}
+```
+
+Into this:
+
+```sh
+[2016-03-09T15:27:09.339Z] INFO (14139 on MacBook-Pro-3.home): hello world
+```
+
 There are also two transformer flags:
 
 + `-t` that converts Epoch timestamps to ISO timestamps.
