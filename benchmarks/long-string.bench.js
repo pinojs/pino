@@ -60,7 +60,7 @@ var run = bench([
     }
     setImmediate(cb)
   },
-  function benchPinoExreme (cb) {
+  function benchPinoExtreme (cb) {
     for (var i = 0; i < max; i++) {
       plogExtreme.info(longStr)
     }
