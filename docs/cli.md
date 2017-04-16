@@ -16,7 +16,7 @@ specified with `-m <key>`.
 `pino -m fooMessage` will transform this:
 
 ```js
-{"pid":14139,"hostname":"MacBook-Pro-3.home","level":30,"fooMessage":"hello world","time":1457537229339,"v":0}
+{"pid":14139,"hostname":"MacBook-Pro-3.home","level":30,"fooMessage":"hello world","time":1457537229339,"v":1}
 ```
 
 Into this:

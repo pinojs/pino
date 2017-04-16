@@ -32,7 +32,7 @@ function messagePropArg () {
     return
   }
   var messagePropIndex = process.argv.indexOf('-m') + 1
-  var messageProp = process.argv.length <= messagePropIndex &&
+  var messageProp = process.argv.length > messagePropIndex &&
     process.argv[messagePropIndex]
 
   if (!messageProp) {
