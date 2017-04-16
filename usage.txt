@@ -5,7 +5,11 @@
 
      [33mcat log | pino[39m
 
-  [0mTo converts Epoch timestamps to ISO timestamps use the [33m-t[39m flag[0m
+  [0mTo highlight a string at a key other than 'msg', use [33m-m <key>[39m:[0m
+
+     [33mcat log | pino -m fooMessage[39m
+
+  [0mTo convert Epoch timestamps to ISO timestamps use the [33m-t[39m flag[0m
 
      [33mcat log | pino -t[39m
 
@@ -16,6 +20,7 @@
   [36m[1mFlags[22m[39m
   [0m-h | --help      Display Help
   -v | --version   Display Version
+  -m <key>         Highlight the message at the <key> property[0m
   -t               Convert Epoch timestamps to ISO[0m
   -l               Flip level and date
 
