@@ -5,6 +5,7 @@
 + [Logger Instance](#logger)
   * [.child](#child)
   * [.level](#level)
+  * [.setchildrenlevels](#setchildrenlevels)
   * [.fatal](#fatal)
   * [.error](#error)
   * [.warn](#warn)
@@ -47,9 +48,11 @@
   * `extreme` (boolean): Enables extreme mode, yields an additional 60% performance
     (from 250ms down to 100ms per 10000 ops). There are trade-off's should be
     understood before usage. See [Extreme mode explained](extreme.md). Default: `false`.
-  * `level` (string): one of `'fatal'`, `'error'`, `'warn'`, `'info`', `'debug'`,
-    `'trace'`; also `'silent'` is supported to disable logging. Any other value
+  * `level` (string|object): one of `'fatal'`, `'error'`, `'warn'`, `'info`', `'debug'`,
+    `'trace'`; also `'silent'` is supported to disable logging. Any other _string_ value
     defines a custom level and requires supplying a level value via `levelVal`.
+    Note that an object can be provided for fine-grained configuration of a logger
+     and its children (see [.setChildrenLevels](#setchildrenlevels) for more details).
     Default: 'info'.
   * `levelVal` (integer): when defining a custom log level via `level`, set to an
     integer value to define the new level. Default: `undefined`.
@@ -61,9 +64,8 @@
     it is up to you to terminate the process; you **must** perform only synchronous operations at this point.
     See [Extreme mode explained](extreme.md) for more detail.
   * `enabled` (boolean): enables logging. Default: `true`
-  * `browser` (Object): browser only, may have `asObject` and `write` keys, see [Pino in the Browser](../readme.md#browser) 
 + `stream` (Writable): a writable stream where the logs will be written.
-  Default: `process.stdout`
+  Deafult: `process.stdout`
 
 ### Example:
 ```js
@@ -138,8 +140,10 @@ logger.child({ a: 'property' }).info('hello child!')
 Creates a child logger, setting all key-value pairs in `bindings` as properties
 in the log lines. All serializers will be applied to the given pair.
 
-Child loggers use the same output stream as the parent and inherit
-the current log level of the parent at the time they are spawned.
+Child loggers use the same output stream as the parent and inherit the current
+log level of the parent at the time they are spawned. If an object was used to
+define the parent's level, then the child will use the level specified by a
+matching rule (see discussion below).
 
 From v2.x.x the log level of a child is mutable (whereas in
 v1.x.x it was immutable), and can be set independently of the parent.
@@ -242,6 +246,38 @@ The logging level is a *minimum* level. For instance if `logger.level` is
 `'info'` then all `'fatal'`, `'error'`, `'warn'`, and `'info'` logs will be enabled.
 
 You can pass `'silent'` to disable logging.
+
+<a id="setchildrenlevels"></a>
+## .setChildrenLevels
+
+### Example:
+```
+logger.setChildrenLevels({
+    'myobj:*': 'debug',       // child loggers whose 'name' binding matches
+    'myobj:comm:*': 'trace',  //  ...even more info required for a subset
+    '*': 'info'               // this logger + default for child loggers
+})
+```
+
+### Discussion:
+
+It is possible to provide an object to set different levels for the logger and its
+children (inspired from the
+[debug](https://github.com/visionmedia/debug#wildcards) and
+[pino-debug](https://github.com/pinojs/pino-debug) modules):
++ object keys are names or patterns used to designate the target child loggers
++ object values are logging levels
++ patterns are matched using the child logger binding `'name'`, so to use this
+  feature a child should be instantiated like so:<br>
+`var myModuleLog = mainLogger.child({ name: 'mymodule', ... })`
++ use `'*'`(star) as wildcard (rules are ordered so that `'*'` will not override
+`'mylib*'`).
+
+Note that currently the following properties are _not_ supported (unlike in
+`'debug'`):
++ multiple patterns separated by `','`(comma) or `' '`(space) &ndash;declare
+  several rules instead
++ exclusion patterns indicated by a leading `'-'`(minus) sign
 
 <a id="fatal"></a>
 ## .fatal([obj], msg, [...])
@@ -519,3 +555,4 @@ Serializes an `Error` object if passed in as an property.
   "stack": "Error: an error\n    at Object.<anonymous> (/Users/matteo/Repositories/pino/example.js:16:7)\n    at Module._compile (module.js:435:26)\n    at Object.Module._extensions..js (module.js:442:10)\n    at Module.load (module.js:356:32)\n    at Function.Module._load (module.js:313:12)\n    at Function.Module.runMain (module.js:467:10)\n    at startup (node.js:136:18)\n    at node.js:963:3"
 }
 ```
+

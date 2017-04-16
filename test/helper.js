@@ -12,16 +12,24 @@ function sink (func) {
   return result
 }
 
-function check (t, chunk, level, msg) {
+// 'wanted' either:
+// - an object (then expect all its properties, 'msg' optional)
+// - or level property value
+function check (t, chunk, wanted, msg) {
   t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
   delete chunk.time
-  t.deepEqual(chunk, {
+  let ref = {
     pid: pid,
     hostname: hostname,
-    level: level,
-    msg: msg,
     v: 1
-  })
+  }
+  if (typeof wanted === 'object') {
+    Object.assign(ref, wanted)
+  } else {
+    ref.level = wanted
+  }
+  if (typeof msg !== 'undefined') ref.msg = msg
+  t.deepEqual(chunk, ref)
 }
 
 module.exports.sink = sink

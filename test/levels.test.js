@@ -253,3 +253,88 @@ test('setting level in child', function (t) {
   instance.error('this is an error')
   instance.fatal('this is fatal')
 })
+
+test('level as object, config before child', function (t) {
+  t.plan(6)
+  var expected = [{
+    level: 30,
+    msg: 'hello from parent'
+  }, {
+    name: 'debugme1',
+    level: 30,
+    msg: 'hello from child'
+  }, {
+    name: 'debugme1',
+    level: 20,
+    msg: 'child debug'
+  }]
+  var instance = pino({
+  }, sink(function (chunk, enc, cb) {
+    var wanted = expected.shift()
+    check(t, chunk, wanted)
+    cb()
+  }))
+  instance.setChildrenLevels({ 'debugme*': 'debug', '*': 'info' })
+  var child = instance.child({ name: 'debugme1' })
+
+  instance.info('hello from parent')
+  child.info('hello from child')
+  instance.debug('parent debug')
+  child.debug('child debug')
+
+  t.end()
+})
+
+test('level as object, dynamic config', function (t) {
+  t.plan(6)
+  var expected = [{
+    level: 30,
+    msg: 'hello from parent'
+  }, {
+    name: 'debugme1',
+    level: 30,
+    msg: 'hello from child'
+  }, {
+    name: 'debugme1',
+    level: 20,
+    msg: 'child debug'
+  }]
+  var instance = pino(sink(function (chunk, enc, cb) {
+    var wanted = expected.shift()
+    check(t, chunk, wanted)
+    cb()
+  }))
+  var child = instance.child({ name: 'debugme1' })
+  instance.setChildrenLevels({ 'debugme*': 'debug', '*': 'info' })
+
+  instance.info('hello from parent')
+  child.info('hello from child')
+  instance.debug('parent debug')
+  child.debug('child debug')
+
+  t.end()
+})
+
+test('level rules ordering', function (t) {
+  t.plan(2)
+  var expected = [{
+    name: 'debugme1',
+    level: 20,
+    msg: 'hello from child'
+  }]
+  var instance = pino({
+  }, sink(function (chunk, enc, cb) {
+    var wanted = expected.shift()
+    check(t, chunk, wanted)
+    cb()
+  }))
+  instance.setChildrenLevels({ 'debugme*': 'debug', 'debugme:sub*': 'info', '*': 'info' })
+  var child = instance.child({ name: 'debugme1' })
+  var childsub = instance.child({ name: 'debugme:submod' })
+
+  instance.debug('hello from parent')
+  child.debug('hello from child')
+  childsub.debug('hello from childsub')
+
+  t.end()
+})

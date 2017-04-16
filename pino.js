@@ -54,7 +54,7 @@ function getLevelVal () {
   return this._levelVal
 }
 function setLevelVal (num) {
-  if (typeof num === 'string') { return this._setLevel(num) }
+  if (typeof num !== 'number') { return this._setLevel(num) }
 
   if (this.emit) {
     this.emit('level-change', this.levels.labels[num], num, this.levels.labels[this._levelVal], this._levelVal)
@@ -165,23 +165,40 @@ function child (bindings) {
   }
   data = this.chindings + data.substr(0, data.length - 1)
 
+  const nameChild = bindings.name || this.name
+  var levelChild = bindings.level || this.level
+  // child log level will be overridden if parent rule matches
+  if (this.levelRules) {
+    for (var i = 0; i < this.levelRules.length; i++) {
+      const rule = this.levelRules[i]
+      const regexp = rule[0]
+      if (regexp.test(nameChild)) {
+        levelChild = rule[1]
+        break
+      }
+    }
+  }
+
   var opts = {
-    level: bindings.level || this.level,
+    level: levelChild,
     levelVal: levels.isStandardLevelVal(this.levelVal) ? undefined : this.levelVal,
+    levelRules: false,
     serializers: bindings.hasOwnProperty('serializers') ? Object.assign({}, this.serializers, bindings.serializers) : this.serializers,
     stringify: this.stringify,
     end: this.end,
-    name: this.name,
+    name: nameChild,
     timestamp: this.timestamp,
     slowtime: this.slowtime,
     chindings: data,
     cache: this.cache,
+    children: [],
     formatOpts: this.formatOpts
   }
 
   var _child = Object.create(this)
   _child.stream = this.stream
   tools.applyOptions.call(_child, opts)
+  this.children.push(_child)
   return _child
 }
 Object.defineProperty(pinoPrototype, 'child', {
@@ -233,6 +250,33 @@ Object.defineProperty(pinoPrototype, 'addLevel', {
   value: addLevel
 })
 
+function setChildrenLevels (levels) {
+  // process and save rules for future offspring
+  // rules is an ordered (more specific first) list of [regexp, level]
+  this.levelRules = Object.keys(levels).sort(tools.orderByPrecision).map(function (pattern) {
+    return [new RegExp('^' + pattern.replace(/\*/g, '.*?') + '$'), levels[pattern]]
+  })
+  // apply rules to existing offspring and to us
+  function applyRules (rules, logger) {
+    for (var i = 0; i < rules.length; i++) {
+      const rule = rules[i]
+      const regexp = rule[0]
+      if (regexp.test(logger.name)) {
+        logger.level = rule[1]
+        return
+      }
+    }
+  }
+  for (var j = 0; j < this.children.length; j++) {
+    applyRules(this.levelRules, this.children[j])
+  }
+  applyRules(this.levelRules, this)
+}
+Object.defineProperty(pinoPrototype, 'setChildrenLevels', {
+  enumerable: true,
+  value: setChildrenLevels
+})
+
 function pino (opts, stream) {
   var iopts = opts
   var istream = stream
@@ -261,6 +305,8 @@ function pino (opts, stream) {
     buf: ''
   }
   iopts.chindings = ''
+  iopts.levelRules = false
+  iopts.children = []
 
   if (iopts.enabled === false) {
     iopts.level = 'silent'
@@ -306,9 +352,3 @@ module.exports.stdSerializers = {
   res: serializers.asResValue,
   err: serializers.asErrValue
 }
-module.exports.pretty = pretty
-Object.defineProperty(
-  module.exports,
-  'LOG_VERSION',
-  {value: LOG_VERSION, enumerable: true}
-)
