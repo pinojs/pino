@@ -3,6 +3,7 @@
 + [pino](#constructor)
 + [pino.pretty](#pretty)
 + [Logger Instance](#logger)
+  * [.pino](#version)
   * [.child](#child)
   * [.level](#level)
   * [.fatal](#fatal)
@@ -61,7 +62,7 @@
     it is up to you to terminate the process; you **must** perform only synchronous operations at this point.
     See [Extreme mode explained](extreme.md) for more detail.
   * `enabled` (boolean): enables logging. Default: `true`
-  * `browser` (Object): browser only, may have `asObject` and `write` keys, see [Pino in the Browser](../readme.md#browser) 
+  * `browser` (Object): browser only, may have `asObject` and `write` keys, see [Pino in the Browser](../readme.md#browser)
 + `stream` (Writable): a writable stream where the logs will be written.
   Default: `process.stdout`
 
@@ -119,6 +120,17 @@ in this section.
 
 <a id="logger"></a>
 # Logger
+
+<a id="version"></a>
+## .pino
+
+Exposes the current version of Pino.
+
+### Example:
+```js
+var log = require('pino')()
+if ('pino' in child) conosole.log(`pino version: ${log.pino}`)
+```
 
 <a id="child"></a>
 ## .child(bindings)
