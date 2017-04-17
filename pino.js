@@ -122,7 +122,7 @@ function asJson (obj, msg, num) {
   // to catch both null and undefined
   /* eslint-disable eqeqeq */
   if (msg != undefined) {
-    data += ',' + JSON.stringify('' + this.messageKey) + ':' + JSON.stringify('' + msg)
+    data += this.messageKeyString + JSON.stringify('' + msg)
   }
   // we need the child bindings added to the output first so that logged
   // objects can take precedence when JSON.parse-ing the resulting log line
@@ -178,7 +178,8 @@ function child (bindings) {
     chindings: data,
     cache: this.cache,
     formatOpts: this.formatOpts,
-    messageKey: this.messageKey
+    messageKey: this.messageKey,
+    messageKeyString: this.messageKeyString
   }
 
   var _child = Object.create(this)
@@ -258,6 +259,7 @@ function pino (opts, stream) {
   // internal options
   iopts.stringify = iopts.safe ? stringifySafe : JSON.stringify
   iopts.formatOpts = {lowres: true}
+  iopts.messageKeyString = ',' + JSON.stringify('' + iopts.messageKey) + ':'
   iopts.end = ',"v":' + LOG_VERSION + '}\n'
   iopts.cache = !iopts.extreme ? null : {
     size: 4096,
