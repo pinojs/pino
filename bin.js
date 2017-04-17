@@ -14,7 +14,7 @@ if (arg('-h') || arg('--help')) {
   process.stdin.pipe(pretty({
     timeTransOnly: arg('-t'),
     levelFirst: arg('-l'),
-    messageProp: messagePropArg()
+    messageKey: messageKeyArg()
   })).pipe(process.stdout)
 }
 
@@ -27,16 +27,16 @@ function arg (s) {
   return !!~process.argv.indexOf(s)
 }
 
-function messagePropArg () {
+function messageKeyArg () {
   if (!arg('-m')) {
     return
   }
-  var messagePropIndex = process.argv.indexOf('-m') + 1
-  var messageProp = process.argv.length > messagePropIndex &&
-    process.argv[messagePropIndex]
+  var messageKeyIndex = process.argv.indexOf('-m') + 1
+  var messageKey = process.argv.length > messageKeyIndex &&
+    process.argv[messageKeyIndex]
 
-  if (!messageProp) {
+  if (!messageKey) {
     throw new Error('-m flag provided without a string argument')
   }
-  return messageProp
+  return messageKey
 }

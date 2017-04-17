@@ -31,9 +31,9 @@ function withSpaces (value) {
   return lines.join('\n')
 }
 
-function filter (value, messageProp) {
+function filter (value, messageKey) {
   var keys = Object.keys(value)
-  var filteredKeys = standardKeys.concat([messageProp])
+  var filteredKeys = standardKeys.concat([messageKey])
   var result = ''
 
   for (var i = 0; i < keys.length; i++) {
@@ -56,8 +56,8 @@ function pretty (opts) {
   var timeTransOnly = opts && opts.timeTransOnly
   var formatter = opts && opts.formatter
   var levelFirst = opts && opts.levelFirst
-  var messageProp = opts && opts.messageProp
-  messageProp = messageProp || 'msg'
+  var messageKey = opts && opts.messageKey
+  messageKey = messageKey || 'msg'
 
   var stream = split(mapLine)
   var ctx
@@ -113,14 +113,14 @@ function pretty (opts) {
     }
     line += value.pid + ' on ' + value.hostname + ')'
     line += ': '
-    if (value[messageProp]) {
-      line += ctx.cyan(value[messageProp])
+    if (value[messageKey]) {
+      line += ctx.cyan(value[messageKey])
     }
     line += '\n'
     if (value.type === 'Error') {
       line += '    ' + withSpaces(value.stack) + '\n'
     } else {
-      line += filter(value, messageProp)
+      line += filter(value, messageKey)
     }
     return line
   }

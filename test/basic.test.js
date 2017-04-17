@@ -191,13 +191,13 @@ test('set the name', function (t) {
   instance.fatal('this is fatal')
 })
 
-test('set the messageProp', function (t) {
+test('set the messageKey', function (t) {
   t.plan(2)
 
   var message = 'hello world'
-  var messageProp = 'fooMessage'
+  var messageKey = 'fooMessage'
   var instance = pino({
-    messageProp: messageProp
+    messageKey: messageKey
   }, sink(function (chunk, enc, cb) {
     t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
