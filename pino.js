@@ -38,6 +38,10 @@ var pinoPrototype = Object.create(EventEmitter.prototype, {
   stream: {
     value: process.stdout,
     writable: true
+  },
+  pino: {
+    value: require('./package.json').version,
+    enumerable: true
   }
 })
 

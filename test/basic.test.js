@@ -9,6 +9,19 @@ var check = require('./helper').check
 var pid = process.pid
 var hostname = os.hostname()
 
+test('pino version is exposed', function (t) {
+  t.plan(2)
+  var instance = pino()
+  t.ok(instance.pino)
+  t.is(instance.pino, require('../package.json').version)
+})
+
+test('child exposes pino version', function (t) {
+  t.plan(1)
+  var child = pino().child({foo: 'bar'})
+  t.ok(child.pino)
+})
+
 function levelTest (name, level) {
   test(name + ' logs as ' + level, function (t) {
     t.plan(2)
