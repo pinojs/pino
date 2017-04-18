@@ -204,6 +204,29 @@ test('set the name', function (t) {
   instance.fatal('this is fatal')
 })
 
+test('set the messageKey', function (t) {
+  t.plan(2)
+
+  var message = 'hello world'
+  var messageKey = 'fooMessage'
+  var instance = pino({
+    messageKey: messageKey
+  }, sink(function (chunk, enc, cb) {
+    t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
+    delete chunk.time
+    t.deepEqual(chunk, {
+      pid: pid,
+      hostname: hostname,
+      level: 30,
+      fooMessage: message,
+      v: 1
+    })
+    cb()
+  }))
+
+  instance.info(message)
+})
+
 test('set undefined properties', function (t) {
   t.plan(2)
 

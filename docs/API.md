@@ -54,6 +54,7 @@
     Default: 'info'.
   * `levelVal` (integer): when defining a custom log level via `level`, set to an
     integer value to define the new level. Default: `undefined`.
+  * `messageKey` (string): the string key for the 'message' in the JSON object. Default `msg`.
   * `prettyPrint` (boolean|object): enables [pino.pretty](#pretty). This is intended for non-production
     configurations. This may be set to a configuration object as outlined in [pino.pretty](#pretty). Default: `false`.
   * `onTerminated` (function): this function will be invoked during process shutdown when `extreme` is set to `true`.
@@ -94,6 +95,8 @@ Returns a new [logger](#logger) instance.
   JSON object as an argument and should return a string value.
   * `levelFirst` (boolean): if set to `true`, it will print the name of the log
   level as the first field in the log line. Default: `false`.
+  * `messageKey` (string): the key in the JSON object to use as the highlighted
+  message. Default: `msg`.
 
 ### Example:
 ```js

@@ -19,7 +19,6 @@ var standardKeys = [
   'hostname',
   'name',
   'level',
-  'msg',
   'time',
   'v'
 ]
@@ -32,12 +31,13 @@ function withSpaces (value) {
   return lines.join('\n')
 }
 
-function filter (value) {
+function filter (value, messageKey) {
   var keys = Object.keys(value)
+  var filteredKeys = standardKeys.concat([messageKey])
   var result = ''
 
   for (var i = 0; i < keys.length; i++) {
-    if (standardKeys.indexOf(keys[i]) < 0) {
+    if (filteredKeys.indexOf(keys[i]) < 0) {
       result += '    ' + keys[i] + ': ' + withSpaces(JSON.stringify(value[keys[i]], null, 2)) + '\n'
     }
   }
@@ -56,6 +56,8 @@ function pretty (opts) {
   var timeTransOnly = opts && opts.timeTransOnly
   var formatter = opts && opts.formatter
   var levelFirst = opts && opts.levelFirst
+  var messageKey = opts && opts.messageKey
+  messageKey = messageKey || 'msg'
 
   var stream = split(mapLine)
   var ctx
@@ -111,14 +113,14 @@ function pretty (opts) {
     }
     line += value.pid + ' on ' + value.hostname + ')'
     line += ': '
-    if (value.msg) {
-      line += ctx.cyan(value.msg)
+    if (value[messageKey]) {
+      line += ctx.cyan(value[messageKey])
     }
     line += '\n'
     if (value.type === 'Error') {
       line += '    ' + withSpaces(value.stack) + '\n'
     } else {
-      line += filter(value)
+      line += filter(value, messageKey)
     }
     return line
   }

@@ -27,7 +27,8 @@ var defaultOptions = {
     if (err) return process.exit(1)
     process.exit(0)
   },
-  enabled: true
+  enabled: true,
+  messageKey: 'msg'
 }
 
 var pinoPrototype = Object.create(EventEmitter.prototype, {
@@ -125,7 +126,7 @@ function asJson (obj, msg, num) {
   // to catch both null and undefined
   /* eslint-disable eqeqeq */
   if (msg != undefined) {
-    data += ',"msg":' + JSON.stringify('' + msg)
+    data += this.messageKeyString + JSON.stringify('' + msg)
   }
   // we need the child bindings added to the output first so that logged
   // objects can take precedence when JSON.parse-ing the resulting log line
@@ -180,7 +181,9 @@ function child (bindings) {
     slowtime: this.slowtime,
     chindings: data,
     cache: this.cache,
-    formatOpts: this.formatOpts
+    formatOpts: this.formatOpts,
+    messageKey: this.messageKey,
+    messageKeyString: this.messageKeyString
   }
 
   var _child = Object.create(this)
@@ -248,7 +251,8 @@ function pino (opts, stream) {
   if (iopts.extreme && iopts.prettyPrint) throw Error('cannot enable pretty print in extreme mode')
   istream = istream || process.stdout
   if (iopts.prettyPrint) {
-    var pstream = pretty(iopts.prettyPrint)
+    var prettyOpts = Object.assign({ messageKey: iopts.messageKey }, iopts.prettyPrint)
+    var pstream = pretty(prettyOpts)
     var origStream = istream
     pump(pstream, origStream, function (err) {
       if (err) instance.emit('error', err)
@@ -259,6 +263,7 @@ function pino (opts, stream) {
   // internal options
   iopts.stringify = iopts.safe ? stringifySafe : JSON.stringify
   iopts.formatOpts = {lowres: true}
+  iopts.messageKeyString = `,"${iopts.messageKey}":`
   iopts.end = ',"v":' + LOG_VERSION + '}\n'
   iopts.cache = !iopts.extreme ? null : {
     size: 4096,
