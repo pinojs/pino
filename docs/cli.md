@@ -62,3 +62,15 @@ Into this:
 ```sh
 INFO [2016-03-09T15:27:09.339Z] (14139 on MacBook-Pro-3.home): hello world
 ```
+If you would like to enforce the output to be color encoded you can specify the `-c` flag
+`cat log | pino -c` will transform this:
+
+```js
+{"pid":14139,"hostname":"MacBook-Pro-3.home","level":30,"fooMessage":"hello world","time":1457537229339,"v":1}
+```
+
+Into this:
+
+```sh
+[2017-04-25T17:32:09.662Z] [32mINFO[39m (24280 on SP2): [36mhello world[39m
+```
