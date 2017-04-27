@@ -57,6 +57,7 @@ function pretty (opts) {
   var formatter = opts && opts.formatter
   var levelFirst = opts && opts.levelFirst
   var messageKey = opts && opts.messageKey
+  var forceColor = opts && opts.forceColor
   messageKey = messageKey || 'msg'
 
   var stream = split(mapLine)
@@ -67,7 +68,7 @@ function pretty (opts) {
 
   stream.pipe = function (dest, opts) {
     ctx = new chalk.constructor({
-      enabled: !!(chalk.supportsColor && dest.isTTY)
+      enabled: !!((chalk.supportsColor && dest.isTTY) || forceColor)
     })
 
     levelColors = {

@@ -97,6 +97,8 @@ Returns a new [logger](#logger) instance.
   level as the first field in the log line. Default: `false`.
   * `messageKey` (string): the key in the JSON object to use as the highlighted
   message. Default: `msg`.
+  * `forceColor` (boolean): if set to `true`, will add color information to the formatted output
+  message. Default: `false`.
 
 ### Example:
 ```js

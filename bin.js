@@ -14,6 +14,7 @@ if (arg('-h') || arg('--help')) {
   process.stdin.pipe(pretty({
     timeTransOnly: arg('-t'),
     levelFirst: arg('-l'),
+    forceColor: arg('-c'),
     messageKey: messageKeyArg()
   })).pipe(process.stdout)
 }

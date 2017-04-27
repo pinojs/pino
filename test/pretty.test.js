@@ -40,6 +40,17 @@ test('pino pretty moves level to start on flag', function (t) {
   instance.info('hello world')
 })
 
+test('pino pretty force color on flag', function (t) {
+  t.plan(1)
+  var prettier = pretty({ forceColor: true })
+  prettier.pipe(split(function (line) {
+    t.ok(line.match(/.*\u001b\[32mINFO\u001b\[39m.*\u001b\[36mhello world\u001b\[39m$/), 'color coding information is encoded in the line')
+    return line
+  }))
+  var instance = pino(prettier)
+
+  instance.info('hello world')
+})
 test('pino transform can just parse the dates', function (t) {
   t.plan(1)
   var prettier = pretty({ timeTransOnly: true })
