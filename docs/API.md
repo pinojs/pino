@@ -48,10 +48,6 @@
     If set to `false`, no timestamp will be included in the output.
     See [stdTimeFunctions](#stdTimeFunctions) for more information.
     Caution: any sort of formatted time will significantly slow down Pino's performance.
-  * `slowtime` (boolean): Outputs ISO time stamps (`'2016-03-09T15:18:53.889Z'`)
-    instead of Epoch time stamps (`1457536759176`). **WARNING**: This option
-    carries a 25% performance drop. We recommend using default Epoch timestamps and transforming logs after if required. The `pino -t` command will do this for
-    you (see [CLI](cli.md)). Default: `false`.
   * `extreme` (boolean): Enables extreme mode, yields an additional 60% performance
     (from 250ms down to 100ms per 10000 ops). There are trade-off's should be
     understood before usage. See [Extreme mode explained](extreme.md). Default: `false`.
