@@ -12,6 +12,20 @@ test('pino exposes standard time functions', function (t) {
   t.ok(pino.stdTimeFunctions.nullTime)
 })
 
+test('pino accepts external time functions', function (t) {
+  t.plan(2)
+  var opts = {
+    timestamp: function () {
+      return ',"time":"none"'
+    }
+  }
+  var instance = pino(opts, sink(function (chunk, enc, cb) {
+    t.equal(chunk.hasOwnProperty('time'), true)
+    t.equal(chunk.time, 'none')
+  }))
+  instance.info('foobar')
+})
+
 test('inserts timestamp by default', function (t) {
   var instance = pino(sink(function (chunk, enc, cb) {
     t.equal(chunk.hasOwnProperty('time'), true)

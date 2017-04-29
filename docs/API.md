@@ -44,10 +44,11 @@
     property name is logged objects.
   * `timestamp` (boolean|function): Enables or disables the inclusion of a timestamp in the
     log message. If a function is supplied, it must synchronously return a JSON string
-    representation of the time, e.g. `"time":1493426328206 (which is the default).
+    representation of the time, e.g. `,"time":1493426328206 (which is the default).
     If set to `false`, no timestamp will be included in the output.
-    See [stdTimeFunctions](#stdTimeFunctions) for more information.
-    Caution: any sort of formatted time will significantly slow down Pino's performance.
+    See [stdTimeFunctions](#stdTimeFunctions) for a set of available functions
+    for passing in as a value for this option. Caution: any sort of formatted
+    time will significantly slow down Pino's performance.
   * `extreme` (boolean): Enables extreme mode, yields an additional 60% performance
     (from 250ms down to 100ms per 10000 ops). There are trade-off's should be
     understood before usage. See [Extreme mode explained](extreme.md). Default: `false`.
@@ -549,17 +550,17 @@ format. Alternatively, you can specify your own time function.
 
 A time function must synchronously return a string that would be a valid
 component of a JSON string. For example, the default function returns
-a string like `"time":1493426328206`.
+a string like `,"time":1493426328206`.
 
 <a id="epochTimeFunction"></a>
 ### .epochTime
 
-The default time function for Pino. Returns a string like `"time":1493426328206`.
+The default time function for Pino. Returns a string like `,"time":1493426328206`.
 
 <a id="slowTimeFunction"></a>
 ### .slowTime
 
-Returns an ISO formatted string like `"time":"2017-04-29T00:47:49.354Z". It is
+Returns an ISO formatted string like `,"time":"2017-04-29T00:47:49.354Z". It is
 highly recommended that you avoid this function. It incurs a significant
 performance penalty.
 
