@@ -10,6 +10,7 @@ var events = require('./lib/events')
 var levels = require('./lib/levels')
 var tools = require('./lib/tools')
 var serializers = require('./lib/serializers')
+var time = require('./lib/time')
 
 var LOG_VERSION = 1
 
@@ -17,8 +18,7 @@ var defaultOptions = {
   safe: true,
   name: undefined,
   serializers: {},
-  timestamp: true,
-  slowtime: false,
+  timestamp: time.epochTime,
   extreme: false,
   level: 'info',
   levelVal: undefined,
@@ -178,7 +178,6 @@ function child (bindings) {
     end: this.end,
     name: this.name,
     timestamp: this.timestamp,
-    slowtime: this.slowtime,
     chindings: data,
     cache: this.cache,
     formatOpts: this.formatOpts,
@@ -315,6 +314,7 @@ module.exports.stdSerializers = {
   res: serializers.asResValue,
   err: serializers.asErrValue
 }
+module.exports.stdTimeFunctions = Object.assign({}, time)
 module.exports.pretty = pretty
 Object.defineProperty(
   module.exports,

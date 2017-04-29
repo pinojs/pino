@@ -23,6 +23,10 @@
     + [.req](#reqSerializer)
     + [.res](#resSerializer)
     + [.err](#errSerializer)
+  + [.stdTimeFunctions](#stdTimeFunctions)
+    + [.epochTime](#epochTimeFunction)
+    + [.slowTime](#slowTimeFunction)
+    + [.nullTime](#nullTimeFunction)
 
 # module.exports
 
@@ -38,9 +42,12 @@
     of objects. These functions should return an JSONifiable object and they
     should never throw. Each property name of this object will match to a
     property name is logged objects.
-  * `timestamp` (boolean): Enables or disables the inclusion of a timestamp in the
-    log message. `slowtime` has no effect if this option is set to `false`.
-    Defaults: `true`.
+  * `timestamp` (boolean|function): Enables or disables the inclusion of a timestamp in the
+    log message. If a function is supplied, it must synchronously return a JSON string
+    representation of the time, e.g. `"time":1493426328206 (which is the default).
+    If set to `false`, no timestamp will be included in the output.
+    See [stdTimeFunctions](#stdTimeFunctions) for more information.
+    Caution: any sort of formatted time will significantly slow down Pino's performance.
   * `slowtime` (boolean): Outputs ISO time stamps (`'2016-03-09T15:18:53.889Z'`)
     instead of Epoch time stamps (`1457536759176`). **WARNING**: This option
     carries a 25% performance drop. We recommend using default Epoch timestamps and transforming logs after if required. The `pino -t` command will do this for
@@ -536,3 +543,32 @@ Serializes an `Error` object if passed in as an property.
   "stack": "Error: an error\n    at Object.<anonymous> (/Users/matteo/Repositories/pino/example.js:16:7)\n    at Module._compile (module.js:435:26)\n    at Object.Module._extensions..js (module.js:442:10)\n    at Module.load (module.js:356:32)\n    at Function.Module._load (module.js:313:12)\n    at Function.Module.runMain (module.js:467:10)\n    at startup (node.js:136:18)\n    at node.js:963:3"
 }
 ```
+<a id="stdTimeFunctions"></a>
+## .stdTimeFunctions
+
+Available as a static property, the `stdTimeFunctions` provide functions for
+generating the timestamp property in the log output. You can set the `timestamp`
+option during initialization to one of these functions to adjust the output
+format. Alternatively, you can specify your own time function.
+
+A time function must synchronously return a string that would be a valid
+component of a JSON string. For example, the default function returns
+a string like `"time":1493426328206`.
+
+<a id="epochTimeFunction"></a>
+### .epochTime
+
+The default time function for Pino. Returns a string like `"time":1493426328206`.
+
+<a id="slowTimeFunction"></a>
+### .slowTime
+
+Returns an ISO formatted string like `"time":"2017-04-29T00:47:49.354Z". It is
+highly recommended that you avoid this function. It incurs a significant
+performance penalty.
+
+<a id="nullTimeFunction"></a>
+### .nulltime
+
+Returns an empty string. This function is used when the `timestamp` option
+is set to `false`.

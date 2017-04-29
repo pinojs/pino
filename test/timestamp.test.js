@@ -4,6 +4,14 @@ var test = require('tap').test
 var pino = require('../')
 var sink = require('./helper').sink
 
+test('pino exposes standard time functions', function (t) {
+  t.plan(4)
+  t.ok(pino.stdTimeFunctions)
+  t.ok(pino.stdTimeFunctions.epochTime)
+  t.ok(pino.stdTimeFunctions.slowTime)
+  t.ok(pino.stdTimeFunctions.nullTime)
+})
+
 test('inserts timestamp by default', function (t) {
   var instance = pino(sink(function (chunk, enc, cb) {
     t.equal(chunk.hasOwnProperty('time'), true)
