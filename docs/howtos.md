@@ -6,7 +6,7 @@
 + [How to use Pino with Koa](#koa)
 + [How to use Pino with debug](#debug)
 + [How to rotate log files](#rotate)
-+ [How to save to multiple file](#multiple)
++ [How to save to multiple files](#multiple)
 + [How to redact sensitive information](#redact)
 
 <a id="express"></a>
