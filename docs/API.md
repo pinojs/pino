@@ -40,8 +40,8 @@
   * `name` (string): the name of the logger. Default: `undefined`.
   * `serializers` (object): an object containing functions for custom serialization
     of objects. These functions should return an JSONifiable object and they
-    should never throw. Each property name of this object will match to a
-    property name is logged objects.
+    should never throw. When logging an object, each top-level property matching the exact key of a serializer 
+    will be serialized using the defined serializer.
   * `timestamp` (boolean|function): Enables or disables the inclusion of a timestamp in the
     log message. If a function is supplied, it must synchronously return a JSON string
     representation of the time, e.g. `,"time":1493426328206 (which is the default).
