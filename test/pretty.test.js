@@ -231,3 +231,21 @@ test('can be enabled via constructor with pretty configuration', function (t) {
     t.notEqual(actual.match(/^INFO.*h/), null)
   })
 })
+
+test('works without time', function (t) {
+  t.plan(4)
+  var prettier = pretty()
+  prettier.pipe(split(function (line) {
+    t.ok(line.match(/.*hello world$/), 'end of line matches')
+    t.ok(line.match(/^INFO.*/), 'includes level')
+    t.ok(line.indexOf('' + process.pid) > 0, 'includes pid')
+    t.ok(line.indexOf('' + hostname) > 0, 'includes hostname')
+    return line
+  }))
+
+  var instance = pino({
+    timestamp: null
+  }, prettier)
+
+  instance.info('hello world')
+})

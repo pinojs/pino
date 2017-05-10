@@ -105,8 +105,8 @@ function pretty (opts) {
     }
 
     line = (levelFirst)
-        ? asColoredLevel(value) + ' [' + asISODate(value.time) + ']'
-        : '[' + asISODate(value.time) + '] ' + asColoredLevel(value)
+        ? asColoredLevel(value) + ' ' + formatTime(value)
+        : formatTime(value, ' ') + asColoredLevel(value)
 
     line += ' ('
     if (value.name) {
@@ -128,6 +128,19 @@ function pretty (opts) {
 
   function asISODate (time) {
     return new Date(time).toISOString()
+  }
+
+  function formatTime (value, after) {
+    after = after || ''
+    try {
+      if (!value || !value.time) {
+        return ''
+      } else {
+        return '[' + asISODate(value.time) + ']' + after
+      }
+    } catch (_) {
+      return ''
+    }
   }
 
   function asColoredLevel (value) {
