@@ -73,6 +73,20 @@ test('after the fact add level does not include lower levels', function (t) {
   log.foo('bar')
 })
 
+test('after the fact add of a lower level does not include it', function (t) {
+  t.plan(1)
+
+  var log = pino(sink(function (chunk, enc, cb) {
+    t.is(chunk.msg, 'bar')
+    cb()
+  }))
+
+  log.level = 'info'
+  log.addLevel('foo', 15)
+  log.info('bar')
+  log.foo('nope')
+})
+
 test('children can be set to custom level', function (t) {
   t.plan(2)
 

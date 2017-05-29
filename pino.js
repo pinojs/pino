@@ -233,7 +233,12 @@ function addLevel (name, lvl) {
   this.levels.values[name] = lvl
   this.levels.labels[lvl] = name
   this._lscache[lvl] = flatstr('"level":' + Number(lvl))
-  this[name] = tools.genLog(lvl)
+  Object.defineProperty(this, name, {
+    value: lvl < this._levelVal ? tools.noop : tools.genLog(lvl),
+    enumerable: true,
+    writable: true
+  })
+
   return true
 }
 Object.defineProperty(pinoPrototype, 'addLevel', {
