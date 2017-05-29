@@ -58,7 +58,7 @@
     "benchmark": "^2.1.2",
     "bole": "^3.0.2",
     "bunyan": "^1.8.5",
-    "debug": "^2.5.1",
+    "debug": "^2.6.8",
     "fastbench": "^1.0.0",
     "flush-write-stream": "^1.0.2",
     "fresh-require": "^1.0.3",
@@ -77,7 +77,7 @@
   "dependencies": {
     "chalk": "^1.1.1",
     "fast-json-parse": "^1.0.0",
-    "fast-safe-stringify": "^1.1.11",
+    "fast-safe-stringify": "^1.2.0",
     "flatstr": "^1.0.4",
     "pump": "^1.0.2",
     "quick-format-unescaped": "^1.1.1",
