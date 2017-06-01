@@ -2,6 +2,7 @@
 
 var test = require('tap').test
 var os = require('os')
+var proxyquire = require('proxyquire')
 var pino = require('../')
 var sink = require('./helper').sink
 var check = require('./helper').check
@@ -441,4 +442,26 @@ test('children with same names render in correct order', function (t) {
   }))
 
   root.child({a: 1}).child({a: 2}).info({a: 3})
+})
+
+//  https://github.com/pinojs/pino/pull/251 - use this.stringify
+test('when safe is true it should ONLY use `fast-safe-stringify`', function (t) {
+  t.plan(2)
+  var safeStates = [true, false]
+  var isFastSafeStringifyCalled = null
+  var mockedPino = proxyquire('../', {
+    'fast-safe-stringify': function () {
+      isFastSafeStringifyCalled = true
+      return '{ "hello": "world" }'
+    }
+  })
+  safeStates.forEach(function (safeState) {
+    isFastSafeStringifyCalled = false
+    var instance = mockedPino({ safe: safeState }, sink(function (chunk, enc, cb) {
+      cb()
+    }))
+    instance.info({ hello: 'world' })
+    t.equal(isFastSafeStringifyCalled, safeState)
+  })
+  t.end()
 })
