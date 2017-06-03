@@ -37,9 +37,23 @@ Node's single threaded event loop.
 
 If you write a transport, let us know and we will add a link here!
 
++ [pino-couch](#pino-couch)
 + [pino-elasticsearch](#pino-elasticsearch)
 + [pino-socket](#pino-socket)
 + [pino-syslog](#pino-syslog)
+
+<a id="pino-couch"></a>
+### pino-couch
+
+[pino-couch][pino-couch] uploads each log line as a [CouchDB][CouchDB] document.
+
+```sh
+$ node yourapp.js | pino-couch -U https://your-server -d mylogs
+```
+
+[pino-couch]: https://github.com/IBM/pino-couch
+[CouchDB]: https://couchdb.apache.org
+
 
 <a id="pino-elasticsearch"></a>
 ### pino-elasticsearch
