@@ -444,7 +444,7 @@ test('children with same names render in correct order', function (t) {
   root.child({a: 1}).child({a: 2}).info({a: 3})
 })
 
-//  https://github.com/pinojs/pino/pull/251 - use this.stringify
+// https://github.com/pinojs/pino/pull/251 - use this.stringify
 test('when safe is true it should ONLY use `fast-safe-stringify`', function (t) {
   t.plan(2)
   var safeStates = [true, false]

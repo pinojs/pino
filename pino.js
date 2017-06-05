@@ -1,6 +1,7 @@
 'use strict'
 
 var EventEmitter = require('events').EventEmitter
+var stringifySafe = require('fast-safe-stringify')
 var fs = require('fs')
 var pump = require('pump')
 var flatstr = require('flatstr')
@@ -266,7 +267,7 @@ function pino (opts, stream) {
   }
 
   // internal options
-  iopts.stringify = iopts.safe ? require('fast-safe-stringify') : JSON.stringify
+  iopts.stringify = iopts.safe ? stringifySafe : JSON.stringify
   iopts.formatOpts = {lowres: true}
   iopts.messageKeyString = `,"${iopts.messageKey}":`
   iopts.end = ',"v":' + LOG_VERSION + '}\n'
