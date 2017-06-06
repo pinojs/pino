@@ -289,6 +289,10 @@ parents and children will end up in log output.
 
 <https://gitter.im/pinojs/pino>
 
+### Chat on IRC
+
+You'll find an active group of Pino users in the #pino channel on Freenode, including some of the contributors to this project.
+
 ## Contributing
 
 Pino is an **OPEN Open Source Project**. This means that:
