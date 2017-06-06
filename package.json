@@ -65,6 +65,7 @@
     "log": "^1.4.0",
     "loglevel": "^1.4.0",
     "pre-commit": "^1.2.2",
+    "proxyquire": "^1.8.0",
     "snazzy": "^7.0.0",
     "standard": "^10.0.0",
     "steed": "^1.1.3",

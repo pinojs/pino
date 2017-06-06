@@ -1,7 +1,7 @@
 'use strict'
 
-var stringifySafe = require('fast-safe-stringify')
 var EventEmitter = require('events').EventEmitter
+var stringifySafe = require('fast-safe-stringify')
 var fs = require('fs')
 var pump = require('pump')
 var flatstr = require('flatstr')
@@ -127,7 +127,7 @@ function asJson (obj, msg, num) {
   // to catch both null and undefined
   /* eslint-disable eqeqeq */
   if (msg != undefined) {
-    data += this.messageKeyString + JSON.stringify('' + msg)
+    data += this.messageKeyString + this.stringify('' + msg)
   }
   // we need the child bindings added to the output first so that logged
   // objects can take precedence when JSON.parse-ing the resulting log line
