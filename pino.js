@@ -11,6 +11,8 @@ var levels = require('./lib/levels')
 var tools = require('./lib/tools')
 var serializers = require('./lib/serializers')
 var time = require('./lib/time')
+var MultiStream = require('./lib/multistream')
+var needsMetadata = Symbol.for('needsMetadata')
 
 var LOG_VERSION = 1
 
@@ -199,14 +201,21 @@ Object.defineProperty(pinoPrototype, 'child', {
 
 function pinoWrite (obj, msg, num) {
   var s = this.asJson(obj, msg, num)
+  var stream = this.stream
   if (!this.cache) {
-    this.stream.write(flatstr(s))
+    if (stream[needsMetadata]) {
+      stream.lastLevel = num
+      stream.lastMsg = msg
+      stream.lastObj = obj
+      stream.lastLogger = this // for child loggers
+    }
+    stream.write(flatstr(s))
     return
   }
 
   this.cache.buf += s
   if (this.cache.buf.length > this.cache.size) {
-    this.stream.write(flatstr(this.cache.buf))
+    stream.write(flatstr(this.cache.buf))
     this.cache.buf = ''
   }
 }
@@ -328,3 +337,6 @@ Object.defineProperty(
   'LOG_VERSION',
   {value: LOG_VERSION, enumerable: true}
 )
+
+module.exports.multistream = MultiStream
+module.exports.needsMetadata = needsMetadata
