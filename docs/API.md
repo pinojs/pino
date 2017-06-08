@@ -27,6 +27,7 @@
     + [.epochTime](#epochTimeFunction)
     + [.slowTime](#slowTimeFunction)
     + [.nullTime](#nullTimeFunction)
++ [Metadata Support](#metadata)
 
 # module.exports
 
@@ -76,7 +77,8 @@
   * `enabled` (boolean): enables logging. Default: `true`
   * `browser` (Object): browser only, may have `asObject` and `write` keys, see [Pino in the Browser](../readme.md#browser)
 + `stream` (Writable): a writable stream where the logs will be written.
-  Default: `process.stdout`
+  It can also receive some log-line [metadata](#metadata), if the
+  relative protocol is enabled. Default: `process.stdout`
 
 ### Example:
 ```js
@@ -576,3 +578,31 @@ performance penalty.
 
 Returns an empty string. This function is used when the `timestamp` option
 is set to `false`.
+
+<a id="metadata"></a>
+# Metadata
+
+A destination stream can have a property `Symbol.for('needsMetadata')`
+to indicate that for every log line that is written, it wants set to
+itself:
+
+* the last logging level as `this.lastLevel`
+* the last logging message as `this.lastMsg`
+* the last logging object as `this.lastObj`
+* the last logger instance as `this.lastLogger` (to support child
+  loggers)
+
+## Example
+
+```js
+var instance = pino({}, {
+  [Symbol.for('needsMetadata')]: true,
+  write: function (chunk) {
+    console.log('lastLevel', this.lastLevel)
+    console.log('lastMsg', this.lastMsg)
+    console.log('lastObj', this.lastObj)
+    console.log('lastLogger', this.lastLogger)
+    console.log('line', chunk)
+  }
+})
+```
