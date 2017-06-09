@@ -582,14 +582,14 @@ is set to `false`.
 <a id="metadata"></a>
 # Metadata
 
-A destination stream can have a property `Symbol.for('needsMetadata')`
+A destination stream can have a property `stream[Symbol.for('needsMetadata')] = true`
 to indicate that for every log line written, the following properties of the stream
 should be set:
 
-* the last logging level as `this.lastLevel`
-* the last logging message as `this.lastMsg`
-* the last logging object as `this.lastObj`
-* the last logger instance as `this.lastLogger` (to support child
+* the last logging level as `stream.lastLevel`
+* the last logging message as `stream.lastMsg`
+* the last logging object as `stream.lastObj`
+* the last logger instance as `stream.lastLogger` (to support child
   loggers)
 
 ## Example
