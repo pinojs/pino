@@ -583,8 +583,8 @@ is set to `false`.
 # Metadata
 
 A destination stream can have a property `Symbol.for('needsMetadata')`
-to indicate that for every log line that is written, it wants set to
-itself:
+to indicate that for every log line written, the following properties of the stream
+should be set:
 
 * the last logging level as `this.lastLevel`
 * the last logging message as `this.lastMsg`
