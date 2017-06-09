@@ -90,6 +90,47 @@ test('http request support via serializer', function (t) {
   })
 })
 
+test('http request support via serializer without request connection', function (t) {
+  t.plan(3)
+
+  var originalReq
+  var instance = pino({
+    serializers: {
+      req: pino.stdSerializers.req
+    }
+  }, sink(function (chunk, enc, cb) {
+    t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
+    delete chunk.time
+    t.deepEqual(chunk, {
+      pid: pid,
+      hostname: hostname,
+      level: 30,
+      msg: 'my request',
+      v: 1,
+      req: {
+        method: originalReq.method,
+        url: originalReq.url,
+        headers: originalReq.headers
+      }
+    })
+    cb()
+  }))
+
+  var server = http.createServer(function (req, res) {
+    originalReq = req
+    delete req.connection
+    instance.info({ req: req }, 'my request')
+    res.end('hello')
+  }).listen(function (err) {
+    t.error(err)
+    t.teardown(server.close.bind(server))
+
+    http.get('http://localhost:' + server.address().port, function (res) {
+      res.resume()
+    })
+  })
+})
+
 test('http response support', function (t) {
   t.plan(3)
 
