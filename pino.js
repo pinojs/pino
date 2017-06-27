@@ -121,26 +121,31 @@ Object.defineProperty(
 )
 
 function asJson (obj, msg, num) {
-  if (!msg && obj instanceof Error) {
-    msg = obj.message
+  // to catch both null and undefined
+  var objError = obj instanceof Error
+  if (!msg) {
+    if (objError) {
+      msg = obj.message
+    } else {
+      msg = undefined
+    }
   }
   var data = this._baseLog + this._lscache[num] + this.time()
-  // to catch both null and undefined
-  /* eslint-disable eqeqeq */
-  if (msg != undefined) {
+  if (msg !== undefined) {
     data += this.messageKeyString + this.stringify('' + msg)
   }
   // we need the child bindings added to the output first so that logged
   // objects can take precedence when JSON.parse-ing the resulting log line
   data = data + this.chindings
   var value
-  if (obj) {
-    if (obj.stack) {
+  if (obj !== undefined && obj !== null) {
+    var notHasOwnProperty = obj.hasOwnProperty === undefined
+    if (objError) {
       data += ',"type":"Error","stack":' + this.stringify(obj.stack)
     }
     for (var key in obj) {
       value = obj[key]
-      if ((!obj.hasOwnProperty || obj.hasOwnProperty(key)) && value !== undefined) {
+      if ((notHasOwnProperty || obj.hasOwnProperty(key)) && value !== undefined) {
         value = this.stringify(this.serializers[key] ? this.serializers[key](value) : value)
         if (value !== undefined) {
           data += ',"' + key + '":' + value
@@ -201,7 +206,7 @@ Object.defineProperty(pinoPrototype, 'child', {
 function pinoWrite (obj, msg, num) {
   var s = this.asJson(obj, msg, num)
   var stream = this.stream
-  if (!this.cache) {
+  if (this.cache === null) {
     if (stream[needsMetadata]) {
       stream.lastLevel = num
       stream.lastMsg = msg
