@@ -171,8 +171,13 @@ In short, the way Pino generates logs:
 1. Reduces the impact of logging on your application to an extremely minimal amount.
 2. Gives greater flexibility in how logs are processed and stored.
 
+Given all of the above, Pino clearly promotes out-of-process log processing.
+However, it is possible to wrap Pino and perform processing in-process.
+For an example of this, see [pino-multi-stream][pinoms].
+
 [pino-tee]: https://npm.im/pino-tee
 [jq]: https://stedolan.github.io/jq/
+[pinoms]: https://npm.im/pino-multi-stream
 
 <a name="browser"></a>
 ## Pino in the browser
