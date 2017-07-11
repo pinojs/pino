@@ -76,7 +76,7 @@
     "zuul": "^3.11.1"
   },
   "dependencies": {
-    "chalk": "^1.1.1",
+    "chalk": "^2.0.1",
     "fast-json-parse": "^1.0.0",
     "fast-safe-stringify": "^1.1.11",
     "flatstr": "^1.0.4",
