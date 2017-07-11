@@ -12,6 +12,9 @@ var tools = require('./lib/tools')
 var serializers = require('./lib/serializers')
 var time = require('./lib/time')
 var needsMetadata = Symbol.for('needsMetadata')
+var isStandardLevelVal = levels.isStandardLevelVal
+var isStandardLevel = levels.isStandardLevel
+var applyOptions = tools.applyOptions
 
 var LOG_VERSION = 1
 
@@ -74,7 +77,7 @@ function setLevelVal (num) {
       this[key] = tools.noop
       continue
     }
-    this[key] = levels.isStandardLevel(key) ? pinoPrototype[key] : tools.genLog(this.levels.values[key])
+    this[key] = isStandardLevel(key) ? pinoPrototype[key] : tools.genLog(this.levels.values[key])
   }
 }
 Object.defineProperty(pinoPrototype, 'levelVal', {
@@ -160,42 +163,34 @@ Object.defineProperty(pinoPrototype, 'asJson', {
   value: asJson
 })
 
-function child (bindings) {
+function asChindings (that, bindings) {
   if (!bindings) {
     throw Error('missing bindings for child Pino')
   }
-
-  var data = ','
-  var value
   var key
+  var value
+  var data = that.chindings
   for (key in bindings) {
     value = bindings[key]
     if (key !== 'level' && key !== 'serializers' && bindings.hasOwnProperty(key) && value !== undefined) {
-      value = this.serializers[key] ? this.serializers[key](value) : value
-      data += '"' + key + '":' + this.stringify(value) + ','
+      value = that.serializers[key] ? that.serializers[key](value) : value
+      data += ',"' + key + '":' + that.stringify(value)
     }
   }
-  data = this.chindings + data.substr(0, data.length - 1)
+  return data
+}
 
+function child (bindings) {
   var opts = {
+    chindings: asChindings(this, bindings),
     level: bindings.level || this.level,
-    levelVal: levels.isStandardLevelVal(this.levelVal) ? undefined : this.levelVal,
-    serializers: bindings.hasOwnProperty('serializers') ? Object.assign({}, this.serializers, bindings.serializers) : this.serializers,
-    stringify: this.stringify,
-    end: this.end,
-    name: this.name,
-    timestamp: this.timestamp,
-    slowtime: this.slowtime,
-    chindings: data,
-    cache: this.cache,
-    formatOpts: this.formatOpts,
-    messageKey: this.messageKey,
-    messageKeyString: this.messageKeyString
+    levelVal: isStandardLevelVal(this.levelVal) ? undefined : this.levelVal,
+    serializers: bindings.hasOwnProperty('serializers') ? Object.assign({}, this.serializers, bindings.serializers) : this.serializers
   }
 
   var _child = Object.create(this)
   _child.stream = this.stream
-  tools.applyOptions.call(_child, opts)
+  applyOptions(_child, opts)
   return _child
 }
 Object.defineProperty(pinoPrototype, 'child', {
@@ -297,7 +292,31 @@ function pino (opts, stream) {
   var instance = Object.create(pinoPrototype)
   instance.stream = istream
   tools.defineLevelsProperty(instance)
-  tools.applyOptions.call(instance, iopts)
+
+  instance.stringify = iopts.stringify
+  instance.end = iopts.end
+  instance.name = iopts.name
+  instance.timestamp = iopts.timestamp
+  instance.slowtime = iopts.slowtime
+  instance.cache = iopts.cache
+  instance.formatiopts = iopts.formatiopts
+  instance.onTerminated = iopts.onTerminated
+  instance.messageKey = iopts.messageKey
+  instance.messageKeyString = iopts.messageKeyString
+
+  applyOptions(instance, iopts)
+
+  if (iopts.slowtime) {
+    instance.time = time.slowTime
+    process.emitWarning('use `timestamp: pino.stdTimeFunctions.slowTime`', '(pino) `slowtime` is deprecated')
+  } else if (iopts.timestamp && Function.prototype.isPrototypeOf(iopts.timestamp)) {
+    instance.time = iopts.timestamp
+  } else if (iopts.timestamp) {
+    instance.time = time.epochTime
+  } else {
+    instance.time = time.nullTime
+  }
+
   if (iopts.cache) setTimeout(waitForFDSettle, 100)
 
   var settleTries = 0
