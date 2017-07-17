@@ -13,7 +13,7 @@ It also includes a shell utility to pretty-print its log files.
 * [API ⇗](docs/API.md)
 * [Extreme mode explained ⇗](docs/extreme.md)
 * [Pino Howtos ⇗](docs/howtos.md)
-* [Transports with Pino ⇗](docs/transports.md)
+* [Transports with Pino](#transports)
 * [Pino in the browser](#browser)
 * [Caveats](#caveats)
 * [Team](#team)
@@ -139,6 +139,46 @@ In many cases, pino is over 6x faster than alternatives.
 For a fair comparison, [LogLevel](http://npm.im/loglevel) was extended
 to include a timestamp and [bole](http://npm.im/bole) had
 `fastTime` mode switched on.
+
+<a name="transports"></a>
+## Transports
+
+A transport in most logging libraries is something that runs in-process to
+perform some operation with the finalized log line. For example, a transport
+might send the log line to a standard syslog server after processing the log
+line and reformatting it. For details on implementing, and some already written,
+transports, see our [Transports⇗](docs/transports.md) document.
+
+> **Pino *does not* natively support in-process transports.**
+
+Pino does not support in-process transports because Node processes are
+single threaded processes (ignoring some technical details). Given this
+restriction, one of the methods Pino employs to achieve its speed is to
+purposefully offload the handling of logs, and their ultimate destination, to
+external processes so that the threading capabilities of the OS can be
+used (or other CPUs).
+
+One consequence of this methodology is that "error" logs do not get written to
+`stderr`. However, since Pino logs are in a parseable format, it is possible to
+use tools like [pino-tee][pino-tee] or [jq][jq] to work with the logs. For
+example, to view only logs marked as "error" logs:
+
+```
+$ node an-app.js | jq 'select(.level == 50)'
+```
+
+In short, the way Pino generates logs:
+
+1. Reduces the impact of logging on your application to an extremely minimal amount.
+2. Gives greater flexibility in how logs are processed and stored.
+
+Given all of the above, Pino clearly promotes out-of-process log processing.
+However, it is possible to wrap Pino and perform processing in-process.
+For an example of this, see [pino-multi-stream][pinoms].
+
+[pino-tee]: https://npm.im/pino-tee
+[jq]: https://stedolan.github.io/jq/
+[pinoms]: https://npm.im/pino-multi-stream
 
 <a name="browser"></a>
 ## Pino in the browser

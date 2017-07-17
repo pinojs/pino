@@ -1,13 +1,7 @@
 # Transports
 
-A transport in most logging libraries is something that runs in-process to
-perform some operation with the finalized log line. For example, a transport
-might send the log line to a standard syslog server after processing the log
-line and reformatting it.
-
-Pino *does not* support in-process transports. A "transport" for Pino is some
-other tool into which the output of Pino is piped. Consider the following
-example:
+A "transport" for Pino is some other tool into which the output of Pino is piped.
+Consider the following example:
 
 ```js
 var split = require('split2')
