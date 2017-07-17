@@ -152,10 +152,11 @@ transports, see our [Transports⇗](docs/transports.md) document.
 > **Pino *does not* natively support in-process transports.**
 
 Pino does not support in-process transports because Node processes are
-single threaded processes (ignoring some technical details). In order for Pino
-to achieve the speed it achieves, Pino purposefully offloads the handling of
-logs, and their ultimate destination, to external processes so that the
-threading capabilities of the OS can be used (or other CPUs).
+single threaded processes (ignoring some technical details). Given this
+restriction, one of the methods Pino employs to achieve its speed is to
+purposefully offload the handling of logs, and their ultimate destination, to
+external processes so that the threading capabilities of the OS can be
+used (or other CPUs).
 
 One consequence of this methodology is that "error" logs do not get written to
 `stderr`. However, since Pino logs are in a parseable format, it is possible to
