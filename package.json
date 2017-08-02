@@ -53,7 +53,7 @@
   "bugs": {
     "url": "https://github.com/pinojs/pino/issues"
   },
-  "homepage": "https://github.com/pinojs/pino#readme",
+  "homepage": "http://getpino.io",
   "devDependencies": {
     "benchmark": "^2.1.2",
     "bole": "^3.0.2",
