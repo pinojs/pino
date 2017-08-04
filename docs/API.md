@@ -147,7 +147,7 @@ Exposes the current version of Pino.
 ### Example:
 ```js
 var log = require('pino')()
-if ('pino' in child) conosole.log(`pino version: ${log.pino}`)
+if ('pino' in child) console.log(`pino version: ${log.pino}`)
 ```
 
 <a id="child"></a>
