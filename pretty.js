@@ -131,7 +131,7 @@ function pretty (opts) {
     }
 
     if (timeTransOnly) {
-      value.time = asISODate(value.time)
+      value.time = asLocalDate(value.time)
       return JSON.stringify(value) + '\n'
     }
 
