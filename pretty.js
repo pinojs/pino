@@ -156,7 +156,7 @@ function pretty (opts) {
     }
     return line
   }
-  
+
   /*
   function asISODate (time) {
     return new Date(time).toISOString()
