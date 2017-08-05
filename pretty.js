@@ -214,4 +214,3 @@ function pretty (opts) {
 }
 
 module.exports = pretty
-
