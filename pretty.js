@@ -25,7 +25,7 @@ var standardKeys = [
 
 var localTime = {
   dateTime: 'YYYY-MM-DD hh:mm:ss.SSS', // '2017-08-05 12:30:45.789'
-  dateTimeTZ: 'YYYY-MM-DDThh:mm:ss.SSSTZ', // '2017-08-05 12:30:45.789 +08:00'
+  dateTimeTZ: 'YYYY-MM-DDThh:mm:ss.SSSTZ', // '2017-08-05T12:30:45.789+08:00'
   time: 'hh:mm:ss',
   milliTime: 'hh:mm:ss.SSS'
 }
@@ -164,6 +164,8 @@ function pretty (opts) {
   // TODO:
   // 1. need validate custom format string
   // 2. more format string support
+  // 3. unit test
+  // 4. parse bin.js custom input format string
   function asLocalDate (aTime, aFormat) {
     var time = aTime
     var format = aFormat
