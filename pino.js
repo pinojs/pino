@@ -1,5 +1,6 @@
 'use strict'
 
+var os = require('os')
 var EventEmitter = require('events').EventEmitter
 var stringifySafe = require('fast-safe-stringify')
 var fs = require('fs')
@@ -34,6 +35,10 @@ var defaultOptions = {
   },
   enabled: true,
   messageKey: 'msg'
+}
+var defaultBaseLog = {
+  pid: process.pid,
+  hostname: os.hostname()
 }
 
 var pinoPrototype = Object.create(EventEmitter.prototype, {
@@ -336,6 +341,15 @@ function pino (opts, stream) {
       var fd = (istream.fd) ? istream.fd : istream._handle.fd
       fs.writeSync(fd, buf)
     }
+  }
+
+  var baseLog = (typeof iopts.baseLog === 'object') ? iopts.baseLog : defaultBaseLog
+  instance = instance.child(baseLog)
+
+  if (iopts.name !== undefined) {
+    instance = instance.child({
+      name: iopts.name
+    })
   }
 
   return instance
