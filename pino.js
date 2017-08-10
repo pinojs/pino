@@ -133,7 +133,7 @@ function asJson (obj, msg, num) {
   var hasObj = obj !== undefined && obj !== null
   var objError = hasObj && obj instanceof Error
   msg = !msg && objError ? obj.message : msg || undefined
-  var data = this._baseLog + this._lscache[num] + this.time()
+  var data = '{' + this._lscache[num] + this.time()
   if (msg !== undefined) {
     // JSON.stringify is safe here
     data += this.messageKeyString + JSON.stringify('' + msg)
