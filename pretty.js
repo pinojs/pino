@@ -71,6 +71,10 @@ function pretty (opts) {
       enabled: !!((chalk.supportsColor && dest.isTTY) || forceColor)
     })
 
+    if (forceColor && ctx.level === 0) {
+      ctx.level = 1
+    }
+
     levelColors = {
       default: ctx.white,
       60: ctx.bgRed,
@@ -81,7 +85,7 @@ function pretty (opts) {
       10: ctx.grey
     }
 
-    pipe.call(stream, dest, opts)
+    return pipe.call(stream, dest, opts)
   }
 
   return stream
