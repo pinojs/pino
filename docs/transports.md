@@ -172,12 +172,6 @@ pino-mq will take all messages received on process.stdin and send them over a me
 * transforming messages pressure to another component
 
 
-#### Installation
-
-```
-npm install -g pino-mq
-```
-
 ##### Quick Example
 ```
 node app.js | pino-mq -u "amqp://guest:guest@localhost/" -q "pino-logs"
