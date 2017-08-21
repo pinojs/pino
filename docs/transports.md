@@ -33,8 +33,10 @@ If you write a transport, let us know and we will add a link here!
 
 + [pino-couch](#pino-couch)
 + [pino-elasticsearch](#pino-elasticsearch)
++ [pino-mq](#pino-mq)
 + [pino-socket](#pino-socket)
 + [pino-syslog](#pino-syslog)
+
 
 <a id="pino-couch"></a>
 ### pino-couch
@@ -81,6 +83,29 @@ the default for `pino-elasticsearch`.
 [pino-elasticsearch]: https://github.com/pinojs/pino-elasticsearch
 [elasticsearch]: https://www.elastic.co/products/elasticsearch
 [kibana]: https://www.elastic.co/products/kibana
+
+<a id="pino-mq"></a>
+### pino-mq
+pino-mq will take all messages received on process.stdin and send them over a message bus using JSON serialization; this is more a transform for pino messages because you will need some processing on the other end of the queue(s) to process message and store them in a backend; it is useful for :
+* moving your backpressure from your application to broker
+* transforming messages pressure to another component
+
+```
+node app.js | pino-mq -u "amqp://guest:guest@localhost/" -q "pino-logs"
+```
+
+or (recomended)
+
+```
+node app.js | pino-mq -c pino-mq.json
+```
+
+you can get a sample of configuration file by running:
+```
+pino-mq -g
+```
+
+for full documentation of command line switches and pino-mq.json read [readme](https://github.com/itavy/pino-mq#readme)
 
 <a id="pino-socket"></a>
 ### pino-socket
