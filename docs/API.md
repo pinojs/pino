@@ -25,6 +25,7 @@
     + [.err](#errSerializer)
   + [.stdTimeFunctions](#stdTimeFunctions)
     + [.epochTime](#epochTimeFunction)
+    + [.unixTime](#unixTimeFunction)
     + [.slowTime](#slowTimeFunction)
     + [.nullTime](#nullTimeFunction)
 + [Metadata Support](#metadata)
@@ -41,7 +42,7 @@
   * `name` (string): the name of the logger. Default: `undefined`.
   * `serializers` (object): an object containing functions for custom serialization
     of objects. These functions should return an JSONifiable object and they
-    should never throw. When logging an object, each top-level property matching the exact key of a serializer 
+    should never throw. When logging an object, each top-level property matching the exact key of a serializer
     will be serialized using the defined serializer.
   * `timestamp` (boolean|function): Enables or disables the inclusion of a timestamp in the
     log message. If a function is supplied, it must synchronously return a JSON string
@@ -565,6 +566,11 @@ a string like `,"time":1493426328206`.
 ### .epochTime
 
 The default time function for Pino. Returns a string like `,"time":1493426328206`.
+
+<a id="unixTimeFunction"></a>
+### .unixTime
+
+Returns a unix time in seconds, like `,"time":1493426328`.
 
 <a id="slowTimeFunction"></a>
 ### .slowTime
