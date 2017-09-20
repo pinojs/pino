@@ -76,6 +76,11 @@ $ node yourapp.js | pino-elasticsearch --host 192.168.1.42
 
 Assuming Elasticsearch is running on `192.168.1.42`.
 
+If you wish to connect to AWS Elasticsearch:
+```sh
+$ node yourapp.js | pino-elasticsearch  --host https://your-url.us-east-1.es.amazonaws.com --port 443 -c ./aws_config.json
+```
+
 Then, head to your
 Kibana instance, and [create an index pattern](https://www.elastic.co/guide/en/kibana/current/setup.html) on `'pino'`,
 the default for `pino-elasticsearch`.
