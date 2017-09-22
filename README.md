@@ -331,7 +331,7 @@ parents and children will end up in log output.
 
 ### Chat on IRC
 
-You'll find an active group of Pino users in the #pino channel on Freenode, including some of the contributors to this project.
+You'll find an active group of Pino users in the #pinojs channel on Freenode, including some of the contributors to this project.
 
 ## Contributing
 
