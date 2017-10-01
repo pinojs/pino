@@ -11,6 +11,7 @@ It also includes a shell utility to pretty-print its log files.
 * [Usage](#usage)
 * [Benchmarks](#benchmarks)
 * [API ⇗](docs/API.md)
+* [CLI ⇗](docs/cli.md)
 * [Extreme mode explained ⇗](docs/extreme.md)
 * [Pino Howtos ⇗](docs/howtos.md)
 * [Transports with Pino](#transports)
