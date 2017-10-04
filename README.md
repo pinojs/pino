@@ -85,53 +85,54 @@ As far as we know, it is one of the fastest loggers in town:
 `pino.info('hello world')`:
 
 ```
-benchBunyan*10000: 1355.229ms
-benchWinston*10000: 2226.117ms
-benchBole*10000: 291.727ms
-benchDebug*10000: 445.291ms
-benchLogLevel*10000: 322.181ms
-benchPino*10000: 269.109ms
-benchPinoExtreme*10000: 102.239ms
+BASIC benchmark averages
+Bunyan average: 581.082ms
+Winston average: 656.630ms
+Bole average: 250.564ms
+Debug average: 359.370ms
+LogLevel average: 253.322ms
+Pino average: 239.423ms
+PinoExtreme average: 115.419ms
 ```
 
 `pino.info({'hello': 'world'})`:
 
 ```
-benchBunyanObj*10000: 1464.568ms
-benchWinstonObj*10000: 2177.602ms
-benchBoleObj*10000: 322.105ms
-benchLogLevelObject*10000: 1443.148ms
-benchPinoObj*10000: 309.564ms
-benchPinoUnsafeObj*10000: 301.308ms
-benchPinoExtremeObj*10000: 130.343ms
-benchPinoUnsafeExtremeObj*10000: 131.322ms
+OBJECT benchmark averages
+BunyanObj average: 656.738ms
+WinstonObj average: 647.149ms
+BoleObj average: 259.732ms
+LogLevelObject average: 2124.287ms
+PinoObj average: 250.745ms
+PinoUnsafeObj average: 250.892ms
+PinoExtremeObj average: 119.039ms
+PinoUnsafeExtremeObj average: 120.124ms
 ```
 
 `pino.info(aBigDeeplyNestedObject)`:
 
 ```
-benchBunyanDeepObj*10000: 8749.174ms
-benchWinstonDeepObj*10000: 17761.409ms
-benchBoleDeepObj*10000: 5252.563ms
-benchLogLevelDeepObj*10000: 43518.525ms
-benchPinoDeepObj*10000: 5124.361ms
-benchPinoUnsafeDeepObj*10000: 3539.253ms
-benchPinoExtremeDeepObj*10000: 5138.457ms
-benchPinoUnsafeExtremeDeepObj*10000: 3480.270ms
+DEEPOBJECT benchmark averages
+BunyanDeepObj average: 6170.365ms
+WinstonDeepObj average: 21100.343ms
+BoleDeepObj average: 12478.122ms
+LogLevelDeepObj average: 70502.084ms
+PinoDeepObj average: 12243.930ms
+PinoUnsafeDeepObj average: 7072.363ms
+PinoExtremeDeepObj average: 11891.257ms
+PinoUnsafeExtremeDeepObj average: 7015.133ms
 ```
 
 `pino.info('hello %s %j %d', 'world', {obj: true}, 4, {another: 'obj'})`:
 
 ```
-benchDebugInterpolateExtra*10000: 640.001ms
-benchBunyanInterpolateExtra*10000: 2888.825ms
-benchWinstonInterpolateExtra*10000: 2616.285ms
-benchBoleInterpolateExtra*10000: 1313.470ms
-benchLogLevelInterpolateExtra*10000: 1487.610ms
-benchPinoInterpolateExtra*10000: 486.367ms
-benchPinoUnsafeInterpolateExtra*10000: 457.778ms
-benchPinoExtremeInterpolateExtra*10000: 314.635ms
-benchPinoUnsafeExtremeInterpolateExtra*10000: 294.915ms
+BunyanInterpolateExtra average: 2824.858ms
+WinstonInterpolateExtra average: 1352.891ms
+BoleInterpolateExtra average: 2074.439ms
+PinoInterpolateExtra average: 408.851ms
+PinoUnsafeInterpolateExtra average: 402.502ms
+PinoExtremeInterpolateExtra average: 228.683ms
+PinoUnsafeExtremeInterpolateExtra average: 236.527ms
 ```
 
 In many cases, pino is over 6x faster than alternatives.
