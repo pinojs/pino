@@ -86,56 +86,56 @@ As far as we know, it is one of the fastest loggers in town:
 
 ```
 BASIC benchmark averages
-Bunyan average: 581.082ms
-Winston average: 656.630ms
-Bole average: 250.564ms
-Debug average: 359.370ms
-LogLevel average: 253.322ms
-Pino average: 239.423ms
-PinoExtreme average: 115.419ms
+Bunyan average: 549.042ms
+Winston average: 467.873ms
+Bole average: 201.529ms
+Debug average: 253.724ms
+LogLevel average: 282.653ms
+Pino average: 188.956ms
+PinoExtreme average: 108.809ms
 ```
 
 `pino.info({'hello': 'world'})`:
 
 ```
 OBJECT benchmark averages
-BunyanObj average: 656.738ms
-WinstonObj average: 647.149ms
-BoleObj average: 259.732ms
-LogLevelObject average: 2124.287ms
-PinoObj average: 250.745ms
-PinoUnsafeObj average: 250.892ms
-PinoExtremeObj average: 119.039ms
-PinoUnsafeExtremeObj average: 120.124ms
+BunyanObj average: 564.363ms
+WinstonObj average: 464.824ms
+BoleObj average: 230.220ms
+LogLevelObject average: 474.857ms
+PinoObj average: 201.442ms
+PinoUnsafeObj average: 202.687ms
+PinoExtremeObj average: 108.689ms
+PinoUnsafeExtremeObj average: 106.718ms
 ```
 
 `pino.info(aBigDeeplyNestedObject)`:
 
 ```
 DEEPOBJECT benchmark averages
-BunyanDeepObj average: 6170.365ms
-WinstonDeepObj average: 21100.343ms
-BoleDeepObj average: 12478.122ms
-LogLevelDeepObj average: 70502.084ms
-PinoDeepObj average: 12243.930ms
-PinoUnsafeDeepObj average: 7072.363ms
-PinoExtremeDeepObj average: 11891.257ms
-PinoUnsafeExtremeDeepObj average: 7015.133ms
+BunyanDeepObj average: 5293.279ms
+WinstonDeepObj average: 9020.292ms
+BoleDeepObj average: 9169.043ms
+LogLevelDeepObj average: 15260.917ms
+PinoDeepObj average: 8467.807ms
+PinoUnsafeDeepObj average: 6159.227ms
+PinoExtremeDeepObj average: 8354.557ms
+PinoUnsafeExtremeDeepObj average: 6214.073ms
 ```
 
 `pino.info('hello %s %j %d', 'world', {obj: true}, 4, {another: 'obj'})`:
 
 ```
-BunyanInterpolateExtra average: 2824.858ms
-WinstonInterpolateExtra average: 1352.891ms
-BoleInterpolateExtra average: 2074.439ms
-PinoInterpolateExtra average: 408.851ms
-PinoUnsafeInterpolateExtra average: 402.502ms
-PinoExtremeInterpolateExtra average: 228.683ms
-PinoUnsafeExtremeInterpolateExtra average: 236.527ms
+BunyanInterpolateExtra average: 778.408ms
+WinstonInterpolateExtra average: 627.956ms
+BoleInterpolateExtra average: 429.757ms
+PinoInterpolateExtra average: 316.043ms
+PinoUnsafeInterpolateExtra average: 316.809ms
+PinoExtremeInterpolateExtra average: 218.468ms
+PinoUnsafeExtremeInterpolateExtra average: 215.040ms
 ```
 
-In many cases, pino is over 6x faster than alternatives.
+In many cases, pino is over 5x faster than alternatives.
 
 For a fair comparison, [LogLevel](http://npm.im/loglevel) was extended
 to include a timestamp and [bole](http://npm.im/bole) had
