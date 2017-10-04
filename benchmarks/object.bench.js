@@ -30,7 +30,7 @@ require('bole').output({
   stream: dest
 }).setFastTime(true)
 
-var chill = new winston.Logger({
+var chill = winston.createLogger({
   transports: [
     new winston.transports.Stream({
       stream: fs.createWriteStream('/dev/null')
@@ -47,7 +47,7 @@ var run = bench([
   },
   function benchWinstonObj (cb) {
     for (var i = 0; i < max; i++) {
-      chill.log({ hello: 'world', level: 'info' })
+      chill.info({ hello: 'world' })
     }
     setImmediate(cb)
   },

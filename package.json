@@ -72,7 +72,7 @@
     "tap": "^10.0.0",
     "tape": "^4.6.2",
     "through2": "^2.0.1",
-    "winston": "^2.3.0",
+    "winston": "^3.0.0-rc0",
     "zuul": "^3.11.1"
   },
   "dependencies": {

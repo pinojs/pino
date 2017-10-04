@@ -36,7 +36,7 @@ require('bole').output({
   stream: dest
 }).setFastTime(true)
 
-var chill = new winston.Logger({
+var chill = winston.createLogger({
   transports: [
     new winston.transports.Stream({
       stream: fs.createWriteStream('/dev/null')
