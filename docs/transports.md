@@ -34,6 +34,7 @@ If you write a transport, let us know and we will add a link here!
 + [pino-couch](#pino-couch)
 + [pino-elasticsearch](#pino-elasticsearch)
 + [pino-mq](#pino-mq)
++ [pino-redis](#pino-redis)
 + [pino-socket](#pino-socket)
 + [pino-syslog](#pino-syslog)
 
@@ -111,6 +112,18 @@ pino-mq -g
 ```
 
 for full documentation of command line switches and pino-mq.json read [readme](https://github.com/itavy/pino-mq#readme)
+
+<a id="pino-redis"></a>
+### pino-redis
+
+[pino-redis][pino-redis] loads pino logs into [Redis][Redis].
+
+```sh
+$ node yourapp.js | pino-redis -U redis://username:password@localhost:6379
+```
+
+[pino-redis]: https://github.com/buianhthang/pino-redis
+[Redis]: https://redis.io/
 
 <a id="pino-socket"></a>
 ### pino-socket
