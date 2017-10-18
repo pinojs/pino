@@ -18,9 +18,10 @@ function pino (opts) {
     proto.error = proto.fatal = proto.warn =
     proto.info = proto.debug = proto.trace = proto
   }
-
+  if (opts.enabled === false) opts.level = 'silent'
   var level = opts.level || 'info'
   var val = pino.levels.values[level]
+  if (level === 'silent') val = Infinity
   var logger = Object.create(proto)
   if (!logger.log) logger.log = noop
 
