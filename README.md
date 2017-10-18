@@ -193,7 +193,7 @@ By default, in the browser,
 ### Browser Options
 
 Pino can be passed a `browser` object in the options object,
-which can have a `write` property or an `asObject` property.
+which can have the following properties: 
 
 #### `asObject` (Boolean)
 
@@ -240,6 +240,67 @@ var pino = require('pino')({browser: {write: {
   }
 }}})
 ```
+
+#### `serialize`: (Boolean | Array)
+
+The serializers provided to `pino` are ignored by default in the browser, including
+the standard serializers provided with Pino. Since the default destination for log
+messages is the console, values such as `Error` objects are enhanced for inspection, 
+which they otherwise wouldn't be if the Error serializer was enabled.
+
+We can turn all serializers on, 
+
+```js
+var pino = require('pino')({
+  browser: {
+    serialize: true
+  }
+})
+```
+
+Or we can selectively enable them via an array:
+
+```js
+var pino = require('pino')({
+  serializers: {
+    custom: myCustomSerializer,
+    another: anotherSerializer
+  },
+  browser: {
+    serialize: ['custom']
+  }
+})
+// following will apply myCustomSerializer to the custom property,
+// but will not apply anotherSerizlier to another key
+pino.info({custom: 'a', another: 'b'})  
+```
+
+When `serialize` is `true` the standard error serializer is also enabled (see https://github.com/pinojs/pino/blob/master/docs/API.md#stdSerializers).
+This is a global serializer which will apply to any `Error` objects passed to the logger methods.
+
+If `serialize` is an array the standard error serializer is also automatically enabled, it can
+be explicitly disabled by including a string in the serialize array: `!stdSerializers.err`, like so:
+
+```js
+var pino = require('pino')({
+  serializers: {
+    custom: myCustomSerializer,
+    another: anotherSerializer
+  },
+  browser: {
+    serialize: ['!stdSerializers.err', 'custom'] //will not serialize Errors, will serialize `custom` keys
+  }
+})
+```
+
+The `serialize` array also applies to any child logger serializers (see https://github.com/pinojs/pino/blob/master/docs/API.md#discussion-2
+for how to set child-bound serializers).
+
+Unlike server pino the serializers apply to every object passed to the logger method,
+if the `asObject` option is `true`, this results in the serializers applying to the
+first object (as in server pino).      
+
+For more info on serializers see https://github.com/pinojs/pino/blob/master/docs/API.md#parameters.
 
 <a name="caveats"></a>
 ## Caveats

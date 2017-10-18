@@ -112,7 +112,15 @@ test('exposes faux stdSerializers', function (t) {
   t.ok(pino.stdSerializers.err)
   t.deepEqual(pino.stdSerializers.req(), {})
   t.deepEqual(pino.stdSerializers.res(), {})
-  t.deepEqual(pino.stdSerializers.err(), {})
+  t.end()
+})
+
+test('exposes err stdSerializer', function (t) {
+  t.ok(pino.stdSerializers)
+  t.ok(pino.stdSerializers.req)
+  t.ok(pino.stdSerializers.res)
+  t.ok(pino.stdSerializers.err)
+  t.ok(pino.stdSerializers.err(Error()))
   t.end()
 })
 
