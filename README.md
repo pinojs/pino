@@ -302,6 +302,73 @@ first object (as in server pino).
 
 For more info on serializers see https://github.com/pinojs/pino/blob/master/docs/API.md#parameters.
 
+#### `transmit` (Object)
+
+An object with `send` and `level` properties.
+
+The `transmit.level` property specifies the minimum level (inclusive) of when the `send` function
+should be called, if not supplied the `send` function be called based on the main logging `level`
+(set via `options.level`, defaulting to `info`). 
+
+The `transmit` object must have a `send` function which will be called after 
+writing the log message. The `send` function is passed the level of the log 
+message and a `logEvent` object. 
+
+The `logEvent` object is a data structure representing a log message, it represents
+the arguments passed to a logger statement, the level 
+at which they were logged and the heirarchy of child bindings. 
+
+The `logEvent` format is structured like so: 
+
+```js
+{ 
+  messages = Array, 
+  bindings = Array, 
+  level: { label = String, value = Number}
+}
+```
+
+The `messages` array is all arguments passed to logger method, (for instance `logger.info('a', 'b', 'c')`
+would result in `messages` array `['a', 'b', 'c']`).
+
+The `bindings` array represents each child logger (if any), and the relevant bindings. 
+For instance given `logger.child({a: 1}).child({b: 2}).info({c: 3})`, the bindings array 
+would hold `[{a: 1}, {b: 2}]` and the `messages` array would be `[{c: 3}]`. The `bindings`
+are ordered according to their position in the child logger heirarchy, with the lowest index
+being the top of the heirarchy.
+
+By default serializers are not applied to log output in the browser, but they will *always* be
+applied to `messages` and `bindings` in the `logEvent` object. This allows us to ensure a consistent 
+format for all values between server and client.
+
+The `level` holds the label (for instance `info`), and the corresponding numerical value 
+(for instance `30`). This could be important in cases where client side level values and 
+labels differ from server side.
+
+The point of the `send` function is to remotely record log messages: 
+
+```js
+var pino = require('pino')({
+  browser: {
+    transmit: {
+      level: 'warn',
+      send: function (level, logEvent) {
+        if (level === 'warn') {
+          // maybe send the logEvent to a separate endpoint
+          // or maybe analyse the messages further before sending
+        }
+        // we could also use the `logEvent.level.value` property to determine
+        // numerical value
+        if (logEvent.level.value >= 50) { // covers error and fatal
+
+          // send the logEvent somewhere 
+        }
+      }
+    }
+  }
+})
+```
+
 <a name="caveats"></a>
 ## Caveats
 
