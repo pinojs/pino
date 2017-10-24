@@ -70,6 +70,26 @@ test('passes send function messages in logEvent object', function (t) {
   logger.fatal({test: 'test'}, 'another test')
 })
 
+test('supplies a timestamp (ts) in logEvent object which is exactly the same as the `time` property in asObject mode', function (t) {
+  t.plan(1)
+  var expected
+  var logger = pino({
+    browser: {
+      asObject: true, // implict because `write`, but just to be explicit
+      write: function (o) {
+        expected = o.time
+      },
+      transmit: {
+        send: function (level, logEvent) {
+          t.is(logEvent.ts, expected)
+        }
+      }
+    }
+  })
+
+  logger.fatal('test')
+})
+
 test('passes send function child bindings via logEvent object', function (t) {
   t.plan(4)
   var logger = pino({
