@@ -1,5 +1,9 @@
 'use strict'
-var test = require('tap').test
+// eslint-disable-next-line
+if (typeof $1 !== 'undefined') $1 = arguments.callee.caller.arguments[0]
+
+var test = require('tape')
+var fresh = require('fresh-require')
 var pino = require('../browser')
 
 var parentSerializers = {
@@ -45,15 +49,12 @@ test('if serialize option is true, standard error serializer is auto enabled', f
   console.error = function (err) {
     t.deepEqual(err, expect)
   }
-  delete require.cache[require.resolve('../browser')]
 
-  var logger = require('../browser')({
+  var logger = fresh('../browser', require)({
     browser: { serialize: true }
   })
 
   console.error = consoleError
-
-  delete require.cache[require.resolve('../browser')]
 
   logger.fatal(err)
 })
@@ -68,15 +69,12 @@ test('if serialize option is array, standard error serializer is auto enabled', 
   console.error = function (err) {
     t.deepEqual(err, expect)
   }
-  delete require.cache[require.resolve('../browser')]
 
-  var logger = require('../browser')({
+  var logger = fresh('../browser', require)({
     browser: { serialize: [] }
   })
 
   console.error = consoleError
-
-  delete require.cache[require.resolve('../browser')]
 
   logger.fatal(err)
 })
@@ -91,15 +89,12 @@ test('if serialize option is array containing !stdSerializers.err, standard erro
   console.error = function (err) {
     t.is(err, expect)
   }
-  delete require.cache[require.resolve('../browser')]
 
-  var logger = require('../browser')({
+  var logger = fresh('../browser', require)({
     browser: { serialize: ['!stdSerializers.err'] }
   })
 
   console.error = consoleError
-
-  delete require.cache[require.resolve('../browser')]
 
   logger.fatal(err)
 })
@@ -112,9 +107,8 @@ test('in browser, serializers apply to all objects', function (t) {
     t.is(test2.key2, 'serialized2')
     t.is(test5.key3, 'serialized3')
   }
-  delete require.cache[require.resolve('../browser')]
 
-  var logger = require('../browser')({
+  var logger = fresh('../browser', require)({
     serializers: {
       key: function () { return 'serialized' },
       key2: function () { return 'serialized2' },
@@ -124,8 +118,6 @@ test('in browser, serializers apply to all objects', function (t) {
   })
 
   console.error = consoleError
-
-  delete require.cache[require.resolve('../browser')]
 
   logger.fatal({key: 'test'}, {key2: 'test'}, 'str should skip', [{foo: 'array should skip'}], {key3: 'test'})
 })
@@ -138,9 +130,8 @@ test('serialize can be an array of selected serializers', function (t) {
     t.is(test2.key2, 'serialized2')
     t.is(test5.key3, 'test')
   }
-  delete require.cache[require.resolve('../browser')]
 
-  var logger = require('../browser')({
+  var logger = fresh('../browser', require)({
     serializers: {
       key: function () { return 'serialized' },
       key2: function () { return 'serialized2' },
@@ -150,8 +141,6 @@ test('serialize can be an array of selected serializers', function (t) {
   })
 
   console.error = consoleError
-
-  delete require.cache[require.resolve('../browser')]
 
   logger.fatal({key: 'test'}, {key2: 'test'}, 'str should skip', [{foo: 'array should skip'}], {key3: 'test'})
 })
@@ -164,15 +153,12 @@ test('serialize filter applies to child loggers', function (t) {
     t.is(test2.key2, 'serialized2')
     t.is(test5.key3, 'test')
   }
-  delete require.cache[require.resolve('../browser')]
 
-  var logger = require('../browser')({
+  var logger = fresh('../browser', require)({
     browser: { serialize: ['key2'] }
   })
 
   console.error = consoleError
-
-  delete require.cache[require.resolve('../browser')]
 
   logger.child({aBinding: 'test',
     serializers: {
@@ -188,9 +174,8 @@ test('parent serializers apply to child bindings', function (t) {
   console.error = function (binding) {
     t.is(binding.key, 'serialized')
   }
-  delete require.cache[require.resolve('../browser')]
 
-  var logger = require('../browser')({
+  var logger = fresh('../browser', require)({
     serializers: {
       key: function () { return 'serialized' }
     },
@@ -198,8 +183,6 @@ test('parent serializers apply to child bindings', function (t) {
   })
 
   console.error = consoleError
-
-  delete require.cache[require.resolve('../browser')]
 
   logger.child({key: 'test'}).fatal({test: 'test'})
 })
@@ -210,15 +193,12 @@ test('child serializers apply to child bindings', function (t) {
   console.error = function (binding) {
     t.is(binding.key, 'serialized')
   }
-  delete require.cache[require.resolve('../browser')]
 
-  var logger = require('../browser')({
+  var logger = fresh('../browser', require)({
     browser: { serialize: true }
   })
 
   console.error = consoleError
-
-  delete require.cache[require.resolve('../browser')]
 
   logger.child({key: 'test',
     serializers: {

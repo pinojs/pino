@@ -19,7 +19,7 @@
     "lib"
   ],
   "scripts": {
-    "browser-test": "zuul tape test/browser.test.js --local",
+    "browser-test": "zuul tape test/browser*test.js --local",
     "test": "standard | snazzy && tap --no-cov test/*test.js",
     "ci": "standard | snazzy && tap --cov test/*test.js",
     "bench-all": "node benchmarks/runbench all",

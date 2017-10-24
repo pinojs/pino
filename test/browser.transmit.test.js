@@ -1,5 +1,5 @@
 'use strict'
-var test = require('tap').test
+var test = require('tape')
 var pino = require('../browser')
 
 function noop () {}
