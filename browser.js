@@ -136,71 +136,59 @@ function set (opts, logger, val, level, fallback) {
   logger[level] = val > pino.levels.values[level] ? noop
     : (logger[level] ? logger[level] : (_console[level] || _console[fallback] || noop))
 
-  if (opts.serialize && !opts.asObject) serializerWrap(logger, level)
-  if (opts.asObject) asObjectWrap(logger, level)
-  if (opts.transmit) transmitWrap(opts.transmit, logger, val, level, opts.level)
+  wrap(opts, logger, val, level)
 }
 
-function serializerWrap (logger, level) {
+function wrap (opts, logger, val, level) {
+  if (!opts.transmit && logger[level] === noop) return
+
   logger[level] = (function (write) {
     return function LOG () {
+      var ts = Date.now()
       var args = new Array(arguments.length)
       for (var i = 0; i < args.length; i++) args[i] = arguments[i]
-      applySerializers(args, this._serialize, this.serializers, this._stdErrSerialize)
-      write.apply(this, args)
+
+      if (opts.serialize && !opts.asObject) {
+        applySerializers(args, this._serialize, this.serializers, this._stdErrSerialize)
+      }
+      if (opts.asObject) write.call(this, asObject(this, level, args, ts))
+      else write.apply(this, args)
+
+      if (opts.transmit) {
+        var transmitLevel = opts.transmit.level || opts.level
+        var transmitValue = pino.levels.values[transmitLevel]
+        var methodValue = pino.levels.values[level]
+        if (methodValue < transmitValue) return
+        transmit(this, {
+          ts: ts,
+          methodLevel: level,
+          methodValue: methodValue,
+          transmitLevel: transmitLevel,
+          transmitValue: pino.levels.values[opts.transmit.level || opts.level],
+          send: opts.transmit.send,
+          val: val
+        }, args)
+      }
     }
   })(logger[level])
 }
 
-function asObjectWrap (logger, level) {
-  logger[level] = (function (write, k) {
-    return function LOG () {
-      var args = new Array(arguments.length)
-      for (var i = 0; i < args.length; i++) args[i] = arguments[i]
-      if (this._serialize) applySerializers(args, this._serialize, this.serializers, this._stdErrSerialize)
-      var msg = args[0]
-      var o = { time: Date.now(), level: pino.levels.values[k] }
-      var lvl = (this._childLevel | 0) + 1
-      if (lvl < 1) lvl = 1
-      // deliberate, catching objects, arrays
-      if (msg !== null && typeof msg === 'object') {
-        while (lvl-- && typeof args[0] === 'object') {
-          Object.assign(o, args.shift())
-        }
-        msg = args.length ? format(args) : undefined
-      } else if (typeof msg === 'string') msg = format(args)
-      if (msg !== undefined) o.msg = msg
-      write.call(this, o)
+function asObject (logger, level, args, ts) {
+  if (logger._serialize) applySerializers(args, logger._serialize, logger.serializers, logger._stdErrSerialize)
+  var msg = args[0]
+  var o = { time: ts, level: pino.levels.values[level] }
+  var lvl = (logger._childLevel | 0) + 1
+  if (lvl < 1) lvl = 1
+  // deliberate, catching objects, arrays
+  if (msg !== null && typeof msg === 'object') {
+    args = args.slice()
+    while (lvl-- && typeof args[0] === 'object') {
+      Object.assign(o, args.shift())
     }
-  })(logger[level], level)
-}
-
-function transmitWrap (opts, logger, val, methodLevel, logLevel) {
-  var transmitLevel = opts.level || logLevel
-  var transmitValue = pino.levels.values[transmitLevel]
-  var methodValue = pino.levels.values[methodLevel]
-  var send = opts.send
-
-  if (methodValue < transmitValue) {
-    return
-  }
-
-  logger[methodLevel] = (function (write) {
-    return function () {
-      var args = new Array(arguments.length)
-      for (var i = 0; i < args.length; i++) args[i] = arguments[i]
-      write.apply(this, args)
-      var transmitOpts = {
-        methodLevel: methodLevel,
-        methodValue: methodValue,
-        transmitLevel: transmitLevel,
-        transmitValue: transmitValue,
-        send: send,
-        val: val
-      }
-      transmit(this, transmitOpts, args)
-    }
-  })(logger[methodLevel])
+    msg = args.length ? format(args) : undefined
+  } else if (typeof msg === 'string') msg = format(args)
+  if (msg !== undefined) o.msg = msg
+  return o
 }
 
 function applySerializers (args, serialize, serializers, stdErrSerialize) {
@@ -230,6 +218,7 @@ function bind (parent, bindings, level) {
 
 function transmit (logger, opts, args) {
   var send = opts.send
+  var ts = opts.ts
   var methodLevel = opts.methodLevel
   var methodValue = opts.methodValue
   var val = opts.val
@@ -240,7 +229,7 @@ function transmit (logger, opts, args) {
     logger.serializers,
     logger._stdErrSerialize === undefined ? true : logger._stdErrSerialize
   )
-
+  logger._logEvent.ts = ts
   logger._logEvent.messages = args.filter(function (arg) {
       // bindings can only be objects, so reference equality check via indexOf is fine
     return logger._logEvent.bindings.indexOf(arg) === -1
@@ -256,6 +245,7 @@ function transmit (logger, opts, args) {
 
 function createLogEventShape () {
   return {
+    ts: 0,
     messages: [],
     bindings: [],
     level: {label: '', value: 0}

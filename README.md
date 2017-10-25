@@ -322,11 +322,15 @@ The `logEvent` format is structured like so:
 
 ```js
 { 
+  ts = Number,
   messages = Array, 
   bindings = Array, 
   level: { label = String, value = Number}
 }
 ```
+
+The `ts` property is a unix epoch timestamp in milliseconds, the time is taken from the moment the
+logger method is called.
 
 The `messages` array is all arguments passed to logger method, (for instance `logger.info('a', 'b', 'c')`
 would result in `messages` array `['a', 'b', 'c']`).
