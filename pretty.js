@@ -99,10 +99,6 @@ function pretty (opts) {
       return line + '\n'
     }
 
-    if (formatter) {
-      return opts.formatter(parsed.value) + '\n'
-    }
-
     if (timeTransOnly) {
       value.time = asISODate(value.time)
       return JSON.stringify(value) + '\n'
@@ -111,6 +107,18 @@ function pretty (opts) {
     line = (levelFirst)
         ? asColoredLevel(value) + ' ' + formatTime(value)
         : formatTime(value, ' ') + asColoredLevel(value)
+
+    if (formatter) {
+      return opts.formatter(value, {
+        prefix: line,
+        chalk: ctx,
+        withSpaces: withSpaces,
+        filter: filter,
+        formatTime: formatTime,
+        asColoredText: asColoredText,
+        asColoredLevel: asColoredLevel
+      }) + '\n'
+    }
 
     line += ' ('
     if (value.name) {
@@ -148,10 +156,14 @@ function pretty (opts) {
   }
 
   function asColoredLevel (value) {
+    return asColoredText(value, levelColors.hasOwnProperty(value.level) ? levels[value.level] : levels.default)
+  }
+
+  function asColoredText (value, text) {
     if (levelColors.hasOwnProperty(value.level)) {
-      return levelColors[value.level](levels[value.level])
+      return levelColors[value.level](text)
     } else {
-      return levelColors.default(levels.default)
+      return levelColors.default(text)
     }
   }
 }
