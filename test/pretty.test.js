@@ -66,22 +66,14 @@ test('pino transform can just parse the dates', function (t) {
 
 test('pino transform can format with a custom function', function (t) {
   t.plan(8)
-  var prettier = pretty({ formatter: function (line, {
-      prefix,
-      chalk,
-      withSpaces,
-      filter,
-      formatTime,
-      asColoredText,
-      asColoredLevel
-  }) {
-    t.ok(prefix.indexOf('INFO') > -1, 'prefix contains level')
-    t.ok(typeof chalk.white === 'function', 'chalk instance')
-    t.ok(typeof withSpaces === 'function', 'withSpaces function')
-    t.ok(typeof filter === 'function', 'filter function')
-    t.ok(typeof formatTime === 'function', 'formatTime function')
-    t.ok(typeof asColoredText === 'function', 'asColoredText function')
-    t.ok(typeof asColoredLevel === 'function', 'asColoredLevel function')
+  var prettier = pretty({ formatter: function (line, opts) {
+    t.ok(opts.prefix.indexOf('INFO') > -1, 'prefix contains level')
+    t.ok(typeof opts.chalk.white === 'function', 'chalk instance')
+    t.ok(typeof opts.withSpaces === 'function', 'withSpaces function')
+    t.ok(typeof opts.filter === 'function', 'filter function')
+    t.ok(typeof opts.formatTime === 'function', 'formatTime function')
+    t.ok(typeof opts.asColoredText === 'function', 'asColoredText function')
+    t.ok(typeof opts.asColoredLevel === 'function', 'asColoredLevel function')
     return 'msg: ' + line.msg + ', foo: ' + line.foo
   } })
   prettier.pipe(split(function (line) {
