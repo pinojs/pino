@@ -105,8 +105,10 @@ Returns a new [logger](#logger) instance.
 + `options` (object):
   * `timeTransOnly` (boolean): if set to `true`, it will only covert the unix
   timestamp to ISO 8601 date format, and reserialize the JSON (equivalent to `pino -t`).
-  * `formatter` (function): a custom function to format the line, is passed the
-  JSON object as an argument and should return a string value.
+  * `formatter` (function): a custom function to format the line. It's passed 2 arguments,
+  JSON object log data and an options object
+  that [exposes utility functions](https://github.com/pinojs/pino/blob/master/pretty.js#L110).
+  It should return a string value.
   * `levelFirst` (boolean): if set to `true`, it will print the name of the log
   level as the first field in the log line. Default: `false`.
   * `messageKey` (string): the key in the JSON object to use as the highlighted
