@@ -250,6 +250,15 @@ Object.defineProperty(pinoPrototype, 'addLevel', {
   value: addLevel
 })
 
+function isLevelEnabled (logLevel) {
+  var logLevelVal = this.levels.values[logLevel]
+  return logLevelVal && (logLevelVal >= this._levelVal)
+}
+Object.defineProperty(pinoPrototype, 'isLevelEnabled', {
+  enumerable: true,
+  value: isLevelEnabled
+})
+
 function pino (opts, stream) {
   var iopts = opts
   var istream = stream
