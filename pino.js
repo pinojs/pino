@@ -352,7 +352,9 @@ function pino (opts, stream) {
     })
   }
 
-  instance = instance.child(base)
+  if (base != null) {
+    instance = instance.child(base)
+  }
 
   return instance
 }

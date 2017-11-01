@@ -77,6 +77,10 @@
     See [Extreme mode explained](extreme.md) for more detail.
   * `enabled` (boolean): enables logging. Default: `true`
   * `browser` (Object): browser only, may have `asObject` and `write` keys, see [Pino in the Browser](../readme.md#browser)
+  * `base` (Object): key-value object added as child logger to each log line. If set to `null` the `base` child logger is not added . Default: 
+    * `pid` (process.pid)
+    * `hostname` (os.hostname) 
+    * `name` of logger if supplied as option
 + `stream` (Writable): a writable stream where the logs will be written.
   It can also receive some log-line [metadata](#metadata), if the
   relative protocol is enabled. Default: `process.stdout`
