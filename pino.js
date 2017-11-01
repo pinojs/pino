@@ -36,7 +36,8 @@ var defaultOptions = {
   enabled: true,
   messageKey: 'msg'
 }
-var defaultBaseLog = {
+
+var defaultBase = {
   pid: process.pid,
   hostname: os.hostname()
 }
@@ -343,8 +344,8 @@ function pino (opts, stream) {
     }
   }
 
-  var baseLog = (typeof iopts.baseLog === 'object') ? iopts.baseLog : defaultBaseLog
-  instance = instance.child(baseLog)
+  var base = (typeof iopts.base === 'object') ? iopts.base : defaultBase
+  instance = instance.child(base)
 
   if (iopts.name !== undefined) {
     instance = instance.child({
