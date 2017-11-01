@@ -345,13 +345,14 @@ function pino (opts, stream) {
   }
 
   var base = (typeof iopts.base === 'object') ? iopts.base : defaultBase
-  instance = instance.child(base)
 
   if (iopts.name !== undefined) {
-    instance = instance.child({
+    base = Object.assign({}, base, {
       name: iopts.name
     })
   }
+
+  instance = instance.child(base)
 
   return instance
 }
