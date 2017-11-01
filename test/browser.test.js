@@ -10,6 +10,40 @@ levelTest('info')
 levelTest('debug')
 levelTest('trace')
 
+test('silent level', function (t) {
+  var instance = pino({
+    level: 'silent',
+    browser: {write: function (o) {
+      t.fail()
+    }}
+  })
+  instance.info('test')
+  var child = instance.child({test: 'test'})
+  child.info('msg-test')
+  // use setTimeout because setImmediate isn't supported in most browsers
+  setTimeout(function () {
+    t.pass()
+    t.end()
+  }, 0)
+})
+
+test('enabled false', function (t) {
+  var instance = pino({
+    enabled: false,
+    browser: {write: function (o) {
+      t.fail()
+    }}
+  })
+  instance.info('test')
+  var child = instance.child({test: 'test'})
+  child.info('msg-test')
+  // use setTimeout because setImmediate isn't supported in most browsers
+  setTimeout(function () {
+    t.pass()
+    t.end()
+  }, 0)
+})
+
 test('throw if creating child without bindings', function (t) {
   t.plan(1)
 
@@ -78,7 +112,15 @@ test('exposes faux stdSerializers', function (t) {
   t.ok(pino.stdSerializers.err)
   t.deepEqual(pino.stdSerializers.req(), {})
   t.deepEqual(pino.stdSerializers.res(), {})
-  t.deepEqual(pino.stdSerializers.err(), {})
+  t.end()
+})
+
+test('exposes err stdSerializer', function (t) {
+  t.ok(pino.stdSerializers)
+  t.ok(pino.stdSerializers.req)
+  t.ok(pino.stdSerializers.res)
+  t.ok(pino.stdSerializers.err)
+  t.ok(pino.stdSerializers.err(Error()))
   t.end()
 })
 
