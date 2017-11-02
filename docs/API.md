@@ -77,7 +77,7 @@
     See [Extreme mode explained](extreme.md) for more detail.
   * `enabled` (boolean): enables logging. Default: `true`
   * `browser` (Object): browser only, may have `asObject` and `write` keys, see [Pino in the Browser](../readme.md#browser)
-  * `crlf` (boolean): emit `\r\n` instead of `\n`. Default: `false`.
+  * `crlf` (boolean): logs newline delimited JSON with `\r\n` instead of `\n`. Default: `false`.
 + `stream` (Writable): a writable stream where the logs will be written.
   It can also receive some log-line [metadata](#metadata), if the
   relative protocol is enabled. Default: `process.stdout`
