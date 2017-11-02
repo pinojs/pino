@@ -33,13 +33,12 @@ var defaultOptions = {
     if (err) return process.exit(1)
     process.exit(0)
   },
+  base: {
+    pid: process.pid,
+    hostname: os.hostname()
+  },
   enabled: true,
   messageKey: 'msg'
-}
-
-var defaultBase = {
-  pid: process.pid,
-  hostname: os.hostname()
 }
 
 var pinoPrototype = Object.create(EventEmitter.prototype, {
@@ -344,7 +343,7 @@ function pino (opts, stream) {
     }
   }
 
-  var base = (typeof iopts.base === 'object') ? iopts.base : defaultBase
+  var base = (typeof iopts.base === 'object') ? iopts.base : defaultOptions.base
 
   if (iopts.name !== undefined) {
     base = Object.assign({}, base, {
