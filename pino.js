@@ -133,7 +133,7 @@ function asJson (obj, msg, num) {
   var hasObj = obj !== undefined && obj !== null
   var objError = hasObj && obj instanceof Error
   msg = !msg && objError ? obj.message : msg || undefined
-  var data = '{' + this._lscache[num] + this.time()
+  var data = this._lscache[num] + this.time()
   if (msg !== undefined) {
     // JSON.stringify is safe here
     data += this.messageKeyString + JSON.stringify('' + msg)
@@ -241,7 +241,7 @@ function addLevel (name, lvl) {
   if (this.levels.labels.hasOwnProperty(lvl)) return false
   this.levels.values[name] = lvl
   this.levels.labels[lvl] = name
-  this._lscache[lvl] = flatstr('"level":' + Number(lvl))
+  this._lscache[lvl] = flatstr('{"level":' + Number(lvl))
   Object.defineProperty(this, name, {
     value: lvl < this._levelVal ? tools.noop : tools.genLog(lvl),
     enumerable: true,
