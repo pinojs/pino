@@ -146,13 +146,14 @@ function wrap (opts, logger, val, level) {
     return function LOG () {
       var ts = Date.now()
       var args = new Array(arguments.length)
+      var proto = (Object.getPrototypeOf && Object.getPrototypeOf(this) === _console) ? _console : this
       for (var i = 0; i < args.length; i++) args[i] = arguments[i]
 
       if (opts.serialize && !opts.asObject) {
         applySerializers(args, this._serialize, this.serializers, this._stdErrSerialize)
       }
-      if (opts.asObject) write.call(this, asObject(this, level, args, ts))
-      else write.apply(this, args)
+      if (opts.asObject) write.call(proto, asObject(this, level, args, ts))
+      else write.apply(proto, args)
 
       if (opts.transmit) {
         var transmitLevel = opts.transmit.level || opts.level

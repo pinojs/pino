@@ -23,22 +23,22 @@ var standardKeys = [
   'v'
 ]
 
-function withSpaces (value) {
-  var lines = value.split('\n')
+function withSpaces (value, eol) {
+  var lines = value.split('\r?\n')
   for (var i = 1; i < lines.length; i++) {
     lines[i] = '    ' + lines[i]
   }
-  return lines.join('\n')
+  return lines.join(eol)
 }
 
-function filter (value, messageKey) {
+function filter (value, messageKey, eol) {
   var keys = Object.keys(value)
   var filteredKeys = standardKeys.concat([messageKey])
   var result = ''
 
   for (var i = 0; i < keys.length; i++) {
     if (filteredKeys.indexOf(keys[i]) < 0) {
-      result += '    ' + keys[i] + ': ' + withSpaces(JSON.stringify(value[keys[i]], null, 2)) + '\n'
+      result += '    ' + keys[i] + ': ' + withSpaces(JSON.stringify(value[keys[i]], null, 2), eol) + eol
     }
   }
 
@@ -58,6 +58,7 @@ function pretty (opts) {
   var levelFirst = opts && opts.levelFirst
   var messageKey = opts && opts.messageKey
   var forceColor = opts && opts.forceColor
+  var eol = opts && opts.crlf ? '\r\n' : '\n'
   messageKey = messageKey || 'msg'
 
   var stream = split(mapLine)
@@ -101,7 +102,7 @@ function pretty (opts) {
 
     if (timeTransOnly) {
       value.time = asISODate(value.time)
-      return JSON.stringify(value) + '\n'
+      return JSON.stringify(value) + eol
     }
 
     line = (levelFirst)
@@ -131,9 +132,9 @@ function pretty (opts) {
     }
     line += '\n'
     if (value.type === 'Error') {
-      line += '    ' + withSpaces(value.stack) + '\n'
+      line += '    ' + withSpaces(value.stack, eol) + eol
     } else {
-      line += filter(value, messageKey)
+      line += filter(value, messageKey, eol)
     }
     return line
   }
