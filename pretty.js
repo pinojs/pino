@@ -97,7 +97,7 @@ function pretty (opts) {
 
     if (parsed.err || !isPinoLine(value)) {
       // pass through
-      return line + '\n'
+      return line + eol
     }
 
     if (timeTransOnly) {
@@ -118,7 +118,7 @@ function pretty (opts) {
         formatTime: formatTime,
         asColoredText: asColoredText,
         asColoredLevel: asColoredLevel
-      }) + '\n'
+      }) + eol
     }
 
     line += ' ('
@@ -130,7 +130,7 @@ function pretty (opts) {
     if (value[messageKey]) {
       line += ctx.cyan(value[messageKey])
     }
-    line += '\n'
+    line += eol
     if (value.type === 'Error') {
       line += '    ' + withSpaces(value.stack, eol) + eol
     } else {
