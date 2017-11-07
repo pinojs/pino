@@ -256,3 +256,12 @@ test('works without time', function (t) {
 
   instance.info('hello world')
 })
+
+test('throws error when enabled with stream specified', function (t) {
+  t.plan(1)
+  var logStream = writeStream(function (s, enc, cb) {
+    cb()
+  })
+
+  t.throws(() => pino({prettyPrint: true}, logStream), {})
+})
