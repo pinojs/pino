@@ -18,6 +18,7 @@
   * [level-change (event)](#level-change)
   * [.levels.values](#levelValues)
   * [.levels.labels](#levelLabels)
+  * [.isLevelEnabled](#isLevelEnabled)
   * [LOG_VERSION](#log_version)
   * [.stdSerializers](#stdSerializers)
     + [.req](#reqSerializer)
@@ -77,9 +78,9 @@
     See [Extreme mode explained](extreme.md) for more detail.
   * `enabled` (boolean): enables logging. Default: `true`
   * `browser` (Object): browser only, may have `asObject` and `write` keys, see [Pino in the Browser](../readme.md#browser)
-  * `base` (Object): key-value object added as child logger to each log line. If set to `null` the `base` child logger is not added . Default: 
+  * `base` (Object): key-value object added as child logger to each log line. If set to `null` the `base` child logger is not added . Default:
     * `pid` (process.pid)
-    * `hostname` (os.hostname) 
+    * `hostname` (os.hostname)
     * `name` of logger if supplied as option
   * `crlf` (boolean): logs newline delimited JSON with `\r\n` instead of `\n`. Default: `false`.
 + `stream` (Writable): a writable stream where the logs will be written.
@@ -474,6 +475,18 @@ pino.levels.labels[50] === 'error' // true
 Returns the mappings of level internal level numbers to their string
 representations. This property is available as a static property or as an
 instance property.
+
+<a id="isLevelEnabled"></a>
+## .isLevelEnabled(logLevel)
+
+### Example:
+```js
+if (logger.isLevelEnabled('debug')) logger.debug('conditional log')
+```
+
+### Discussion:
+A utility method for determining if a given log level will write to the output
+stream.
 
 <a id="log_version"></a>
 ## .LOG_VERSION
