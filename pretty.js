@@ -97,11 +97,7 @@ function pretty (opts) {
 
     if (parsed.err || !isPinoLine(value)) {
       // pass through
-      return line + '\n'
-    }
-
-    if (formatter) {
-      return opts.formatter(parsed.value) + eol
+      return line + eol
     }
 
     if (timeTransOnly) {
@@ -113,6 +109,18 @@ function pretty (opts) {
         ? asColoredLevel(value) + ' ' + formatTime(value)
         : formatTime(value, ' ') + asColoredLevel(value)
 
+    if (formatter) {
+      return opts.formatter(value, {
+        prefix: line,
+        chalk: ctx,
+        withSpaces: withSpaces,
+        filter: filter,
+        formatTime: formatTime,
+        asColoredText: asColoredText,
+        asColoredLevel: asColoredLevel
+      }) + eol
+    }
+
     line += ' ('
     if (value.name) {
       line += value.name + '/'
@@ -122,7 +130,7 @@ function pretty (opts) {
     if (value[messageKey]) {
       line += ctx.cyan(value[messageKey])
     }
-    line += '\n'
+    line += eol
     if (value.type === 'Error') {
       line += '    ' + withSpaces(value.stack, eol) + eol
     } else {
@@ -149,10 +157,14 @@ function pretty (opts) {
   }
 
   function asColoredLevel (value) {
+    return asColoredText(value, levelColors.hasOwnProperty(value.level) ? levels[value.level] : levels.default)
+  }
+
+  function asColoredText (value, text) {
     if (levelColors.hasOwnProperty(value.level)) {
-      return levelColors[value.level](levels[value.level])
+      return levelColors[value.level](text)
     } else {
-      return levelColors.default(levels.default)
+      return levelColors.default(text)
     }
   }
 }
