@@ -265,3 +265,8 @@ test('throws error when enabled with stream specified', function (t) {
 
   t.throws(() => pino({prettyPrint: true}, logStream), {})
 })
+
+test('does not throw error when enabled with stream specified', function (t) {
+  pino({prettyPrint: true}, process.stdout)
+  t.end()
+})

@@ -273,13 +273,13 @@ function pino (opts, stream) {
   }
   iopts = Object.assign({}, defaultOptions, iopts)
   if (iopts.extreme && iopts.prettyPrint) throw Error('cannot enable pretty print in extreme mode')
-  if (stream && iopts.prettyPrint) throw Error('cannot enable pretty print when stream specified')
   istream = istream || process.stdout
+  var isStdout = istream === process.stdout
+  if (!isStdout && iopts.prettyPrint) throw Error('cannot enable pretty print when stream is not process.stdout')
   if (iopts.prettyPrint) {
     var prettyOpts = Object.assign({ messageKey: iopts.messageKey }, iopts.prettyPrint)
     var pstream = pretty(prettyOpts)
-    var origStream = istream
-    pump(pstream, origStream, function (err) {
+    pump(pstream, process.stdout, function (err) {
       if (err) instance.emit('error', err)
     })
     istream = pstream
