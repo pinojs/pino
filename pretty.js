@@ -46,10 +46,7 @@ function filter (value, messageKey, eol) {
 }
 
 function isPinoLine (line) {
-  return line &&
-    line.hasOwnProperty('hostname') &&
-    line.hasOwnProperty('pid') &&
-    (line.hasOwnProperty('v') && line.v === 1)
+  return line && (line.hasOwnProperty('v') && line.v === 1)
 }
 
 function pretty (opts) {
@@ -121,21 +118,40 @@ function pretty (opts) {
       }) + eol
     }
 
-    line += ' ('
-    if (value.name) {
-      line += value.name + '/'
+    if (value.name || value.pid || value.hostname) {
+      line += ' ('
+
+      if (value.name) {
+        line += value.name
+      }
+
+      if (value.name && value.pid) {
+        line += '/' + value.pid
+      } else if (value.pid) {
+        line += value.pid
+      }
+
+      if (value.hostname) {
+        line += ' on ' + value.hostname
+      }
+
+      line += ')'
     }
-    line += value.pid + ' on ' + value.hostname + ')'
+
     line += ': '
+
     if (value[messageKey]) {
       line += ctx.cyan(value[messageKey])
     }
+
     line += eol
+
     if (value.type === 'Error') {
       line += '    ' + withSpaces(value.stack, eol) + eol
     } else {
       line += filter(value, messageKey, eol)
     }
+
     return line
   }
 
