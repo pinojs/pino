@@ -133,6 +133,95 @@ test('handles missing time', function (t) {
   t.deepEqual(lines, ['{"hello":"world"}'], 'preserved lines')
 })
 
+test('handles missing pid, hostname and name', function (t) {
+  t.plan(1)
+
+  var prettier = pretty()
+  prettier.pipe(split(function (line) {
+    t.ok(line.match(/\[.*\] INFO: hello world/), 'line does not match')
+
+    return line
+  }))
+
+  var instance = pino({ base: null }, prettier)
+
+  instance.info('hello world')
+})
+
+test('handles missing pid', function (t) {
+  t.plan(1)
+
+  var name = 'test'
+  var msg = 'hello world'
+  var regex = new RegExp('\\[.*\\] INFO \\(' + name + ' on ' + hostname + '\\): ' + msg)
+
+  var prettier = pretty()
+  prettier.pipe(split(function (line) {
+    t.ok(regex.test(line), 'line does not match')
+
+    return line
+  }))
+
+  var opts = {
+    base: {
+      name: name,
+      hostname: hostname
+    }
+  }
+  var instance = pino(opts, prettier)
+
+  instance.info(msg)
+})
+
+test('handles missing hostname', function (t) {
+  t.plan(1)
+
+  var name = 'test'
+  var msg = 'hello world'
+  var regex = new RegExp('\\[.*\\] INFO \\(' + name + '/' + process.pid + '\\): ' + msg)
+
+  var prettier = pretty()
+  prettier.pipe(split(function (line) {
+    t.ok(regex.test(line), 'line does not match')
+
+    return line
+  }))
+
+  var opts = {
+    base: {
+      name: name,
+      pid: process.pid
+    }
+  }
+  var instance = pino(opts, prettier)
+
+  instance.info(msg)
+})
+
+test('handles missing name', function (t) {
+  t.plan(1)
+
+  var msg = 'hello world'
+  var regex = new RegExp('\\[.*\\] INFO \\(' + process.pid + ' on ' + hostname + '\\): ' + msg)
+
+  var prettier = pretty()
+  prettier.pipe(split(function (line) {
+    t.ok(regex.test(line), 'line does not match')
+
+    return line
+  }))
+
+  var opts = {
+    base: {
+      hostname: hostname,
+      pid: process.pid
+    }
+  }
+  var instance = pino(opts, prettier)
+
+  instance.info(msg)
+})
+
 test('pino transform prettifies properties', function (t) {
   t.plan(1)
   var prettier = pretty()
