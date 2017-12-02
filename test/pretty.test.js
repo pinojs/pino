@@ -239,6 +239,27 @@ test('pino transform prettifies properties', function (t) {
   instance.info({ a: 'b' }, 'hello world')
 })
 
+test('pino transform prettifies nested properties', function (t) {
+  t.plan(5)
+  var expectedLines = [
+    undefined,
+    '    a: {',
+    '      "b": {',
+    '        "c": "d"',
+    '      }',
+    '    }'
+  ]
+  var prettier = pretty()
+  prettier.pipe(split(function (line) {
+    var expectedLine = expectedLines.shift()
+    if (expectedLine !== undefined) {
+      t.equal(line, expectedLine, 'prettifies the line')
+    }
+  }))
+  var instance = pino(prettier)
+  instance.info({ a: { b: { c: 'd' } } }, 'hello world')
+})
+
 test('pino transform treats the name with care', function (t) {
   t.plan(1)
   var prettier = pretty()
