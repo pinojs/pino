@@ -24,7 +24,7 @@ var standardKeys = [
 ]
 
 function withSpaces (value, eol) {
-  var lines = value.split('\r?\n')
+  var lines = value.split(/\r?\n/)
   for (var i = 1; i < lines.length; i++) {
     lines[i] = '    ' + lines[i]
   }
