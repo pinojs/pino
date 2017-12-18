@@ -5,6 +5,7 @@ var path = require('path')
 var writeStream = require('flush-write-stream')
 var fork = require('child_process').fork
 var spawn = require('child_process').spawn
+var semver = require('semver')
 var fixturesPath = path.join(__dirname, 'fixtures', 'events')
 
 test('no event loop logs successfully', function (t) {
@@ -97,7 +98,11 @@ test('terminates on SIGHUP when no other handlers registered', function (t) {
   }))
 
   child.on('exit', function (code) {
-    t.is(code, 0)
+    if (semver.gt(process.version, '9.0.0')) {
+      t.is(code, 1)
+    } else {
+      t.is(code, 0)
+    }
   })
 
   child.on('close', function () {
