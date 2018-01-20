@@ -15,7 +15,8 @@ if (arg('-h') || arg('--help')) {
     timeTransOnly: arg('-t'),
     levelFirst: arg('-l'),
     forceColor: arg('-c'),
-    messageKey: messageKeyArg()
+    messageKey: messageKeyArg(),
+    dateFormat: dateFormat()
   })).pipe(process.stdout)
 }
 
@@ -40,4 +41,17 @@ function messageKeyArg () {
     throw new Error('-m flag provided without a string argument')
   }
   return messageKey
+}
+
+function dateFormat () {
+  if (!arg('--dateFmt')) {
+    return
+  }
+  var dateFormatIndex = process.argv.indexOf('--dateFmt') + 1
+  var dateFormat = process.argv.length > dateFormatIndex &&
+    process.argv[dateFormatIndex]
+  if (!dateFormat) {
+    throw new Error('--dateFmt flag provided without a string argument')
+  }
+  return dateFormat
 }

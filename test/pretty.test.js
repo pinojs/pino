@@ -354,7 +354,7 @@ test('works without time', function (t) {
   var prettier = pretty()
   prettier.pipe(split(function (line) {
     t.ok(line.match(/.*hello world$/), 'end of line matches')
-    t.ok(line.match(/^INFO.*/), 'includes level')
+    t.ok(line.match(/(?!^)INFO.*/), 'includes level')
     t.ok(line.indexOf('' + process.pid) > 0, 'includes pid')
     t.ok(line.indexOf('' + hostname) > 0, 'includes hostname')
     return line

@@ -23,13 +23,6 @@ var standardKeys = [
   'v'
 ]
 
-var localTime = {
-  dateTime: 'YYYY-MM-DDThh:mm:ss.SSS', // '2017-08-05T12:30:45.789'
-  dateTimeTZ: 'YYYY-MM-DDThh:mm:ss.SSSTZ', // '2017-08-05T12:30:45.789+08:00'
-  time: 'hh:mm:ss',
-  milliTime: 'hh:mm:ss.SSS'
-}
-
 function toTimezoneOffset (aMinTimeoffset) {
   // +/- minute timeoffset
   var tz = aMinTimeoffset || new Date().getTimezoneOffset()
@@ -80,6 +73,7 @@ function isPinoLine (line) {
 function pretty (opts) {
   var timeTransOnly = opts && opts.timeTransOnly
   var formatter = opts && opts.formatter
+  var dateFormat = opts && opts.dateFormat
   var levelFirst = opts && opts.levelFirst
   var messageKey = opts && opts.messageKey
   var forceColor = opts && opts.forceColor
@@ -126,17 +120,13 @@ function pretty (opts) {
     }
 
     if (timeTransOnly) {
-      value.time = asLocalDate(value.time)
+      value.time = asISODate(value.time, dateFormat)
       return JSON.stringify(value) + eol
-      /*
-      value.time = asISODate(value.time)
-      return JSON.stringify(value) + eol
-      */
     }
 
     line = (levelFirst)
         ? asColoredLevel(value) + ' ' + formatTime(value)
-        : formatTime(value, ' ') + asColoredLevel(value)
+        : formatTime(value) + ' ' + asColoredLevel(value)
 
     if (formatter) {
       return opts.formatter(value, {
@@ -186,24 +176,15 @@ function pretty (opts) {
 
     return line
   }
-/*
-  function asISODate (time) {
-    return new Date(time).toISOString()
-  }
-*/
-  // TODO:
-  //  bin.js custom input timezone
-  function asLocalDate (aTime, aTZO) {
+
+  function asISODate (aTime, aFmt, aTZO) {
     var time = aTime
-    var format = localTime.dateTimeTZ || 'YYYY-MM-DDThh:mm:ss.SSSTZ'
-    var tzOffset = aTZO
+    var format = aFmt || 'YYYY-MM-DDThh:mm:ss.SSSTZ'
+
     var date = new Date(time)
-    if (tzOffset === undefined) {
-      tzOffset = date.getTimezoneOffset()
-    }
     // make independent of the system timezone
+    var tzOffset = aTZO || date.getTimezoneOffset()
     date.setUTCMinutes(date.getUTCMinutes() - tzOffset)
-    // var year = date.getUTCFullYear()
     var year = format.indexOf('YYYY') > -1
       ? date.getUTCFullYear()
       : date.getUTCFullYear().toString().substring(2, 4)
@@ -227,13 +208,12 @@ function pretty (opts) {
     return _format
   }
 
-  function formatTime (value, after) {
-    after = after || ''
+  function formatTime (value) {
     try {
       if (!value || !value.time) {
         return ''
       } else {
-        return '[' + asLocalDate(value.time) + ']' + after
+        return '[' + asISODate(value.time, dateFormat) + ']'
       }
     } catch (_) {
       return ''
