@@ -30,10 +30,7 @@ var localTime = {
   milliTime: 'hh:mm:ss.SSS'
 }
 
-// cache, compute once for timezone-offset
-var tz = _localTimeOffset()
-
-function _localTimeOffset (aMinTimeoffset) {
+function toTimezoneOffset (aMinTimeoffset) {
   // +/- minute timeoffset
   var tz = aMinTimeoffset || new Date().getTimezoneOffset()
   var tmp = Math.abs(tz)
@@ -129,12 +126,12 @@ function pretty (opts) {
     }
 
     if (timeTransOnly) {
-      /*
       value.time = asLocalDate(value.time)
       return JSON.stringify(value) + eol
-      */
+      /*
       value.time = asISODate(value.time)
       return JSON.stringify(value) + eol
+      */
     }
 
     line = (levelFirst)
@@ -189,14 +186,13 @@ function pretty (opts) {
 
     return line
   }
-
+/*
   function asISODate (time) {
     return new Date(time).toISOString()
   }
-
+*/
   // TODO:
-  //  more format string support
-  //  parse bin.js custom input format string
+  //  bin.js custom input timezone
   function asLocalDate (aTime, aTZO) {
     var time = aTime
     var format = localTime.dateTimeTZ || 'YYYY-MM-DDThh:mm:ss.SSSTZ'
@@ -207,7 +203,10 @@ function pretty (opts) {
     }
     // make independent of the system timezone
     date.setUTCMinutes(date.getUTCMinutes() - tzOffset)
-    var year = date.getUTCFullYear()
+    // var year = date.getUTCFullYear()
+    var year = format.indexOf('YYYY') > -1
+      ? date.getUTCFullYear()
+      : date.getUTCFullYear().toString().substring(2, 4)
     var month = _lpadzero(date.getUTCMonth() + 1, 2)
     var day = _lpadzero(date.getUTCDate(), 2)
     var hour = _lpadzero(date.getUTCHours(), 2)
@@ -217,14 +216,14 @@ function pretty (opts) {
     date.setUTCMinutes(date.getUTCMinutes() + tzOffset)
 
     var _format = format
-      .replace(/YYYY/g, year)
+      .replace(/Y{1,4}/g, year)
       .replace(/MM/g, month)
       .replace(/DD/g, day)
       .replace(/hh/g, hour)
       .replace(/mm/g, minute)
       .replace(/ss/g, second)
       .replace(/SSS/g, milli)
-      .replace(/TZ/g, tz || _localTimeOffset())
+      .replace(/TZ/g, toTimezoneOffset(tzOffset))
     return _format
   }
 
