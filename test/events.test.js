@@ -96,6 +96,8 @@ test('terminates on SIGHUP when no other handlers registered', function (t) {
     cb()
   }))
 
+  child.stderr.pipe(process.stdout)
+
   child.on('exit', function (code) {
     t.is(code, 0)
   })

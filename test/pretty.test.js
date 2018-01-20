@@ -65,8 +65,15 @@ test('pino transform can just parse the dates', function (t) {
 })
 
 test('pino transform can format with a custom function', function (t) {
-  t.plan(1)
-  var prettier = pretty({ formatter: function (line) {
+  t.plan(8)
+  var prettier = pretty({ formatter: function (line, opts) {
+    t.ok(opts.prefix.indexOf('INFO') > -1, 'prefix contains level')
+    t.ok(typeof opts.chalk.white === 'function', 'chalk instance')
+    t.ok(typeof opts.withSpaces === 'function', 'withSpaces function')
+    t.ok(typeof opts.filter === 'function', 'filter function')
+    t.ok(typeof opts.formatTime === 'function', 'formatTime function')
+    t.ok(typeof opts.asColoredText === 'function', 'asColoredText function')
+    t.ok(typeof opts.asColoredLevel === 'function', 'asColoredLevel function')
     return 'msg: ' + line.msg + ', foo: ' + line.foo
   } })
   prettier.pipe(split(function (line) {
@@ -126,6 +133,95 @@ test('handles missing time', function (t) {
   t.deepEqual(lines, ['{"hello":"world"}'], 'preserved lines')
 })
 
+test('handles missing pid, hostname and name', function (t) {
+  t.plan(1)
+
+  var prettier = pretty()
+  prettier.pipe(split(function (line) {
+    t.ok(line.match(/\[.*\] INFO: hello world/), 'line does not match')
+
+    return line
+  }))
+
+  var instance = pino({ base: null }, prettier)
+
+  instance.info('hello world')
+})
+
+test('handles missing pid', function (t) {
+  t.plan(1)
+
+  var name = 'test'
+  var msg = 'hello world'
+  var regex = new RegExp('\\[.*\\] INFO \\(' + name + ' on ' + hostname + '\\): ' + msg)
+
+  var prettier = pretty()
+  prettier.pipe(split(function (line) {
+    t.ok(regex.test(line), 'line does not match')
+
+    return line
+  }))
+
+  var opts = {
+    base: {
+      name: name,
+      hostname: hostname
+    }
+  }
+  var instance = pino(opts, prettier)
+
+  instance.info(msg)
+})
+
+test('handles missing hostname', function (t) {
+  t.plan(1)
+
+  var name = 'test'
+  var msg = 'hello world'
+  var regex = new RegExp('\\[.*\\] INFO \\(' + name + '/' + process.pid + '\\): ' + msg)
+
+  var prettier = pretty()
+  prettier.pipe(split(function (line) {
+    t.ok(regex.test(line), 'line does not match')
+
+    return line
+  }))
+
+  var opts = {
+    base: {
+      name: name,
+      pid: process.pid
+    }
+  }
+  var instance = pino(opts, prettier)
+
+  instance.info(msg)
+})
+
+test('handles missing name', function (t) {
+  t.plan(1)
+
+  var msg = 'hello world'
+  var regex = new RegExp('\\[.*\\] INFO \\(' + process.pid + ' on ' + hostname + '\\): ' + msg)
+
+  var prettier = pretty()
+  prettier.pipe(split(function (line) {
+    t.ok(regex.test(line), 'line does not match')
+
+    return line
+  }))
+
+  var opts = {
+    base: {
+      hostname: hostname,
+      pid: process.pid
+    }
+  }
+  var instance = pino(opts, prettier)
+
+  instance.info(msg)
+})
+
 test('pino transform prettifies properties', function (t) {
   t.plan(1)
   var prettier = pretty()
@@ -141,6 +237,27 @@ test('pino transform prettifies properties', function (t) {
   var instance = pino(prettier)
 
   instance.info({ a: 'b' }, 'hello world')
+})
+
+test('pino transform prettifies nested properties', function (t) {
+  t.plan(5)
+  var expectedLines = [
+    undefined,
+    '    a: {',
+    '      "b": {',
+    '        "c": "d"',
+    '      }',
+    '    }'
+  ]
+  var prettier = pretty()
+  prettier.pipe(split(function (line) {
+    var expectedLine = expectedLines.shift()
+    if (expectedLine !== undefined) {
+      t.equal(line, expectedLine, 'prettifies the line')
+    }
+  }))
+  var instance = pino(prettier)
+  instance.info({ a: { b: { c: 'd' } } }, 'hello world')
 })
 
 test('pino transform treats the name with care', function (t) {
@@ -188,7 +305,7 @@ test('handles `true` input', function (t) {
   prettier.end()
 })
 
-test('accept customLogLevvel', function (t) {
+test('accept customLogLevel', function (t) {
   t.plan(1)
   var prettier = pretty()
 
@@ -266,4 +383,18 @@ test('convert timestamp to local-time with tz', function (t) {
   var instance = pino(prettier)
 
   instance.info('>' + Date.now() + '<' + ' hello world')
+})
+
+test('throws error when enabled with stream specified', function (t) {
+  t.plan(1)
+  var logStream = writeStream(function (s, enc, cb) {
+    cb()
+  })
+
+  t.throws(() => pino({prettyPrint: true}, logStream), {})
+})
+
+test('does not throw error when enabled with stream specified', function (t) {
+  pino({prettyPrint: true}, process.stdout)
+  t.end()
 })

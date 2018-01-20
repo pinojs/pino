@@ -18,6 +18,7 @@
   * [level-change (event)](#level-change)
   * [.levels.values](#levelValues)
   * [.levels.labels](#levelLabels)
+  * [.isLevelEnabled](#isLevelEnabled)
   * [LOG_VERSION](#log_version)
   * [.stdSerializers](#stdSerializers)
     + [.req](#reqSerializer)
@@ -25,6 +26,7 @@
     + [.err](#errSerializer)
   + [.stdTimeFunctions](#stdTimeFunctions)
     + [.epochTime](#epochTimeFunction)
+    + [.unixTime](#unixTimeFunction)
     + [.slowTime](#slowTimeFunction)
     + [.nullTime](#nullTimeFunction)
 + [Metadata Support](#metadata)
@@ -41,7 +43,7 @@
   * `name` (string): the name of the logger. Default: `undefined`.
   * `serializers` (object): an object containing functions for custom serialization
     of objects. These functions should return an JSONifiable object and they
-    should never throw. When logging an object, each top-level property matching the exact key of a serializer 
+    should never throw. When logging an object, each top-level property matching the exact key of a serializer
     will be serialized using the defined serializer.
   * `timestamp` (boolean|function): Enables or disables the inclusion of a timestamp in the
     log message. If a function is supplied, it must synchronously return a JSON string
@@ -76,6 +78,11 @@
     See [Extreme mode explained](extreme.md) for more detail.
   * `enabled` (boolean): enables logging. Default: `true`
   * `browser` (Object): browser only, may have `asObject` and `write` keys, see [Pino in the Browser](../readme.md#browser)
+  * `base` (Object): key-value object added as child logger to each log line. If set to `null` the `base` child logger is not added . Default:
+    * `pid` (process.pid)
+    * `hostname` (os.hostname)
+    * `name` of logger if supplied as option
+  * `crlf` (boolean): logs newline delimited JSON with `\r\n` instead of `\n`. Default: `false`.
 + `stream` (Writable): a writable stream where the logs will be written.
   It can also receive some log-line [metadata](#metadata), if the
   relative protocol is enabled. Default: `process.stdout`
@@ -104,14 +111,17 @@ Returns a new [logger](#logger) instance.
 + `options` (object):
   * `timeTransOnly` (boolean): if set to `true`, it will only covert the unix
   timestamp to ISO 8601 date format, and reserialize the JSON (equivalent to `pino -t`).
-  * `formatter` (function): a custom function to format the line, is passed the
-  JSON object as an argument and should return a string value.
+  * `formatter` (function): a custom function to format the line. It's passed 2 arguments,
+  JSON object log data and an options object
+  that [exposes utility functions](https://github.com/pinojs/pino/blob/master/pretty.js#L110).
+  It should return a string value.
   * `levelFirst` (boolean): if set to `true`, it will print the name of the log
   level as the first field in the log line. Default: `false`.
   * `messageKey` (string): the key in the JSON object to use as the highlighted
   message. Default: `msg`.
   * `forceColor` (boolean): if set to `true`, will add color information to the formatted output
   message. Default: `false`.
+  * `crlf` (boolean): emit `\r\n` instead of `\n`. Default: `false`.
 
 ### Example:
 ```js
@@ -466,6 +476,18 @@ Returns the mappings of level internal level numbers to their string
 representations. This property is available as a static property or as an
 instance property.
 
+<a id="isLevelEnabled"></a>
+## .isLevelEnabled(logLevel)
+
+### Example:
+```js
+if (logger.isLevelEnabled('debug')) logger.debug('conditional log')
+```
+
+### Discussion:
+A utility method for determining if a given log level will write to the output
+stream.
+
 <a id="log_version"></a>
 ## .LOG_VERSION
 
@@ -565,6 +587,11 @@ a string like `,"time":1493426328206`.
 ### .epochTime
 
 The default time function for Pino. Returns a string like `,"time":1493426328206`.
+
+<a id="unixTimeFunction"></a>
+### .unixTime
+
+Returns a unix time in seconds, like `,"time":1493426328`.
 
 <a id="slowTimeFunction"></a>
 ### .slowTime

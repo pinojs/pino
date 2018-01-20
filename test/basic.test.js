@@ -272,6 +272,47 @@ test('set properties defined in the prototype chain', function (t) {
   instance.info(new MyObject())
 })
 
+test('set the base', function (t) {
+  t.plan(2)
+
+  var instance = pino({
+    base: {
+      a: 'b'
+    }
+  }, sink(function (chunk, enc, cb) {
+    t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
+    delete chunk.time
+    t.deepEqual(chunk, {
+      a: 'b',
+      level: 60,
+      msg: 'this is fatal',
+      v: 1
+    })
+    cb()
+  }))
+
+  instance.fatal('this is fatal')
+})
+
+test('set the base to null', function (t) {
+  t.plan(2)
+
+  var instance = pino({
+    base: null
+  }, sink(function (chunk, enc, cb) {
+    t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
+    delete chunk.time
+    t.deepEqual(chunk, {
+      level: 60,
+      msg: 'this is fatal',
+      v: 1
+    })
+    cb()
+  }))
+
+  instance.fatal('this is fatal')
+})
+
 test('throw if creating child without bindings', function (t) {
   t.plan(1)
 

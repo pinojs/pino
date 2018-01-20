@@ -33,8 +33,11 @@ If you write a transport, let us know and we will add a link here!
 
 + [pino-couch](#pino-couch)
 + [pino-elasticsearch](#pino-elasticsearch)
++ [pino-mq](#pino-mq)
++ [pino-redis](#pino-redis)
 + [pino-socket](#pino-socket)
 + [pino-syslog](#pino-syslog)
+
 
 <a id="pino-couch"></a>
 ### pino-couch
@@ -74,6 +77,11 @@ $ node yourapp.js | pino-elasticsearch --host 192.168.1.42
 
 Assuming Elasticsearch is running on `192.168.1.42`.
 
+If you wish to connect to AWS Elasticsearch:
+```sh
+$ node yourapp.js | pino-elasticsearch  --host https://your-url.us-east-1.es.amazonaws.com --port 443 -c ./aws_config.json
+```
+
 Then, head to your
 Kibana instance, and [create an index pattern](https://www.elastic.co/guide/en/kibana/current/setup.html) on `'pino'`,
 the default for `pino-elasticsearch`.
@@ -81,6 +89,41 @@ the default for `pino-elasticsearch`.
 [pino-elasticsearch]: https://github.com/pinojs/pino-elasticsearch
 [elasticsearch]: https://www.elastic.co/products/elasticsearch
 [kibana]: https://www.elastic.co/products/kibana
+
+<a id="pino-mq"></a>
+### pino-mq
+pino-mq will take all messages received on process.stdin and send them over a message bus using JSON serialization; this is more a transform for pino messages because you will need some processing on the other end of the queue(s) to process message and store them in a backend; it is useful for :
+* moving your backpressure from your application to broker
+* transforming messages pressure to another component
+
+```
+node app.js | pino-mq -u "amqp://guest:guest@localhost/" -q "pino-logs"
+```
+
+or (recomended)
+
+```
+node app.js | pino-mq -c pino-mq.json
+```
+
+you can get a sample of configuration file by running:
+```
+pino-mq -g
+```
+
+for full documentation of command line switches and pino-mq.json read [readme](https://github.com/itavy/pino-mq#readme)
+
+<a id="pino-redis"></a>
+### pino-redis
+
+[pino-redis][pino-redis] loads pino logs into [Redis][Redis].
+
+```sh
+$ node yourapp.js | pino-redis -U redis://username:password@localhost:6379
+```
+
+[pino-redis]: https://github.com/buianhthang/pino-redis
+[Redis]: https://redis.io/
 
 <a id="pino-socket"></a>
 ### pino-socket

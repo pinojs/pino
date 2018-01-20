@@ -1,5 +1,6 @@
 'use strict'
 
+var os = require('os')
 var EventEmitter = require('events').EventEmitter
 var stringifySafe = require('fast-safe-stringify')
 var fs = require('fs')
@@ -31,6 +32,10 @@ var defaultOptions = {
   onTerminated: function (eventName, err) {
     if (err) return process.exit(1)
     process.exit(0)
+  },
+  base: {
+    pid: process.pid,
+    hostname: os.hostname()
   },
   enabled: true,
   messageKey: 'msg'
@@ -128,7 +133,7 @@ function asJson (obj, msg, num) {
   var hasObj = obj !== undefined && obj !== null
   var objError = hasObj && obj instanceof Error
   msg = !msg && objError ? obj.message : msg || undefined
-  var data = this._baseLog + this._lscache[num] + this.time()
+  var data = this._lscache[num] + this.time()
   if (msg !== undefined) {
     // JSON.stringify is safe here
     data += this.messageKeyString + JSON.stringify('' + msg)
@@ -236,7 +241,7 @@ function addLevel (name, lvl) {
   if (this.levels.labels.hasOwnProperty(lvl)) return false
   this.levels.values[name] = lvl
   this.levels.labels[lvl] = name
-  this._lscache[lvl] = flatstr('"level":' + Number(lvl))
+  this._lscache[lvl] = flatstr('{"level":' + Number(lvl))
   Object.defineProperty(this, name, {
     value: lvl < this._levelVal ? tools.noop : tools.genLog(lvl),
     enumerable: true,
@@ -250,6 +255,15 @@ Object.defineProperty(pinoPrototype, 'addLevel', {
   value: addLevel
 })
 
+function isLevelEnabled (logLevel) {
+  var logLevelVal = this.levels.values[logLevel]
+  return logLevelVal && (logLevelVal >= this._levelVal)
+}
+Object.defineProperty(pinoPrototype, 'isLevelEnabled', {
+  enumerable: true,
+  value: isLevelEnabled
+})
+
 function pino (opts, stream) {
   var iopts = opts
   var istream = stream
@@ -260,11 +274,12 @@ function pino (opts, stream) {
   iopts = Object.assign({}, defaultOptions, iopts)
   if (iopts.extreme && iopts.prettyPrint) throw Error('cannot enable pretty print in extreme mode')
   istream = istream || process.stdout
+  var isStdout = istream === process.stdout
+  if (!isStdout && iopts.prettyPrint) throw Error('cannot enable pretty print when stream is not process.stdout')
   if (iopts.prettyPrint) {
     var prettyOpts = Object.assign({ messageKey: iopts.messageKey }, iopts.prettyPrint)
     var pstream = pretty(prettyOpts)
-    var origStream = istream
-    pump(pstream, origStream, function (err) {
+    pump(pstream, process.stdout, function (err) {
       if (err) instance.emit('error', err)
     })
     istream = pstream
@@ -274,7 +289,7 @@ function pino (opts, stream) {
   iopts.stringify = iopts.safe ? stringifySafe : JSON.stringify
   iopts.formatOpts = {lowres: true}
   iopts.messageKeyString = `,"${iopts.messageKey}":`
-  iopts.end = ',"v":' + LOG_VERSION + '}\n'
+  iopts.end = ',"v":' + LOG_VERSION + '}' + (iopts.crlf ? '\r\n' : '\n')
   iopts.cache = !iopts.extreme ? null : {
     size: 4096,
     buf: ''
@@ -336,6 +351,18 @@ function pino (opts, stream) {
       var fd = (istream.fd) ? istream.fd : istream._handle.fd
       fs.writeSync(fd, buf)
     }
+  }
+
+  var base = (typeof iopts.base === 'object') ? iopts.base : defaultOptions.base
+
+  if (iopts.name !== undefined) {
+    base = Object.assign({}, base, {
+      name: iopts.name
+    })
+  }
+
+  if (base !== null) {
+    instance = instance.child(base)
   }
 
   return instance
