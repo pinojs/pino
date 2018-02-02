@@ -220,7 +220,7 @@ test('opts.browser.write func string interpolation', function (t) {
     browser: {
       write: function (o) {
         t.is(o.level, 30)
-        t.is(o.msg, 'test2 test ({\\"test\\":\\"test3\\"})')
+        t.is(o.msg, 'test2 test ({"test":"test3"})')
         t.ok(o.time)
       }
     }
