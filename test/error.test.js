@@ -79,7 +79,7 @@ test('type, message and stack should be first level properties', function (t) {
 
 test('err serializer', function (t) {
   t.plan(2)
-  var err = Object.assign(new Error('myerror'), {foo: 'bar'})
+  var err = Object.assign(new Error('myerror'), {foo: 'bar', domain: {}, domainEmitter: {}, domainThrown: true, domainBound: function () {}})
   var instance = pino({
     serializers: {
       err: pino.stdSerializers.err
