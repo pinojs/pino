@@ -38,10 +38,10 @@
 
 ### Parameters:
 + `options` (object):
-  * `safe` (boolean): avoid error caused by circular references in the object tree.
+  * `safe` (boolean): Avoid error caused by circular references in the object tree.
     Default: `true`.
-  * `name` (string): the name of the logger. Default: `undefined`.
-  * `serializers` (object): an object containing functions for custom serialization
+  * `name` (string): The name of the logger. Default: `undefined`.
+  * `serializers` (object): An object containing functions for custom serialization
     of objects. These functions should return an JSONifiable object and they
     should never throw. When logging an object, each top-level property matching the exact key of a serializer
     will be serialized using the defined serializer.
@@ -62,28 +62,31 @@
   * `extreme` (boolean): Enables extreme mode, yields an additional 60% performance
     (from 250ms down to 100ms per 10000 ops). There are trade-off's should be
     understood before usage. See [Extreme mode explained](extreme.md). Default: `false`.
-  * `level` (string): one of `'fatal'`, `'error'`, `'warn'`, `'info`', `'debug'`,
+  * `level` (string): One of `'fatal'`, `'error'`, `'warn'`, `'info`', `'debug'`,
     `'trace'`; also `'silent'` is supported to disable logging. Any other value
     defines a custom level and requires supplying a level value via `levelVal`.
     Default: 'info'.
-  * `levelVal` (integer): when defining a custom log level via `level`, set to an
+  * `levelVal` (integer): When defining a custom log level via `level`, set to an
     integer value to define the new level. Default: `undefined`.
-  * `messageKey` (string): the string key for the 'message' in the JSON object. Default `msg`.
-  * `prettyPrint` (boolean|object): enables [pino.pretty](#pretty). This is intended for non-production
+  * `messageKey` (string): The string key for the 'message' in the JSON object. Default `msg`.
+  * `objectKey` (string): The root key name to nest stringified objects under. If not changed any
+    objects that get logged will have their properties merged with the log properties.
+    If set to a key value such as `data`, stringified objects will be nested under this value. Default `''`. 
+  * `prettyPrint` (boolean|object): Enables [pino.pretty](#pretty). This is intended for non-production
     configurations. This may be set to a configuration object as outlined in [pino.pretty](#pretty). Default: `false`.
-  * `onTerminated` (function): this function will be invoked during process shutdown when `extreme` is set to `true`.
+  * `onTerminated` (function): This function will be invoked during process shutdown when `extreme` is set to `true`.
     The signature of the function is `onTerminated(eventName, err)`. If you do not specify a function, Pino will
     invoke `process.exit(0)` when no error has occurred, and `process.exit(1)` otherwise. If you do specify a function,
     it is up to you to terminate the process; you **must** perform only synchronous operations at this point.
     See [Extreme mode explained](extreme.md) for more detail.
-  * `enabled` (boolean): enables logging. Default: `true`
-  * `browser` (Object): browser only, may have `asObject` and `write` keys, see [Pino in the Browser](../readme.md#browser)
-  * `base` (Object): key-value object added as child logger to each log line. If set to `null` the `base` child logger is not added . Default:
+  * `enabled` (boolean): Enables logging. Default: `true`
+  * `browser` (Object): Browser only, may have `asObject` and `write` keys, see [Pino in the Browser](../readme.md#browser)
+  * `base` (Object): A key-value object added as child logger to each log line. If set to `null` the `base` child logger is not added . Default:
     * `pid` (process.pid)
     * `hostname` (os.hostname)
-    * `name` of logger if supplied as option
-  * `crlf` (boolean): logs newline delimited JSON with `\r\n` instead of `\n`. Default: `false`.
-+ `stream` (Writable): a writable stream where the logs will be written.
+    * `name` (string): The name of the logger if supplied as option.
+  * `crlf` (boolean): Logs newline delimited JSON with `\r\n` instead of `\n`. Default: `false`.
++ `stream` (Writable): A writable stream where the logs will be written.
   It can also receive some log-line [metadata](#metadata), if the
   relative protocol is enabled. Default: `process.stdout`
 
