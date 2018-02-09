@@ -228,6 +228,31 @@ test('set the messageKey', function (t) {
   instance.info(message)
 })
 
+test('set the objectKey', function (t) {
+  t.plan(2)
+
+  var message = 'hello world'
+  var obj = {a: 'a', b: 'b'}
+  var objectKey = 'data'
+  var instance = pino({
+    objectKey: objectKey
+  }, sink(function (chunk, enc, cb) {
+    t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
+    delete chunk.time
+    t.deepEqual(chunk, {
+      pid: pid,
+      hostname: hostname,
+      level: 30,
+      msg: message,
+      data: obj,
+      v: 1
+    })
+    cb()
+  }))
+
+  instance.info(obj, message)
+})
+
 test('set undefined properties', function (t) {
   t.plan(2)
 
