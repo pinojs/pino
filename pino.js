@@ -158,7 +158,8 @@ function asJson (obj, msg, num) {
         }
       }
     }
-    this.objectKeyString === ',"":{' ? data += objData : (data += this.objectKeyString + objData.slice(1) + '}')
+    this.objectKeyString === ',"":{' || Object.keys(obj).length < 1
+      ? data += objData : data += this.objectKeyString + objData.slice(1) + '}'
   }
   return data + this.end
 }

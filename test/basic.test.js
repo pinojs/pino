@@ -253,6 +253,32 @@ test('set the objectKey', function (t) {
   instance.info(obj, message)
 })
 
+test('set the objectKey and passing error', function (t) {
+  t.plan(2)
+  var err = new Error('myerror')
+  var instance = pino({
+    objectKey: 'data',
+    serializers: {
+      err: pino.stdSerializers.err
+    }
+  }, sink(function (chunk, enc, cb) {
+    t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
+    delete chunk.time
+    t.deepEqual(chunk, {
+      pid: pid,
+      hostname: hostname,
+      level: 30,
+      type: 'Error',
+      msg: err.message,
+      stack: err.stack,
+      v: 1
+    })
+    cb()
+  }))
+
+  instance.info(err)
+})
+
 test('set undefined properties', function (t) {
   t.plan(2)
 
