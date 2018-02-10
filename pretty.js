@@ -28,7 +28,6 @@ function toTimezoneOffset (aMinTimeoffset) {
   var tz = aMinTimeoffset || new Date().getTimezoneOffset()
   var tmp = Math.abs(tz)
 
-  // var offset = String(Math.floor(tmp / 60)).padStart(2, '0') + ':' + String(tmp % 60).padStart(2, '0')
   var offset = _lpadzero(String(Math.floor(tmp / 60)), 2) + ':' + _lpadzero(String(tmp % 60), 2)
   return tz > 0 ? '-' + offset : '+' + offset
 }
