@@ -367,24 +367,6 @@ test('works without time', function (t) {
   instance.info('hello world')
 })
 
-test('convert timestamp to local-time with tz', function (t) {
-  t.plan(5)
-  var prettier = pretty()
-  prettier.pipe(split(function (line) {
-    var now = line.slice(line.indexOf('>') + 1, line.indexOf('<'))
-    t.ok(line.match(/.*hello world$/), 'end of line matches')
-    t.ok(line.match(/(?!^)INFO.*/), 'includes level')
-    t.ok(line.indexOf('' + process.pid) > 0, 'includes pid')
-    t.ok(line.indexOf('' + hostname) > 0, 'includes hostname')
-    t.ok(Date.parse(line.substr(1, 29)) === parseInt(now), 'local date timezone')
-    return line
-  }))
-
-  var instance = pino(prettier)
-
-  instance.info('>' + Date.now() + '<' + ' hello world')
-})
-
 test('throws error when enabled with stream specified', function (t) {
   t.plan(1)
   var logStream = writeStream(function (s, enc, cb) {

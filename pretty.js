@@ -73,6 +73,7 @@ function pretty (opts) {
   var timeTransOnly = opts && opts.timeTransOnly
   var formatter = opts && opts.formatter
   var dateFormat = opts && opts.dateFormat
+  var localTime = opts && opts.localTime
   var levelFirst = opts && opts.levelFirst
   var messageKey = opts && opts.messageKey
   var forceColor = opts && opts.forceColor
@@ -119,7 +120,9 @@ function pretty (opts) {
     }
 
     if (timeTransOnly) {
-      value.time = asISODate(value.time, dateFormat)
+      value.time = (localTime)
+        ? asLocalISODate(value.time, dateFormat)
+        : asISODate(value.time)
       return JSON.stringify(value) + eol
     }
 
@@ -176,13 +179,17 @@ function pretty (opts) {
     return line
   }
 
-  function asISODate (aTime, aFmt, aTZO) {
+  function asISODate (time) {
+    return new Date(time).toISOString()
+  }
+
+  function asLocalISODate (aTime, aFormat, aMinuteTZ) {
     var time = aTime
-    var format = aFmt || 'YYYY-MM-DDThh:mm:ss.SSSTZ'
+    var format = aFormat || 'YYYY-MM-DDThh:mm:ss.SSSTZ'
 
     var date = new Date(time)
     // make independent of the system timezone
-    var tzOffset = aTZO || date.getTimezoneOffset()
+    var tzOffset = aMinuteTZ || date.getTimezoneOffset()
     date.setUTCMinutes(date.getUTCMinutes() - tzOffset)
     var year = format.indexOf('YYYY') > -1
       ? date.getUTCFullYear()
@@ -195,7 +202,7 @@ function pretty (opts) {
     var milli = _lpadzero(date.getUTCMilliseconds(), 3)
     date.setUTCMinutes(date.getUTCMinutes() + tzOffset)
 
-    var _format = format
+    return format
       .replace(/Y{1,4}/g, year)
       .replace(/MM/g, month)
       .replace(/DD/g, day)
@@ -204,7 +211,6 @@ function pretty (opts) {
       .replace(/ss/g, second)
       .replace(/SSS/g, milli)
       .replace(/TZ/g, toTimezoneOffset(tzOffset))
-    return _format
   }
 
   function formatTime (value) {
@@ -212,7 +218,9 @@ function pretty (opts) {
       if (!value || !value.time) {
         return ''
       } else {
-        return '[' + asISODate(value.time, dateFormat) + ']'
+        return '[' + ((localTime)
+          ? asLocalISODate(value.time, dateFormat)
+          : asISODate(value.time)) + ']'
       }
     } catch (_) {
       return ''
