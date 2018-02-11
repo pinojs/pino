@@ -158,8 +158,11 @@ function asJson (obj, msg, num) {
         }
       }
     }
-    this.objectKeyString === ',"":{' || Object.keys(obj).length < 1
-      ? data += objData : data += this.objectKeyString + objData.slice(1) + '}'
+    if (this.objectKeyString === ',"":{' || Object.keys(obj).length < 1) {
+      data += objData
+    } else {
+      data += this.objectKeyString + objData.slice(1) + '}'
+    }
   }
   return data + this.end
 }
