@@ -38,7 +38,8 @@ var defaultOptions = {
     hostname: os.hostname()
   },
   enabled: true,
-  messageKey: 'msg'
+  messageKey: 'msg',
+  objectKey: ''
 }
 
 var pinoPrototype = Object.create(EventEmitter.prototype, {
@@ -141,6 +142,7 @@ function asJson (obj, msg, num) {
   // we need the child bindings added to the output first so that logged
   // objects can take precedence when JSON.parse-ing the resulting log line
   data = data + this.chindings
+  var objData = ''
   var value
   if (hasObj) {
     var notHasOwnProperty = obj.hasOwnProperty === undefined
@@ -152,9 +154,14 @@ function asJson (obj, msg, num) {
       if ((notHasOwnProperty || obj.hasOwnProperty(key)) && value !== undefined) {
         value = this.stringify(this.serializers[key] ? this.serializers[key](value) : value)
         if (value !== undefined) {
-          data += ',"' + key + '":' + value
+          objData += ',"' + key + '":' + value
         }
       }
+    }
+    if (this.objectKeyString === ',"":{' || Object.keys(obj).length < 1) {
+      data += objData
+    } else {
+      data += this.objectKeyString + objData.slice(1) + '}'
     }
   }
   return data + this.end
@@ -289,6 +296,7 @@ function pino (opts, stream) {
   iopts.stringify = iopts.safe ? stringifySafe : JSON.stringify
   iopts.formatOpts = {lowres: true}
   iopts.messageKeyString = `,"${iopts.messageKey}":`
+  iopts.objectKeyString = `,"${iopts.objectKey}":{`
   iopts.end = ',"v":' + LOG_VERSION + '}' + (iopts.crlf ? '\r\n' : '\n')
   iopts.cache = !iopts.extreme ? null : {
     size: 4096,
@@ -314,6 +322,7 @@ function pino (opts, stream) {
   instance.onTerminated = iopts.onTerminated
   instance.messageKey = iopts.messageKey
   instance.messageKeyString = iopts.messageKeyString
+  instance.objectKeyString = iopts.objectKeyString
 
   applyOptions(instance, iopts)
 
