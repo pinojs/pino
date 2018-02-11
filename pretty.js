@@ -128,7 +128,7 @@ function pretty (opts) {
 
     line = (levelFirst)
         ? asColoredLevel(value) + ' ' + formatTime(value)
-        : formatTime(value) + ' ' + asColoredLevel(value)
+        : formatTime(value, ' ') + asColoredLevel(value)
 
     if (formatter) {
       return opts.formatter(value, {
@@ -186,7 +186,6 @@ function pretty (opts) {
   function asLocalISODate (aTime, aFormat, aMinuteTZ) {
     var time = aTime
     var format = aFormat || 'YYYY-MM-DDThh:mm:ss.SSSTZ'
-
     var date = new Date(time)
     // make independent of the system timezone
     var tzOffset = aMinuteTZ || date.getTimezoneOffset()
@@ -213,14 +212,15 @@ function pretty (opts) {
       .replace(/TZ/g, toTimezoneOffset(tzOffset))
   }
 
-  function formatTime (value) {
+  function formatTime (value, after) {
+    after = after || ''
     try {
       if (!value || !value.time) {
         return ''
       } else {
         return '[' + ((localTime)
           ? asLocalISODate(value.time, dateFormat)
-          : asISODate(value.time)) + ']'
+          : asISODate(value.time)) + ']' + after
       }
     } catch (_) {
       return ''

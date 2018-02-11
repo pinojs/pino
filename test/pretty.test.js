@@ -7,6 +7,7 @@ var os = require('os')
 var path = require('path')
 var writeStream = require('flush-write-stream')
 var fork = require('child_process').fork
+var spawn = require('child_process').spawn
 var split = require('split2')
 var hostname = os.hostname()
 
@@ -354,7 +355,7 @@ test('works without time', function (t) {
   var prettier = pretty()
   prettier.pipe(split(function (line) {
     t.ok(line.match(/.*hello world$/), 'end of line matches')
-    t.ok(line.match(/(?!^)INFO.*/), 'includes level')
+    t.ok(line.match(/^INFO.*/), 'includes level')
     t.ok(line.indexOf('' + process.pid) > 0, 'includes pid')
     t.ok(line.indexOf('' + hostname) > 0, 'includes hostname')
     return line
@@ -379,4 +380,35 @@ test('throws error when enabled with stream specified', function (t) {
 test('does not throw error when enabled with stream specified', function (t) {
   pino({prettyPrint: true}, process.stdout)
   t.end()
+})
+
+test('CLI: --localTime option', function (t) {
+  t.plan(5)
+  var now = Date.now()
+  var log = {
+    level: 30,
+    msg: 'hello world',
+    time: now,
+    pid: process.pid,
+    hostname: hostname,
+    v: 1
+  }
+  var child = spawn('node', [path.join(__dirname, '../bin.js'), '--localTime'], { stdio: 'pipe' })
+  child.stdin.end(JSON.stringify(log))
+
+  var line = ''
+  child.stdout.on('data', (data) => {
+    line += data.toString()
+  })
+
+  child.on('close', function () {
+    line = line.slice(0, -1 * (os.EOL).length)
+    var localTime = line.slice(line.indexOf('[') + 1, line.indexOf(']'))
+    t.ok(line.match(/.*hello world$/), 'end of line matches')
+    t.ok(line.match(/(?!^)INFO.*/), 'includes level')
+    t.ok(line.indexOf('' + process.pid) > 0, 'includes pid')
+    t.ok(line.indexOf('' + hostname) > 0, 'includes hostname')
+    t.ok(Date.parse(localTime) === parseInt(now), 'localTime <-> UTC match')
+    return line
+  })
 })
