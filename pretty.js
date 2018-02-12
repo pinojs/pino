@@ -122,7 +122,7 @@ function pretty (opts) {
     if (timeTransOnly) {
       value.time = (localTime)
         ? asLocalISODate(value.time, dateFormat)
-        : asISODate(value.time)
+        : asISODate(value.time, dateFormat)
       return JSON.stringify(value) + eol
     }
 
@@ -179,8 +179,12 @@ function pretty (opts) {
     return line
   }
 
-  function asISODate (time) {
-    return new Date(time).toISOString()
+  function asISODate (time, dateFormat) {
+    if (dateFormat) {
+      return asLocalISODate(time, dateFormat, 0)
+    } else {
+      return new Date(time).toISOString()
+    }
   }
 
   function asLocalISODate (aTime, aFormat, aMinuteTZ) {
@@ -188,11 +192,13 @@ function pretty (opts) {
     var format = aFormat || 'YYYY-MM-DDThh:mm:ss.SSSTZ'
     var date = new Date(time)
     // make independent of the system timezone
-    var tzOffset = aMinuteTZ || date.getTimezoneOffset()
+    var tzOffset = (aMinuteTZ === undefined)
+      ? date.getTimezoneOffset()
+      : aMinuteTZ
     date.setUTCMinutes(date.getUTCMinutes() - tzOffset)
     var year = format.indexOf('YYYY') > -1
       ? date.getUTCFullYear()
-      : date.getUTCFullYear().toString().substring(2, 4)
+      : date.getUTCFullYear().toString().slice(2, 4)
     var month = _lpadzero(date.getUTCMonth() + 1, 2)
     var day = _lpadzero(date.getUTCDate(), 2)
     var hour = _lpadzero(date.getUTCHours(), 2)
@@ -220,7 +226,7 @@ function pretty (opts) {
       } else {
         return '[' + ((localTime)
           ? asLocalISODate(value.time, dateFormat)
-          : asISODate(value.time)) + ']' + after
+          : asISODate(value.time, dateFormat)) + ']' + after
       }
     } catch (_) {
       return ''
