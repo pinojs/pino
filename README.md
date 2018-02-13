@@ -479,7 +479,7 @@ See the [CONTRIBUTING.md](https://github.com/pinojs/pino/blob/master/CONTRIBUTIN
 
 This project was kindly sponsored by [nearForm](http://nearform.com).
 
-Logo and identity designed by Beibhinn Murphy O'Brien: https://www.behance.net/BeibhinnMurphyOBrien.
+Logo and identity designed by Cosmic Fox Design: https://www.behance.net/cosmicfox.
 
 ## License
 
