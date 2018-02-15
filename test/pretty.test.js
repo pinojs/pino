@@ -7,7 +7,6 @@ var os = require('os')
 var path = require('path')
 var writeStream = require('flush-write-stream')
 var fork = require('child_process').fork
-var spawn = require('child_process').spawn
 var split = require('split2')
 var hostname = os.hostname()
 
@@ -382,65 +381,39 @@ test('does not throw error when enabled with stream specified', function (t) {
   t.end()
 })
 
-test('CLI: --localTime option', function (t) {
+test('pino pretty localTime flag', function (t) {
   t.plan(5)
-  var now = Date.now()
-  var log = {
-    level: 30,
-    msg: 'hello world',
-    time: now,
-    pid: process.pid,
-    hostname: hostname,
-    v: 1
-  }
-  var child = spawn('node', [path.join(__dirname, '../bin.js'), '--localTime'], { stdio: 'pipe' })
-  child.stdin.end(JSON.stringify(log))
-
-  var line = ''
-  child.stdout.on('data', (data) => {
-    line += data.toString('binary')
-  })
-
-  child.on('close', function () {
-    line = line.slice(0, -1 * (os.EOL).length)
+  var prettier = pretty({ localTime: true })
+  prettier.pipe(split(function (line) {
     var localTime = line.slice(line.indexOf('[') + 1, line.indexOf(']'))
+    var msgTime = line.slice(line.indexOf('>') + 1, line.indexOf('<'))
     t.ok(line.match(/.*hello world$/), 'end of line matches')
     t.ok(line.match(/(?!^)INFO.*/), 'includes level')
     t.ok(line.indexOf('' + process.pid) > 0, 'includes pid')
     t.ok(line.indexOf('' + hostname) > 0, 'includes hostname')
-    t.ok(Date.parse(localTime) === parseInt(now), 'localTime <-> UTC match')
+    t.ok(Date.parse(localTime) === parseInt(msgTime), 'local iso time <-> Epoch timestamps match')
     return line
-  })
+  }))
+  var instance = pino(prettier)
+
+  instance.info('>' + Date.now() + '< hello world')
 })
 
-test('CLI: --dateFormat option', function (t) {
+test('pino pretty dateFormat flag', function (t) {
   t.plan(5)
-  var now = Date.now()
-  var log = {
-    level: 30,
-    msg: 'hello world',
-    time: now,
-    pid: process.pid,
-    hostname: hostname,
-    v: 1
-  }
-  var child = spawn('node', [path.join(__dirname, '../bin.js'), '--dateFormat', 'YYYY/MM/DDThh,mm,ss_SSSZ'], { stdio: 'pipe' })
-  child.stdin.end(JSON.stringify(log))
-
-  var line = ''
-  child.stdout.on('data', (data) => {
-    line += data.toString('binary')
-  })
-
-  child.on('close', function () {
-    line = line.slice(0, -1 * (os.EOL).length)
+  var prettier = pretty({ dateFormat: 'YYYY/MM/DDThh,mm,ss_SSSZ' })
+  prettier.pipe(split(function (line) {
     var formatDate = line.slice(line.indexOf('[') + 1, line.indexOf(']'))
+    var msgTime = line.slice(line.indexOf('>') + 1, line.indexOf('<'))
     var toISODate = formatDate.replace(/\//g, '-').replace(/,/g, ':').replace(/_/g, '.')
     t.ok(line.match(/.*hello world$/), 'end of line matches')
     t.ok(line.match(/(?!^)INFO.*/), 'includes level')
     t.ok(line.indexOf('' + process.pid) > 0, 'includes pid')
     t.ok(line.indexOf('' + hostname) > 0, 'includes hostname')
-    t.ok(Date.parse(toISODate) === parseInt(now), 'custDateFormat <-> UTC match')
+    t.ok(Date.parse(toISODate) === parseInt(msgTime), 'custDateFormat <-> Epoch timestamps match')
     return line
-  })
+  }))
+  var instance = pino(prettier)
+
+  instance.info('>' + Date.now() + '< hello world')
 })
