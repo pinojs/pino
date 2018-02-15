@@ -382,7 +382,7 @@ test('does not throw error when enabled with stream specified', function (t) {
 })
 
 test('pino pretty localTime flag', function (t) {
-  t.plan(5)
+  t.plan(6)
   var prettier = pretty({ localTime: true })
   prettier.pipe(split(function (line) {
     var localTime = line.slice(line.indexOf('[') + 1, line.indexOf(']'))
@@ -391,7 +391,8 @@ test('pino pretty localTime flag', function (t) {
     t.ok(line.match(/(?!^)INFO.*/), 'includes level')
     t.ok(line.indexOf('' + process.pid) > 0, 'includes pid')
     t.ok(line.indexOf('' + hostname) > 0, 'includes hostname')
-    t.ok(Date.parse(localTime) === parseInt(msgTime), 'local iso time <-> Epoch timestamps match')
+    t.ok(Date.parse(localTime) > parseInt(msgTime, 10) - 2000, 'local iso time <-> Epoch timestamps match')
+    t.ok(Date.parse(localTime) < parseInt(msgTime, 10) + 2000, 'local iso time <-> Epoch timestamps match')
     return line
   }))
   var instance = pino(prettier)
@@ -400,7 +401,7 @@ test('pino pretty localTime flag', function (t) {
 })
 
 test('pino pretty dateFormat flag', function (t) {
-  t.plan(5)
+  t.plan(6)
   var prettier = pretty({ dateFormat: 'YYYY/MM/DDThh,mm,ss_SSSZ' })
   prettier.pipe(split(function (line) {
     var formatDate = line.slice(line.indexOf('[') + 1, line.indexOf(']'))
@@ -410,7 +411,8 @@ test('pino pretty dateFormat flag', function (t) {
     t.ok(line.match(/(?!^)INFO.*/), 'includes level')
     t.ok(line.indexOf('' + process.pid) > 0, 'includes pid')
     t.ok(line.indexOf('' + hostname) > 0, 'includes hostname')
-    t.ok(Date.parse(toISODate) === parseInt(msgTime), 'custDateFormat <-> Epoch timestamps match')
+    t.ok(Date.parse(toISODate) > parseInt(msgTime, 10) - 2000, 'custDateFormat <-> Epoch timestamps match')
+    t.ok(Date.parse(toISODate) < parseInt(msgTime, 10) + 2000, 'custDateFormat <-> Epoch timestamps match')
     return line
   }))
   var instance = pino(prettier)
