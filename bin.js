@@ -17,6 +17,16 @@ if (arg('-h') || arg('--help')) {
     forceColor: arg('-c'),
     messageKey: messageKeyArg()
   })).pipe(process.stdout)
+  process.stdin.on('end', closeProcess)
+  process.on('SIGINT', waitClose)
+}
+
+function waitClose () {
+  setTimeout(closeProcess, 2000)
+}
+
+function closeProcess () {
+  process.exit()
 }
 
 function usage () {
