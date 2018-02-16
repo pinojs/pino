@@ -380,3 +380,42 @@ test('does not throw error when enabled with stream specified', function (t) {
   pino({prettyPrint: true}, process.stdout)
   t.end()
 })
+
+test('pino pretty localTime flag', function (t) {
+  t.plan(6)
+  var prettier = pretty({ localTime: true })
+  prettier.pipe(split(function (line) {
+    var localTime = line.slice(line.indexOf('[') + 1, line.indexOf(']'))
+    var msgTime = line.slice(line.indexOf('>') + 1, line.indexOf('<'))
+    t.ok(line.match(/.*hello world$/), 'end of line matches')
+    t.ok(line.match(/(?!^)INFO.*/), 'includes level')
+    t.ok(line.indexOf('' + process.pid) > 0, 'includes pid')
+    t.ok(line.indexOf('' + hostname) > 0, 'includes hostname')
+    t.ok(Date.parse(localTime) > parseInt(msgTime, 10) - 2000, 'local iso time <-> Epoch timestamps match')
+    t.ok(Date.parse(localTime) < parseInt(msgTime, 10) + 2000, 'local iso time <-> Epoch timestamps match')
+    return line
+  }))
+  var instance = pino(prettier)
+
+  instance.info('>' + Date.now() + '< hello world')
+})
+
+test('pino pretty dateFormat flag', function (t) {
+  t.plan(6)
+  var prettier = pretty({ dateFormat: 'YYYY/MM/DDThh,mm,ss_SSSZ' })
+  prettier.pipe(split(function (line) {
+    var formatDate = line.slice(line.indexOf('[') + 1, line.indexOf(']'))
+    var msgTime = line.slice(line.indexOf('>') + 1, line.indexOf('<'))
+    var toISODate = formatDate.replace(/\//g, '-').replace(/,/g, ':').replace(/_/g, '.')
+    t.ok(line.match(/.*hello world$/), 'end of line matches')
+    t.ok(line.match(/(?!^)INFO.*/), 'includes level')
+    t.ok(line.indexOf('' + process.pid) > 0, 'includes pid')
+    t.ok(line.indexOf('' + hostname) > 0, 'includes hostname')
+    t.ok(Date.parse(toISODate) > parseInt(msgTime, 10) - 2000, 'custDateFormat <-> Epoch timestamps match')
+    t.ok(Date.parse(toISODate) < parseInt(msgTime, 10) + 2000, 'custDateFormat <-> Epoch timestamps match')
+    return line
+  }))
+  var instance = pino(prettier)
+
+  instance.info('>' + Date.now() + '< hello world')
+})

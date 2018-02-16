@@ -23,6 +23,26 @@ var standardKeys = [
   'v'
 ]
 
+function toTimezoneOffset (aMinTimeoffset) {
+  // +/- minute timeoffset
+  var tz = aMinTimeoffset || new Date().getTimezoneOffset()
+  var tmp = Math.abs(tz)
+
+  var offset = _lpadzero(String(Math.floor(tmp / 60)), 2) + ':' + _lpadzero(String(tmp % 60), 2)
+  return tz > 0 ? '-' + offset : '+' + offset
+}
+
+function _lpadzero (aTarget, aLength, aPadChar) {
+  var char = aPadChar || '0'
+  var targetStr = aTarget.toString()
+  var times = aLength - targetStr.length
+  var padding = ''
+  while ((times--) > 0) {
+    padding += char
+  }
+  return padding + targetStr
+}
+
 function withSpaces (value, eol) {
   var lines = value.split(/\r?\n/)
   for (var i = 1; i < lines.length; i++) {
@@ -52,6 +72,8 @@ function isPinoLine (line) {
 function pretty (opts) {
   var timeTransOnly = opts && opts.timeTransOnly
   var formatter = opts && opts.formatter
+  var dateFormat = opts && opts.dateFormat
+  var localTime = opts && opts.localTime
   var levelFirst = opts && opts.levelFirst
   var messageKey = opts && opts.messageKey
   var forceColor = opts && opts.forceColor
@@ -98,7 +120,9 @@ function pretty (opts) {
     }
 
     if (timeTransOnly) {
-      value.time = asISODate(value.time)
+      value.time = (localTime)
+        ? asLocalISODate(value.time, dateFormat)
+        : asISODate(value.time, dateFormat)
       return JSON.stringify(value) + eol
     }
 
@@ -155,8 +179,43 @@ function pretty (opts) {
     return line
   }
 
-  function asISODate (time) {
-    return new Date(time).toISOString()
+  function asISODate (time, dateFormat) {
+    if (dateFormat) {
+      return asLocalISODate(time, dateFormat, 0)
+    } else {
+      return new Date(time).toISOString()
+    }
+  }
+
+  function asLocalISODate (aTime, aFormat, aMinuteTZ) {
+    var time = aTime
+    var format = aFormat || 'YYYY-MM-DDThh:mm:ss.SSSTZ'
+    var date = new Date(time)
+    // make independent of the system timezone
+    var tzOffset = (aMinuteTZ === undefined)
+      ? date.getTimezoneOffset()
+      : aMinuteTZ
+    date.setUTCMinutes(date.getUTCMinutes() - tzOffset)
+    var year = format.indexOf('YYYY') > -1
+      ? date.getUTCFullYear()
+      : date.getUTCFullYear().toString().slice(2, 4)
+    var month = _lpadzero(date.getUTCMonth() + 1, 2)
+    var day = _lpadzero(date.getUTCDate(), 2)
+    var hour = _lpadzero(date.getUTCHours(), 2)
+    var minute = _lpadzero(date.getUTCMinutes(), 2)
+    var second = _lpadzero(date.getUTCSeconds(), 2)
+    var milli = _lpadzero(date.getUTCMilliseconds(), 3)
+    date.setUTCMinutes(date.getUTCMinutes() + tzOffset)
+
+    return format
+      .replace(/Y{1,4}/g, year)
+      .replace(/MM/g, month)
+      .replace(/DD/g, day)
+      .replace(/hh/g, hour)
+      .replace(/mm/g, minute)
+      .replace(/ss/g, second)
+      .replace(/SSS/g, milli)
+      .replace(/TZ/g, toTimezoneOffset(tzOffset))
   }
 
   function formatTime (value, after) {
@@ -165,7 +224,9 @@ function pretty (opts) {
       if (!value || !value.time) {
         return ''
       } else {
-        return '[' + asISODate(value.time) + ']' + after
+        return '[' + ((localTime)
+          ? asLocalISODate(value.time, dateFormat)
+          : asISODate(value.time, dateFormat)) + ']' + after
       }
     } catch (_) {
       return ''
