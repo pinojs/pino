@@ -74,3 +74,34 @@ Into this:
 ```sh
 [2017-04-25T17:32:09.662Z] [32mINFO[39m (24280 on SP2): [36mhello world[39m
 ```
+
+If you logged instance of Error object, Pino adds `"type":"Error"` to json.
+By default, Pino will transform this:
+
+```js
+{"level":50,"time":1457537229339,"msg":"Error message.","pid":44127,"hostname":"MacBook-Pro-3.home","type":"Error","stack":"Stack of the error","statusCode":500,"v":1}
+```
+
+Into this:
+
+```sh
+ERROR [2016-03-09T15:27:09.339Z] (44127 on MacBook-Pro-3.home): Error message.
+    Stack of the error
+```
+
+If you want to output additional properties for json of Error object, you can use `--errorProps <properties>` flag.
+
+`pino --errorProps statusCode,v` will transform this:
+
+```js
+{"level":50,"time":1457537229339,"msg":"Error message.","pid":44127,"hostname":"MacBook-Pro-3.home","type":"Error","stack":"Stack of the error","statusCode":500,"v":1}
+```
+
+Into this:
+
+```sh
+ERROR [2016-03-09T15:27:09.339Z] (44127 on MacBook-Pro-3.home): Error message.
+    Stack of the error
+statusCode: 500
+v: 1
+```

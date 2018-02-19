@@ -17,6 +17,7 @@ if (arg('-h') || arg('--help')) {
     forceColor: arg('-c'),
     messageKey: messageKeyArg(),
     dateFormat: dateFormat(),
+    errorProps: errorPropsArg(),
     localTime: arg('--localTime')
   })).pipe(process.stdout)
 }
@@ -55,4 +56,18 @@ function dateFormat () {
     throw new Error('--dateFormat flag provided without a string argument')
   }
   return dateFormat
+}
+
+function errorPropsArg () {
+  if (!arg('--errorProps')) {
+    return
+  }
+  var errorPropsIndex = process.argv.indexOf('--errorProps') + 1
+  var errorProps = process.argv.length > errorPropsIndex &&
+    process.argv[errorPropsIndex]
+  if (!errorProps) {
+    throw new Error('--errorProps flag provided without a string argument')
+  }
+  var errorPropsArr = errorProps.split(',')
+  return errorPropsArr
 }

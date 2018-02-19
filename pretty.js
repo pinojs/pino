@@ -73,6 +73,7 @@ function pretty (opts) {
   var timeTransOnly = opts && opts.timeTransOnly
   var formatter = opts && opts.formatter
   var dateFormat = opts && opts.dateFormat
+  var errorProps = opts && opts.errorProps
   var localTime = opts && opts.localTime
   var levelFirst = opts && opts.levelFirst
   var messageKey = opts && opts.messageKey
@@ -172,6 +173,15 @@ function pretty (opts) {
 
     if (value.type === 'Error') {
       line += '    ' + withSpaces(value.stack, eol) + eol
+
+      if (errorProps && errorProps.length > 0) {
+        for (var i = 0; i < errorProps.length; i++) {
+          var key = errorProps[i]
+          if (value.hasOwnProperty(key)) {
+            line += key + ': ' + value[key] + eol
+          }
+        }
+      }
     } else {
       line += filter(value, messageKey, eol)
     }
