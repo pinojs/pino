@@ -3,6 +3,7 @@
 'use strict'
 
 var pretty = require('./pretty')
+var fs = require('fs')
 
 module.exports = pretty
 
@@ -17,20 +18,13 @@ if (arg('-h') || arg('--help')) {
     forceColor: arg('-c'),
     messageKey: messageKeyArg()
   })).pipe(process.stdout)
-  process.stdin.on('end', closeProcess)
-  process.on('SIGINT', waitClose)
-}
-
-function waitClose () {
-  setTimeout(closeProcess, 2000)
-}
-
-function closeProcess () {
-  process.exit()
+  if (!process.stdin.isTTY && !fs.fstatSync(process.stdin.fd).isFile()) {
+    process.once('SIGINT', function noOp () {})
+  }
 }
 
 function usage () {
-  return require('fs')
+  return fs
       .createReadStream(require('path').join(__dirname, 'usage.txt'))
 }
 
