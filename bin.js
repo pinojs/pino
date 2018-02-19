@@ -3,6 +3,7 @@
 'use strict'
 
 var pretty = require('./pretty')
+var fs = require('fs')
 
 module.exports = pretty
 
@@ -19,10 +20,13 @@ if (arg('-h') || arg('--help')) {
     dateFormat: dateFormat(),
     localTime: arg('--localTime')
   })).pipe(process.stdout)
+  if (!process.stdin.isTTY && !fs.fstatSync(process.stdin.fd).isFile()) {
+    process.once('SIGINT', function noOp () {})
+  }
 }
 
 function usage () {
-  return require('fs')
+  return fs
       .createReadStream(require('path').join(__dirname, 'usage.txt'))
 }
 
