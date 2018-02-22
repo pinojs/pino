@@ -3,6 +3,7 @@
 var os = require('os')
 var EventEmitter = require('events').EventEmitter
 var stringifySafe = require('fast-safe-stringify')
+var serializers = require('pino-std-serializers')
 var fs = require('fs')
 var pump = require('pump')
 var flatstr = require('flatstr')
@@ -10,7 +11,6 @@ var pretty = require('./pretty')
 var events = require('./lib/events')
 var levels = require('./lib/levels')
 var tools = require('./lib/tools')
-var serializers = require('./lib/serializers')
 var time = require('./lib/time')
 var needsMetadata = Symbol.for('needsMetadata')
 var isStandardLevelVal = levels.isStandardLevelVal
@@ -372,9 +372,11 @@ tools.defineLevelsProperty(pino)
 
 module.exports = pino
 module.exports.stdSerializers = {
-  req: serializers.asReqValue,
-  res: serializers.asResValue,
-  err: serializers.asErrValue
+  req: serializers.req,
+  res: serializers.res,
+  err: serializers.err,
+  wrapRequestSerializer: serializers.wrapRequestSerializer,
+  wrapRespnonseSerializer: serializers.wrapResponseSerializer
 }
 module.exports.stdTimeFunctions = Object.assign({}, time)
 module.exports.pretty = pretty

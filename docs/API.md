@@ -24,6 +24,8 @@
     + [.req](#reqSerializer)
     + [.res](#resSerializer)
     + [.err](#errSerializer)
+    + [.wrapRequestSerializer](#wrapReq)
+    + [.wrapResponseSerializers](#wrapRes)
   + [.stdTimeFunctions](#stdTimeFunctions)
     + [.epochTime](#epochTimeFunction)
     + [.unixTime](#unixTimeFunction)
@@ -500,7 +502,8 @@ or as an instance property.
 ## .stdSerializers
 
 Available as a static property, the `stdSerializers` provide functions for
-serializing objects common to many projects.
+serializing objects common to many projects. The serializers are directly
+imported from [pino-std-serializers](https://github.com/pinojs/pino-std-serializers).
 
 <a id="reqSerializer"></a>
 ### .req
@@ -571,6 +574,21 @@ Serializes an `Error` object if passed in as an property.
   "stack": "Error: an error\n    at Object.<anonymous> (/Users/matteo/Repositories/pino/example.js:16:7)\n    at Module._compile (module.js:435:26)\n    at Object.Module._extensions..js (module.js:442:10)\n    at Module.load (module.js:356:32)\n    at Function.Module._load (module.js:313:12)\n    at Function.Module.runMain (module.js:467:10)\n    at startup (node.js:136:18)\n    at node.js:963:3"
 }
 ```
+
+<a id="wrapReq"></a>
+## .wrapRequestSerializer
+
+Wraps the standard request serializer such that custom serializers can use
+the newly serilized request. An example of using this function can be found
+in the [pino-http][https://github.com/pinojs/pino-http] module.
+
+<a id="wrapRes"></a>
+## .wrapResponseSerializer
+
+Wraps the standard response serializer such that custom serializers can use
+the newly serilized response. An example of using this function can be found
+in the [pino-http][https://github.com/pinojs/pino-http] module.
+
 <a id="stdTimeFunctions"></a>
 ## .stdTimeFunctions
 
