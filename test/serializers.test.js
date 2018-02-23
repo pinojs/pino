@@ -111,3 +111,27 @@ test('non overriden serializers are available in the children', function (t) {
   child.fatal({onlyChild: 'test'})
   parent.fatal({onlyChild: 'test'})
 })
+
+test('Symbol.for(\'pino.*\') serializer', function (t) {
+  t.plan(6)
+  var globalSerializer = {
+    [Symbol.for('pino.*')]: function (obj) {
+      if (obj.lionel === 'richie') {
+        return {hello: 'is', it: 'me', you: 'are', looking: 'for'}
+      }
+      return {lionel: 'richie'}
+    }
+  }
+  var c = 0
+  var logger = pino({serializers: globalSerializer}, sink(function (o, enc, cb) {
+    c++
+    if (c === 1) { t.match(o, {lionel: 'richie'}); t.notMatch(o, ['hello', 'it', 'you', 'looking']) }
+    if (c === 2) { t.match(o, {hello: 'is', it: 'me', you: 'are', looking: 'for'}); t.notMatch(o, ['lionel']) }
+    if (c === 3) { t.match(o, {lionel: 'richie'}); t.notMatch(o, ['pid', 'hostname']) }
+    cb()
+  }))
+
+  logger.info({hello: 'is', it: 'me', you: 'are', looking: 'for'})
+  logger.info({lionel: 'richie'})
+  logger.info('message')
+})

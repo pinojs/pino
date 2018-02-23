@@ -45,6 +45,8 @@
     of objects. These functions should return an JSONifiable object and they
     should never throw. When logging an object, each top-level property matching the exact key of a serializer
     will be serialized using the defined serializer.
+        
+    Alternatively, it is possible to register a serializer under the key `Symbol.for('pino.*')` which will act upon the complete log object, i.e. every property.
   * `timestamp` (boolean|function): Enables or disables the inclusion of a timestamp in the
     log message. If a function is supplied, it must synchronously return a JSON string
     representation of the time, e.g. `,"time":1493426328206 (which is the default).
