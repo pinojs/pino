@@ -80,6 +80,7 @@
     "fast-json-parse": "^1.0.3",
     "fast-safe-stringify": "^1.2.3",
     "flatstr": "^1.0.5",
+    "pino-std-serializers": "^1.0.0",
     "pump": "^2.0.1",
     "quick-format-unescaped": "^1.1.2",
     "split2": "^2.2.0"
