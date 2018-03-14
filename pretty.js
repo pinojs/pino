@@ -128,8 +128,8 @@ function pretty (opts) {
     }
 
     line = (levelFirst)
-        ? asColoredLevel(value) + ' ' + formatTime(value)
-        : formatTime(value, ' ') + asColoredLevel(value)
+      ? asColoredLevel(value) + ' ' + formatTime(value)
+      : formatTime(value, ' ') + asColoredLevel(value)
 
     if (formatter) {
       return opts.formatter(value, {

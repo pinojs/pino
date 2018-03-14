@@ -232,7 +232,7 @@ function transmit (logger, opts, args) {
   )
   logger._logEvent.ts = ts
   logger._logEvent.messages = args.filter(function (arg) {
-      // bindings can only be objects, so reference equality check via indexOf is fine
+    // bindings can only be objects, so reference equality check via indexOf is fine
     return logger._logEvent.bindings.indexOf(arg) === -1
   })
 

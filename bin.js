@@ -27,8 +27,8 @@ if (arg('-h') || arg('--help')) {
 }
 
 function usage () {
-  return fs
-      .createReadStream(require('path').join(__dirname, 'usage.txt'))
+  var help = require('path').join(__dirname, 'usage.txt')
+  return fs.createReadStream(help)
 }
 
 function arg (s) {
