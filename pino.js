@@ -147,6 +147,10 @@ function asJson (obj, msg, num) {
     if (objError) {
       data += ',"type":"Error","stack":' + this.stringify(obj.stack)
     }
+    // if global serializer is set, call it first
+    if (this.serializers[Symbol.for('pino.*')]) {
+      obj = this.serializers[Symbol.for('pino.*')](obj)
+    }
     for (var key in obj) {
       value = obj[key]
       if ((notHasOwnProperty || obj.hasOwnProperty(key)) && value !== undefined) {
@@ -171,6 +175,9 @@ function asChindings (that, bindings) {
   var key
   var value
   var data = that.chindings
+  if (that.serializers[Symbol.for('pino.*')]) {
+    bindings = that.serializers[Symbol.for('pino.*')](bindings)
+  }
   for (key in bindings) {
     value = bindings[key]
     if (key !== 'level' && key !== 'serializers' && bindings.hasOwnProperty(key) && value !== undefined) {
