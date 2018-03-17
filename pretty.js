@@ -23,6 +23,13 @@ var standardKeys = [
   'v'
 ]
 
+var defaultErrorLikeObjectKeys = [
+  'err',
+  'error'
+]
+
+var defaultMessageKey = 'msg'
+
 function toTimezoneOffset (aMinTimeoffset) {
   // +/- minute timeoffset
   var tz = aMinTimeoffset || new Date().getTimezoneOffset()
@@ -51,7 +58,7 @@ function withSpaces (value, eol) {
   return lines.join(eol)
 }
 
-function filter (value, messageKey, eol, excludeStandardKeys) {
+function filter (value, messageKey, eol, errorLikeObjectKeys, excludeStandardKeys) {
   var keys = Object.keys(value)
   var filteredKeys = [messageKey]
 
@@ -62,7 +69,18 @@ function filter (value, messageKey, eol, excludeStandardKeys) {
   var result = ''
 
   for (var i = 0; i < keys.length; i++) {
-    if (filteredKeys.indexOf(keys[i]) < 0) {
+    if (errorLikeObjectKeys.indexOf(keys[i]) !== -1) {
+      var arrayOfLines = ('    ' + keys[i] + ': ' + withSpaces(JSON.stringify(value[keys[i]], null, 2), eol) + eol).split('\n')
+      result += arrayOfLines.map(line => {
+        if (/^\s*"stack"/.test(line)) {
+          var indentSize = /^\s*/.exec(line)[0].length
+          const indentation = Array(indentSize).join(' ')
+          return line.replace(/\\n/g, '\n' + indentation)
+        }
+
+        return line
+      }).join('\n')
+    } else if (filteredKeys.indexOf(keys[i]) < 0) {
       result += '    ' + keys[i] + ': ' + withSpaces(JSON.stringify(value[keys[i]], null, 2), eol) + eol
     }
   }
@@ -79,12 +97,15 @@ function pretty (opts) {
   var formatter = opts && opts.formatter
   var dateFormat = opts && opts.dateFormat
   var errorProps = opts && opts.errorProps
+  var errorLikeObjectKeys = opts && opts.errorlikeobjectkeys
   var localTime = opts && opts.localTime
   var levelFirst = opts && opts.levelFirst
   var messageKey = opts && opts.messageKey
   var forceColor = opts && opts.forceColor
   var eol = opts && opts.crlf ? '\r\n' : '\n'
-  messageKey = messageKey || 'msg'
+
+  messageKey = messageKey || defaultMessageKey
+  errorLikeObjectKeys = errorLikeObjectKeys || defaultErrorLikeObjectKeys
 
   var stream = split(mapLine)
   var ctx
@@ -204,7 +225,7 @@ function pretty (opts) {
             if (value[key] instanceof Object) {
               // call 'filter' with 'excludeStandardKeys' = false
               // because nested property might contain property from 'standardKeys'
-              line += key + ': {' + eol + filter(value[key], '', eol, false) + '}' + eol
+              line += key + ': {' + eol + filter(value[key], '', eol, errorLikeObjectKeys, false) + '}' + eol
             } else {
               line += key + ': ' + value[key] + eol
             }
@@ -212,7 +233,7 @@ function pretty (opts) {
         }
       }
     } else {
-      line += filter(value, messageKey, eol)
+      line += filter(value, messageKey, eol, errorLikeObjectKeys)
     }
 
     return line
