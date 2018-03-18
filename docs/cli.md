@@ -79,7 +79,7 @@ If an instance of `Error` is logged, Pino adds `"type":"Error"` to the logged JS
 Thus, when prettifying the output, Pino will transform the JSON:
 
 ```js
-{"level":50,"time":1457537229339,"msg":"Error message.","pid":44127,"hostname":"MacBook-Pro-3.home","type":"Error","stack":"Stack of the error","statusCode":500,"v":1}
+{"level":50,"time":1457537229339,"msg":"Error message.","pid":44127,"hostname":"MacBook-Pro-3.home","type":"Error","stack":"Stack of the error","statusCode":500,"dataBaseSpecificError":{"errorType":"some database error type","erroMessage":"some database error message","evenMoreSpecificStuff":{"someErrorRelatedObject":"error"}},"v":1}
 ```
 
 To:
@@ -91,10 +91,10 @@ ERROR [2016-03-09T15:27:09.339Z] (44127 on MacBook-Pro-3.home): Error message.
 
 To log additional properties of `Error` objects, supply the `--errorProps <properties>` flag.
 
-For example, `pino --errorProps statusCode,v` will transform:
+For example, `pino --errorProps statusCode` will transform:
 
 ```js
-{"level":50,"time":1457537229339,"msg":"Error message.","pid":44127,"hostname":"MacBook-Pro-3.home","type":"Error","stack":"Stack of the error","statusCode":500,"v":1}
+{"level":50,"time":1457537229339,"msg":"Error message.","pid":44127,"hostname":"MacBook-Pro-3.home","type":"Error","stack":"Stack of the error","statusCode":500,"dataBaseSpecificError":{"errorType":"some database error type","erroMessage":"some database error message","evenMoreSpecificStuff":{"someErrorRelatedObject":"error"}},"v":1}
 ```
 
 To:
@@ -103,5 +103,29 @@ To:
 ERROR [2016-03-09T15:27:09.339Z] (44127 on MacBook-Pro-3.home): Error message.
     Stack of the error
 statusCode: 500
-v: 1
+```
+
+In order to print all nested properties of `Error` objects, you can use `--errorProps` flag with `*` property.
+
+Please note, that you need to escape `*` character (`'*'` or `\*`), because `*` is a wildcard in Bash.
+
+`pino --errorProps '*'` will transform:
+
+```js
+{"level":50,"time":1457537229339,"msg":"Error message.","pid":44127,"hostname":"MacBook-Pro-3.home","type":"Error","stack":"Stack of the error","statusCode":500,"dataBaseSpecificError":{"errorType":"some database error type","erroMessage":"some database error message","evenMoreSpecificStuff":{"someErrorRelatedObject":"error"}},"v":1}
+```
+
+To:
+
+```sh
+[2016-03-09T15:27:09.339Z] ERROR (44127 on MacBook-Pro-3.home): Error message.
+    Stack of the error
+statusCode: 500
+dataBaseSpecificError: {
+    errorType: "some database error type"
+    erroMessage: "some database error message"
+    evenMoreSpecificStuff: {
+      "someErrorRelatedObject": "error"
+    }
+}
 ```
