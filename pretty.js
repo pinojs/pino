@@ -81,7 +81,7 @@ function filter (value, messageKey, eol, errorLikeObjectKeys, excludeStandardKey
         if (/^\s*"stack"/.test(line)) {
           var matches = /^(\s*"stack":)\s*"(.*)"$/.exec(line)
 
-          var indentSize = /^\s*/.exec(line)[0].length + 3
+          var indentSize = /^\s*/.exec(line)[0].length + 2
           var indentation = indent(indentSize)
           return matches[1] + '\n' +
             indent(2) + indentation +
