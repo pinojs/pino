@@ -107,7 +107,7 @@ statusCode: 500
 
 In order to print all nested properties of `Error` objects, you can use `--errorProps` flag with `*` property.
 
-Please note, that you need to escape `*` character (`'*'` or `\*`), because `*` is a wildcard in Bash.
+Note: you must quote or escape the `*` (asterisk) to avoid shell expansion.
 
 `pino --errorProps '*'` will transform:
 
