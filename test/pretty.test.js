@@ -105,7 +105,7 @@ test('pino transform prettifies Error', function (t) {
   instance.info(err)
 })
 
-function getIndendLevel (str) {
+function getIndentLevel (str) {
   return (/^\s*/.exec(str) || [''])[0].length
 }
 
@@ -132,7 +132,7 @@ test('pino transform prettifies Error in property within errorLikeObjectKeys', f
       currentTrace = expectedTraces.shift()
 
       t.ok(line.indexOf(currentTrace) >= 0, `${i} line matches`)
-      t.ok(getIndendLevel(line) > getIndendLevel(currentStack), `${i} proper indentation`)
+      t.ok(getIndentLevel(line) > getIndentLevel(currentStack), `${i} proper indentation`)
     }
     i++
     return line
