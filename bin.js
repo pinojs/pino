@@ -18,8 +18,8 @@ if (arg('-h') || arg('--help')) {
     forceColor: arg('-c'),
     messageKey: argWithParam('-m'),
     dateFormat: argWithParam('--dateFormat'),
-    errorProps: argWithParam('--errorProps').split(/\s?,\s?/),
-    errorLikeObjectKeys: argWithParam('--errorLikeObjectKeys').split(/\s?,\s?/),
+    errorProps: paramToArray(argWithParam('--errorProps')),
+    errorLikeObjectKeys: paramToArray(argWithParam('--errorLikeObjectKeys')),
     localTime: arg('--localTime')
   })).pipe(process.stdout)
   if (!process.stdin.isTTY && !fs.fstatSync(process.stdin.fd).isFile()) {
@@ -48,4 +48,12 @@ function argWithParam (s) {
     throw new Error(s + ' flag provided without a string argument')
   }
   return argValue
+}
+
+function paramToArray (param) {
+  if (!param) {
+    return
+  }
+
+  return param.split(/\s?,\s?/)
 }

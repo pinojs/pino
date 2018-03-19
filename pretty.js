@@ -53,12 +53,18 @@ function _lpadzero (aTarget, aLength, aPadChar) {
 function withSpaces (value, eol) {
   var lines = value.split(/\r?\n/)
   for (var i = 1; i < lines.length; i++) {
-    lines[i] = '    ' + lines[i]
+    lines[i] = indent(4) + lines[i]
   }
   return lines.join(eol)
 }
 
+function indent (n) {
+  return Array(n + 1).join(' ')
+}
+
 function filter (value, messageKey, eol, errorLikeObjectKeys, excludeStandardKeys) {
+  errorLikeObjectKeys = errorLikeObjectKeys || []
+
   var keys = Object.keys(value)
   var filteredKeys = [messageKey]
 
@@ -70,18 +76,22 @@ function filter (value, messageKey, eol, errorLikeObjectKeys, excludeStandardKey
 
   for (var i = 0; i < keys.length; i++) {
     if (errorLikeObjectKeys.indexOf(keys[i]) !== -1) {
-      var arrayOfLines = ('    ' + keys[i] + ': ' + withSpaces(JSON.stringify(value[keys[i]], null, 2), eol) + eol).split('\n')
+      var arrayOfLines = (indent(4) + keys[i] + ': ' + withSpaces(JSON.stringify(value[keys[i]], null, 2), eol) + eol).split('\n')
       result += arrayOfLines.map(line => {
         if (/^\s*"stack"/.test(line)) {
-          var indentSize = /^\s*/.exec(line)[0].length
-          const indentation = Array(indentSize).join(' ')
-          return line.replace(/\\n/g, '\n' + indentation)
+          var matches = /^(\s*"stack":)\s*"(.*)"$/.exec(line)
+
+          var indentSize = /^\s*/.exec(line)[0].length + 3
+          var indentation = indent(indentSize)
+          return matches[1] + '\n' +
+            indent(2) + indentation +
+            matches[2].replace(/\\n/g, '\n' + indent(2) + indentation)
         }
 
         return line
       }).join('\n')
     } else if (filteredKeys.indexOf(keys[i]) < 0) {
-      result += '    ' + keys[i] + ': ' + withSpaces(JSON.stringify(value[keys[i]], null, 2), eol) + eol
+      result += indent(4) + keys[i] + ': ' + withSpaces(JSON.stringify(value[keys[i]], null, 2), eol) + eol
     }
   }
 
