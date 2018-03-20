@@ -77,19 +77,27 @@ function filter (value, messageKey, eol, errorLikeObjectKeys, excludeStandardKey
   for (var i = 0; i < keys.length; i++) {
     if (errorLikeObjectKeys.indexOf(keys[i]) !== -1) {
       var arrayOfLines = (indent(4) + keys[i] + ': ' + withSpaces(JSON.stringify(value[keys[i]], null, 2), eol) + eol).split('\n')
-      result += arrayOfLines.map(line => {
+
+      for (var j = 0; j < arrayOfLines.length; j++) {
+        if (j !== 0) {
+          result += '\n'
+        }
+
+        var line = arrayOfLines[j]
+
         if (/^\s*"stack"/.test(line)) {
           var matches = /^(\s*"stack":)\s*"(.*)"$/.exec(line)
 
           var indentSize = /^\s*/.exec(line)[0].length + 2
           var indentation = indent(indentSize)
-          return matches[1] + '\n' +
+
+          result += matches[1] + '\n' +
             indent(2) + indentation +
             matches[2].replace(/\\n/g, '\n' + indent(2) + indentation)
+        } else {
+          result += line
         }
-
-        return line
-      }).join('\n')
+      }
     } else if (filteredKeys.indexOf(keys[i]) < 0) {
       result += indent(4) + keys[i] + ': ' + withSpaces(JSON.stringify(value[keys[i]], null, 2), eol) + eol
     }
