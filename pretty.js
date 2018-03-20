@@ -51,11 +51,11 @@ function withSpaces (value, eol) {
   return lines.join(eol)
 }
 
-function filter (value, messageKey, eol, isExcludeStandardKeys) {
+function filter (value, messageKey, eol, excludeStandardKeys) {
   var keys = Object.keys(value)
   var filteredKeys = [messageKey]
 
-  if (isExcludeStandardKeys !== false) {
+  if (excludeStandardKeys !== false) {
     filteredKeys = filteredKeys.concat(standardKeys)
   }
 
@@ -202,7 +202,7 @@ function pretty (opts) {
 
           if (value.hasOwnProperty(key)) {
             if (value[key] instanceof Object) {
-              // call 'filter' with 'isExcludeStandardKeys' = false
+              // call 'filter' with 'excludeStandardKeys' = false
               // because nested property might contain property from 'standardKeys'
               line += key + ': {' + eol + filter(value[key], '', eol, false) + '}' + eol
             } else {
