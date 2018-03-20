@@ -86,14 +86,16 @@ function filter (value, messageKey, eol, errorLikeObjectKeys, excludeStandardKey
         var line = arrayOfLines[j]
 
         if (/^\s*"stack"/.test(line)) {
-          var matches = /^(\s*"stack":)\s*"(.*)"$/.exec(line)
+          var matches = /^(\s*"stack":)\s*"(.*)",?$/.exec(line)
 
-          var indentSize = /^\s*/.exec(line)[0].length + 2
-          var indentation = indent(indentSize)
+          if (matches.length === 3) {
+            var indentSize = /^\s*/.exec(line)[0].length + 2
+            var indentation = indent(indentSize)
 
-          result += matches[1] + '\n' +
+            result += matches[1] + '\n' +
             indent(2) + indentation +
             matches[2].replace(/\\n/g, '\n' + indent(2) + indentation)
+          }
         } else {
           result += line
         }
