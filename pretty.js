@@ -51,9 +51,14 @@ function withSpaces (value, eol) {
   return lines.join(eol)
 }
 
-function filter (value, messageKey, eol) {
+function filter (value, messageKey, eol, excludeStandardKeys) {
   var keys = Object.keys(value)
-  var filteredKeys = standardKeys.concat([messageKey])
+  var filteredKeys = [messageKey]
+
+  if (excludeStandardKeys !== false) {
+    filteredKeys = filteredKeys.concat(standardKeys)
+  }
+
   var result = ''
 
   for (var i = 0; i < keys.length; i++) {
@@ -174,11 +179,35 @@ function pretty (opts) {
     if (value.type === 'Error') {
       line += '    ' + withSpaces(value.stack, eol) + eol
 
+      var propsForPrint
       if (errorProps && errorProps.length > 0) {
-        for (var i = 0; i < errorProps.length; i++) {
-          var key = errorProps[i]
+        // don't need print these props for 'Error' object
+        var excludedProps = standardKeys.concat([messageKey, 'type', 'stack'])
+
+        if (errorProps[0] === '*') {
+          // print all value props excluding 'excludedProps'
+          propsForPrint = Object.keys(value).filter(function (prop) {
+            return excludedProps.indexOf(prop) < 0
+          })
+        } else {
+          // print props from 'errorProps' only
+          // but exclude 'excludedProps'
+          propsForPrint = errorProps.filter(function (prop) {
+            return excludedProps.indexOf(prop) < 0
+          })
+        }
+
+        for (var i = 0; i < propsForPrint.length; i++) {
+          var key = propsForPrint[i]
+
           if (value.hasOwnProperty(key)) {
-            line += key + ': ' + value[key] + eol
+            if (value[key] instanceof Object) {
+              // call 'filter' with 'excludeStandardKeys' = false
+              // because nested property might contain property from 'standardKeys'
+              line += key + ': {' + eol + filter(value[key], '', eol, false) + '}' + eol
+            } else {
+              line += key + ': ' + value[key] + eol
+            }
           }
         }
       }

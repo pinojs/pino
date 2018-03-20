@@ -420,7 +420,7 @@ test('pino pretty dateFormat flag', function (t) {
   instance.info('>' + Date.now() + '< hello world')
 })
 
-test('pino pretty errorProps flag', function (t) {
+test('pino pretty errorProps flag with certain props', function (t) {
   t.plan(3)
   var prettier = pretty({ errorProps: ['statusCode', 'originalStack'] })
 
@@ -444,6 +444,46 @@ test('pino pretty errorProps flag', function (t) {
   error.stack = 'error stack'
   error.statusCode = 500
   error.originalStack = 'original stack'
+
+  instance.error(error)
+})
+
+test('pino pretty errorProps flag with "*" (print all nested props)', function (t) {
+  t.plan(9)
+  var prettier = pretty({ errorProps: ['*'] })
+
+  var expectedLines = [
+    undefined,
+    '    error stack',
+    'statusCode: 500',
+    'originalStack: original stack',
+    'dataBaseSpecificError: {',
+    '    erroMessage: "some database error message"',
+    '    evenMoreSpecificStuff: {',
+    '      "someErrorRelatedObject": "error"',
+    '    }',
+    '}'
+  ]
+
+  prettier.pipe(split(function (line) {
+    var expectedLine = expectedLines.shift()
+    if (expectedLine !== undefined) {
+      t.equal(line, expectedLine, 'prettifies the line')
+    }
+  }))
+
+  var instance = pino(prettier)
+
+  var error = new Error('error message')
+  error.stack = 'error stack'
+  error.statusCode = 500
+  error.originalStack = 'original stack'
+  error.dataBaseSpecificError = {
+    erroMessage: 'some database error message',
+    evenMoreSpecificStuff: {
+      someErrorRelatedObject: 'error'
+    }
+  }
 
   instance.error(error)
 })
