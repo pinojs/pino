@@ -53,7 +53,7 @@ function _lpadzero (aTarget, aLength, aPadChar) {
 function withSpaces (value, eol) {
   var lines = value.split(/\r?\n/)
   for (var i = 1; i < lines.length; i++) {
-    lines[i] = indent(4) + lines[i]
+    lines[i] = '    ' + lines[i]
   }
   return lines.join(eol)
 }
@@ -76,7 +76,7 @@ function filter (value, messageKey, eol, errorLikeObjectKeys, excludeStandardKey
 
   for (var i = 0; i < keys.length; i++) {
     if (errorLikeObjectKeys.indexOf(keys[i]) !== -1) {
-      var arrayOfLines = (indent(4) + keys[i] + ': ' + withSpaces(JSON.stringify(value[keys[i]], null, 2), eol) + eol).split('\n')
+      var arrayOfLines = ('    ' + keys[i] + ': ' + withSpaces(JSON.stringify(value[keys[i]], null, 2), eol) + eol).split('\n')
 
       for (var j = 0; j < arrayOfLines.length; j++) {
         if (j !== 0) {
@@ -89,19 +89,18 @@ function filter (value, messageKey, eol, errorLikeObjectKeys, excludeStandardKey
           var matches = /^(\s*"stack":)\s*"(.*)",?$/.exec(line)
 
           if (matches.length === 3) {
-            var indentSize = /^\s*/.exec(line)[0].length + 2
+            var indentSize = /^\s*/.exec(line)[0].length + 4
             var indentation = indent(indentSize)
 
-            result += matches[1] + '\n' +
-            indent(2) + indentation +
-            matches[2].replace(/\\n/g, '\n' + indent(2) + indentation)
+            result += matches[1] + '\n' + indentation +
+              matches[2].replace(/\\n/g, '\n' + indentation)
           }
         } else {
           result += line
         }
       }
     } else if (filteredKeys.indexOf(keys[i]) < 0) {
-      result += indent(4) + keys[i] + ': ' + withSpaces(JSON.stringify(value[keys[i]], null, 2), eol) + eol
+      result += '    ' + keys[i] + ': ' + withSpaces(JSON.stringify(value[keys[i]], null, 2), eol) + eol
     }
   }
 
