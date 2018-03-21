@@ -126,7 +126,7 @@ Returns a new [logger](#logger) instance.
   * `forceColor` (boolean): if set to `true`, will add color information to the formatted output
   message. Default: `false`.
   * `crlf` (boolean): emit `\r\n` instead of `\n`. Default: `false`.
-  * `errorLikeObjectKeys` (array): error-like objects containing stack traces that should be ŕettified. Default: `['err', 'error']`.
+  * `errorLikeObjectKeys` (array): error-like objects containing stack traces that should be prettified. Default: `['err', 'error']`.
 
 ### Example:
 ```js
