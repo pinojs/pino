@@ -9,6 +9,7 @@ var writeStream = require('flush-write-stream')
 var fork = require('child_process').fork
 var split = require('split2')
 var hostname = os.hostname()
+var serializers = require('pino-std-serializers')
 
 test('pino transform prettifies', function (t) {
   t.plan(4)
@@ -51,6 +52,7 @@ test('pino pretty force color on flag', function (t) {
 
   instance.info('hello world')
 })
+
 test('pino transform can just parse the dates', function (t) {
   t.plan(1)
   var prettier = pretty({ timeTransOnly: true })
@@ -101,6 +103,80 @@ test('pino transform prettifies Error', function (t) {
   var instance = pino(prettier)
 
   instance.info(err)
+})
+
+function getIndentLevel (str) {
+  return (/^\s*/.exec(str) || [''])[0].length
+}
+
+test('pino transform prettifies Error in property within errorLikeObjectKeys', function (t) {
+  var prettier = pretty({
+    errorLikeObjectKeys: ['err']
+  })
+
+  var err = new Error('hello world')
+  var expectedTraces = err.stack.split('\n').slice(1)
+
+  t.plan(expectedTraces.length * 2)
+
+  var i = 0
+  var currentTrace = ''
+  var currentStack = ''
+
+  prettier.pipe(split(function (line) {
+    if (/^\s*"stack"/.test(line)) {
+      currentStack = line
+    }
+
+    if (/^\s*at/.test(line)) {
+      currentTrace = expectedTraces.shift()
+
+      t.ok(line.indexOf(currentTrace) >= 0, `${i} line matches`)
+      t.ok(getIndentLevel(line) > getIndentLevel(currentStack), `${i} proper indentation`)
+    }
+    i++
+    return line
+  }))
+
+  var instance = pino({ serializers: { err: serializers.err } }, prettier)
+
+  instance.info({ err })
+})
+
+test('pino transform prettifies Error in property within errorLikeObjectKeys when stack is not the last property', function (t) {
+  var prettier = pretty({
+    errorLikeObjectKeys: ['err']
+  })
+
+  var err = new Error('hello world')
+  err.anotherField = 'dummy value'
+
+  var expectedTraces = err.stack.split('\n').slice(1)
+
+  t.plan(expectedTraces.length * 2)
+
+  var i = 0
+  var currentTrace = ''
+  var currentStack = ''
+
+  prettier.pipe(split(function (line) {
+    if (/^\s*"stack"/.test(line)) {
+      currentStack = line
+    }
+
+    if (/^\s*at/.test(line)) {
+      currentTrace = expectedTraces.shift()
+
+      t.ok(line.indexOf(currentTrace) >= 0, `${i} line matches`)
+      t.ok(getIndentLevel(line) > getIndentLevel(currentStack), `${i} proper indentation`)
+    }
+    i++
+    return line
+  }))
+
+  var instance = pino({ serializers: { err: serializers.err } }, prettier)
+
+  instance.info({ err })
 })
 
 test('pino transform preserve output if not valid JSON', function (t) {
