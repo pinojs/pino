@@ -58,10 +58,6 @@ function withSpaces (value, eol) {
   return lines.join(eol)
 }
 
-function indent (n) {
-  return Array(n + 1).join(' ')
-}
-
 function filter (value, messageKey, eol, errorLikeObjectKeys, excludeStandardKeys) {
   errorLikeObjectKeys = errorLikeObjectKeys || []
 
@@ -90,7 +86,7 @@ function filter (value, messageKey, eol, errorLikeObjectKeys, excludeStandardKey
 
           if (matches.length === 3) {
             var indentSize = /^\s*/.exec(line)[0].length + 4
-            var indentation = indent(indentSize)
+            var indentation = Array(indentSize + 1).join(' ')
 
             result += matches[1] + '\n' + indentation +
               matches[2].replace(/\\n/g, '\n' + indentation)
@@ -116,7 +112,7 @@ function pretty (opts) {
   var formatter = opts && opts.formatter
   var dateFormat = opts && opts.dateFormat
   var errorProps = opts && opts.errorProps
-  var errorLikeObjectKeys = opts && opts.errorlikeobjectkeys
+  var errorLikeObjectKeys = opts && opts.errorLikeObjectKeys
   var localTime = opts && opts.localTime
   var levelFirst = opts && opts.levelFirst
   var messageKey = opts && opts.messageKey
