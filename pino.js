@@ -5,6 +5,7 @@ var EventEmitter = require('events').EventEmitter
 var stringifySafe = require('fast-safe-stringify')
 var serializers = require('pino-std-serializers')
 var fs = require('fs')
+var util = require('util')
 var pump = require('pump')
 var flatstr = require('flatstr')
 var pretty = require('./pretty')
@@ -326,7 +327,7 @@ function pino (opts, stream) {
 
   if (iopts.slowtime) {
     instance.time = time.slowTime
-    process.emitWarning('use `timestamp: pino.stdTimeFunctions.slowTime`', '(pino) `slowtime` is deprecated')
+    util.deprecate(tools.noop, '(pino) `slowtime` is deprecated: use `timestamp: pino.stdTimeFunctions.slowTime`')()
   } else if (iopts.timestamp && Function.prototype.isPrototypeOf(iopts.timestamp)) {
     instance.time = iopts.timestamp
   } else if (iopts.timestamp) {
@@ -383,8 +384,19 @@ module.exports.stdSerializers = {
   res: serializers.res,
   err: serializers.err,
   wrapRequestSerializer: serializers.wrapRequestSerializer,
-  wrapRespnonseSerializer: serializers.wrapResponseSerializer
+  wrapResponseSerializer: serializers.wrapResponseSerializer
 }
+
+Object.defineProperty(module.exports.stdSerializers, 'wrapRespnonseSerializer', {
+  enumerable: true,
+  get: util.deprecate(
+    function () {
+      return serializers.wrapResponseSerializer
+    },
+    '`pino.stdSerializers.wrapRespnonseSerializer` is deprecated: use `pino.stdSerializers.wrapResponseSerializer`'
+  )
+})
+
 module.exports.stdTimeFunctions = Object.assign({}, time)
 module.exports.pretty = pretty
 Object.defineProperty(
