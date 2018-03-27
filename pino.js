@@ -383,7 +383,7 @@ module.exports.stdSerializers = {
   res: serializers.res,
   err: serializers.err,
   wrapRequestSerializer: serializers.wrapRequestSerializer,
-  wrapRespnonseSerializer: serializers.wrapResponseSerializer
+  wrapResponseSerializer: serializers.wrapResponseSerializer
 }
 module.exports.stdTimeFunctions = Object.assign({}, time)
 module.exports.pretty = pretty
