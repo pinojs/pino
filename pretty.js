@@ -84,12 +84,16 @@ function filter (value, messageKey, eol, errorLikeObjectKeys, excludeStandardKey
         if (/^\s*"stack"/.test(line)) {
           var matches = /^(\s*"stack":)\s*"(.*)",?$/.exec(line)
 
-          if (matches && matches.length === 3) {
-            var indentSize = /^\s*/.exec(line)[0].length + 4
-            var indentation = Array(indentSize + 1).join(' ')
+          if (matches) {
+            if (matches.length === 3) {
+              var indentSize = /^\s*/.exec(line)[0].length + 4
+              var indentation = Array(indentSize + 1).join(' ')
 
-            result += matches[1] + '\n' + indentation +
-              matches[2].replace(/\\n/g, '\n' + indentation)
+              result += matches[1] + '\n' + indentation +
+                matches[2].replace(/\\n/g, '\n' + indentation)
+            }
+          } else {
+            result += line
           }
         } else {
           result += line
