@@ -563,3 +563,32 @@ test('pino pretty errorProps flag with "*" (print all nested props)', function (
 
   instance.error(error)
 })
+
+test('pino pretty handles errors with a null stack', function (t) {
+  t.plan(6)
+  var prettier = pretty()
+
+  var expectedLines = [
+    undefined,
+    '    message: "foo"',
+    '    stack: null',
+    undefined,
+    '    error: {',
+    '      "message": "foo",',
+    '      "stack": null',
+    '    }'
+  ]
+
+  prettier.pipe(split(function (line) {
+    var expectedLine = expectedLines.shift()
+    if (expectedLine !== undefined) {
+      t.equal(line, expectedLine, 'prettifies the line')
+    }
+  }))
+
+  var instance = pino(prettier)
+  const error = {message: 'foo', stack: null}
+  const objectWithError = {error: error}
+  instance.error(error)
+  instance.error(objectWithError)
+})
