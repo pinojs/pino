@@ -9,7 +9,7 @@ var pid = process.pid
 var hostname = os.hostname()
 
 test('metadata works', function (t) {
-  t.plan(6)
+  t.plan(7)
   var dest = sink(function (chunk, enc, cb) {
     t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
@@ -22,12 +22,14 @@ test('metadata works', function (t) {
       v: 1
     })
   })
+  var now = Date.now()
   var instance = pino({}, {
     [Symbol.for('needsMetadata')]: true,
     write: function (chunk) {
       t.equal(instance, this.lastLogger)
       t.equal(30, this.lastLevel)
       t.equal('a msg', this.lastMsg)
+      t.ok(Number(this.lastTime) >= now)
       t.deepEqual({ hello: 'world' }, this.lastObj)
       dest.write(chunk)
     }

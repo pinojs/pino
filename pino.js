@@ -129,12 +129,12 @@ Object.defineProperty(
   {value: LOG_VERSION}
 )
 
-function asJson (obj, msg, num) {
+function asJson (obj, msg, num, time) {
   // to catch both null and undefined
   var hasObj = obj !== undefined && obj !== null
   var objError = hasObj && obj instanceof Error
   msg = !msg && objError ? obj.message : msg || undefined
-  var data = this._lscache[num] + this.time()
+  var data = this._lscache[num] + time
   if (msg !== undefined) {
     // JSON.stringify is safe here
     data += this.messageKeyString + JSON.stringify('' + msg)
@@ -208,13 +208,15 @@ Object.defineProperty(pinoPrototype, 'child', {
 })
 
 function pinoWrite (obj, msg, num) {
-  var s = this.asJson(obj, msg, num)
+  var t = this.time()
+  var s = this.asJson(obj, msg, num, t)
   var stream = this.stream
   if (this.cache === null) {
     if (stream[needsMetadata]) {
       stream.lastLevel = num
       stream.lastMsg = msg
       stream.lastObj = obj
+      stream.lastTime = t.slice(8)
       stream.lastLogger = this // for child loggers
     }
     stream.write(flatstr(s))
