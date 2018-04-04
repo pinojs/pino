@@ -637,6 +637,8 @@ should be set:
 * the last logging level as `stream.lastLevel`
 * the last logging message as `stream.lastMsg`
 * the last logging object as `stream.lastObj`
+* the last time as `stream.lastTime`, which will be the partial string returned
+  by the time function.
 * the last logger instance as `stream.lastLogger` (to support child
   loggers)
 
