@@ -4,9 +4,6 @@
   "description": "super fast, all natural json logger",
   "main": "pino.js",
   "browser": "./browser.js",
-  "bin": {
-    "pino": "./bin.js"
-  },
   "files": [
     "pino.js",
     "bin.js",
@@ -64,6 +61,7 @@
     "fresh-require": "^1.0.3",
     "log": "^1.4.0",
     "loglevel": "^1.6.1",
+    "pino-pretty": "^1.0.0",
     "pre-commit": "^1.2.2",
     "proxyquire": "^2.0.1",
     "snazzy": "^7.1.1",

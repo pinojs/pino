@@ -3,15 +3,12 @@
 # pino&nbsp;&nbsp;[![Build Status](https://travis-ci.org/pinojs/pino.svg?branch=master)](https://travis-ci.org/pinojs/pino)&nbsp;[![Coverage Status](https://coveralls.io/repos/github/pinojs/pino/badge.svg?branch=master)](https://coveralls.io/github/pinojs/pino?branch=master) [![TypeScript definitions on DefinitelyTyped](http://definitelytyped.org/badges/standard.svg)](http://definitelytyped.org)
 
 [Extremely fast](#benchmarks) node.js logger, inspired by Bunyan.
-It also includes a shell utility to pretty-print its log files.
-
-![cli](demo.png)
 
 * [Installation](#install)
 * [Usage](#usage)
 * [Benchmarks](#benchmarks)
 * [API ⇗](docs/API.md)
-* [CLI ⇗](docs/cli.md)
+* [Pretty Printing ⇗](docs/pretty.md)
 * [Extreme mode explained ⇗](docs/extreme.md)
 * [Pino Howtos ⇗](docs/howtos.md)
 * [Transports with Pino](#transports)
@@ -194,7 +191,7 @@ By default, in the browser,
 ### Browser Options
 
 Pino can be passed a `browser` object in the options object,
-which can have the following properties: 
+which can have the following properties:
 
 #### `asObject` (Boolean)
 
@@ -246,10 +243,10 @@ var pino = require('pino')({browser: {write: {
 
 The serializers provided to `pino` are ignored by default in the browser, including
 the standard serializers provided with Pino. Since the default destination for log
-messages is the console, values such as `Error` objects are enhanced for inspection, 
+messages is the console, values such as `Error` objects are enhanced for inspection,
 which they otherwise wouldn't be if the Error serializer was enabled.
 
-We can turn all serializers on, 
+We can turn all serializers on,
 
 ```js
 var pino = require('pino')({
@@ -273,7 +270,7 @@ var pino = require('pino')({
 })
 // following will apply myCustomSerializer to the custom property,
 // but will not apply anotherSerizlier to another key
-pino.info({custom: 'a', another: 'b'})  
+pino.info({custom: 'a', another: 'b'})
 ```
 
 When `serialize` is `true` the standard error serializer is also enabled (see https://github.com/pinojs/pino/blob/master/docs/API.md#stdSerializers).
@@ -299,7 +296,7 @@ for how to set child-bound serializers).
 
 Unlike server pino the serializers apply to every object passed to the logger method,
 if the `asObject` option is `true`, this results in the serializers applying to the
-first object (as in server pino).      
+first object (as in server pino).
 
 For more info on serializers see https://github.com/pinojs/pino/blob/master/docs/API.md#parameters.
 
@@ -309,23 +306,23 @@ An object with `send` and `level` properties.
 
 The `transmit.level` property specifies the minimum level (inclusive) of when the `send` function
 should be called, if not supplied the `send` function be called based on the main logging `level`
-(set via `options.level`, defaulting to `info`). 
+(set via `options.level`, defaulting to `info`).
 
-The `transmit` object must have a `send` function which will be called after 
-writing the log message. The `send` function is passed the level of the log 
-message and a `logEvent` object. 
+The `transmit` object must have a `send` function which will be called after
+writing the log message. The `send` function is passed the level of the log
+message and a `logEvent` object.
 
 The `logEvent` object is a data structure representing a log message, it represents
-the arguments passed to a logger statement, the level 
-at which they were logged and the heirarchy of child bindings. 
+the arguments passed to a logger statement, the level
+at which they were logged and the heirarchy of child bindings.
 
-The `logEvent` format is structured like so: 
+The `logEvent` format is structured like so:
 
 ```js
-{ 
+{
   ts = Number,
-  messages = Array, 
-  bindings = Array, 
+  messages = Array,
+  bindings = Array,
   level: { label = String, value = Number}
 }
 ```
@@ -336,21 +333,21 @@ logger method is called.
 The `messages` array is all arguments passed to logger method, (for instance `logger.info('a', 'b', 'c')`
 would result in `messages` array `['a', 'b', 'c']`).
 
-The `bindings` array represents each child logger (if any), and the relevant bindings. 
-For instance given `logger.child({a: 1}).child({b: 2}).info({c: 3})`, the bindings array 
+The `bindings` array represents each child logger (if any), and the relevant bindings.
+For instance given `logger.child({a: 1}).child({b: 2}).info({c: 3})`, the bindings array
 would hold `[{a: 1}, {b: 2}]` and the `messages` array would be `[{c: 3}]`. The `bindings`
 are ordered according to their position in the child logger heirarchy, with the lowest index
 being the top of the heirarchy.
 
 By default serializers are not applied to log output in the browser, but they will *always* be
-applied to `messages` and `bindings` in the `logEvent` object. This allows us to ensure a consistent 
+applied to `messages` and `bindings` in the `logEvent` object. This allows us to ensure a consistent
 format for all values between server and client.
 
-The `level` holds the label (for instance `info`), and the corresponding numerical value 
-(for instance `30`). This could be important in cases where client side level values and 
+The `level` holds the label (for instance `info`), and the corresponding numerical value
+(for instance `30`). This could be important in cases where client side level values and
 labels differ from server side.
 
-The point of the `send` function is to remotely record log messages: 
+The point of the `send` function is to remotely record log messages:
 
 ```js
 var pino = require('pino')({
@@ -366,7 +363,7 @@ var pino = require('pino')({
         // numerical value
         if (logEvent.level.value >= 50) { // covers error and fatal
 
-          // send the logEvent somewhere 
+          // send the logEvent somewhere
         }
       }
     }

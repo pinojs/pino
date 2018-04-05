@@ -1,7 +1,6 @@
 # Table of Contents
 
 + [pino](#constructor)
-+ [pino.pretty](#pretty)
 + [Logger Instance](#logger)
   * [.pino](#version)
   * [.child](#child)
@@ -47,7 +46,7 @@
     of objects. These functions should return an JSONifiable object and they
     should never throw. When logging an object, each top-level property matching the exact key of a serializer
     will be serialized using the defined serializer.
-        
+
     Alternatively, it is possible to register a serializer under the key `Symbol.for('pino.*')` which will act upon the complete log object, i.e. every property.
   * `timestamp` (boolean|function): Enables or disables the inclusion of a timestamp in the
     log message. If a function is supplied, it must synchronously return a JSON string
@@ -73,8 +72,13 @@
   * `levelVal` (integer): when defining a custom log level via `level`, set to an
     integer value to define the new level. Default: `undefined`.
   * `messageKey` (string): the string key for the 'message' in the JSON object. Default `msg`.
-  * `prettyPrint` (boolean|object): enables [pino.pretty](#pretty). This is intended for non-production
-    configurations. This may be set to a configuration object as outlined in [pino.pretty](#pretty). Default: `false`.
+  * `prettyPrint` (boolean|object): enables pretty printing log logs. This is intended for non-production
+    configurations. This may be set to a configuration object as outlined in the
+    [`pino-pretty` documentation](https://github.com/pinojs/pino-pretty).
+    The options object may additionally contain a `prettifier` property to define
+    which prettifier module to use. When not present, `prettifier` defaults to
+    `'pino-pretty'`. Regardless of the value, the specified prettifier module
+    must be installed as a separate dependency. Default: `false`.
   * `onTerminated` (function): this function will be invoked during process shutdown when `extreme` is set to `true`.
     The signature of the function is `onTerminated(eventName, err)`. If you do not specify a function, Pino will
     invoke `process.exit(0)` when no error has occurred, and `process.exit(1)` otherwise. If you do specify a function,
@@ -107,49 +111,6 @@ var logger = pino({
 ```
 ### Discussion:
 Returns a new [logger](#logger) instance.
-
-<a id="pretty"></a>
-## .pretty([options])
-
-### Parameters:
-+ `options` (object):
-  * `timeTransOnly` (boolean): if set to `true`, it will only covert the unix
-  timestamp to ISO 8601 date format, and reserialize the JSON (equivalent to `pino -t`).
-  * `formatter` (function): a custom function to format the line. It's passed 2 arguments,
-  JSON object log data and an options object
-  that [exposes utility functions](https://github.com/pinojs/pino/blob/master/pretty.js#L110).
-  It should return a string value.
-  * `levelFirst` (boolean): if set to `true`, it will print the name of the log
-  level as the first field in the log line. Default: `false`.
-  * `messageKey` (string): the key in the JSON object to use as the highlighted
-  message. Default: `msg`.
-  * `forceColor` (boolean): if set to `true`, will add color information to the formatted output
-  message. Default: `false`.
-  * `crlf` (boolean): emit `\r\n` instead of `\n`. Default: `false`.
-  * `errorLikeObjectKeys` (array): error-like objects containing stack traces that should be prettified. Default: `['err', 'error']`.
-
-### Example:
-```js
-'use strict'
-
-var pino = require('pino')
-var pretty = pino.pretty()
-pretty.pipe(process.stdout)
-var log = pino({
-  name: 'app',
-  safe: true
-}, pretty)
-
-log.child({ widget: 'foo' }).info('hello')
-log.child({ widget: 'bar' }).warn('hello 2')
-```
-
-### Discussion:
-Provides access to the [CLI](cli.md) log prettifier as an API.
-
-This can also be enabled via the [constructor](#constructor) by setting the
-`prettyPrint` option to either `true` or a configuration object described
-in this section.
 
 <a id="logger"></a>
 # Logger
