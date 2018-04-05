@@ -1,7 +1,7 @@
 # Pretty Printing
 
-By default, Pino log lines are newline delimited JSON. This is perfect for
-production usage and long term storage. It's not so great for development
+By default, Pino log lines are newline delimited JSON (NDJSON). This is perfect
+for production usage and long term storage. It's not so great for development
 environments. Thus, Pino logs can be prettified by using a Pino prettifier
 module like [`pino-pretty`][pp]:
 
@@ -9,9 +9,13 @@ module like [`pino-pretty`][pp]:
 $ cat app.log | pino-pretty
 ```
 
+For almost all situations, this is the recommended way to prettify logs. The
+programmatic API, described in the next section, is primarily for integration
+purposes with other CLI based prettifiers.
+
 ## Prettifier API
 
-Pino prettifier modules are extra modules that provide a CLI for parsing ndJSON
+Pino prettifier modules are extra modules that provide a CLI for parsing NDJSON
 log lines piped via `stdin` and expose an API which conforms to the Pino
 [metadata streams](API.md#metadata) API.
 
@@ -46,9 +50,12 @@ The reference implementation of such a module is the [`pino-pretty`][pp] module.
 To learn more about creating your own prettifier module, learn from the
 `pino-pretty` source code.
 
-## Example
+### API Example
 
-To use pretty printing in your project:
+> #### NOTE:
+> For general usage, it is highly recommended that you pipe logs into
+> the prettifier instead. Prettified logs are not easily parsed and cannot
+> be easily investigated at a later date.
 
 1. Install a prettifier module as a separate dependency, e.g. `npm install --save pino-pretty`.
 1. Instantiate the logger with pretty printing enabled:

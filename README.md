@@ -75,6 +75,11 @@ This produces:
 
 ```
 
+If you have the [`pino-pretty`](https://github.com/pinojs/pino-pretty) module
+installed then you can make these logs easier to read:
+
+![pretty demo](pretty-demo.png)
+
 <a name="benchmarks"></a>
 ## Benchmarks
 
