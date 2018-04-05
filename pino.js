@@ -272,14 +272,15 @@ Object.defineProperty(pinoPrototype, 'isLevelEnabled', {
   value: isLevelEnabled
 })
 
-function getPrettyStream (opts) {
-  var prettyFactory
-  var prettyModule = opts.prettifier || 'pino-pretty'
+function getPrettyStream (opts, prettifier) {
+  if (prettifier && typeof prettifier === 'function') {
+    return prettifier(opts).asMetaWrapper(process.stdout)
+  }
   try {
-    prettyFactory = require(prettyModule)
+    var prettyFactory = require('pino-pretty')
     return prettyFactory(opts).asMetaWrapper(process.stdout)
   } catch (e) {
-    throw Error(`Missing ${prettyModule} module: ${prettyModule} must be installed separately`)
+    throw Error('Missing `pino-pretty` module: `pino-pretty` must be installed separately')
   }
 }
 
@@ -297,7 +298,7 @@ function pino (opts, stream) {
   if (!isStdout && iopts.prettyPrint) throw Error('cannot enable pretty print when stream is not process.stdout')
   if (iopts.prettyPrint) {
     var prettyOpts = Object.assign({ messageKey: iopts.messageKey }, iopts.prettyPrint)
-    var pstream = getPrettyStream(prettyOpts)
+    var pstream = getPrettyStream(prettyOpts, iopts.prettifier)
     istream = pstream
   }
 

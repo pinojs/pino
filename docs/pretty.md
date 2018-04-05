@@ -3,12 +3,21 @@
 By default, Pino log lines are newline delimited JSON. This is perfect for
 production usage and long term storage. It's not so great for development
 environments. Thus, Pino logs can be prettified by using a Pino prettifier
-module.
+module like [`pino-pretty`][pp]:
 
-Pino prettifier modules are extra modules that provide [metadata streams][mdstreams].
-These modules provide a factory function which return a prettifier function.
-This prettifier function has an `asMetaWrapper(dest)` method attached to it.
-A psuedo-example is:
+```sh
+$ cat app.log | pino-pretty
+```
+
+## Prettifier API
+
+Pino prettifier modules are extra modules that provide a CLI for parsing ndJSON
+log lines piped via `stdin` and expose an API which conforms to the Pino
+[metadata streams](API.md#metadata) API.
+
+The API requires modules provide a factory function which return a prettifier
+function. This prettifier function has an `asMetaWrapper(dest)` method attached
+to it. A psuedo-example is:
 
 ```js
 module.exports = function myPrettifier (options) {
@@ -47,17 +56,19 @@ To use pretty printing in your project:
   const pino = require('pino')
   const log = pino({
     prettyPrint: {
-      prettifier: 'pino-pretty'
-    }
+      levelFirst: true
+    },
+    prettifier: require('pino-pretty')
   })
   ```
   Note: the default prettifier module is `pino-pretty`, so the preceeding
   example could be:
   ```js
-  const isdebug = require('isdebug') // true when NODE_ENV=development
   const pino = require('pino')
   const log = pino({
-    prettyPrint: isdebug
+    prettyPrint: {
+      levelFirst: true
+    }
   })
   ```
   See the [`pino-pretty` documentation][pp] for more information on the options

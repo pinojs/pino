@@ -36,6 +36,21 @@ test('can be enabled via constructor with pretty configuration', function (t) {
   })
 })
 
+test('can be enabled via constructor with prettifier', function (t) {
+  t.plan(1)
+  var actual = ''
+  var child = fork(path.join(__dirname, 'fixtures', 'pretty', 'prettyFactory.js'), {silent: true})
+
+  child.stdout.pipe(writeStream(function (s, enc, cb) {
+    actual += s
+    cb()
+  }))
+
+  child.on('close', function () {
+    t.notEqual(actual.match(/^INFO.*h/), null)
+  })
+})
+
 test('throws error when enabled with stream specified', function (t) {
   t.plan(1)
   var logStream = writeStream(function (s, enc, cb) {
