@@ -29,6 +29,9 @@
     "bench-grandchild": "node benchmarks/runbench grandchild",
     "bench-conception": "node benchmarks/runbench conception"
   },
+  "bin": {
+    "pino": "./bin.js"
+  },
   "precommit": "test",
   "repository": {
     "type": "git",
