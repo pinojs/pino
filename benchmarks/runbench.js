@@ -1,6 +1,7 @@
 'use strict'
 
 var fs = require('fs')
+var os = require('os')
 var path = require('path')
 var spawn = require('child_process').spawn
 var pump = require('pump')
@@ -86,6 +87,10 @@ function displayResults (results) {
     }
   }
   console.log('==========')
+  console.log('System: %s/%s %s %s ~ %s (cores/threads: %s)',
+    os.type(), os.platform(), os.arch(), os.release(),
+    os.cpus()[0].model, os.cpus().length
+  )
 }
 
 function toBench (done) {
