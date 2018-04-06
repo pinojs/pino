@@ -297,9 +297,18 @@ You can pass `'silent'` to disable logging.
 + `...` (*): format string values when `msg` is a format string
 
 ### Discussion:
-Log at `'fatal'` level the given `msg`. If the first argument is an
-object, all its properties will be included in the JSON line.
-If more args follow `msg`, they will be silently ignored.
+Log at `'fatal'` level the given `msg`. The `msg` may contain up to 10
+[format string tokens][formatstrs] (given that the method accetps up to 11
+arguments total). The subsequent parameters passed will be used to fill in these
+placeholder tokens with the associated value. Any extra parameters will be
+silently ignored. For example, `log.fatal('%s', 'a', 'b')` will only log the
+string `a` and ignore the `'b'` parameter.
+
+If the first argument is an object, all its properties will be included in the
+JSON line. The number of available format string tokens and associated
+parameters will be reduced accodringly.
+
+[formatstrs]: https://nodejs.org/dist/latest-v8.x/docs/api/util.html#util_util_format_format_args
 
 <a id="error"></a>
 ## .error([obj], msg, [...])
@@ -310,9 +319,16 @@ If more args follow `msg`, they will be silently ignored.
 + `...` (*): format string values when `msg` is a format string
 
 ### Discussion:
-Log at `'error'` level the given `msg`. If the first argument is an
-object, all its properties will be included in the JSON line.
-If more args follow `msg`, they will be silently ignored.
+Log at `'error'` level the given `msg`. The `msg` may contain up to 10
+[format string tokens][formatstrs] (given that the method accetps up to 11
+arguments total). The subsequent parameters passed will be used to fill in these
+placeholder tokens with the associated value. Any extra parameters will be
+silently ignored. For example, `log.error('%s', 'a', 'b')` will only log the
+string `a` and ignore the `'b'` parameter.
+
+If the first argument is an object, all its properties will be included in the
+JSON line. The number of available format string tokens and associated
+parameters will be reduced accodringly.
 
 <a id="warn"></a>
 ## .warn([obj], msg, [...])
@@ -323,9 +339,16 @@ If more args follow `msg`, they will be silently ignored.
 + `...` (*): format string values when `msg` is a format string
 
 ### Discussion:
-Log at `'warn'` level the given `msg`. If the first argument is an
-object, all its properties will be included in the JSON line.
-If more args follow `msg`, they will be silently ignored.
+Log at `'warn'` level the given `msg`. The `msg` may contain up to 10
+[format string tokens][formatstrs] (given that the method accetps up to 11
+arguments total). The subsequent parameters passed will be used to fill in these
+placeholder tokens with the associated value. Any extra parameters will be
+silently ignored. For example, `log.warn('%s', 'a', 'b')` will only log the
+string `a` and ignore the `'b'` parameter.
+
+If the first argument is an object, all its properties will be included in the
+JSON line. The number of available format string tokens and associated
+parameters will be reduced accodringly.
 
 <a id="info"></a>
 ## .info([obj], msg, [...])
@@ -336,9 +359,16 @@ If more args follow `msg`, they will be silently ignored.
 + `...` (*): format string values when `msg` is a format string
 
 ### Discussion:
-Log at `'info'` level the given `msg`. If the first argument is an
-object, all its properties will be included in the JSON line.
-If more args follow `msg`, they will be silently ignored.
+Log at `'info'` level the given `msg`. The `msg` may contain up to 10
+[format string tokens][formatstrs] (given that the method accetps up to 11
+arguments total). The subsequent parameters passed will be used to fill in these
+placeholder tokens with the associated value. Any extra parameters will be
+silently ignored. For example, `log.info('%s', 'a', 'b')` will only log the
+string `a` and ignore the `'b'` parameter.
+
+If the first argument is an object, all its properties will be included in the
+JSON line. The number of available format string tokens and associated
+parameters will be reduced accodringly.
 
 <a id="debug"></a>
 ## .debug([obj], msg, [...])
@@ -349,9 +379,16 @@ If more args follow `msg`, they will be silently ignored.
 + `...` (*): format string values when `msg` is a format string
 
 ### Discussion:
-Log at `'debug'` level the given `msg`. If the first argument is an
-object, all its properties will be included in the JSON line.
-If more args follow `msg`, they will be silently ignored.
+Log at `'debug'` level the given `msg`. The `msg` may contain up to 10
+[format string tokens][formatstrs] (given that the method accetps up to 11
+arguments total). The subsequent parameters passed will be used to fill in these
+placeholder tokens with the associated value. Any extra parameters will be
+silently ignored. For example, `log.debug('%s', 'a', 'b')` will only log the
+string `a` and ignore the `'b'` parameter.
+
+If the first argument is an object, all its properties will be included in the
+JSON line. The number of available format string tokens and associated
+parameters will be reduced accodringly.
 
 <a id="trace"></a>
 ## .trace([obj], msg, [...])
@@ -362,9 +399,16 @@ If more args follow `msg`, they will be silently ignored.
 + `...` (*): format string values when `msg` is a format string
 
 ### Discussion:
-Log at `'trace'` level the given `msg`. If the first argument is an
-object, all its properties will be included in the JSON line.
-If more args follow `msg`, they will be silently ignored.
+Log at `'trace'` level the given `msg`. The `msg` may contain up to 10
+[format string tokens][formatstrs] (given that the method accetps up to 11
+arguments total). The subsequent parameters passed will be used to fill in these
+placeholder tokens with the associated value. Any extra parameters will be
+silently ignored. For example, `log.trace('%s', 'a', 'b')` will only log the
+string `a` and ignore the `'b'` parameter.
+
+If the first argument is an object, all its properties will be included in the
+JSON line. The number of available format string tokens and associated
+parameters will be reduced accodringly.
 
 <a id="flush"></a>
 ## .flush()
