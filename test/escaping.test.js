@@ -70,7 +70,7 @@ var toEscape = [
   '\u001C', // FS   File Separator
   '\u001D', // GS   Group Separator
   '\u001E', // RS   Record Separator
-  '\u001F'  // US   Unit Separator
+  '\u001F' // US   Unit Separator
 ]
 
 toEscape.forEach(function (key) {

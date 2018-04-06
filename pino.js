@@ -1,15 +1,17 @@
 'use strict'
 
+var os = require('os')
 var EventEmitter = require('events').EventEmitter
 var stringifySafe = require('fast-safe-stringify')
+var serializers = require('pino-std-serializers')
 var fs = require('fs')
+var util = require('util')
 var pump = require('pump')
 var flatstr = require('flatstr')
 var pretty = require('./pretty')
 var events = require('./lib/events')
 var levels = require('./lib/levels')
 var tools = require('./lib/tools')
-var serializers = require('./lib/serializers')
 var time = require('./lib/time')
 var needsMetadata = Symbol.for('needsMetadata')
 var isStandardLevelVal = levels.isStandardLevelVal
@@ -31,6 +33,10 @@ var defaultOptions = {
   onTerminated: function (eventName, err) {
     if (err) return process.exit(1)
     process.exit(0)
+  },
+  base: {
+    pid: process.pid,
+    hostname: os.hostname()
   },
   enabled: true,
   messageKey: 'msg'
@@ -123,12 +129,12 @@ Object.defineProperty(
   {value: LOG_VERSION}
 )
 
-function asJson (obj, msg, num) {
+function asJson (obj, msg, num, time) {
   // to catch both null and undefined
   var hasObj = obj !== undefined && obj !== null
   var objError = hasObj && obj instanceof Error
   msg = !msg && objError ? obj.message : msg || undefined
-  var data = this._baseLog + this._lscache[num] + this.time()
+  var data = this._lscache[num] + time
   if (msg !== undefined) {
     // JSON.stringify is safe here
     data += this.messageKeyString + JSON.stringify('' + msg)
@@ -141,6 +147,10 @@ function asJson (obj, msg, num) {
     var notHasOwnProperty = obj.hasOwnProperty === undefined
     if (objError) {
       data += ',"type":"Error","stack":' + this.stringify(obj.stack)
+    }
+    // if global serializer is set, call it first
+    if (this.serializers[Symbol.for('pino.*')]) {
+      obj = this.serializers[Symbol.for('pino.*')](obj)
     }
     for (var key in obj) {
       value = obj[key]
@@ -166,6 +176,9 @@ function asChindings (that, bindings) {
   var key
   var value
   var data = that.chindings
+  if (that.serializers[Symbol.for('pino.*')]) {
+    bindings = that.serializers[Symbol.for('pino.*')](bindings)
+  }
   for (key in bindings) {
     value = bindings[key]
     if (key !== 'level' && key !== 'serializers' && bindings.hasOwnProperty(key) && value !== undefined) {
@@ -195,13 +208,15 @@ Object.defineProperty(pinoPrototype, 'child', {
 })
 
 function pinoWrite (obj, msg, num) {
-  var s = this.asJson(obj, msg, num)
+  var t = this.time()
+  var s = this.asJson(obj, msg, num, t)
   var stream = this.stream
   if (this.cache === null) {
     if (stream[needsMetadata]) {
       stream.lastLevel = num
       stream.lastMsg = msg
       stream.lastObj = obj
+      stream.lastTime = t.slice(8)
       stream.lastLogger = this // for child loggers
     }
     stream.write(flatstr(s))
@@ -236,7 +251,7 @@ function addLevel (name, lvl) {
   if (this.levels.labels.hasOwnProperty(lvl)) return false
   this.levels.values[name] = lvl
   this.levels.labels[lvl] = name
-  this._lscache[lvl] = flatstr('"level":' + Number(lvl))
+  this._lscache[lvl] = flatstr('{"level":' + Number(lvl))
   Object.defineProperty(this, name, {
     value: lvl < this._levelVal ? tools.noop : tools.genLog(lvl),
     enumerable: true,
@@ -250,6 +265,15 @@ Object.defineProperty(pinoPrototype, 'addLevel', {
   value: addLevel
 })
 
+function isLevelEnabled (logLevel) {
+  var logLevelVal = this.levels.values[logLevel]
+  return logLevelVal && (logLevelVal >= this._levelVal)
+}
+Object.defineProperty(pinoPrototype, 'isLevelEnabled', {
+  enumerable: true,
+  value: isLevelEnabled
+})
+
 function pino (opts, stream) {
   var iopts = opts
   var istream = stream
@@ -260,11 +284,12 @@ function pino (opts, stream) {
   iopts = Object.assign({}, defaultOptions, iopts)
   if (iopts.extreme && iopts.prettyPrint) throw Error('cannot enable pretty print in extreme mode')
   istream = istream || process.stdout
+  var isStdout = istream === process.stdout
+  if (!isStdout && iopts.prettyPrint) throw Error('cannot enable pretty print when stream is not process.stdout')
   if (iopts.prettyPrint) {
     var prettyOpts = Object.assign({ messageKey: iopts.messageKey }, iopts.prettyPrint)
     var pstream = pretty(prettyOpts)
-    var origStream = istream
-    pump(pstream, origStream, function (err) {
+    pump(pstream, process.stdout, function (err) {
       if (err) instance.emit('error', err)
     })
     istream = pstream
@@ -274,7 +299,7 @@ function pino (opts, stream) {
   iopts.stringify = iopts.safe ? stringifySafe : JSON.stringify
   iopts.formatOpts = {lowres: true}
   iopts.messageKeyString = `,"${iopts.messageKey}":`
-  iopts.end = ',"v":' + LOG_VERSION + '}\n'
+  iopts.end = ',"v":' + LOG_VERSION + '}' + (iopts.crlf ? '\r\n' : '\n')
   iopts.cache = !iopts.extreme ? null : {
     size: 4096,
     buf: ''
@@ -304,7 +329,7 @@ function pino (opts, stream) {
 
   if (iopts.slowtime) {
     instance.time = time.slowTime
-    process.emitWarning('use `timestamp: pino.stdTimeFunctions.slowTime`', '(pino) `slowtime` is deprecated')
+    util.deprecate(tools.noop, '(pino) `slowtime` is deprecated: use `timestamp: pino.stdTimeFunctions.slowTime`')()
   } else if (iopts.timestamp && Function.prototype.isPrototypeOf(iopts.timestamp)) {
     instance.time = iopts.timestamp
   } else if (iopts.timestamp) {
@@ -338,6 +363,18 @@ function pino (opts, stream) {
     }
   }
 
+  var base = (typeof iopts.base === 'object') ? iopts.base : defaultOptions.base
+
+  if (iopts.name !== undefined) {
+    base = Object.assign({}, base, {
+      name: iopts.name
+    })
+  }
+
+  if (base !== null) {
+    instance = instance.child(base)
+  }
+
   return instance
 }
 
@@ -345,10 +382,23 @@ tools.defineLevelsProperty(pino)
 
 module.exports = pino
 module.exports.stdSerializers = {
-  req: serializers.asReqValue,
-  res: serializers.asResValue,
-  err: serializers.asErrValue
+  req: serializers.req,
+  res: serializers.res,
+  err: serializers.err,
+  wrapRequestSerializer: serializers.wrapRequestSerializer,
+  wrapResponseSerializer: serializers.wrapResponseSerializer
 }
+
+Object.defineProperty(module.exports.stdSerializers, 'wrapRespnonseSerializer', {
+  enumerable: true,
+  get: util.deprecate(
+    function () {
+      return serializers.wrapResponseSerializer
+    },
+    '`pino.stdSerializers.wrapRespnonseSerializer` is deprecated: use `pino.stdSerializers.wrapResponseSerializer`'
+  )
+})
+
 module.exports.stdTimeFunctions = Object.assign({}, time)
 module.exports.pretty = pretty
 Object.defineProperty(

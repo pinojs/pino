@@ -18,11 +18,14 @@
   * [level-change (event)](#level-change)
   * [.levels.values](#levelValues)
   * [.levels.labels](#levelLabels)
+  * [.isLevelEnabled](#isLevelEnabled)
   * [LOG_VERSION](#log_version)
   * [.stdSerializers](#stdSerializers)
     + [.req](#reqSerializer)
     + [.res](#resSerializer)
     + [.err](#errSerializer)
+    + [.wrapRequestSerializer](#wrapReq)
+    + [.wrapResponseSerializers](#wrapRes)
   + [.stdTimeFunctions](#stdTimeFunctions)
     + [.epochTime](#epochTimeFunction)
     + [.unixTime](#unixTimeFunction)
@@ -44,6 +47,8 @@
     of objects. These functions should return an JSONifiable object and they
     should never throw. When logging an object, each top-level property matching the exact key of a serializer
     will be serialized using the defined serializer.
+        
+    Alternatively, it is possible to register a serializer under the key `Symbol.for('pino.*')` which will act upon the complete log object, i.e. every property.
   * `timestamp` (boolean|function): Enables or disables the inclusion of a timestamp in the
     log message. If a function is supplied, it must synchronously return a JSON string
     representation of the time, e.g. `,"time":1493426328206 (which is the default).
@@ -77,6 +82,11 @@
     See [Extreme mode explained](extreme.md) for more detail.
   * `enabled` (boolean): enables logging. Default: `true`
   * `browser` (Object): browser only, may have `asObject` and `write` keys, see [Pino in the Browser](../readme.md#browser)
+  * `base` (Object): key-value object added as child logger to each log line. If set to `null` the `base` child logger is not added . Default:
+    * `pid` (process.pid)
+    * `hostname` (os.hostname)
+    * `name` of logger if supplied as option
+  * `crlf` (boolean): logs newline delimited JSON with `\r\n` instead of `\n`. Default: `false`.
 + `stream` (Writable): a writable stream where the logs will be written.
   It can also receive some log-line [metadata](#metadata), if the
   relative protocol is enabled. Default: `process.stdout`
@@ -105,14 +115,18 @@ Returns a new [logger](#logger) instance.
 + `options` (object):
   * `timeTransOnly` (boolean): if set to `true`, it will only covert the unix
   timestamp to ISO 8601 date format, and reserialize the JSON (equivalent to `pino -t`).
-  * `formatter` (function): a custom function to format the line, is passed the
-  JSON object as an argument and should return a string value.
+  * `formatter` (function): a custom function to format the line. It's passed 2 arguments,
+  JSON object log data and an options object
+  that [exposes utility functions](https://github.com/pinojs/pino/blob/master/pretty.js#L110).
+  It should return a string value.
   * `levelFirst` (boolean): if set to `true`, it will print the name of the log
   level as the first field in the log line. Default: `false`.
   * `messageKey` (string): the key in the JSON object to use as the highlighted
   message. Default: `msg`.
   * `forceColor` (boolean): if set to `true`, will add color information to the formatted output
   message. Default: `false`.
+  * `crlf` (boolean): emit `\r\n` instead of `\n`. Default: `false`.
+  * `errorLikeObjectKeys` (array): error-like objects containing stack traces that should be prettified. Default: `['err', 'error']`.
 
 ### Example:
 ```js
@@ -467,6 +481,18 @@ Returns the mappings of level internal level numbers to their string
 representations. This property is available as a static property or as an
 instance property.
 
+<a id="isLevelEnabled"></a>
+## .isLevelEnabled(logLevel)
+
+### Example:
+```js
+if (logger.isLevelEnabled('debug')) logger.debug('conditional log')
+```
+
+### Discussion:
+A utility method for determining if a given log level will write to the output
+stream.
+
 <a id="log_version"></a>
 ## .LOG_VERSION
 
@@ -479,7 +505,8 @@ or as an instance property.
 ## .stdSerializers
 
 Available as a static property, the `stdSerializers` provide functions for
-serializing objects common to many projects.
+serializing objects common to many projects. The serializers are directly
+imported from [pino-std-serializers](https://github.com/pinojs/pino-std-serializers).
 
 <a id="reqSerializer"></a>
 ### .req
@@ -550,6 +577,21 @@ Serializes an `Error` object if passed in as an property.
   "stack": "Error: an error\n    at Object.<anonymous> (/Users/matteo/Repositories/pino/example.js:16:7)\n    at Module._compile (module.js:435:26)\n    at Object.Module._extensions..js (module.js:442:10)\n    at Module.load (module.js:356:32)\n    at Function.Module._load (module.js:313:12)\n    at Function.Module.runMain (module.js:467:10)\n    at startup (node.js:136:18)\n    at node.js:963:3"
 }
 ```
+
+<a id="wrapReq"></a>
+## .wrapRequestSerializer
+
+Wraps the standard request serializer such that custom serializers can use
+the newly serilized request. An example of using this function can be found
+in the [pino-http][https://github.com/pinojs/pino-http] module.
+
+<a id="wrapRes"></a>
+## .wrapResponseSerializer
+
+Wraps the standard response serializer such that custom serializers can use
+the newly serilized response. An example of using this function can be found
+in the [pino-http][https://github.com/pinojs/pino-http] module.
+
 <a id="stdTimeFunctions"></a>
 ## .stdTimeFunctions
 
@@ -595,6 +637,8 @@ should be set:
 * the last logging level as `stream.lastLevel`
 * the last logging message as `stream.lastMsg`
 * the last logging object as `stream.lastObj`
+* the last time as `stream.lastTime`, which will be the partial string returned
+  by the time function.
 * the last logger instance as `stream.lastLogger` (to support child
   loggers)
 

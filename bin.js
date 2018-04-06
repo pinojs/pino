@@ -3,6 +3,7 @@
 'use strict'
 
 var pretty = require('./pretty')
+var fs = require('fs')
 
 module.exports = pretty
 
@@ -15,29 +16,44 @@ if (arg('-h') || arg('--help')) {
     timeTransOnly: arg('-t'),
     levelFirst: arg('-l'),
     forceColor: arg('-c'),
-    messageKey: messageKeyArg()
+    messageKey: argWithParam('-m'),
+    dateFormat: argWithParam('--dateFormat'),
+    errorProps: paramToArray(argWithParam('--errorProps')),
+    errorLikeObjectKeys: paramToArray(argWithParam('--errorLikeObjectKeys')),
+    localTime: arg('--localTime')
   })).pipe(process.stdout)
+  if (!process.stdin.isTTY && !fs.fstatSync(process.stdin.fd).isFile()) {
+    process.once('SIGINT', function noOp () {})
+  }
 }
 
 function usage () {
-  return require('fs')
-      .createReadStream(require('path').join(__dirname, 'usage.txt'))
+  var help = require('path').join(__dirname, 'usage.txt')
+  return fs.createReadStream(help)
 }
 
 function arg (s) {
   return !!~process.argv.indexOf(s)
 }
 
-function messageKeyArg () {
-  if (!arg('-m')) {
+function argWithParam (s) {
+  if (!arg(s)) {
     return
   }
-  var messageKeyIndex = process.argv.indexOf('-m') + 1
-  var messageKey = process.argv.length > messageKeyIndex &&
-    process.argv[messageKeyIndex]
+  var argIndex = process.argv.indexOf(s) + 1
+  var argValue = process.argv.length > argIndex &&
+    process.argv[argIndex]
 
-  if (!messageKey) {
-    throw new Error('-m flag provided without a string argument')
+  if (!argValue) {
+    throw new Error(s + ' flag provided without a string argument')
   }
-  return messageKey
+  return argValue
+}
+
+function paramToArray (param) {
+  if (!param) {
+    return
+  }
+
+  return param.split(/\s?,\s?/)
 }
