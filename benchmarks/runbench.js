@@ -76,13 +76,13 @@ function displayResults (results) {
   console.log('==========')
   var benchNames = Object.keys(results)
   for (var i = 0; i < benchNames.length; i += 1) {
-    console.log(benchNames[i] + ' averages')
+    console.log(benchNames[i].toUpperCase() + ' benchmark averages')
     var benchmark = results[benchNames[i]]
     var loggers = Object.keys(benchmark)
     for (var j = 0; j < loggers.length; j += 1) {
       var logger = benchmark[loggers[j]]
       var average = sum(logger) / logger.length
-      console.log(loggers[j] + ' average: ' + average)
+      console.log(loggers[j] + ' average: ' + average.toFixed(3) + 'ms')
     }
   }
   console.log('==========')
