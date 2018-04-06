@@ -17,7 +17,7 @@ var plogUnsafeExtreme = require('../')({extreme: true, safe: false}, dest)
 
 var loglevel = require('./loglevelMock')(dest)
 
-var deep = require('../package.json')
+var deep = Object.assign({}, require('../package.json'), { level: 'info' })
 deep.deep = Object.assign({}, JSON.parse(JSON.stringify(deep)))
 deep.deep.deep = Object.assign({}, JSON.parse(JSON.stringify(deep)))
 deep.deep.deep.deep = Object.assign({}, JSON.parse(JSON.stringify(deep)))
@@ -36,8 +36,13 @@ require('bole').output({
   stream: dest
 }).setFastTime(true)
 
-winston.add(winston.transports.File, { filename: '/dev/null' })
-winston.remove(winston.transports.Console)
+var chill = winston.createLogger({
+  transports: [
+    new winston.transports.Stream({
+      stream: fs.createWriteStream('/dev/null')
+    })
+  ]
+})
 
 var run = bench([
   function benchBunyanDeepObj (cb) {
@@ -48,7 +53,7 @@ var run = bench([
   },
   function benchWinstonDeepObj (cb) {
     for (var i = 0; i < max; i++) {
-      winston.info(deep)
+      chill.log(deep)
     }
     setImmediate(cb)
   },
