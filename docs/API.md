@@ -47,7 +47,7 @@
     of objects. These functions should return an JSONifiable object and they
     should never throw. When logging an object, each top-level property matching the exact key of a serializer
     will be serialized using the defined serializer.
-        
+
     Alternatively, it is possible to register a serializer under the key `Symbol.for('pino.*')` which will act upon the complete log object, i.e. every property.
   * `timestamp` (boolean|function): Enables or disables the inclusion of a timestamp in the
     log message. If a function is supplied, it must synchronously return a JSON string
@@ -299,10 +299,7 @@ You can pass `'silent'` to disable logging.
 ### Discussion:
 Log at `'fatal'` level the given `msg`. If the first argument is an
 object, all its properties will be included in the JSON line.
-If more args follows `msg`, these will be used to format `msg` using
-[`util.format`][util-format].
-
-[util-format]: https://nodejs.org/api/util.html#util_util_format_format
+If more args follow `msg`, they will be silently ignored.
 
 <a id="error"></a>
 ## .error([obj], msg, [...])
@@ -315,8 +312,7 @@ If more args follows `msg`, these will be used to format `msg` using
 ### Discussion:
 Log at `'error'` level the given `msg`. If the first argument is an
 object, all its properties will be included in the JSON line.
-If more args follows `msg`, these will be used to format `msg` using
-[`util.format`][util-format].
+If more args follow `msg`, they will be silently ignored.
 
 <a id="warn"></a>
 ## .warn([obj], msg, [...])
@@ -329,8 +325,7 @@ If more args follows `msg`, these will be used to format `msg` using
 ### Discussion:
 Log at `'warn'` level the given `msg`. If the first argument is an
 object, all its properties will be included in the JSON line.
-If more args follows `msg`, these will be used to format `msg` using
-[`util.format`][util-format].
+If more args follow `msg`, they will be silently ignored.
 
 <a id="info"></a>
 ## .info([obj], msg, [...])
@@ -343,8 +338,7 @@ If more args follows `msg`, these will be used to format `msg` using
 ### Discussion:
 Log at `'info'` level the given `msg`. If the first argument is an
 object, all its properties will be included in the JSON line.
-If more args follows `msg`, these will be used to format `msg` using
-[`util.format`][util-format].
+If more args follow `msg`, they will be silently ignored.
 
 <a id="debug"></a>
 ## .debug([obj], msg, [...])
@@ -357,8 +351,7 @@ If more args follows `msg`, these will be used to format `msg` using
 ### Discussion:
 Log at `'debug'` level the given `msg`. If the first argument is an
 object, all its properties will be included in the JSON line.
-If more args follows `msg`, these will be used to format `msg` using
-[`util.format`][util-format].
+If more args follow `msg`, they will be silently ignored.
 
 <a id="trace"></a>
 ## .trace([obj], msg, [...])
@@ -371,8 +364,7 @@ If more args follows `msg`, these will be used to format `msg` using
 ### Discussion:
 Log at `'trace'` level the given `msg`. If the first argument is an
 object, all its properties will be included in the JSON line.
-If more args follows `msg`, these will be used to format `msg` using
-[`util.format`][util-format].
+If more args follow `msg`, they will be silently ignored.
 
 <a id="flush"></a>
 ## .flush()
