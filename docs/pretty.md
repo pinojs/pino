@@ -19,29 +19,31 @@ Pino prettifier modules are extra modules that provide a CLI for parsing NDJSON
 log lines piped via `stdin` and expose an API which conforms to the Pino
 [metadata streams](API.md#metadata) API.
 
-The API requires modules provide a factory function which return a prettifier
-function. This prettifier function has an `asMetaWrapper(dest)` method attached
-to it. A psuedo-example is:
+The API requires modules provide a factory function which returns a prettifier
+function. This prettifier function must accept either a string of NDJSON or
+a Pino log object. A psuedo-example of such a prettifier is:
 
 ```js
 module.exports = function myPrettifier (options) {
   // Deal with whatever options are supplied.
   return function prettifier (inputData) {
-    // `inputData` can be an ndJSON string or a Pino log object.
-    return `formatted log string`
+    let logObject
+    if (typeof inputData === 'string') {
+      const parsedData = someJsonParser(inputData)
+      logObject = (isPinoLog(parsedData)) ? parsedData : undefined
+    } else if (isObject(inputData) && isPinoLog(inputData)) {
+      logObject = inputData
+    }
+    if (!logObject) return inputData
+    // implement prettification
   }
 
-  function asMetaWrapper (destinationStream) {
-    return {
-      [Symbol.for('needsMetadata')]: true,
-      lastLevel: 0,
-      lastMsg: null,
-      lastObj: null,
-      lastLogger: null,
-      write (chunk) {
-        destinationStream.write(`formatted log string`)
-      }
-    }
+  function isObject (input) {
+    return Object.prototype.toString.apply(input) === '[object Object]'
+  }
+
+  function isPinoLog (log) {
+    return log && (log.hasOwnProperty('v') && log.v === 1)
   }
 }
 ```

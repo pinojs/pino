@@ -274,11 +274,11 @@ Object.defineProperty(pinoPrototype, 'isLevelEnabled', {
 
 function getPrettyStream (opts, prettifier) {
   if (prettifier && typeof prettifier === 'function') {
-    return prettifier(opts).asMetaWrapper(process.stdout)
+    return tools.asMetaWrapper(prettifier(opts), process.stdout)
   }
   try {
     var prettyFactory = require('pino-pretty')
-    return prettyFactory(opts).asMetaWrapper(process.stdout)
+    return tools.asMetaWrapper(prettyFactory(opts), process.stdout)
   } catch (e) {
     throw Error('Missing `pino-pretty` module: `pino-pretty` must be installed separately')
   }
