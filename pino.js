@@ -4,9 +4,9 @@ var os = require('os')
 var EventEmitter = require('events').EventEmitter
 var stringifySafe = require('fast-safe-stringify')
 var serializers = require('pino-std-serializers')
-var fs = require('fs')
 var util = require('util')
 var flatstr = require('flatstr')
+var SonicBoom = require('sonic-boom')
 var events = require('./lib/events')
 var levels = require('./lib/levels')
 var tools = require('./lib/tools')
@@ -23,19 +23,18 @@ var defaultOptions = {
   name: undefined,
   serializers: {},
   timestamp: time.epochTime,
-  extreme: false,
   level: 'info',
   levelVal: undefined,
   prettyPrint: false,
-  onTerminated: function (eventName, err) {
-    if (err) return process.exit(1)
-    process.exit(0)
-  },
   base: {
     pid: process.pid,
     hostname: os.hostname()
   },
   enabled: true,
+  onTerminated: function (eventName, err) {
+    if (err) return process.exit(1)
+    process.exit(0)
+  },
   messageKey: 'msg'
 }
 
@@ -208,35 +207,25 @@ function pinoWrite (obj, msg, num) {
   var t = this.time()
   var s = this.asJson(obj, msg, num, t)
   var stream = this.stream
-  if (this.cache === null) {
-    if (stream[needsMetadata]) {
-      stream.lastLevel = num
-      stream.lastMsg = msg
-      stream.lastObj = obj
-      stream.lastTime = t.slice(8)
-      stream.lastLogger = this // for child loggers
-    }
-    stream.write(flatstr(s))
-    return
+  if (stream[needsMetadata]) {
+    stream.lastLevel = num
+    stream.lastMsg = msg
+    stream.lastObj = obj
+    stream.lastTime = t.slice(8)
+    stream.lastLogger = this // for child loggers
   }
-
-  this.cache.buf += s
-  if (this.cache.buf.length > this.cache.size) {
-    stream.write(flatstr(this.cache.buf))
-    this.cache.buf = ''
-  }
+  stream.write(flatstr(s))
 }
 Object.defineProperty(pinoPrototype, 'write', {
   value: pinoWrite
 })
 
 function flush () {
-  if (!this.cache) {
+  if (!this.stream.flushSync) {
     return
   }
 
-  this.stream.write(flatstr(this.cache.buf))
-  this.cache.buf = ''
+  this.stream.flushSync()
 }
 Object.defineProperty(pinoPrototype, 'flush', {
   enumerable: true,
@@ -286,12 +275,15 @@ function getPrettyStream (opts, prettifier) {
 function pino (opts, stream) {
   var iopts = opts
   var istream = stream
-  if (iopts && (iopts.writable || iopts._writableState)) {
+  if (iopts && (iopts.writable || iopts._writableState || iopts instanceof SonicBoom)) {
     istream = iopts
     iopts = defaultOptions
   }
   iopts = Object.assign({}, defaultOptions, iopts)
-  if (iopts.extreme && iopts.prettyPrint) throw Error('cannot enable pretty print in extreme mode')
+  if (iopts.extreme) {
+    throw new Error('the extreme option is deprecated, use require(\'pino\').extreme(dest) instead')
+  }
+  if (stream instanceof SonicBoom && iopts.prettyPrint) throw Error('cannot enable pretty print in extreme mode')
   istream = istream || process.stdout
   var isStdout = istream === process.stdout
   if (!isStdout && iopts.prettyPrint) throw Error('cannot enable pretty print when stream is not process.stdout')
@@ -306,10 +298,6 @@ function pino (opts, stream) {
   iopts.formatOpts = {lowres: true}
   iopts.messageKeyString = `,"${iopts.messageKey}":`
   iopts.end = ',"v":' + LOG_VERSION + '}' + (iopts.crlf ? '\r\n' : '\n')
-  iopts.cache = !iopts.extreme ? null : {
-    size: 4096,
-    buf: ''
-  }
   iopts.chindings = ''
 
   if (iopts.enabled === false) {
@@ -324,7 +312,6 @@ function pino (opts, stream) {
   instance.end = iopts.end
   instance.name = iopts.name
   instance.timestamp = iopts.timestamp
-  instance.cache = iopts.cache
   instance.formatiopts = iopts.formatiopts
   instance.onTerminated = iopts.onTerminated
   instance.messageKey = iopts.messageKey
@@ -340,29 +327,18 @@ function pino (opts, stream) {
     instance.time = time.nullTime
   }
 
-  if (iopts.cache) setTimeout(waitForFDSettle, 100)
-
-  var settleTries = 0
-  function waitForFDSettle () {
-    var isBlockable = tools.streamIsBlockable(istream)
-    if (isBlockable === false && settleTries > 10) {
-      return instance.emit('error', Error('stream must have a file descriptor in extreme mode'))
-    } else if (isBlockable === true) {
-      return events(instance, extremeModeExitHandler)
+  if (istream instanceof SonicBoom) {
+    if (istream.fd === -1) {
+      istream.on('ready', function () {
+        events(instance, extremeModeExitHandler)
+      })
+    } else {
+      events(instance, extremeModeExitHandler)
     }
-    settleTries += 1
-    setTimeout(waitForFDSettle, 100)
   }
 
   function extremeModeExitHandler () {
-    var buf = iopts.cache.buf
-    if (buf) {
-      // We need to block the process exit long enough to flush the buffer
-      // to the destination stream. We do that by forcing a synchronous
-      // write directly to the stream's file descriptor.
-      var fd = (istream.fd) ? istream.fd : istream._handle.fd
-      fs.writeSync(fd, buf)
-    }
+    istream.flushSync()
   }
 
   var base = (typeof iopts.base === 'object') ? iopts.base : defaultOptions.base
@@ -382,6 +358,13 @@ function pino (opts, stream) {
 
 tools.defineLevelsProperty(pino)
 
+function extreme (dest) {
+  if (!dest) {
+    return new SonicBoom(process.stdout.fd)
+  }
+  return new SonicBoom(dest)
+}
+
 module.exports = pino
 module.exports.stdSerializers = {
   req: serializers.req,
@@ -400,6 +383,8 @@ Object.defineProperty(module.exports.stdSerializers, 'wrapRespnonseSerializer', 
     '`pino.stdSerializers.wrapRespnonseSerializer` is deprecated: use `pino.stdSerializers.wrapResponseSerializer`'
   )
 })
+
+module.exports.extreme = extreme
 
 module.exports.stdTimeFunctions = Object.assign({}, time)
 Object.defineProperty(

@@ -22,28 +22,6 @@ test('no event loop logs successfully', function (t) {
   })
 })
 
-test('handles no file descriptor in extreme mode', function (t) {
-  t.plan(2)
-  var output = ''
-  var errorOutput = ''
-  var child = fork(path.join(fixturesPath, 'no-fd.js'), {silent: true})
-
-  child.stdout.pipe(writeStream(function (s, enc, cb) {
-    output += s
-    cb()
-  }))
-
-  child.stderr.pipe(writeStream(function (s, enc, cb) {
-    errorOutput += s
-    cb()
-  }))
-
-  child.on('close', function () {
-    t.is(output, '')
-    t.notEqual(errorOutput.match(/stream must have/g), null)
-  })
-})
-
 test('terminates when uncaughtException is fired with onTerminate registered', function (t) {
   t.plan(3)
   var output = ''
