@@ -2,9 +2,9 @@
 
 var os = require('os')
 var EventEmitter = require('events').EventEmitter
+var SonicBoom = require('sonic-boom')
 var stringifySafe = require('fast-safe-stringify')
 var serializers = require('pino-std-serializers')
-var fs = require('fs')
 var util = require('util')
 var flatstr = require('flatstr')
 var events = require('./lib/events')
@@ -348,6 +348,7 @@ function pino (opts, stream) {
     if (isBlockable === false && settleTries > 10) {
       return instance.emit('error', Error('stream must have a file descriptor in extreme mode'))
     } else if (isBlockable === true) {
+      istream = new SonicBoom(istream.fd)
       return events(instance, extremeModeExitHandler)
     }
     settleTries += 1
@@ -356,13 +357,7 @@ function pino (opts, stream) {
 
   function extremeModeExitHandler () {
     var buf = iopts.cache.buf
-    if (buf) {
-      // We need to block the process exit long enough to flush the buffer
-      // to the destination stream. We do that by forcing a synchronous
-      // write directly to the stream's file descriptor.
-      var fd = (istream.fd) ? istream.fd : istream._handle.fd
-      fs.writeSync(fd, buf)
-    }
+    if (buf) istream.flushSync()
   }
 
   var base = (typeof iopts.base === 'object') ? iopts.base : defaultOptions.base
