@@ -287,6 +287,9 @@ function pino (opts, stream) {
   istream = istream || process.stdout
   var isStdout = istream === process.stdout
   if (!isStdout && iopts.prettyPrint) throw Error('cannot enable pretty print when stream is not process.stdout')
+  if (isStdout && istream.fd >= 0) {
+    istream = new SonicBoom(istream.fd)
+  }
   if (iopts.prettyPrint) {
     var prettyOpts = Object.assign({ messageKey: iopts.messageKey }, iopts.prettyPrint)
     var pstream = getPrettyStream(prettyOpts, iopts.prettifier)
