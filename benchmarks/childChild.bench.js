@@ -7,7 +7,7 @@ var fs = require('fs')
 var dest = fs.createWriteStream('/dev/null')
 var plog = pino(dest).child({ a: 'property' }).child({sub: 'child'})
 delete require.cache[require.resolve('../')]
-var plogExtreme = require('../')({extreme: true}, dest).child({ a: 'property' }).child({sub: 'child'})
+var plogExtreme = require('../')(pino.extreme('/dev/null')).child({ a: 'property' }).child({sub: 'child'})
 
 var max = 10
 var blog = bunyan.createLogger({

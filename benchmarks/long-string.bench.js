@@ -9,7 +9,7 @@ var fs = require('fs')
 var dest = fs.createWriteStream('/dev/null')
 var plog = pino(dest)
 delete require.cache[require.resolve('../')]
-var plogExtreme = require('../')({extreme: true}, dest)
+var plogExtreme = require('../')(pino.extreme('/dev/null'))
 
 var deep = require('../package.json')
 deep.deep = JSON.parse(JSON.stringify(deep))
