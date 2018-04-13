@@ -5,7 +5,6 @@ var os = require('os')
 var pino = require('../')
 var sink = require('./helper').sink
 var http = require('http')
-var time = require('../lib/time')
 
 var pid = process.pid
 var hostname = os.hostname()
@@ -203,16 +202,6 @@ test('http response support via a serializer', function (t) {
       res.resume()
     })
   })
-})
-
-test('slowtime', function (t) {
-  var instance = pino({timestamp: time.slowTime},
-    sink(function (chunk, enc, cb) {
-      t.ok(Date.parse(chunk.time) <= new Date(), 'time is greater than Date.now()')
-      t.end()
-    }))
-
-  instance.info('hello world')
 })
 
 test('http request support via serializer in a child', function (t) {

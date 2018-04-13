@@ -23,7 +23,6 @@ var defaultOptions = {
   name: undefined,
   serializers: {},
   timestamp: time.epochTime,
-  slowtime: false,
   extreme: false,
   level: 'info',
   levelVal: undefined,
@@ -325,7 +324,6 @@ function pino (opts, stream) {
   instance.end = iopts.end
   instance.name = iopts.name
   instance.timestamp = iopts.timestamp
-  instance.slowtime = iopts.slowtime
   instance.cache = iopts.cache
   instance.formatiopts = iopts.formatiopts
   instance.onTerminated = iopts.onTerminated
@@ -334,10 +332,7 @@ function pino (opts, stream) {
 
   applyOptions(instance, iopts)
 
-  if (iopts.slowtime) {
-    instance.time = time.slowTime
-    util.deprecate(tools.noop, '(pino) `slowtime` is deprecated: use `timestamp: pino.stdTimeFunctions.slowTime`')()
-  } else if (iopts.timestamp && Function.prototype.isPrototypeOf(iopts.timestamp)) {
+  if (iopts.timestamp && Function.prototype.isPrototypeOf(iopts.timestamp)) {
     instance.time = iopts.timestamp
   } else if (iopts.timestamp) {
     instance.time = time.epochTime

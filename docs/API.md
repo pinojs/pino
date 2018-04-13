@@ -28,7 +28,6 @@
   + [.stdTimeFunctions](#stdTimeFunctions)
     + [.epochTime](#epochTimeFunction)
     + [.unixTime](#unixTimeFunction)
-    + [.slowTime](#slowTimeFunction)
     + [.nullTime](#nullTimeFunction)
 + [Metadata Support](#metadata)
 
@@ -55,13 +54,6 @@
     See [stdTimeFunctions](#stdTimeFunctions) for a set of available functions
     for passing in as a value for this option. Caution: any sort of formatted
     time will significantly slow down Pino's performance.
-  * `slowtime` (boolean): Outputs ISO time stamps (`'2016-03-09T15:18:53.889Z'`)
-     instead of Epoch time stamps (`1457536759176`). **WARNING**: This option
-     carries a 25% performance drop. We recommend using default Epoch timestamps
-     and transforming logs after if required. The `pino -t` command will do this
-     for you (see [CLI](cli.md)). Default: `false`.
-     **Deprecation**: this option is scheduled to be removed in Pino 5.0.0. Use
-     `timestamp: pino.stdTimeFunctions.slowTime` instead.
   * `extreme` (boolean): Enables extreme mode, yields an additional 60% performance
     (from 250ms down to 100ms per 10000 ops). There are trade-off's should be
     understood before usage. See [Extreme mode explained](extreme.md). Default: `false`.
@@ -610,13 +602,6 @@ The default time function for Pino. Returns a string like `,"time":1493426328206
 ### .unixTime
 
 Returns a unix time in seconds, like `,"time":1493426328`.
-
-<a id="slowTimeFunction"></a>
-### .slowTime
-
-Returns an ISO formatted string like `,"time":"2017-04-29T00:47:49.354Z". It is
-highly recommended that you avoid this function. It incurs a significant
-performance penalty.
 
 <a id="nullTimeFunction"></a>
 ### .nulltime
