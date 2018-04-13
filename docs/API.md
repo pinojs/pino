@@ -49,7 +49,7 @@
     Alternatively, it is possible to register a serializer under the key `Symbol.for('pino.*')` which will act upon the complete log object, i.e. every property.
   * `timestamp` (boolean|function): Enables or disables the inclusion of a timestamp in the
     log message. If a function is supplied, it must synchronously return a JSON string
-    representation of the time, e.g. `,"time":1493426328206 (which is the default).
+    representation of the time, e.g. `,"time":1493426328206` (which is the default).
     If set to `false`, no timestamp will be included in the output.
     See [stdTimeFunctions](#stdTimeFunctions) for a set of available functions
     for passing in as a value for this option. Caution: any sort of formatted
