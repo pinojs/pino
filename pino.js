@@ -6,9 +6,7 @@ var stringifySafe = require('fast-safe-stringify')
 var serializers = require('pino-std-serializers')
 var fs = require('fs')
 var util = require('util')
-var pump = require('pump')
 var flatstr = require('flatstr')
-var pretty = require('./pretty')
 var events = require('./lib/events')
 var levels = require('./lib/levels')
 var tools = require('./lib/tools')
@@ -274,6 +272,18 @@ Object.defineProperty(pinoPrototype, 'isLevelEnabled', {
   value: isLevelEnabled
 })
 
+function getPrettyStream (opts, prettifier) {
+  if (prettifier && typeof prettifier === 'function') {
+    return tools.asMetaWrapper(prettifier(opts), process.stdout)
+  }
+  try {
+    var prettyFactory = require('pino-pretty')
+    return tools.asMetaWrapper(prettyFactory(opts), process.stdout)
+  } catch (e) {
+    throw Error('Missing `pino-pretty` module: `pino-pretty` must be installed separately')
+  }
+}
+
 function pino (opts, stream) {
   var iopts = opts
   var istream = stream
@@ -288,10 +298,7 @@ function pino (opts, stream) {
   if (!isStdout && iopts.prettyPrint) throw Error('cannot enable pretty print when stream is not process.stdout')
   if (iopts.prettyPrint) {
     var prettyOpts = Object.assign({ messageKey: iopts.messageKey }, iopts.prettyPrint)
-    var pstream = pretty(prettyOpts)
-    pump(pstream, process.stdout, function (err) {
-      if (err) instance.emit('error', err)
-    })
+    var pstream = getPrettyStream(prettyOpts, iopts.prettifier)
     istream = pstream
   }
 
@@ -400,7 +407,6 @@ Object.defineProperty(module.exports.stdSerializers, 'wrapRespnonseSerializer', 
 })
 
 module.exports.stdTimeFunctions = Object.assign({}, time)
-module.exports.pretty = pretty
 Object.defineProperty(
   module.exports,
   'LOG_VERSION',
