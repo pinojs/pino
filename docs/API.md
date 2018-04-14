@@ -611,8 +611,9 @@ is set to `false`.
 <a id=".destination"></a>
 # .destination(dest?)
 
-Create a pino destination. It yields a 30% over using a standard Node.js
-stream.
+Create a pino destination.
+It returns a stream-like object with significantly more throughput than a
+standard Node.js stream.
 
 ```js
 const pino = require('pino')
@@ -620,18 +621,18 @@ const logger = pino(pino.destination('./my-file'))
 const logger2 = pino(pino.destination())
 ```
 
-`dest` could be both a file or a file descriptor. If it is omitted, it
+`dest` could be either a file or a file descriptor. If it is omitted, it
 will be `process.stdout.fd`.
 
 The default `stream` is a destination.
 
 It is based on [`sonic-boom`](https://github.com/mcollina/sonic-boom).
 
-<a id=".extremie"></a>
+<a id=".extreme"></a>
 # .extreme(dest?)
 
 Create an extreme mode destination. It yields an additional 60% performance.
-There are trade-off's should be understood before usage.
+There are trade-offs that should be understood before usage.
 See [Extreme mode explained](extreme.md).
 
 ```js
@@ -640,7 +641,7 @@ const logger = pino(pino.extreme('./my-file'))
 const logger2 = pino(pino.extreme())
 ```
 
-`dest` could be both a file or a file descriptor. If it is omitted, it
+`dest` can be either a file or a file descriptor. If it is omitted, it
 will be `process.stdout.fd`.
 
 It is based on [`sonic-boom`](https://github.com/mcollina/sonic-boom).
