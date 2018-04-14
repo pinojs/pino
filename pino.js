@@ -281,9 +281,8 @@ function pino (opts, stream) {
   }
   iopts = Object.assign({}, defaultOptions, iopts)
   if (iopts.extreme) {
-    throw new Error('the extreme option is deprecated, use require(\'pino\').extreme(dest) instead')
+    throw new Error('The extreme option is removed, use require(\'pino\').extreme(dest) instead')
   }
-  if (stream instanceof SonicBoom && iopts.prettyPrint) throw Error('cannot enable pretty print in extreme mode')
   istream = istream || process.stdout
   var isStdout = istream === process.stdout
   if (!isStdout && iopts.prettyPrint) throw Error('cannot enable pretty print when stream is not process.stdout')

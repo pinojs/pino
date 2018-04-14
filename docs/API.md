@@ -29,6 +29,8 @@
     + [.epochTime](#epochTimeFunction)
     + [.unixTime](#unixTimeFunction)
     + [.nullTime](#nullTimeFunction)
+* [.destination](#destination)
+* [.extreme](#extreme)
 + [Metadata Support](#metadata)
 
 # module.exports
@@ -54,9 +56,6 @@
     See [stdTimeFunctions](#stdTimeFunctions) for a set of available functions
     for passing in as a value for this option. Caution: any sort of formatted
     time will significantly slow down Pino's performance.
-  * `extreme` (boolean): Enables extreme mode, yields an additional 60% performance
-    (from 250ms down to 100ms per 10000 ops). There are trade-off's should be
-    understood before usage. See [Extreme mode explained](extreme.md). Default: `false`.
   * `level` (string): one of `'fatal'`, `'error'`, `'warn'`, `'info`', `'debug'`,
     `'trace'`; also `'silent'` is supported to disable logging. Any other value
     defines a custom level and requires supplying a level value via `levelVal`.
@@ -608,6 +607,43 @@ Returns a unix time in seconds, like `,"time":1493426328`.
 
 Returns an empty string. This function is used when the `timestamp` option
 is set to `false`.
+
+<a id=".destination"></a>
+# .destination(dest?)
+
+Create a pino destination. It yields a 30% over using a standard Node.js
+stream.
+
+```js
+const pino = require('pino')
+const logger = pino(pino.destination('./my-file'))
+const logger2 = pino(pino.destination())
+```
+
+`dest` could be both a file or a file descriptor. If it is omitted, it
+will be `process.stdout.fd`.
+
+The default `stream` is a destination.
+
+It is based on [`sonic-boom`](https://github.com/mcollina/sonic-boom).
+
+<a id=".extremie"></a>
+# .extreme(dest?)
+
+Create an extreme mode destination. It yields an additional 60% performance.
+There are trade-off's should be understood before usage.
+See [Extreme mode explained](extreme.md).
+
+```js
+const pino = require('pino')
+const logger = pino(pino.extreme('./my-file'))
+const logger2 = pino(pino.extreme())
+```
+
+`dest` could be both a file or a file descriptor. If it is omitted, it
+will be `process.stdout.fd`.
+
+It is based on [`sonic-boom`](https://github.com/mcollina/sonic-boom).
 
 <a id="metadata"></a>
 # Metadata
