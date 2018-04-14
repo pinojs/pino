@@ -108,3 +108,26 @@ test('lets app terminate when SIGHUP received with multiple handlers', function 
 
   setTimeout(function () { child.kill('SIGHUP') }, 1000)
 })
+
+test('destination', function (t) {
+  t.plan(2)
+  var output = ''
+  var child = spawn(process.argv[0], [path.join(fixturesPath, 'destination.js')], {silent: true})
+
+  child.stdout.pipe(writeStream(function (s, enc, cb) {
+    output += s
+    cb()
+  }))
+
+  child.stderr.pipe(process.stdout)
+
+  child.on('exit', function (code) {
+    t.is(code, 0)
+  })
+
+  child.on('close', function () {
+    t.notEqual(output.match(/"msg":"h"/), null)
+  })
+
+  setTimeout(function () { child.kill('SIGHUP') }, 1000)
+})

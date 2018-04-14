@@ -363,6 +363,13 @@ tools.defineLevelsProperty(pino)
 
 function extreme (dest) {
   if (!dest) {
+    return new SonicBoom(process.stdout.fd, 4096)
+  }
+  return new SonicBoom(dest, 4096)
+}
+
+function destination (dest) {
+  if (!dest) {
     return new SonicBoom(process.stdout.fd)
   }
   return new SonicBoom(dest)
@@ -388,6 +395,7 @@ Object.defineProperty(module.exports.stdSerializers, 'wrapRespnonseSerializer', 
 })
 
 module.exports.extreme = extreme
+module.exports.destination = destination
 
 module.exports.stdTimeFunctions = Object.assign({}, time)
 Object.defineProperty(
