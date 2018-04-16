@@ -628,7 +628,7 @@ The default `stream` is a destination.
 
 It is based on [`sonic-boom`](https://github.com/mcollina/sonic-boom).
 
-<a id=".extreme"></a>
+<a id="extreme"></a>
 # .extreme(dest?)
 
 Create an extreme mode destination. It yields an additional 60% performance.
