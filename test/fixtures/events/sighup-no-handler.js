@@ -17,6 +17,6 @@ var log = pino(pino.extreme())
 log.info('h')
 
 function foo () {
-  setTimeout(foo, 50)
+  setTimeout(foo, 500)
 }
 foo()
