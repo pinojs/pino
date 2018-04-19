@@ -84,7 +84,7 @@ test('terminates on SIGHUP when no other handlers registered', function (t) {
     t.notEqual(output.match(/"msg":"h"/), null)
   })
 
-  setTimeout(function () { child.kill('SIGHUP') }, 1000)
+  setTimeout(function () { child.kill('SIGHUP') }, 2000)
 })
 
 test('lets app terminate when SIGHUP received with multiple handlers', function (t) {
@@ -106,7 +106,7 @@ test('lets app terminate when SIGHUP received with multiple handlers', function 
     t.notEqual(output.match(/app sighup/), null)
   })
 
-  setTimeout(function () { child.kill('SIGHUP') }, 1000)
+  setTimeout(function () { child.kill('SIGHUP') }, 2000)
 })
 
 test('destination', function (t) {
@@ -129,5 +129,5 @@ test('destination', function (t) {
     t.notEqual(output.match(/"msg":"h"/), null)
   })
 
-  setTimeout(function () { child.kill('SIGHUP') }, 1000)
+  setTimeout(function () { child.kill('SIGHUP') }, 2000)
 })
