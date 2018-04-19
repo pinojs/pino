@@ -11,6 +11,6 @@ process.on('SIGHUP', function () {
 })
 
 function foo () {
-  setTimeout(foo, 50)
+  setTimeout(foo, 500)
 }
 foo()
