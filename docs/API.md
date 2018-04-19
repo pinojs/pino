@@ -626,12 +626,12 @@ will be `process.stdout.fd`.
 
 The default `stream` is a destination.
 
-It is based on [`sonic-boom`](https://github.com/mcollina/sonic-boom).
+`pino.destination()` is implemented on [`sonic-boom`](https://github.com/mcollina/sonic-boom).
 
 <a id="extreme"></a>
 # .extreme(dest?)
 
-Create an extreme mode destination. It yields an additional 60% performance.
+Create an extreme mode destination. This yields an additional 60% performance boost.
 There are trade-offs that should be understood before usage.
 See [Extreme mode explained](extreme.md).
 
@@ -644,7 +644,7 @@ const logger2 = pino(pino.extreme())
 `dest` can be either a file or a file descriptor. If it is omitted, it
 will be `process.stdout.fd`.
 
-It is based on [`sonic-boom`](https://github.com/mcollina/sonic-boom).
+`pino.extreme()` is implemented on [`sonic-boom`](https://github.com/mcollina/sonic-boom).
 
 <a id="metadata"></a>
 # Metadata
