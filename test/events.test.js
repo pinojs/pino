@@ -22,28 +22,6 @@ test('no event loop logs successfully', function (t) {
   })
 })
 
-test('handles no file descriptor in extreme mode', function (t) {
-  t.plan(2)
-  var output = ''
-  var errorOutput = ''
-  var child = fork(path.join(fixturesPath, 'no-fd.js'), {silent: true})
-
-  child.stdout.pipe(writeStream(function (s, enc, cb) {
-    output += s
-    cb()
-  }))
-
-  child.stderr.pipe(writeStream(function (s, enc, cb) {
-    errorOutput += s
-    cb()
-  }))
-
-  child.on('close', function () {
-    t.is(output, '')
-    t.notEqual(errorOutput.match(/stream must have/g), null)
-  })
-})
-
 test('terminates when uncaughtException is fired with onTerminate registered', function (t) {
   t.plan(3)
   var output = ''
@@ -106,7 +84,7 @@ test('terminates on SIGHUP when no other handlers registered', function (t) {
     t.notEqual(output.match(/"msg":"h"/), null)
   })
 
-  setTimeout(function () { child.kill('SIGHUP') }, 1000)
+  setTimeout(function () { child.kill('SIGHUP') }, 2000)
 })
 
 test('lets app terminate when SIGHUP received with multiple handlers', function (t) {
@@ -128,5 +106,28 @@ test('lets app terminate when SIGHUP received with multiple handlers', function 
     t.notEqual(output.match(/app sighup/), null)
   })
 
-  setTimeout(function () { child.kill('SIGHUP') }, 1000)
+  setTimeout(function () { child.kill('SIGHUP') }, 2000)
+})
+
+test('destination', function (t) {
+  t.plan(2)
+  var output = ''
+  var child = spawn(process.argv[0], [path.join(fixturesPath, 'destination.js')], {silent: true})
+
+  child.stdout.pipe(writeStream(function (s, enc, cb) {
+    output += s
+    cb()
+  }))
+
+  child.stderr.pipe(process.stdout)
+
+  child.on('exit', function (code) {
+    t.is(code, 0)
+  })
+
+  child.on('close', function () {
+    t.notEqual(output.match(/"msg":"h"/), null)
+  })
+
+  setTimeout(function () { child.kill('SIGHUP') }, 2000)
 })

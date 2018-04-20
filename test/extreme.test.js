@@ -37,7 +37,7 @@ test('extreme mode', function (t) {
 
   var dest = fs.createWriteStream('/dev/null')
   dest.write = function (s) { actual += s }
-  var extreme = pino({extreme: true}, dest)
+  var extreme = pino(dest)
 
   var i = 44
   while (i--) {
@@ -93,7 +93,7 @@ test('extreme mode with child', function (t) {
 
   var dest = fs.createWriteStream('/dev/null')
   dest.write = function (s) { actual += s }
-  var extreme = pino({extreme: true}, dest).child({ hello: 'world' })
+  var extreme = pino(dest).child({ hello: 'world' })
 
   var i = 500
   while (i--) {
@@ -126,19 +126,15 @@ test('extreme mode with child', function (t) {
   })
 })
 
-test('emits error for invalid stream', function (t) {
-  delete require.cache[require.resolve('../')]
-  var pino = require('../')
-  var outputStream = writeStream(function (s, enc, cb) {})
-  var logger = pino({extreme: true}, outputStream)
-  logger.on('error', function (err) {
-    t.is(err instanceof Error, true)
-    t.is(err.message, 'stream must have a file descriptor in extreme mode')
-    t.end()
+test('throw an error if extreme is passed', function (t) {
+  var pino = require('..')
+  t.throws(() => {
+    pino({extreme: true})
   })
+  t.end()
 })
 
-test('flush does nothing without stream mode', function (t) {
+test('flush does nothing without extreme mode', function (t) {
   var instance = require('..')()
   instance.flush()
   t.end()

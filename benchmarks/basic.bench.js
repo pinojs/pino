@@ -10,7 +10,9 @@ var dest = fs.createWriteStream('/dev/null')
 var loglevel = require('./loglevelMock')(dest)
 var plog = pino(dest)
 delete require.cache[require.resolve('../')]
-var plogExtreme = require('../')({extreme: true}, dest)
+var plogExtreme = require('../')(pino.extreme('/dev/null'))
+delete require.cache[require.resolve('../')]
+var plogDest = require('../')(pino.destination('/dev/null'))
 
 process.env.DEBUG = 'dlog'
 var debug = require('debug')
@@ -73,6 +75,12 @@ var run = bench([
   function benchPino (cb) {
     for (var i = 0; i < max; i++) {
       plog.info('hello world')
+    }
+    setImmediate(cb)
+  },
+  function benchPinoDestination (cb) {
+    for (var i = 0; i < max; i++) {
+      plogDest.info('hello world')
     }
     setImmediate(cb)
   },

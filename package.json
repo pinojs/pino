@@ -17,8 +17,8 @@
   ],
   "scripts": {
     "browser-test": "zuul tape test/browser*test.js --local",
-    "test": "standard | snazzy && NODE_OPTIONS='--no-warnings' tap --no-cov test/*test.js",
-    "ci": "standard | snazzy &&  NODE_OPTIONS='--no-warnings' tap --cov test/*test.js",
+    "test": "standard | snazzy && NODE_OPTIONS='--no-warnings' tap -j 4 --no-cov test/*test.js",
+    "ci": "standard | snazzy &&  NODE_OPTIONS='--no-warnings' tap -j 4 --cov test/*test.js",
     "bench-all": "node benchmarks/runbench all",
     "bench-basic": "node benchmarks/runbench basic",
     "bench-object": "node benchmarks/runbench object",
@@ -83,6 +83,7 @@
     "flatstr": "^1.0.5",
     "pino-std-serializers": "^2.0.0",
     "pump": "^3.0.0",
-    "quick-format-unescaped": "^1.1.2"
+    "quick-format-unescaped": "^1.1.2",
+    "sonic-boom": "^0.3.0"
   }
 }

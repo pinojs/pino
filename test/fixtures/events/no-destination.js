@@ -12,8 +12,7 @@ if (process.listenerCount('SIGHUP') > 0) {
 
 var pino = require(require.resolve('./../../../'))
 
-// extreme mode
-var log = pino(pino.extreme())
+var log = pino()
 log.info('h')
 
 function foo () {
