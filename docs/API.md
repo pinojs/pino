@@ -81,7 +81,7 @@
     it is up to you to terminate the process; you **must** perform only synchronous operations at this point.
     See [Extreme mode explained](extreme.md) for more detail.
   * `enabled` (boolean): enables logging. Default: `true`
-  * `browser` (Object): browser only, may have `asObject` and `write` keys, see [Pino in the Browser](../readme.md#browser)
+  * `browser` (Object): browser only, may have `asObject` and `write` keys, see [Pino in the Browser](https://github.com/pinojs/pino#browser)
   * `base` (Object): key-value object added as child logger to each log line. If set to `null` the `base` child logger is not added . Default:
     * `pid` (process.pid)
     * `hostname` (os.hostname)
