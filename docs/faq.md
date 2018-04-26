@@ -50,6 +50,7 @@ ExecStart=/bin/sh -c '/path/to/node your_app.js | pino-transport'
 ```
 
 <a id="dupe-props"></a>
+## How do I stop `name` from being overwritten?
 See the documentation on [duplicate keys](https://github.com/pinojs/pino#duplicate-keys).
 
 <a id="level-string"></a>
