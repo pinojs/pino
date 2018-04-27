@@ -9,6 +9,7 @@
 * [Benchmarks](#benchmarks)
 * [API ⇗](docs/API.md)
 * [FAQ ⇗](docs/faq.md)
+* [Ecosystem ⇗](docs/ecosystem.md)
 * [Pretty Printing ⇗](docs/pretty.md)
 * [Extreme mode explained ⇗](docs/extreme.md)
 * [Pino Howtos ⇗](docs/howtos.md)
