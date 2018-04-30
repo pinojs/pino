@@ -260,13 +260,13 @@ Object.defineProperty(pinoPrototype, 'isLevelEnabled', {
   value: isLevelEnabled
 })
 
-function getPrettyStream (opts, prettifier) {
+function getPrettyStream (opts, prettifier, dest) {
   if (prettifier && typeof prettifier === 'function') {
-    return tools.asMetaWrapper(prettifier(opts), process.stdout)
+    return tools.asMetaWrapper(prettifier(opts), dest)
   }
   try {
     var prettyFactory = require('pino-pretty')
-    return tools.asMetaWrapper(prettyFactory(opts), process.stdout)
+    return tools.asMetaWrapper(prettyFactory(opts), dest)
   } catch (e) {
     throw Error('Missing `pino-pretty` module: `pino-pretty` must be installed separately')
   }
@@ -285,13 +285,12 @@ function pino (opts, stream) {
   }
   istream = istream || process.stdout
   var isStdout = istream === process.stdout
-  if (!isStdout && iopts.prettyPrint) throw Error('cannot enable pretty print when stream is not process.stdout')
   if (isStdout && istream.fd >= 0) {
     istream = new SonicBoom(istream.fd)
   }
   if (iopts.prettyPrint) {
     var prettyOpts = Object.assign({ messageKey: iopts.messageKey }, iopts.prettyPrint)
-    var pstream = getPrettyStream(prettyOpts, iopts.prettifier)
+    var pstream = getPrettyStream(prettyOpts, iopts.prettifier, istream)
     istream = pstream
   }
 

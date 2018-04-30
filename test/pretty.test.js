@@ -1,5 +1,6 @@
 'use strict'
 
+var Writable = require('stream').Writable
 var test = require('tap').test
 var pino = require('../')
 var path = require('path')
@@ -51,16 +52,27 @@ test('can be enabled via constructor with prettifier', function (t) {
   })
 })
 
-test('throws error when enabled with stream specified', function (t) {
-  t.plan(1)
-  var logStream = writeStream(function (s, enc, cb) {
-    cb()
-  })
-
-  t.throws(() => pino({prettyPrint: true}, logStream), {})
-})
-
 test('does not throw error when enabled with stream specified', function (t) {
   pino({prettyPrint: true}, process.stdout)
   t.end()
+})
+
+test('can send pretty print to custom stream', (t) => {
+  t.plan(1)
+
+  var dest = new Writable({
+    objectMode: true,
+    write (formatted, enc, cb) {
+      t.match(formatted, /^INFO.*foo\n$/)
+      cb()
+    }
+  })
+
+  var log = pino({
+    prettifier: require('pino-pretty'),
+    prettyPrint: {
+      levelFirst: true
+    }
+  }, dest)
+  log.info('foo')
 })
