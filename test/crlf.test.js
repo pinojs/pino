@@ -55,3 +55,15 @@ test('pretty can log CRLF', function (t) {
   t.is(stream.data, 'foo\r\nbar\r\n')
   t.end()
 })
+
+test('line endings can be toggled off', function (t) {
+  t.plan(1)
+  var stream = capture()
+  var logger = pino({
+    appendLineEndings: false
+  }, stream)
+  logger.info('foo')
+  logger.error('bar')
+  t.ok(/foo[^\n]+bar[^\n]/.test(stream.data))
+  t.end()
+})
