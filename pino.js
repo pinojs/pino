@@ -39,6 +39,7 @@ var defaultOptions = {
     hostname: os.hostname()
   },
   enabled: true,
+  appendLineEndings: true,
   messageKey: 'msg'
 }
 
@@ -299,7 +300,7 @@ function pino (opts, stream) {
   iopts.stringify = iopts.safe ? stringifySafe : JSON.stringify
   iopts.formatOpts = {lowres: true}
   iopts.messageKeyString = `,"${iopts.messageKey}":`
-  iopts.end = ',"v":' + LOG_VERSION + '}' + (iopts.crlf ? '\r\n' : '\n')
+  iopts.end = ',"v":' + LOG_VERSION + '}' + (iopts.appendLineEndings !== false ? (iopts.crlf ? '\r\n' : '\n') : '')
   iopts.cache = !iopts.extreme ? null : {
     size: 4096,
     buf: ''
