@@ -57,7 +57,7 @@ test('does not throw error when enabled with stream specified', function (t) {
   t.end()
 })
 
-test('can send pretty print to custom stream', (t) => {
+test('can send pretty print to custom stream', function (t) {
   t.plan(1)
 
   var dest = new Writable({
@@ -75,4 +75,19 @@ test('can send pretty print to custom stream', (t) => {
     }
   }, dest)
   log.info('foo')
+})
+
+test('ignores `undefined` from prettifier', function (t) {
+  t.plan(1)
+  var actual = ''
+  var child = fork(path.join(__dirname, 'fixtures', 'pretty', 'skippedOutput.js'), {silent: true})
+
+  child.stdout.pipe(writeStream(function (s, enc, cb) {
+    actual += s
+    cb()
+  }))
+
+  child.on('close', function () {
+    t.is(actual, '')
+  })
 })
