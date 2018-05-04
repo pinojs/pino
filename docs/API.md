@@ -658,7 +658,7 @@ highly recommended that you avoid this function. It incurs a significant
 performance penalty.
 
 <a id="nullTimeFunction"></a>
-### .nulltime
+### .nullTime
 
 Returns an empty string. This function is used when the `timestamp` option
 is set to `false`.
