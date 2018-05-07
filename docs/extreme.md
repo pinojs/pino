@@ -39,3 +39,31 @@ This has a couple of important caveats:
 
 So in summary, only use extreme mode if you're doing an extreme amount of
 logging, and you're happy in some scenarios to lose the most recent logs.
+
+## Usage
+
+Extreme mode is defined by creating an extreme mode destination with
+`pino.extreme()`.
+
+The following creates an extreme destination to stdout:
+
+```js
+'use strict'
+
+const pino = require('pino')
+const dest = pino.extreme() // no arguments
+const logger = pino(dest)
+
+setInterval(function () {
+  // flush is asynchronous
+  dest.flush()
+}, 10000).unref()
+```
+
+An extreme destination is an instance of
+[`SonicBoom`](https://github.com/mcollina/sonic-boom) with `4096`
+buffering.
+
+In case a synchronous flush is needed, `dest.flushSync()` can be called.
+This method might cause some data loss if a write was already in
+progress, so use it only if truly needed.
