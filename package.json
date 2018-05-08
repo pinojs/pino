@@ -84,6 +84,6 @@
     "pino-std-serializers": "^2.0.0",
     "pump": "^3.0.0",
     "quick-format-unescaped": "^1.1.2",
-    "sonic-boom": "^0.4.1"
+    "sonic-boom": "^0.5.0"
   }
 }
