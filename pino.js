@@ -22,7 +22,7 @@ var defaultOptions = {
   safe: true,
   name: undefined,
   serializers: {},
-  timestamp: time.utcTime,
+  timestamp: time.defaultTime,
   level: 'info',
   levelVal: undefined,
   prettyPrint: false,

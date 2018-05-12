@@ -13,21 +13,28 @@ if (process.version.indexOf('v0.10') >= 0) {
 }
 
 test('extreme mode', function (t) {
-  var now = Date.now
   var hostname = os.hostname
   var proc = process
   global.process = {
     __proto__: process,
     pid: 123456
   }
-  Date.now = function () {
-    return 1459875739796
+  global.Date = class extends Date {
+    constructor (...args) {
+      args[0] = 1459875739000
+      super(...args)
+    }
+    now () {
+      return 1459875739000
+    }
   }
+
   os.hostname = function () {
     return 'abcdefghijklmnopqr'
   }
   delete require.cache[require.resolve('../')]
   var pino = require('../')
+  pino.stdTimeFunctions.defaultTime()
   var expected = ''
   var actual = ''
   var normal = pino(writeStream(function (s, enc, cb) {
@@ -60,7 +67,7 @@ test('extreme mode', function (t) {
 
     t.teardown(function () {
       os.hostname = hostname
-      Date.now = now
+      global.Date = Object.getPrototypeOf(global.Date)
       global.process = proc
     })
 
@@ -69,16 +76,22 @@ test('extreme mode', function (t) {
 })
 
 test('extreme mode with child', function (t) {
-  var now = Date.now
   var hostname = os.hostname
   var proc = process
   global.process = {
     __proto__: process,
     pid: 123456
   }
-  Date.now = function () {
-    return 1459875739796
+  global.Date = class extends Date {
+    constructor (...args) {
+      args[0] = 1459875739000
+      super(...args)
+    }
+    now () {
+      return 1459875739000
+    }
   }
+
   os.hostname = function () {
     return 'abcdefghijklmnopqr'
   }
@@ -118,7 +131,7 @@ test('extreme mode with child', function (t) {
 
     t.teardown(function () {
       os.hostname = hostname
-      Date.now = now
+      global.Date = Object.getPrototypeOf(global.Date)
       global.process = proc
     })
 
