@@ -5,11 +5,12 @@ var pino = require('../')
 var sink = require('./helper').sink
 
 test('pino exposes standard time functions', function (t) {
-  t.plan(4)
+  t.plan(5)
   t.ok(pino.stdTimeFunctions)
   t.ok(pino.stdTimeFunctions.epochTime)
   t.ok(pino.stdTimeFunctions.unixTime)
   t.ok(pino.stdTimeFunctions.nullTime)
+  t.ok(pino.stdTimeFunctions.utcTime)
 })
 
 test('pino accepts external time functions', function (t) {

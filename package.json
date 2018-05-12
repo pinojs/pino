@@ -78,6 +78,7 @@
     "zuul": "^3.11.1"
   },
   "dependencies": {
+    "fast-date": "^1.0.3",
     "fast-json-parse": "^1.0.3",
     "fast-safe-stringify": "^2.0.4",
     "flatstr": "^1.0.5",
