@@ -4,7 +4,7 @@ global.Date = class extends Date {
     args[0] = 1459875739000
     super(...args)
   }
-  now () {
+  static now () {
     return 1459875739000
   }
 }

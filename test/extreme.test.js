@@ -24,7 +24,7 @@ test('extreme mode', function (t) {
       args[0] = 1459875739000
       super(...args)
     }
-    now () {
+    static now () {
       return 1459875739000
     }
   }
@@ -87,7 +87,7 @@ test('extreme mode with child', function (t) {
       args[0] = 1459875739000
       super(...args)
     }
-    now () {
+    static now () {
       return 1459875739000
     }
   }
