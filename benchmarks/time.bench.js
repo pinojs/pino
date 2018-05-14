@@ -3,6 +3,7 @@
 var bench = require('fastbench')
 var pino = require('../')
 
+var iso = pino({timestamp: pino.stdTimeFunctions.isoTime}, pino.destination('/dev/null'))
 var epoch = pino({timestamp: pino.stdTimeFunctions.epochTime}, pino.destination('/dev/null'))
 var unix = pino({timestamp: pino.stdTimeFunctions.unixTime}, pino.destination('/dev/null'))
 var utc = pino({timestamp: pino.stdTimeFunctions.utcTime}, pino.destination('/dev/null'))
@@ -10,6 +11,12 @@ var utc = pino({timestamp: pino.stdTimeFunctions.utcTime}, pino.destination('/de
 var max = 100
 
 var run = bench([
+  function benchPinoIsoTime (cb) {
+    for (var i = 0; i < max; i++) {
+      iso.info('hello world')
+    }
+    setImmediate(cb)
+  },
   function benchPinoEpochTime (cb) {
     for (var i = 0; i < max; i++) {
       epoch.info('hello world')
