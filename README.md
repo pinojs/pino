@@ -1,6 +1,6 @@
 ![banner](pino-banner.png)
 
-# pino&nbsp;&nbsp;[![Build Status](https://travis-ci.org/pinojs/pino.svg?branch=master)](https://travis-ci.org/pinojs/pino)&nbsp;[![Coverage Status](https://coveralls.io/repos/github/pinojs/pino/badge.svg?branch=master)](https://coveralls.io/github/pinojs/pino?branch=master) [![TypeScript definitions on DefinitelyTyped](http://definitelytyped.org/badges/standard.svg)](http://definitelytyped.org)
+# pino&nbsp;&nbsp;[![Build Status](https://travis-ci.org/pinojs/pino.svg?branch=master)](https://travis-ci.org/pinojs/pino)&nbsp;[![Coverage Status](https://coveralls.io/repos/github/pinojs/pino/badge.svg?branch=master)](https://coveralls.io/github/pinojs/pino?branch=master) [![Install Size](https://packagephobia.now.sh/badge?p=pino)](https://packagephobia.now.sh/result?p=pino) [![TypeScript definitions on DefinitelyTyped](http://definitelytyped.org/badges/standard.svg)](http://definitelytyped.org)
 
 [Extremely fast](#benchmarks) node.js logger, inspired by Bunyan.
 It also includes a shell utility to pretty-print its log files.
