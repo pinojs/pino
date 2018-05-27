@@ -41,25 +41,25 @@ function pino (opts) {
   }
   if (opts.enabled === false) opts.level = 'silent'
   var level = opts.level || 'info'
-  var val = pino.levels.values[level]
-  if (level === 'silent') val = Infinity
   var logger = Object.create(proto)
   if (!logger.log) logger.log = noop
+
+  Object.defineProperty(logger, 'levelVal', {
+    get: getLevelVal
+  })
+  Object.defineProperty(logger, 'level', {
+    get: getLevel,
+    set: setLevel
+  })
 
   var setOpts = {
     transmit: transmit,
     serialize: serialize,
     asObject: opts.browser.asObject,
-    levels: levels,
-    level: level
+    levels: levels
   }
-
-  set(setOpts, logger, val, 'error', 'log') // <-- must stay first
-  set(setOpts, logger, val, 'fatal', 'error')
-  set(setOpts, logger, val, 'warn', 'error')
-  set(setOpts, logger, val, 'info', 'log')
-  set(setOpts, logger, val, 'debug', 'log')
-  set(setOpts, logger, val, 'trace', 'log')
+  logger.levels = pino.levels
+  logger.level = level
 
   logger.setMaxListeners = logger.getMaxListeners =
   logger.emit = logger.addListener = logger.on =
@@ -74,6 +74,29 @@ function pino (opts) {
   logger.child = child
 
   if (transmit) logger._logEvent = createLogEventShape()
+
+  function getLevelVal () {
+    return this.level === 'silent'
+      ? Infinity
+      : this.levels.values[this.level]
+  }
+
+  function getLevel () {
+    return this._level
+  }
+  function setLevel (level) {
+    if (level !== 'silent' && !this.levels.values[level]) {
+      throw Error('unknown level ' + level)
+    }
+    this._level = level
+
+    set(setOpts, logger, 'error', 'log') // <-- must stay first
+    set(setOpts, logger, 'fatal', 'error')
+    set(setOpts, logger, 'warn', 'error')
+    set(setOpts, logger, 'info', 'log')
+    set(setOpts, logger, 'debug', 'log')
+    set(setOpts, logger, 'trace', 'log')
+  }
 
   function child (bindings) {
     if (!bindings) {
@@ -105,7 +128,6 @@ function pino (opts) {
     Child.prototype = this
     return new Child(this)
   }
-  logger.levels = pino.levels
   return logger
 }
 
@@ -132,11 +154,12 @@ pino.levels = {
 
 pino.stdSerializers = stdSerializers
 
-function set (opts, logger, val, level, fallback) {
+function set (opts, logger, level, fallback) {
+  var val = logger.levelVal
   logger[level] = val > pino.levels.values[level] ? noop
     : (logger[level] ? logger[level] : (_console[level] || _console[fallback] || noop))
 
-  wrap(opts, logger, val, level)
+  wrap(opts, logger, logger.val, level)
 }
 
 function wrap (opts, logger, val, level) {
@@ -156,7 +179,7 @@ function wrap (opts, logger, val, level) {
       else write.apply(proto, args)
 
       if (opts.transmit) {
-        var transmitLevel = opts.transmit.level || opts.level
+        var transmitLevel = opts.transmit.level || logger.level
         var transmitValue = pino.levels.values[transmitLevel]
         var methodValue = pino.levels.values[level]
         if (methodValue < transmitValue) return
@@ -165,7 +188,7 @@ function wrap (opts, logger, val, level) {
           methodLevel: level,
           methodValue: methodValue,
           transmitLevel: transmitLevel,
-          transmitValue: pino.levels.values[opts.transmit.level || opts.level],
+          transmitValue: pino.levels.values[opts.transmit.level || logger.level],
           send: opts.transmit.send,
           val: val
         }, args)
