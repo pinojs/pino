@@ -18,7 +18,7 @@ test('no event loop logs successfully', function (t) {
   }))
 
   child.on('close', function () {
-    t.notEqual(output.match(/"msg":"h"/), null)
+    t.match(output, /"msg":"h"/)
   })
 })
 
@@ -39,9 +39,9 @@ test('terminates when uncaughtException is fired with onTerminate registered', f
   }))
 
   child.on('close', function () {
-    t.notEqual(output.match(/"msg":"h"/), null)
-    t.notEqual(output.match(/terminated/g), null)
-    t.notEqual(errorOutput.match(/this is not caught/g), null)
+    t.match(output, /"msg":"h"/)
+    t.match(output, /terminated/g)
+    t.match(errorOutput, /this is not caught/g)
   })
 })
 
@@ -60,7 +60,7 @@ test('terminates when uncaughtException is fired without onTerminate registered'
   })
 
   child.on('close', function () {
-    t.notEqual(output.match(/"msg":"h"/), null)
+    t.match(output, /"msg":"h"/)
   })
 })
 
@@ -81,7 +81,7 @@ test('terminates on SIGHUP when no other handlers registered', function (t) {
   })
 
   child.on('close', function () {
-    t.notEqual(output.match(/"msg":"h"/), null)
+    t.match(output, /"msg":"h"/)
   })
 
   setTimeout(function () { child.kill('SIGHUP') }, 2000)
@@ -102,8 +102,8 @@ test('lets app terminate when SIGHUP received with multiple handlers', function 
   })
 
   child.on('close', function () {
-    t.notEqual(output.match(/"msg":"h"/), null)
-    t.notEqual(output.match(/app sighup/), null)
+    t.match(output, /"msg":"h"/)
+    t.match(output, /app sighup/)
   })
 
   setTimeout(function () { child.kill('SIGHUP') }, 2000)
@@ -126,8 +126,6 @@ test('destination', function (t) {
   })
 
   child.on('close', function () {
-    t.notEqual(output.match(/"msg":"h"/), null)
+    t.notEqual(null, output.match(/"msg":"h"/))
   })
-
-  setTimeout(function () { child.kill('SIGHUP') }, 2000)
 })
