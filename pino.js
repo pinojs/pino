@@ -193,7 +193,8 @@ function child (bindings) {
     chindings: asChindings(this, bindings),
     level: bindings.level || this.level,
     levelVal: isStandardLevelVal(this.levelVal) ? undefined : this.levelVal,
-    serializers: bindings.hasOwnProperty('serializers') ? Object.assign({}, this.serializers, bindings.serializers) : this.serializers
+    serializers: bindings.hasOwnProperty('serializers') ? Object.assign({}, this.serializers, bindings.serializers) : this.serializers,
+    stringifiers: this.stringifiers
   }
 
   var _child = Object.create(this)
@@ -304,7 +305,9 @@ function pino (opts, stream) {
     censor: iopts.censor,
     serialize: iopts.stringify
   }) : {}
-  iopts.formatOpts = {lowres: true}
+  iopts.formatOpts = (iopts.redact.length > 0)
+    ? {stringify: iopts.stringifiers[redact.format]}
+    : {stringify: iopts.stringify}
   iopts.messageKeyString = `,"${iopts.messageKey}":`
   iopts.end = ',"v":' + LOG_VERSION + '}' + (iopts.crlf ? '\r\n' : '\n')
   iopts.chindings = ''
@@ -322,7 +325,7 @@ function pino (opts, stream) {
   instance.end = iopts.end
   instance.name = iopts.name
   instance.timestamp = iopts.timestamp
-  instance.formatiopts = iopts.formatiopts
+  instance.formatOpts = iopts.formatOpts
   instance.onTerminated = iopts.onTerminated
   instance.messageKey = iopts.messageKey
   instance.messageKeyString = iopts.messageKeyString

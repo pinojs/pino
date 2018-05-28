@@ -79,12 +79,12 @@
   },
   "dependencies": {
     "fast-json-parse": "^1.0.3",
-    "fast-redact": "^1.0.1",
+    "fast-redact": "^1.1.2",
     "fast-safe-stringify": "^2.0.4",
     "flatstr": "^1.0.5",
     "pino-std-serializers": "^2.0.0",
     "pump": "^3.0.0",
-    "quick-format-unescaped": "^1.1.2",
+    "quick-format-unescaped": "^2.0.1",
     "sonic-boom": "^0.5.0"
   }
 }
