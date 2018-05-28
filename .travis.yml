@@ -6,6 +6,7 @@ node_js:
 - '7'
 - '8'
 - '9'
+- '10'
 script:
 - npm run ci
 env:

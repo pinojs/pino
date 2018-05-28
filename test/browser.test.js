@@ -143,13 +143,13 @@ if (process.title !== 'browser') {
     delete global.console
     var instance = fresh('../browser', require)()
     global.console = console
-    t.is(fnName(instance.log), 'noop')
-    t.is(fnName(instance.fatal), 'noop')
-    t.is(fnName(instance.error), 'noop')
-    t.is(fnName(instance.warn), 'noop')
-    t.is(fnName(instance.info), 'noop')
-    t.is(fnName(instance.debug), 'noop')
-    t.is(fnName(instance.trace), 'noop')
+    t.ok(fnName(instance.log).match(/noop/))
+    t.ok(fnName(instance.fatal).match(/noop/))
+    t.ok(fnName(instance.error).match(/noop/))
+    t.ok(fnName(instance.warn).match(/noop/))
+    t.ok(fnName(instance.info).match(/noop/))
+    t.ok(fnName(instance.debug).match(/noop/))
+    t.ok(fnName(instance.trace).match(/noop/))
     t.end()
   })
 }
