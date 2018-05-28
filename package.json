@@ -79,6 +79,7 @@
   },
   "dependencies": {
     "fast-json-parse": "^1.0.3",
+    "fast-redact": "^1.0.1",
     "fast-safe-stringify": "^2.0.4",
     "flatstr": "^1.0.5",
     "pino-std-serializers": "^2.0.0",

@@ -9,6 +9,7 @@ var flatstr = require('flatstr')
 var SonicBoom = require('sonic-boom')
 var events = require('./lib/events')
 var levels = require('./lib/levels')
+var redact = require('./lib/redact')
 var tools = require('./lib/tools')
 var time = require('./lib/time')
 var needsMetadata = Symbol.for('needsMetadata')
@@ -22,6 +23,8 @@ var defaultOptions = {
   safe: true,
   name: undefined,
   serializers: {},
+  redact: [],
+  censor: '[Redacted]',
   timestamp: time.epochTime,
   level: 'info',
   levelVal: undefined,
@@ -151,7 +154,7 @@ function asJson (obj, msg, num, time) {
     for (var key in obj) {
       value = obj[key]
       if ((notHasOwnProperty || obj.hasOwnProperty(key)) && value !== undefined) {
-        value = this.stringify(this.serializers[key] ? this.serializers[key](value) : value)
+        value = (this.stringifiers[key] || this.stringify)(this.serializers[key] ? this.serializers[key](value) : value)
         if (value !== undefined) {
           data += ',"' + key + '":' + value
         }
@@ -179,7 +182,7 @@ function asChindings (that, bindings) {
     value = bindings[key]
     if (key !== 'level' && key !== 'serializers' && bindings.hasOwnProperty(key) && value !== undefined) {
       value = that.serializers[key] ? that.serializers[key](value) : value
-      data += ',"' + key + '":' + that.stringify(value)
+      data += ',"' + key + '":' + (that.stringifiers[key] || that.stringify)(value)
     }
   }
   return data
@@ -296,6 +299,11 @@ function pino (opts, stream) {
 
   // internal options
   iopts.stringify = iopts.safe ? stringifySafe : JSON.stringify
+  iopts.stringifiers = (iopts.redact.length > 0) ? redact({
+    paths: iopts.redact,
+    censor: iopts.censor,
+    serialize: iopts.stringify
+  }) : {}
   iopts.formatOpts = {lowres: true}
   iopts.messageKeyString = `,"${iopts.messageKey}":`
   iopts.end = ',"v":' + LOG_VERSION + '}' + (iopts.crlf ? '\r\n' : '\n')
@@ -310,6 +318,7 @@ function pino (opts, stream) {
   tools.defineLevelsProperty(instance)
 
   instance.stringify = iopts.stringify
+  instance.stringifiers = iopts.stringifiers
   instance.end = iopts.end
   instance.name = iopts.name
   instance.timestamp = iopts.timestamp
