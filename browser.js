@@ -155,14 +155,14 @@ pino.levels = {
 pino.stdSerializers = stdSerializers
 
 function set (opts, logger, level, fallback) {
-  var val = logger.levelVal
-  logger[level] = val > pino.levels.values[level] ? noop
-    : (logger[level] ? logger[level] : (_console[level] || _console[fallback] || noop))
+  var proto = Object.getPrototypeOf(logger)
+  logger[level] = logger.levelVal > logger.levels.values[level] ? noop
+    : (proto[level] ? proto[level] : (_console[level] || _console[fallback] || noop))
 
-  wrap(opts, logger, logger.val, level)
+  wrap(opts, logger, level)
 }
 
-function wrap (opts, logger, val, level) {
+function wrap (opts, logger, level) {
   if (!opts.transmit && logger[level] === noop) return
 
   logger[level] = (function (write) {
@@ -190,7 +190,7 @@ function wrap (opts, logger, val, level) {
           transmitLevel: transmitLevel,
           transmitValue: pino.levels.values[opts.transmit.level || logger.level],
           send: opts.transmit.send,
-          val: val
+          val: logger.levelVal
         }, args)
       }
     }

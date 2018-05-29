@@ -29,6 +29,66 @@ test('set the level by string', function (t) {
   t.end()
 })
 
+test('set the level by string. init with silent', function (t) {
+  t.plan(4)
+  var expected = [
+    {
+      level: 50,
+      msg: 'this is an error'
+    },
+    {
+      level: 60,
+      msg: 'this is fatal'
+    }
+  ]
+  var instance = pino({
+    level: 'silent',
+    browser: {
+      write: function (actual) {
+        checkLogObjects(t, actual, expected.shift())
+      }
+    }
+  })
+
+  instance.level = 'error'
+  instance.info('hello world')
+  instance.error('this is an error')
+  instance.fatal('this is fatal')
+  t.end()
+})
+
+test('set the level by string. init with silent and transmit', function (t) {
+  t.plan(4)
+  var expected = [
+    {
+      level: 50,
+      msg: 'this is an error'
+    },
+    {
+      level: 60,
+      msg: 'this is fatal'
+    }
+  ]
+  var instance = pino({
+    level: 'silent',
+    browser: {
+      write: function (actual) {
+        checkLogObjects(t, actual, expected.shift())
+      }
+    },
+    transmit: {
+      send: function () {
+      }
+    }
+  })
+
+  instance.level = 'error'
+  instance.info('hello world')
+  instance.error('this is an error')
+  instance.fatal('this is fatal')
+  t.end()
+})
+
 test('set the level via constructor', function (t) {
   t.plan(4)
   var expected = [
