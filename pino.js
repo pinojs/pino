@@ -23,8 +23,7 @@ var defaultOptions = {
   safe: true,
   name: undefined,
   serializers: {},
-  redact: [],
-  censor: '[Redacted]',
+  redact: null,
   timestamp: time.epochTime,
   level: 'info',
   levelVal: undefined,
@@ -300,12 +299,8 @@ function pino (opts, stream) {
 
   // internal options
   iopts.stringify = iopts.safe ? stringifySafe : JSON.stringify
-  iopts.stringifiers = (iopts.redact.length > 0) ? redact({
-    paths: iopts.redact,
-    censor: iopts.censor,
-    serialize: iopts.stringify
-  }) : {}
-  iopts.formatOpts = (iopts.redact.length > 0)
+  iopts.stringifiers = iopts.redact ? redact(iopts.redact, iopts.stringify) : {}
+  iopts.formatOpts = iopts.redact
     ? {stringify: iopts.stringifiers[redact.format]}
     : {stringify: iopts.stringify}
   iopts.messageKeyString = `,"${iopts.messageKey}":`
