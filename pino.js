@@ -320,7 +320,7 @@ function pino (opts, stream) {
   instance.timestamp = iopts.timestamp
   instance.slowtime = iopts.slowtime
   instance.cache = iopts.cache
-  instance.formatiopts = iopts.formatiopts
+  instance.formatOpts = iopts.formatOpts
   instance.onTerminated = iopts.onTerminated
   instance.messageKey = iopts.messageKey
   instance.messageKeyString = iopts.messageKeyString
