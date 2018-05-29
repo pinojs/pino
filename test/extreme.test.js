@@ -7,6 +7,7 @@ const { test } = require('tap')
 const { fork } = require('child_process')
 const writer = require('flush-write-stream')
 const { once } = require('./helper')
+const pino = require('..')
 
 test('extreme mode', async ({is, teardown}) => {
   const now = Date.now
@@ -119,7 +120,40 @@ test('throw an error if extreme is passed', async ({throws}) => {
   })
 })
 
-test('flush does nothing without extreme mode', async () => {
-  var instance = require('..')()
+test('flush is a no-op with non-extreme destinations', async ({is}) => {
+  const instance = require('..')()
+  is(instance.flush.toString(), 'function noop () {}')
+})
+
+test('logger.flush calls dest.flush on extreme destinations', async ({pass, fail}) => {
+  const dest = pino.extreme()
+  var passed = false
+  setTimeout(() => { if (passed === false) fail() })
+  const flush = dest.flush
+  dest.flush = () => {
+    passed = true
+    dest.flush = flush
+    pass('synchronously flushed')
+  }
+  const instance = require('..')(dest)
   instance.flush()
+})
+
+test('flushSync is a no-op with non-extreme destinations', async ({is}) => {
+  const instance = require('..')()
+  is(instance.flushSync.toString(), 'function noop () {}')
+})
+
+test('logger.flushSync calls dest.flushSync on extreme destinations', async ({pass, fail}) => {
+  const dest = pino.extreme()
+  var passed = false
+  setTimeout(() => { if (passed === false) fail() })
+  const flushSync = dest.flushSync
+  dest.flushSync = () => {
+    passed = true
+    dest.flushSync = flushSync
+    pass('synchronously flushed')
+  }
+  const instance = require('..')(dest)
+  instance.flushSync()
 })
