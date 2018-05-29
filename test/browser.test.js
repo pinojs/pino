@@ -136,20 +136,23 @@ absentConsoleMethodTest('info', 'log')
 absentConsoleMethodTest('debug', 'log')
 absentConsoleMethodTest('trace', 'log')
 
-test('in absence of console, log methods become noops', function (t) {
-  var console = global.console
-  delete global.console
-  var instance = fresh('../browser', require)()
-  global.console = console
-  t.is(fnName(instance.log), 'noop')
-  t.is(fnName(instance.fatal), 'noop')
-  t.is(fnName(instance.error), 'noop')
-  t.is(fnName(instance.warn), 'noop')
-  t.is(fnName(instance.info), 'noop')
-  t.is(fnName(instance.debug), 'noop')
-  t.is(fnName(instance.trace), 'noop')
-  t.end()
-})
+// do not run this with airtap
+if (process.title !== 'browser') {
+  test('in absence of console, log methods become noops', function (t) {
+    var console = global.console
+    delete global.console
+    var instance = fresh('../browser', require)()
+    global.console = console
+    t.is(fnName(instance.log), 'noop')
+    t.is(fnName(instance.fatal), 'noop')
+    t.is(fnName(instance.error), 'noop')
+    t.is(fnName(instance.warn), 'noop')
+    t.is(fnName(instance.info), 'noop')
+    t.is(fnName(instance.debug), 'noop')
+    t.is(fnName(instance.trace), 'noop')
+    t.end()
+  })
+}
 
 test('opts.browser.asObject logs pino-like object to console', function (t) {
   t.plan(3)
