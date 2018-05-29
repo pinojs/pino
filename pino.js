@@ -221,15 +221,27 @@ Object.defineProperty(pinoPrototype, 'write', {
 })
 
 function flush () {
+  if (!this.stream.flush) {
+    return
+  }
+
+  this.stream.flush()
+}
+Object.defineProperty(pinoPrototype, 'flush', {
+  enumerable: true,
+  value: flush
+})
+
+function flushSync () {
   if (!this.stream.flushSync) {
     return
   }
 
   this.stream.flushSync()
 }
-Object.defineProperty(pinoPrototype, 'flush', {
+Object.defineProperty(pinoPrototype, 'flushSync', {
   enumerable: true,
-  value: flush
+  value: flushSync
 })
 
 function addLevel (name, lvl) {

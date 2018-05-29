@@ -139,3 +139,21 @@ test('flush does nothing without extreme mode', function (t) {
   instance.flush()
   t.end()
 })
+
+test('flushSync does something with extreme mode', function (t) {
+  var instance = require('..')()
+  instance.flushSync()
+  t.end()
+})
+
+test('flushSync ensure stream is not writing', function (t) {
+  var pino = require('../')
+  var dest = pino.extreme()
+  var instance = pino(dest)
+  dest.write('hello world')
+  instance.flush()
+  t.equal(instance.stream._writing, true)
+  instance.flushSync()
+  t.equal(instance.stream._writing, false)
+  t.end()
+})
