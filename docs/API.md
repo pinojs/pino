@@ -603,7 +603,7 @@ The default time function for Pino. Returns a string like `,"time":1493426328206
 Returns a unix time in seconds, like `,"time":1493426328`.
 
 <a id="nullTimeFunction"></a>
-### .nulltime
+### .nullTime
 
 Returns an empty string. This function is used when the `timestamp` option
 is set to `false`.
