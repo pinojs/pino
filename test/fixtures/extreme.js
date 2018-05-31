@@ -1,5 +1,13 @@
 global.process = { __proto__: process, pid: 123456 }
-Date.now = function () { return 1459875739796 }
+global.Date = class extends Date {
+  constructor (...args) {
+    args[0] = 1459875739000
+    super(...args)
+  }
+  static now () {
+    return 1459875739000
+  }
+}
 require('os').hostname = function () { return 'abcdefghijklmnopqr' }
 var pino = require(require.resolve('./../../'))
 var extreme = pino(pino.extreme())

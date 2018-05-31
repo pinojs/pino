@@ -22,14 +22,14 @@ test('metadata works', function (t) {
       v: 1
     })
   })
-  var now = Date.now()
+  var now = Number(new Date(pino.stdTimeFunctions.defaultTime()))
   var instance = pino({}, {
     [Symbol.for('needsMetadata')]: true,
     write: function (chunk) {
       t.equal(instance, this.lastLogger)
       t.equal(30, this.lastLevel)
       t.equal('a msg', this.lastMsg)
-      t.ok(Number(this.lastTime) >= now)
+      t.ok(Number(new Date(this.lastTime)) >= now)
       t.deepEqual({ hello: 'world' }, this.lastObj)
       dest.write(chunk)
     }
