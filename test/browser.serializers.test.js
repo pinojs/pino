@@ -38,173 +38,175 @@ test('without the serialize option, serializers do not override values', functio
   parent.fatal({test: 'test'})
 })
 
-test('if serialize option is true, standard error serializer is auto enabled', function (t) {
-  t.plan(1)
-  var err = Error('test')
-  err.code = 'test'
-  err.type = 'Error' // get that cov
-  var expect = pino.stdSerializers.err(err)
+if (process.title !== 'browser') {
+  test('if serialize option is true, standard error serializer is auto enabled', function (t) {
+    t.plan(1)
+    var err = Error('test')
+    err.code = 'test'
+    err.type = 'Error' // get that cov
+    var expect = pino.stdSerializers.err(err)
 
-  var consoleError = console.error
-  console.error = function (err) {
-    t.deepEqual(err, expect)
-  }
+    var consoleError = console.error
+    console.error = function (err) {
+      t.deepEqual(err, expect)
+    }
 
-  var logger = fresh('../browser', require)({
-    browser: { serialize: true }
+    var logger = fresh('../browser', require)({
+      browser: { serialize: true }
+    })
+
+    console.error = consoleError
+
+    logger.fatal(err)
   })
 
-  console.error = consoleError
+  test('if serialize option is array, standard error serializer is auto enabled', function (t) {
+    t.plan(1)
+    var err = Error('test')
+    err.code = 'test'
+    var expect = pino.stdSerializers.err(err)
 
-  logger.fatal(err)
-})
+    var consoleError = console.error
+    console.error = function (err) {
+      t.deepEqual(err, expect)
+    }
 
-test('if serialize option is array, standard error serializer is auto enabled', function (t) {
-  t.plan(1)
-  var err = Error('test')
-  err.code = 'test'
-  var expect = pino.stdSerializers.err(err)
+    var logger = fresh('../browser', require)({
+      browser: { serialize: [] }
+    })
 
-  var consoleError = console.error
-  console.error = function (err) {
-    t.deepEqual(err, expect)
-  }
+    console.error = consoleError
 
-  var logger = fresh('../browser', require)({
-    browser: { serialize: [] }
+    logger.fatal(err)
   })
 
-  console.error = consoleError
+  test('if serialize option is array containing !stdSerializers.err, standard error serializer is disabled', function (t) {
+    t.plan(1)
+    var err = Error('test')
+    err.code = 'test'
+    var expect = err
 
-  logger.fatal(err)
-})
+    var consoleError = console.error
+    console.error = function (err) {
+      t.is(err, expect)
+    }
 
-test('if serialize option is array containing !stdSerializers.err, standard error serializer is disabled', function (t) {
-  t.plan(1)
-  var err = Error('test')
-  err.code = 'test'
-  var expect = err
+    var logger = fresh('../browser', require)({
+      browser: { serialize: ['!stdSerializers.err'] }
+    })
 
-  var consoleError = console.error
-  console.error = function (err) {
-    t.is(err, expect)
-  }
+    console.error = consoleError
 
-  var logger = fresh('../browser', require)({
-    browser: { serialize: ['!stdSerializers.err'] }
+    logger.fatal(err)
   })
 
-  console.error = consoleError
+  test('in browser, serializers apply to all objects', function (t) {
+    t.plan(3)
+    var consoleError = console.error
+    console.error = function (test, test2, test3, test4, test5) {
+      t.is(test.key, 'serialized')
+      t.is(test2.key2, 'serialized2')
+      t.is(test5.key3, 'serialized3')
+    }
 
-  logger.fatal(err)
-})
+    var logger = fresh('../browser', require)({
+      serializers: {
+        key: function () { return 'serialized' },
+        key2: function () { return 'serialized2' },
+        key3: function () { return 'serialized3' }
+      },
+      browser: { serialize: true }
+    })
 
-test('in browser, serializers apply to all objects', function (t) {
-  t.plan(3)
-  var consoleError = console.error
-  console.error = function (test, test2, test3, test4, test5) {
-    t.is(test.key, 'serialized')
-    t.is(test2.key2, 'serialized2')
-    t.is(test5.key3, 'serialized3')
-  }
+    console.error = consoleError
 
-  var logger = fresh('../browser', require)({
-    serializers: {
-      key: function () { return 'serialized' },
-      key2: function () { return 'serialized2' },
-      key3: function () { return 'serialized3' }
-    },
-    browser: { serialize: true }
+    logger.fatal({key: 'test'}, {key2: 'test'}, 'str should skip', [{foo: 'array should skip'}], {key3: 'test'})
   })
 
-  console.error = consoleError
+  test('serialize can be an array of selected serializers', function (t) {
+    t.plan(3)
+    var consoleError = console.error
+    console.error = function (test, test2, test3, test4, test5) {
+      t.is(test.key, 'test')
+      t.is(test2.key2, 'serialized2')
+      t.is(test5.key3, 'test')
+    }
 
-  logger.fatal({key: 'test'}, {key2: 'test'}, 'str should skip', [{foo: 'array should skip'}], {key3: 'test'})
-})
+    var logger = fresh('../browser', require)({
+      serializers: {
+        key: function () { return 'serialized' },
+        key2: function () { return 'serialized2' },
+        key3: function () { return 'serialized3' }
+      },
+      browser: { serialize: ['key2'] }
+    })
 
-test('serialize can be an array of selected serializers', function (t) {
-  t.plan(3)
-  var consoleError = console.error
-  console.error = function (test, test2, test3, test4, test5) {
-    t.is(test.key, 'test')
-    t.is(test2.key2, 'serialized2')
-    t.is(test5.key3, 'test')
-  }
+    console.error = consoleError
 
-  var logger = fresh('../browser', require)({
-    serializers: {
-      key: function () { return 'serialized' },
-      key2: function () { return 'serialized2' },
-      key3: function () { return 'serialized3' }
-    },
-    browser: { serialize: ['key2'] }
+    logger.fatal({key: 'test'}, {key2: 'test'}, 'str should skip', [{foo: 'array should skip'}], {key3: 'test'})
   })
 
-  console.error = consoleError
+  test('serialize filter applies to child loggers', function (t) {
+    t.plan(3)
+    var consoleError = console.error
+    console.error = function (binding, test, test2, test3, test4, test5) {
+      t.is(test.key, 'test')
+      t.is(test2.key2, 'serialized2')
+      t.is(test5.key3, 'test')
+    }
 
-  logger.fatal({key: 'test'}, {key2: 'test'}, 'str should skip', [{foo: 'array should skip'}], {key3: 'test'})
-})
+    var logger = fresh('../browser', require)({
+      browser: { serialize: ['key2'] }
+    })
 
-test('serialize filter applies to child loggers', function (t) {
-  t.plan(3)
-  var consoleError = console.error
-  console.error = function (binding, test, test2, test3, test4, test5) {
-    t.is(test.key, 'test')
-    t.is(test2.key2, 'serialized2')
-    t.is(test5.key3, 'test')
-  }
+    console.error = consoleError
 
-  var logger = fresh('../browser', require)({
-    browser: { serialize: ['key2'] }
+    logger.child({aBinding: 'test',
+      serializers: {
+        key: function () { return 'serialized' },
+        key2: function () { return 'serialized2' },
+        key3: function () { return 'serialized3' }
+      }}).fatal({key: 'test'}, {key2: 'test'}, 'str should skip', [{foo: 'array should skip'}], {key3: 'test'})
   })
 
-  console.error = consoleError
+  test('parent serializers apply to child bindings', function (t) {
+    t.plan(1)
+    var consoleError = console.error
+    console.error = function (binding) {
+      t.is(binding.key, 'serialized')
+    }
 
-  logger.child({aBinding: 'test',
-    serializers: {
-      key: function () { return 'serialized' },
-      key2: function () { return 'serialized2' },
-      key3: function () { return 'serialized3' }
-    }}).fatal({key: 'test'}, {key2: 'test'}, 'str should skip', [{foo: 'array should skip'}], {key3: 'test'})
-})
+    var logger = fresh('../browser', require)({
+      serializers: {
+        key: function () { return 'serialized' }
+      },
+      browser: { serialize: true }
+    })
 
-test('parent serializers apply to child bindings', function (t) {
-  t.plan(1)
-  var consoleError = console.error
-  console.error = function (binding) {
-    t.is(binding.key, 'serialized')
-  }
+    console.error = consoleError
 
-  var logger = fresh('../browser', require)({
-    serializers: {
-      key: function () { return 'serialized' }
-    },
-    browser: { serialize: true }
+    logger.child({key: 'test'}).fatal({test: 'test'})
   })
 
-  console.error = consoleError
+  test('child serializers apply to child bindings', function (t) {
+    t.plan(1)
+    var consoleError = console.error
+    console.error = function (binding) {
+      t.is(binding.key, 'serialized')
+    }
 
-  logger.child({key: 'test'}).fatal({test: 'test'})
-})
+    var logger = fresh('../browser', require)({
+      browser: { serialize: true }
+    })
 
-test('child serializers apply to child bindings', function (t) {
-  t.plan(1)
-  var consoleError = console.error
-  console.error = function (binding) {
-    t.is(binding.key, 'serialized')
-  }
+    console.error = consoleError
 
-  var logger = fresh('../browser', require)({
-    browser: { serialize: true }
+    logger.child({key: 'test',
+      serializers: {
+        key: function () { return 'serialized' }
+      }}).fatal({test: 'test'})
   })
-
-  console.error = consoleError
-
-  logger.child({key: 'test',
-    serializers: {
-      key: function () { return 'serialized' }
-    }}).fatal({test: 'test'})
-})
+}
 
 test('child does not overwrite parent serializers', function (t) {
   t.plan(2)

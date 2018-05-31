@@ -1,4 +1,0 @@
-name: pino
-ui: tape
-browserify:
-  - transform: fresh-require/transform
