@@ -53,6 +53,16 @@ test('redact.censor option – throws if censor is a function', function (t) {
   t.end()
 })
 
+test('redact option – top level key', function (t) {
+  var instance = pino({redact: ['key']}, sink(function (o, enc, cb) {
+    t.equals(o.key, '[Redacted]')
+    t.end()
+  }))
+  instance.info({
+    key: {redact: 'me'}
+  })
+})
+
 test('redact option – object', function (t) {
   var instance = pino({redact: ['req.headers.cookie']}, sink(function (o, enc, cb) {
     t.equals(o.req.headers.cookie, '[Redacted]')
@@ -222,6 +232,16 @@ test('redact.remove option – removes both key and value', function (t) {
       remoteAddress: '::ffff:127.0.0.1',
       remotePort: 58022
     }
+  })
+})
+
+test('redact.remove – top level key', function (t) {
+  var instance = pino({redact: {paths: ['key'], remove: true}}, sink(function (o, enc, cb) {
+    t.equals('key' in o, false)
+    t.end()
+  }))
+  instance.info({
+    key: {redact: 'me'}
   })
 })
 
