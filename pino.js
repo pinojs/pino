@@ -125,6 +125,34 @@ Object.defineProperty(
   {value: LOG_VERSION}
 )
 
+// magically escape strings for json
+// relying on their charCodeAt
+// everything below 32 needs JSON.stringify()
+// 34 and 92 happens all the time, so we
+// have a fast case for them
+function asString (str) {
+  var result = ''
+  var last = 0
+  var l = str.length
+  var point = 255
+  if (l > 42) {
+    return JSON.stringify(str)
+  }
+  for (var i = 0; i < l && point >= 32; i++) {
+    point = str.charCodeAt(i)
+    if (point === 34 || point === 92) {
+      result += str.slice(last, i) + '\\'
+      last = i
+    }
+  }
+  if (last === 0) {
+    result = str
+  } else {
+    result += str.slice(last)
+  }
+  return point < 32 ? JSON.stringify(str) : '"' + result + '"'
+}
+
 function asJson (obj, msg, num, time) {
   // to catch both null and undefined
   var hasObj = obj !== undefined && obj !== null
@@ -132,8 +160,7 @@ function asJson (obj, msg, num, time) {
   msg = !msg && objError ? obj.message : msg || undefined
   var data = this._lscache[num] + time
   if (msg !== undefined) {
-    // JSON.stringify is safe here
-    data += this.messageKeyString + JSON.stringify('' + msg)
+    data += this.messageKeyString + asString('' + msg)
   }
   // we need the child bindings added to the output first so that logged
   // objects can take precedence when JSON.parse-ing the resulting log line
@@ -214,7 +241,11 @@ function pinoWrite (obj, msg, num) {
     stream.lastTime = t.slice(8)
     stream.lastLogger = this // for child loggers
   }
-  stream.write(flatstr(s))
+  if (stream instanceof SonicBoom) {
+    stream.write(s)
+  } else {
+    stream.write(flatstr(s))
+  }
 }
 Object.defineProperty(pinoPrototype, 'write', {
   value: pinoWrite
