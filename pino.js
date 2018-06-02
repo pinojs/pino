@@ -297,7 +297,7 @@ function pino (opts, stream) {
 
   // internal options
   iopts.stringify = iopts.safe ? stringifySafe : JSON.stringify
-  iopts.formatOpts = {lowres: true}
+  iopts.formatOpts = {lowres: !iopts.safe}
   iopts.messageKeyString = `,"${iopts.messageKey}":`
   iopts.end = ',"v":' + LOG_VERSION + '}' + (iopts.crlf ? '\r\n' : '\n')
   iopts.cache = !iopts.extreme ? null : {

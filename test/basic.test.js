@@ -506,3 +506,25 @@ test('when safe is true it should ONLY use `fast-safe-stringify`', function (t) 
   })
   t.end()
 })
+
+test('when safe is true, fast-safe-stringify must be used when interpolating', function (t) {
+  var instance = pino({safe: true}, sink(function (chunk, enc, cb) {
+    const { msg } = chunk
+    t.is(msg, 'test {"a":{"b":{"c":"[Circular]"}}}')
+    t.end()
+  }))
+  var o = { a: { b: {} } }
+  o.a.b.c = o.a.b
+  instance.info('test', o)
+})
+
+test('when safe is false, interpolation output circulars at the root', function (t) {
+  var instance = pino({safe: false}, sink(function (chunk, enc, cb) {
+    const { msg } = chunk
+    t.is(msg, 'test "[Circular]"')
+    t.end()
+  }))
+  var o = { a: { b: {} } }
+  o.a.b.c = o.a.b
+  instance.info('test', o)
+})
