@@ -74,6 +74,7 @@ utilities. Thus, some recommendations for this are:
     ```
 
 <a id="auto-add"></a>
+## How do I automatically add something to every log?
 Let's assume you want to have `"module":"foo"` added to every log within a
 module `foo.js`. To accomplish this, simply use a child logger:
 

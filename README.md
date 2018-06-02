@@ -13,7 +13,6 @@
 * [Ecosystem ⇗](docs/ecosystem.md)
 * [Pretty Printing ⇗](docs/pretty.md)
 * [Extreme mode explained ⇗](docs/extreme.md)
-* [Pino Howtos ⇗](docs/howtos.md)
 * [Transports with Pino](#transports)
 * [Pino in the browser](#browser)
 * [Caveats](#caveats)
