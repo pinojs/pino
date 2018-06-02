@@ -297,7 +297,7 @@ function pino (opts, stream) {
 
   // internal options
   iopts.stringify = iopts.safe ? stringifySafe : JSON.stringify
-  iopts.formatOpts = {lowres: true}
+  iopts.formatOpts = {lowres: !iopts.safe}
   iopts.messageKeyString = `,"${iopts.messageKey}":`
   iopts.end = ',"v":' + LOG_VERSION + '}' + (iopts.crlf ? '\r\n' : '\n')
   iopts.cache = !iopts.extreme ? null : {
@@ -320,7 +320,7 @@ function pino (opts, stream) {
   instance.timestamp = iopts.timestamp
   instance.slowtime = iopts.slowtime
   instance.cache = iopts.cache
-  instance.formatiopts = iopts.formatiopts
+  instance.formatOpts = iopts.formatOpts
   instance.onTerminated = iopts.onTerminated
   instance.messageKey = iopts.messageKey
   instance.messageKeyString = iopts.messageKeyString
