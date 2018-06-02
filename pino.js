@@ -1,25 +1,34 @@
 'use strict'
 
-var os = require('os')
-var EventEmitter = require('events').EventEmitter
-var stringifySafe = require('fast-safe-stringify')
-var serializers = require('pino-std-serializers')
-var util = require('util')
-var flatstr = require('flatstr')
-var SonicBoom = require('sonic-boom')
-var events = require('./lib/events')
-var levels = require('./lib/levels')
-var redact = require('./lib/redact')
-var tools = require('./lib/tools')
-var time = require('./lib/time')
-var needsMetadata = Symbol.for('needsMetadata')
-var isStandardLevelVal = levels.isStandardLevelVal
-var isStandardLevel = levels.isStandardLevel
-var applyOptions = tools.applyOptions
+const os = require('os')
+const { EventEmitter } = require('events')
+const stringifySafe = require('fast-safe-stringify')
+const serializers = require('pino-std-serializers')
+const flatstr = require('flatstr')
+const SonicBoom = require('sonic-boom')
+const events = require('./lib/events')
+const redact = require('./lib/redact')
+const time = require('./lib/time')
+const needsMetadata = Symbol.for('needsMetadata')
+const {
+  isStandardLevelVal,
+  isStandardLevel,
+  lscache,
+  levels
+} = require('./lib/levels')
+const {
+  applyOptions,
+  genLog,
+  copy,
+  asMetaWrapper,
+  defineLevelsProperty,
+  noop
+} = require('./lib/tools')
+const { version } = require('./package.json')
 
-var LOG_VERSION = 1
+const LOG_VERSION = 1
 
-var defaultOptions = {
+const defaultOptions = {
   safe: true,
   name: undefined,
   serializers: {},
@@ -40,9 +49,9 @@ var defaultOptions = {
   messageKey: 'msg'
 }
 
-var pinoPrototype = Object.create(EventEmitter.prototype, {
+const pinoPrototype = Object.create(EventEmitter.prototype, {
   silent: {
-    value: tools.noop,
+    value: noop,
     enumerable: true
   },
   stream: {
@@ -50,19 +59,56 @@ var pinoPrototype = Object.create(EventEmitter.prototype, {
     writable: true
   },
   pino: {
-    value: require('./package.json').version,
+    value: version,
     enumerable: true
+  },
+  levelVal: {
+    get: getLevelVal,
+    set: setLevelVal
+  },
+  level: {
+    get: _getLevel,
+    set: _setLevel
+  },
+  _getLevel: {
+    value: _getLevel
+  },
+  _setLevel: {
+    value: _setLevel
+  },
+  _lscache: {
+    value: copy({}, lscache)
+  },
+  LOG_VERSION: {
+    value: LOG_VERSION
+  },
+  asJson: {
+    enumerable: true,
+    value: asJson
+  },
+  child: {
+    enumerable: true,
+    value: child
+  },
+  write: {
+    value: pinoWrite
+  },
+  flush: {
+    enumerable: true,
+    value: flush
+  },
+  addLevel: {
+    enumerable: true,
+    value: addLevel
+  },
+  isLevelEnabled: {
+    enumerable: true,
+    value: isLevelEnabled
   }
 })
 
-var levelMethods = ['fatal', 'error', 'warn', 'info', 'debug', 'trace']
-levelMethods.forEach(function (m) {
-  Object.defineProperty(pinoPrototype, m, {
-    value: tools.genLog(levels.levels[m]),
-    enumerable: true,
-    writable: true
-  })
-})
+const levelMethods = ['fatal', 'error', 'warn', 'info', 'debug', 'trace']
+for (const m of levelMethods) pinoPrototype[m] = genLog(levels[m])
 
 function getLevelVal () {
   return this._levelVal
@@ -78,16 +124,12 @@ function setLevelVal (num) {
 
   for (var key in this.levels.values) {
     if (num > this.levels.values[key]) {
-      this[key] = tools.noop
+      this[key] = noop
       continue
     }
-    this[key] = isStandardLevel(key) ? pinoPrototype[key] : tools.genLog(this.levels.values[key])
+    this[key] = isStandardLevel(key) ? pinoPrototype[key] : genLog(this.levels.values[key])
   }
 }
-Object.defineProperty(pinoPrototype, 'levelVal', {
-  get: getLevelVal,
-  set: setLevelVal
-})
 
 function _setLevel (level) {
   if (typeof level === 'number') {
@@ -102,30 +144,10 @@ function _setLevel (level) {
   }
   this.levelVal = this.levels.values[level]
 }
-Object.defineProperty(pinoPrototype, '_setLevel', {
-  value: _setLevel
-})
 
-Object.defineProperty(pinoPrototype, '_getLevel', {
-  value: function _getLevel (level) {
-    return this.levels.labels[this.levelVal]
-  }
-})
-
-Object.defineProperty(pinoPrototype, 'level', {
-  get: pinoPrototype._getLevel,
-  set: pinoPrototype._setLevel
-})
-
-Object.defineProperty(pinoPrototype, '_lscache', {
-  value: tools.copy({}, levels.lscache)
-})
-
-Object.defineProperty(
-  pinoPrototype,
-  'LOG_VERSION',
-  {value: LOG_VERSION}
-)
+function _getLevel (level) {
+  return this.levels.labels[this.levelVal]
+}
 
 // magically escape strings for json
 // relying on their charCodeAt
@@ -189,10 +211,6 @@ function asJson (obj, msg, num, time) {
   }
   return data + this.end
 }
-Object.defineProperty(pinoPrototype, 'asJson', {
-  enumerable: true,
-  value: asJson
-})
 
 function asChindings (that, bindings) {
   if (!bindings) {
@@ -228,10 +246,6 @@ function child (bindings) {
   applyOptions(_child, opts)
   return _child
 }
-Object.defineProperty(pinoPrototype, 'child', {
-  enumerable: true,
-  value: child
-})
 
 function pinoWrite (obj, msg, num) {
   var t = this.time()
@@ -250,21 +264,11 @@ function pinoWrite (obj, msg, num) {
     stream.write(flatstr(s))
   }
 }
-Object.defineProperty(pinoPrototype, 'write', {
-  value: pinoWrite
-})
 
 function flush () {
-  if (!this.stream.flushSync) {
-    return
-  }
-
+  if (!this.stream.flushSync) return
   this.stream.flushSync()
 }
-Object.defineProperty(pinoPrototype, 'flush', {
-  enumerable: true,
-  value: flush
-})
 
 function addLevel (name, lvl) {
   if (this.levels.values.hasOwnProperty(name)) return false
@@ -272,35 +276,22 @@ function addLevel (name, lvl) {
   this.levels.values[name] = lvl
   this.levels.labels[lvl] = name
   this._lscache[lvl] = flatstr('{"level":' + Number(lvl))
-  Object.defineProperty(this, name, {
-    value: lvl < this._levelVal ? tools.noop : tools.genLog(lvl),
-    enumerable: true,
-    writable: true
-  })
-
+  this[name] = lvl < this._levelVal ? noop : genLog(lvl)
   return true
 }
-Object.defineProperty(pinoPrototype, 'addLevel', {
-  enumerable: true,
-  value: addLevel
-})
 
 function isLevelEnabled (logLevel) {
   var logLevelVal = this.levels.values[logLevel]
   return logLevelVal && (logLevelVal >= this._levelVal)
 }
-Object.defineProperty(pinoPrototype, 'isLevelEnabled', {
-  enumerable: true,
-  value: isLevelEnabled
-})
 
 function getPrettyStream (opts, prettifier, dest) {
   if (prettifier && typeof prettifier === 'function') {
-    return tools.asMetaWrapper(prettifier(opts), dest)
+    return asMetaWrapper(prettifier(opts), dest)
   }
   try {
     var prettyFactory = require('pino-pretty')
-    return tools.asMetaWrapper(prettyFactory(opts), dest)
+    return asMetaWrapper(prettyFactory(opts), dest)
   } catch (e) {
     throw Error('Missing `pino-pretty` module: `pino-pretty` must be installed separately')
   }
@@ -344,7 +335,7 @@ function pino (opts, stream) {
 
   var instance = Object.create(pinoPrototype)
   instance.stream = istream
-  tools.defineLevelsProperty(instance)
+  defineLevelsProperty(instance)
 
   instance.stringify = iopts.stringify
   instance.stringifiers = iopts.stringifiers
@@ -395,24 +386,17 @@ function pino (opts, stream) {
   return instance
 }
 
-tools.defineLevelsProperty(pino)
+defineLevelsProperty(pino)
 
-function extreme (dest) {
-  if (!dest) {
-    return new SonicBoom(process.stdout.fd, 4096)
-  }
+function extreme (dest = process.stdout.fd) {
   return new SonicBoom(dest, 4096)
 }
 
-function destination (dest) {
-  if (!dest) {
-    return new SonicBoom(process.stdout.fd)
-  }
+function destination (dest = process.stdout.fd) {
   return new SonicBoom(dest)
 }
 
-module.exports = pino
-module.exports.stdSerializers = {
+pino.stdSerializers = {
   req: serializers.req,
   res: serializers.res,
   err: serializers.err,
@@ -420,22 +404,18 @@ module.exports.stdSerializers = {
   wrapResponseSerializer: serializers.wrapResponseSerializer
 }
 
-Object.defineProperty(module.exports.stdSerializers, 'wrapRespnonseSerializer', {
-  enumerable: true,
-  get: util.deprecate(
-    function () {
-      return serializers.wrapResponseSerializer
-    },
-    '`pino.stdSerializers.wrapRespnonseSerializer` is deprecated: use `pino.stdSerializers.wrapResponseSerializer`'
-  )
-})
+pino.extreme = extreme
+pino.destination = destination
 
-module.exports.extreme = extreme
-module.exports.destination = destination
+pino.stdTimeFunctions = Object.assign({}, time)
 
-module.exports.stdTimeFunctions = Object.assign({}, time)
 Object.defineProperty(
-  module.exports,
+  pino,
   'LOG_VERSION',
-  {value: LOG_VERSION, enumerable: true}
+  {
+    value: LOG_VERSION,
+    enumerable: true
+  }
 )
+
+module.exports = pino
