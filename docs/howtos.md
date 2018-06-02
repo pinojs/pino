@@ -7,7 +7,6 @@
 + [How to use Pino with debug](#debug)
 + [How to rotate log files](#rotate)
 + [How to save to multiple files](#multiple)
-+ [How to redact sensitive information](#redact)
 
 <a id="express"></a>
 ## How to use Pino with Express
@@ -214,41 +213,4 @@ writing only warnings and errors to `./warn-log:
 
 ```bash
 node app.js | pino-tee warn ./warn-logs > ./all-logs
-```
-
-<a id="redact"></a>
-## How do I redact sensitive information??
-
-Use [pino-noir](http://npm.im/pino-noir) for performant log redaction:
-
-Install and require [pino-noir](http://npm.im/pino-noir),
-initialize with the key paths you wish to redact and pass the
-resulting instance in through the `serializers` option
-
-```js
-var noir = require('pino-noir')
-var pino = require('pino')({
-  serializers: noir(['key', 'path.to.key'])
-})
-
-pino.info({
-  key: 'will be redacted',
-  path: {
-    to: {key: 'sensitive', another: 'thing'}
-  },
-  more: 'stuff'
-})
-
-// {"pid":7306,"hostname":"x","level":30,"time":1475519922198,"key":"[Redacted]","path":{"to":{"key":"[Redacted]","another":"thing"}},"more":"stuff","v":1}
-```
-
-If you have other serializers simply extend:
-
-```js
-var noir = require('pino-noir')
-var pino = require('pino')({
-  serializers: Object.assign(
-    noir(['key', 'path.to.key']),
-    {myCustomSerializer: () => {}}
-})
 ```

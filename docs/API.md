@@ -36,7 +36,7 @@
 # module.exports
 
 <a id="constructor"></a>
-## .pino([options], [stream])
+## pino([options], [stream])
 
 ### Parameters:
 + `options` (object):
@@ -46,9 +46,16 @@
   * `serializers` (object): an object containing functions for custom serialization
     of objects. These functions should return an JSONifiable object and they
     should never throw. When logging an object, each top-level property matching the exact key of a serializer
-    will be serialized using the defined serializer.
-
-    Alternatively, it is possible to register a serializer under the key `Symbol.for('pino.*')` which will act upon the complete log object, i.e. every property.
+    will be serialized using the defined serializer. Alternatively, it is possible to register a serializer under the key `Symbol.for('pino.*')` which will act upon the complete log object, i.e. every property.
+  * `redact` (array|object): As an array, the `redact` option specifies paths that should 
+     have their values redacted from any log output. Each path must be a string, and the syntax
+     for declaring paths corresponds to JavaScript dot and bracket notation. 
+     See the [redaction](redaction.md) documentation for examples and more information.
+     **WARNING**: Never allow user input to define redacted paths. See [fast-redact#caveat](http://github.com/davidmarkclements/fast-redact#caveat) for details.
+     If an object is supplied, three options can be specified: 
+     * `paths` (array): Required. An array of paths
+     * `censor` (string): Optional. A value to overwrite key which are to be redacted. Default: `'[Redacted]'` 
+     * `remove` (boolean): Optional. Instead of censoring the value, remove both the key and the value. Default: `false`
   * `timestamp` (boolean|function): Enables or disables the inclusion of a timestamp in the
     log message. If a function is supplied, it must synchronously return a JSON string
     representation of the time, e.g. `,"time":1493426328206` (which is the default).
