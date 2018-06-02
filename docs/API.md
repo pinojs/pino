@@ -376,6 +376,13 @@ parameters will be reduced accodringly.
 Flushes the content of the buffer in [extreme mode](extreme.md). It has no effect if
 extreme mode is not enabled.
 
+<a id="flushSync"></a>
+## .flushSync()
+
+### Discussion:
+Synchronously flushes the content of the buffer in [extreme mode](extreme.md). It has no effect if
+extreme mode is not enabled.
+
 <a id="addLevel"></a>
 ## .addLevel(name, lvl)
 
