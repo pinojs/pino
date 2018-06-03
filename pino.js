@@ -14,15 +14,23 @@ const {
   isStandardLevelVal,
   isStandardLevel,
   lscache,
-  levels
+  levels,
+  nums,
+  levelMethods,
+  setLevelVal,
+  getLevelVal,
+  _getLevel,
+  _setLevel,
+  addLevel,
+  isLevelEnabled
 } = require('./lib/levels')
 const {
-  applyOptions,
-  genLog,
   copy,
-  asMetaWrapper,
   defineLevelsProperty,
-  noop
+  noop,
+  getPrettyStream,
+  asChindings,
+  asJson
 } = require('./lib/tools')
 const { version } = require('./package.json')
 
@@ -49,255 +57,49 @@ const defaultOptions = {
   messageKey: 'msg'
 }
 
-const pinoPrototype = Object.create(EventEmitter.prototype, {
-  silent: {
-    value: noop,
-    enumerable: true
-  },
-  stream: {
-    value: process.stdout,
-    writable: true
-  },
-  pino: {
-    value: version,
-    enumerable: true
-  },
-  levelVal: {
-    get: getLevelVal,
-    set: setLevelVal
-  },
-  level: {
-    get: _getLevel,
-    set: _setLevel
-  },
-  _getLevel: {
-    value: _getLevel
-  },
-  _setLevel: {
-    value: _setLevel
-  },
-  _lscache: {
-    value: copy({}, lscache)
-  },
-  LOG_VERSION: {
-    value: LOG_VERSION
-  },
-  asJson: {
-    enumerable: true,
-    value: asJson
-  },
-  child: {
-    enumerable: true,
-    value: child
-  },
-  write: {
-    value: pinoWrite
-  },
-  flush: {
-    enumerable: true,
-    value: flush
-  },
-  addLevel: {
-    enumerable: true,
-    value: addLevel
-  },
-  isLevelEnabled: {
-    enumerable: true,
-    value: isLevelEnabled
-  }
-})
+const getLevelSym = Symbol('pino-level-getter')
+const setLevelSym = Symbol('pino-level-setter')
 
-const levelMethods = ['fatal', 'error', 'warn', 'info', 'debug', 'trace']
-for (const m of levelMethods) pinoPrototype[m] = genLog(levels[m])
+const getLevelValSym = Symbol('pino-level-val-getter')
+const setLevelValSym = Symbol('pino-level-val-setter')
 
-function getLevelVal () {
-  return this._levelVal
+const pinoPrototype = {
+  silent: noop,
+  stream: process.stdout,
+  pino: version,
+  get levelVal () { return this[getLevelValSym]() },
+  set levelVal (num) { return this[setLevelValSym](num) },
+  get level () { return this._getLevel() },
+  set level (lvl) { return this._setLevel(lvl) },
+  _lscache: copy({}, lscache),
+  [getLevelSym]: _getLevel,
+  [setLevelSym]: _setLevel,
+  [getLevelValSym]: getLevelVal,
+  [setLevelValSym]: setLevelVal,
+  _getLevel,
+  _setLevel,
+  asJson,
+  child,
+  write,
+  flush,
+  addLevel,
+  isLevelEnabled,
+  LOG_VERSION
 }
-function setLevelVal (num) {
-  if (typeof num === 'string') { return this._setLevel(num) }
+Object.setPrototypeOf(pinoPrototype, EventEmitter.prototype)
+Object.assign(pinoPrototype, levelMethods)
 
-  if (this.emit) {
-    this.emit('level-change', this.levels.labels[num], num, this.levels.labels[this._levelVal], this._levelVal)
-  }
+module.exports = pino
 
-  this._levelVal = num
+defineLevelsProperty(pino, {levels, nums})
 
-  for (var key in this.levels.values) {
-    if (num > this.levels.values[key]) {
-      this[key] = noop
-      continue
-    }
-    this[key] = isStandardLevel(key) ? pinoPrototype[key] : genLog(this.levels.values[key])
-  }
-}
+pino.extreme = (dest = process.stdout.fd) => new SonicBoom(dest, 4096)
+pino.destination = (dest = process.stdout.fd) => new SonicBoom(dest)
 
-function _setLevel (level) {
-  if (typeof level === 'number') {
-    if (!isFinite(level)) {
-      throw Error('unknown level ' + level)
-    }
-    level = this.levels.labels[level]
-  }
+pino.stdSerializers = Object.assign({}, serializers)
+pino.stdTimeFunctions = Object.assign({}, time)
 
-  if (!this.levels.values[level]) {
-    throw Error('unknown level ' + level)
-  }
-  this.levelVal = this.levels.values[level]
-}
-
-function _getLevel (level) {
-  return this.levels.labels[this.levelVal]
-}
-
-// magically escape strings for json
-// relying on their charCodeAt
-// everything below 32 needs JSON.stringify()
-// 34 and 92 happens all the time, so we
-// have a fast case for them
-function asString (str) {
-  var result = ''
-  var last = 0
-  var found = false
-  var l = str.length
-  var point = 255
-  if (l > 42) {
-    return JSON.stringify(str)
-  }
-  for (var i = 0; i < l && point >= 32; i++) {
-    point = str.charCodeAt(i)
-    if (point === 34 || point === 92) {
-      result += str.slice(last, i) + '\\'
-      last = i
-      found = true
-    }
-  }
-  if (!found) {
-    result = str
-  } else {
-    result += str.slice(last)
-  }
-  return point < 32 ? JSON.stringify(str) : '"' + result + '"'
-}
-
-function asJson (obj, msg, num, time) {
-  // to catch both null and undefined
-  var hasObj = obj !== undefined && obj !== null
-  var objError = hasObj && obj instanceof Error
-  msg = !msg && objError ? obj.message : msg || undefined
-  var data = this._lscache[num] + time
-  if (msg !== undefined) {
-    data += this.messageKeyString + asString('' + msg)
-  }
-  // we need the child bindings added to the output first so that logged
-  // objects can take precedence when JSON.parse-ing the resulting log line
-  data = data + this.chindings
-  var value
-  if (hasObj) {
-    var notHasOwnProperty = obj.hasOwnProperty === undefined
-    if (objError) {
-      data += ',"type":"Error","stack":' + this.stringify(obj.stack)
-    }
-    // if global serializer is set, call it first
-    if (this.serializers[Symbol.for('pino.*')]) {
-      obj = this.serializers[Symbol.for('pino.*')](obj)
-    }
-    for (var key in obj) {
-      value = obj[key]
-      if ((notHasOwnProperty || obj.hasOwnProperty(key)) && value !== undefined) {
-        value = (this.stringifiers[key] || this.stringify)(this.serializers[key] ? this.serializers[key](value) : value)
-        if (value !== undefined) {
-          data += ',"' + key + '":' + value
-        }
-      }
-    }
-  }
-  return data + this.end
-}
-
-function asChindings (that, bindings) {
-  if (!bindings) {
-    throw Error('missing bindings for child Pino')
-  }
-  var key
-  var value
-  var data = that.chindings
-  if (that.serializers[Symbol.for('pino.*')]) {
-    bindings = that.serializers[Symbol.for('pino.*')](bindings)
-  }
-  for (key in bindings) {
-    value = bindings[key]
-    if (key !== 'level' && key !== 'serializers' && bindings.hasOwnProperty(key) && value !== undefined) {
-      value = that.serializers[key] ? that.serializers[key](value) : value
-      data += ',"' + key + '":' + (that.stringifiers[key] || that.stringify)(value)
-    }
-  }
-  return data
-}
-
-function child (bindings) {
-  var opts = {
-    chindings: asChindings(this, bindings),
-    level: bindings.level || this.level,
-    levelVal: isStandardLevelVal(this.levelVal) ? undefined : this.levelVal,
-    serializers: bindings.hasOwnProperty('serializers') ? Object.assign({}, this.serializers, bindings.serializers) : this.serializers,
-    stringifiers: this.stringifiers
-  }
-
-  var _child = Object.create(this)
-  _child.stream = this.stream
-  applyOptions(_child, opts)
-  return _child
-}
-
-function pinoWrite (obj, msg, num) {
-  var t = this.time()
-  var s = this.asJson(obj, msg, num, t)
-  var stream = this.stream
-  if (stream[needsMetadata]) {
-    stream.lastLevel = num
-    stream.lastMsg = msg
-    stream.lastObj = obj
-    stream.lastTime = t.slice(8)
-    stream.lastLogger = this // for child loggers
-  }
-  if (stream instanceof SonicBoom) {
-    stream.write(s)
-  } else {
-    stream.write(flatstr(s))
-  }
-}
-
-function flush () {
-  if (!this.stream.flushSync) return
-  this.stream.flushSync()
-}
-
-function addLevel (name, lvl) {
-  if (this.levels.values.hasOwnProperty(name)) return false
-  if (this.levels.labels.hasOwnProperty(lvl)) return false
-  this.levels.values[name] = lvl
-  this.levels.labels[lvl] = name
-  this._lscache[lvl] = flatstr('{"level":' + Number(lvl))
-  this[name] = lvl < this._levelVal ? noop : genLog(lvl)
-  return true
-}
-
-function isLevelEnabled (logLevel) {
-  var logLevelVal = this.levels.values[logLevel]
-  return logLevelVal && (logLevelVal >= this._levelVal)
-}
-
-function getPrettyStream (opts, prettifier, dest) {
-  if (prettifier && typeof prettifier === 'function') {
-    return asMetaWrapper(prettifier(opts), dest)
-  }
-  try {
-    var prettyFactory = require('pino-pretty')
-    return asMetaWrapper(prettyFactory(opts), dest)
-  } catch (e) {
-    throw Error('Missing `pino-pretty` module: `pino-pretty` must be installed separately')
-  }
-}
+pino.LOG_VERSION = LOG_VERSION
 
 function pino (opts, stream) {
   var iopts = opts
@@ -337,7 +139,7 @@ function pino (opts, stream) {
 
   var instance = Object.create(pinoPrototype)
   instance.stream = istream
-  defineLevelsProperty(instance)
+  defineLevelsProperty(instance, {levels, nums})
 
   instance.stringify = iopts.stringify
   instance.stringifiers = iopts.stringifiers
@@ -388,36 +190,57 @@ function pino (opts, stream) {
   return instance
 }
 
-defineLevelsProperty(pino)
+function applyOptions (self, opts) {
+  self.serializers = opts.serializers
+  self.chindings = opts.chindings
 
-function extreme (dest = process.stdout.fd) {
-  return new SonicBoom(dest, 4096)
-}
-
-function destination (dest = process.stdout.fd) {
-  return new SonicBoom(dest)
-}
-
-pino.stdSerializers = {
-  req: serializers.req,
-  res: serializers.res,
-  err: serializers.err,
-  wrapRequestSerializer: serializers.wrapRequestSerializer,
-  wrapResponseSerializer: serializers.wrapResponseSerializer
-}
-
-pino.extreme = extreme
-pino.destination = destination
-
-pino.stdTimeFunctions = Object.assign({}, time)
-
-Object.defineProperty(
-  pino,
-  'LOG_VERSION',
-  {
-    value: LOG_VERSION,
-    enumerable: true
+  if (opts.level && opts.levelVal) {
+    const levelIsStandard = isStandardLevel(opts.level)
+    const valIsStandard = isStandardLevelVal(opts.levelVal)
+    if (valIsStandard) throw Error('level value is already used: ' + opts.levelVal)
+    if (levelIsStandard === false && valIsStandard === false) self.addLevel(opts.level, opts.levelVal)
   }
-)
+  self._setLevel(opts.level)
+}
 
-module.exports = pino
+function child (bindings) {
+  const { stream, level, levelVal, serializers, stringifiers } = this
+  const chindings = asChindings(this, bindings)
+  const opts = {
+    chindings,
+    stringifiers,
+    level: bindings.level || level,
+    levelVal: isStandardLevelVal(levelVal) ? undefined : levelVal,
+    serializers: bindings.hasOwnProperty('serializers')
+      ? Object.assign({}, serializers, bindings.serializers)
+      : serializers
+  }
+
+  const _child = Object.create(this)
+  _child.stream = stream
+  applyOptions(_child, opts)
+  return _child
+}
+
+function write (obj, msg, num) {
+  const t = this.time()
+  const s = this.asJson(obj, msg, num, t)
+  const { stream } = this
+  if (stream[needsMetadata]) {
+    stream.lastLevel = num
+    stream.lastMsg = msg
+    stream.lastObj = obj
+    stream.lastTime = t.slice(8)
+    stream.lastLogger = this // for child loggers
+  }
+  if (stream instanceof SonicBoom) {
+    stream.write(s)
+  } else {
+    stream.write(flatstr(s))
+  }
+}
+
+function flush () {
+  if (!this.stream.flushSync) return
+  this.stream.flushSync()
+}
