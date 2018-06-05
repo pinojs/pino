@@ -157,6 +157,7 @@ function _getLevel (level) {
 function asString (str) {
   var result = ''
   var last = 0
+  var found = false
   var l = str.length
   var point = 255
   if (l > 42) {
@@ -167,9 +168,10 @@ function asString (str) {
     if (point === 34 || point === 92) {
       result += str.slice(last, i) + '\\'
       last = i
+      found = true
     }
   }
-  if (last === 0) {
+  if (!found) {
     result = str
   } else {
     result += str.slice(last)
