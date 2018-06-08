@@ -7,7 +7,7 @@ const serializers = require('pino-std-serializers')
 const flatstr = require('flatstr')
 const SonicBoom = require('sonic-boom')
 const events = require('./lib/events')
-const redact = require('./lib/redact')
+const redaction = require('./lib/redaction')
 const time = require('./lib/time')
 const needsMetadata = Symbol.for('needsMetadata')
 const {
@@ -57,9 +57,6 @@ const defaultOptions = {
   messageKey: 'msg'
 }
 
-const getLevelSym = Symbol('pino-level-getter')
-const setLevelSym = Symbol('pino-level-setter')
-
 const getLevelValSym = Symbol('pino-level-val-getter')
 const setLevelValSym = Symbol('pino-level-val-setter')
 
@@ -72,8 +69,6 @@ const pinoPrototype = {
   get level () { return this._getLevel() },
   set level (lvl) { return this._setLevel(lvl) },
   _lscache: copy({}, lscache),
-  [getLevelSym]: _getLevel,
-  [setLevelSym]: _setLevel,
   [getLevelValSym]: getLevelVal,
   [setLevelValSym]: setLevelVal,
   _getLevel,
@@ -101,69 +96,92 @@ pino.stdTimeFunctions = Object.assign({}, time)
 
 pino.LOG_VERSION = LOG_VERSION
 
-function pino (opts, stream) {
+function create (opts, stream) {
   var iopts = opts
-  var istream = stream
   if (iopts && (iopts.writable || iopts._writableState || iopts instanceof SonicBoom)) {
-    istream = iopts
+    stream = iopts
     iopts = defaultOptions
   }
   iopts = Object.assign({}, defaultOptions, iopts)
-  if (iopts.extreme) {
-    throw new Error('The extreme option is removed, use require(\'pino\').extreme(dest) instead')
+
+  if (iopts.enabled === false) iopts.level = 'silent'
+
+  const {
+    base,
+    prettyPrint,
+    messageKey,
+    prettifier,
+    extreme,
+    safe,
+    redact,
+    crlf,
+    level,
+    serializers,
+    name,
+    timestamp,
+    onTerminated,
+    levelVal
+  } = iopts
+
+  if (extreme) {
+    throw new Error('The extreme option has been removed, use require(\'pino\').extreme(dest) instead')
   }
-  istream = istream || process.stdout
-  var isStdout = istream === process.stdout
-  if (isStdout && istream.fd >= 0) {
-    istream = new SonicBoom(istream.fd)
+  stream = stream || process.stdout
+  if (stream === process.stdout && stream.fd >= 0) {
+    stream = new SonicBoom(stream.fd)
   }
-  if (iopts.prettyPrint) {
-    var prettyOpts = Object.assign({ messageKey: iopts.messageKey }, iopts.prettyPrint)
-    var pstream = getPrettyStream(prettyOpts, iopts.prettifier, istream)
-    istream = pstream
+  if (prettyPrint) {
+    const prettyOpts = Object.assign({ messageKey }, prettyPrint)
+    stream = getPrettyStream(prettyOpts, prettifier, stream)
   }
 
   // internal options
-  iopts.stringify = iopts.safe ? stringifySafe : JSON.stringify
-  iopts.stringifiers = iopts.redact ? redact(iopts.redact, iopts.stringify) : {}
-  iopts.formatOpts = iopts.redact
-    ? {stringify: iopts.stringifiers[redact.format]}
-    : {stringify: iopts.stringify}
-  iopts.messageKeyString = `,"${iopts.messageKey}":`
-  iopts.end = ',"v":' + LOG_VERSION + '}' + (iopts.crlf ? '\r\n' : '\n')
-  iopts.chindings = ''
+  const stringify = safe ? stringifySafe : JSON.stringify
+  const stringifiers = redact ? redaction(redact, stringify) : {}
+  const formatOpts = redact
+    ? {stringify: stringifiers[redaction.format]}
+    : { stringify }
+  const messageKeyString = `,"${messageKey}":`
+  const end = ',"v":' + LOG_VERSION + '}' + (crlf ? '\r\n' : '\n')
+  const chindings = ''
 
-  if (iopts.enabled === false) {
-    iopts.level = 'silent'
+  return {
+    instance: {
+      time: (timestamp && Function.prototype.isPrototypeOf(timestamp))
+        ? timestamp : (timestamp ? time.epochTime : time.nullTime),
+      stream,
+      stringify,
+      stringifiers,
+      end,
+      timestamp,
+      formatOpts,
+      onTerminated,
+      messageKey,
+      messageKeyString
+    },
+    cfg: {
+      base,
+      name,
+      serializers,
+      chindings,
+      level,
+      levelVal
+    }
   }
+}
 
-  var instance = Object.create(pinoPrototype)
-  instance.stream = istream
+function pino (opts, stream) {
+  var { instance, cfg } = create(opts, stream)
+  const { base, name, serializers, chindings, level, levelVal } = cfg
+
+  Object.setPrototypeOf(instance, pinoPrototype)
   defineLevelsProperty(instance, {levels, nums})
 
-  instance.stringify = iopts.stringify
-  instance.stringifiers = iopts.stringifiers
-  instance.end = iopts.end
-  instance.name = iopts.name
-  instance.timestamp = iopts.timestamp
-  instance.formatOpts = iopts.formatOpts
-  instance.onTerminated = iopts.onTerminated
-  instance.messageKey = iopts.messageKey
-  instance.messageKeyString = iopts.messageKeyString
+  configure(instance, {serializers, chindings, level, levelVal})
 
-  applyOptions(instance, iopts)
-
-  if (iopts.timestamp && Function.prototype.isPrototypeOf(iopts.timestamp)) {
-    instance.time = iopts.timestamp
-  } else if (iopts.timestamp) {
-    instance.time = time.epochTime
-  } else {
-    instance.time = time.nullTime
-  }
-
-  if (istream instanceof SonicBoom) {
-    if (istream.fd === -1) {
-      istream.on('ready', function () {
+  if (instance.stream instanceof SonicBoom) {
+    if (instance.stream.fd === -1) {
+      instance.stream.on('ready', function () {
         events(instance, extremeModeExitHandler)
       })
     } else {
@@ -172,35 +190,31 @@ function pino (opts, stream) {
   }
 
   function extremeModeExitHandler () {
-    istream.flushSync()
-  }
-
-  var base = (typeof iopts.base === 'object') ? iopts.base : defaultOptions.base
-
-  if (iopts.name !== undefined) {
-    base = Object.assign({}, base, {
-      name: iopts.name
-    })
+    instance.stream.flushSync()
   }
 
   if (base !== null) {
-    instance = instance.child(base)
+    if (name !== undefined) {
+      instance = instance.child(Object.assign({}, base, {name}))
+    } else {
+      instance = instance.child(base)
+    }
   }
 
   return instance
 }
 
-function applyOptions (self, opts) {
-  self.serializers = opts.serializers
-  self.chindings = opts.chindings
+function configure (instance, {serializers, chindings, level, levelVal}) {
+  instance.serializers = serializers
+  instance.chindings = chindings
 
-  if (opts.level && opts.levelVal) {
-    const levelIsStandard = isStandardLevel(opts.level)
-    const valIsStandard = isStandardLevelVal(opts.levelVal)
-    if (valIsStandard) throw Error('level value is already used: ' + opts.levelVal)
-    if (levelIsStandard === false && valIsStandard === false) self.addLevel(opts.level, opts.levelVal)
+  if (level && levelVal) {
+    const levelIsStandard = isStandardLevel(level)
+    const valIsStandard = isStandardLevelVal(levelVal)
+    if (valIsStandard) throw Error('level value is already used: ' + levelVal)
+    if (levelIsStandard === false && valIsStandard === false) instance.addLevel(level, levelVal)
   }
-  self._setLevel(opts.level)
+  instance._setLevel(level)
 }
 
 function child (bindings) {
@@ -218,7 +232,7 @@ function child (bindings) {
 
   const _child = Object.create(this)
   _child.stream = stream
-  applyOptions(_child, opts)
+  configure(_child, opts)
   return _child
 }
 
