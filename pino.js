@@ -7,7 +7,7 @@ const events = require('./lib/events')
 const redaction = require('./lib/redaction')
 const time = require('./lib/time')
 const proto = require('./lib/proto')
-const { chindingsSym } = require('./lib/symbols')
+const { chindingsSym, redactFmtSym } = require('./lib/symbols')
 const { setLevelState, mappings } = require('./lib/levels')
 const { createArgsNormalizer } = require('./lib/tools')
 const { LOG_VERSION } = require('./lib/meta')
@@ -52,7 +52,7 @@ function pino (...args) {
   const stringify = safe ? stringifySafe : JSON.stringify
   const stringifiers = redact ? redaction(redact, stringify) : {}
   const formatOpts = redact
-    ? {stringify: stringifiers[redaction.format]}
+    ? {stringify: stringifiers[redactFmtSym]}
     : { stringify }
   const messageKeyString = `,"${messageKey}":`
   const end = ',"v":' + LOG_VERSION + '}' + (crlf ? '\r\n' : '\n')
