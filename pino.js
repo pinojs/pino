@@ -11,27 +11,24 @@ const { chindingsSym } = require('./lib/symbols')
 const { setLevelState, mappings } = require('./lib/levels')
 const { createArgsNormalizer } = require('./lib/tools')
 const { LOG_VERSION } = require('./lib/meta')
+
 const { epochTime, nullTime } = time
+const { pid, exit } = process
+const hostname = os.hostname()
 
 const defaultOptions = {
-  safe: true,
-  name: undefined,
-  serializers: {},
-  redact: null,
-  timestamp: epochTime,
   level: 'info',
-  levelVal: undefined,
-  prettyPrint: false,
-  base: {
-    pid: process.pid,
-    hostname: os.hostname()
-  },
+  messageKey: 'msg',
+  safe: true,
   enabled: true,
-  onTerminated: function (eventName, err) {
-    if (err) return process.exit(1)
-    process.exit(0)
-  },
-  messageKey: 'msg'
+  prettyPrint: false,
+  base: { pid, hostname },
+  serializers: {},
+  timestamp: epochTime,
+  onTerminated: (evt, err) => err ? exit(1) : exit(0),
+  name: undefined,
+  levelVal: undefined,
+  redact: null
 }
 
 const normalize = createArgsNormalizer(defaultOptions)
