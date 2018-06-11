@@ -5,13 +5,13 @@ const serializers = require('pino-std-serializers')
 const SonicBoom = require('sonic-boom')
 const events = require('./lib/events')
 const redaction = require('./lib/redaction')
-const timeFmt = require('./lib/time')
+const time = require('./lib/time')
 const proto = require('./lib/proto')
 const { chindingsSym } = require('./lib/symbols')
 const { setLevelState, mappings } = require('./lib/levels')
 const { createArgsNormalizer } = require('./lib/tools')
 const { LOG_VERSION } = require('./lib/meta')
-const { epochTime, nullTime } = timeFmt
+const { epochTime, nullTime } = time
 
 const defaultOptions = {
   safe: true,
@@ -97,8 +97,7 @@ pino.extreme = (dest = process.stdout.fd) => new SonicBoom(dest, 4096)
 pino.destination = (dest = process.stdout.fd) => new SonicBoom(dest)
 pino.levels = mappings()
 pino.stdSerializers = Object.assign({}, serializers)
-pino.stdTimeFunctions = Object.assign({}, timeFmt)
-
+pino.stdTimeFunctions = Object.assign({}, time)
 pino.LOG_VERSION = LOG_VERSION
 
 module.exports = pino
