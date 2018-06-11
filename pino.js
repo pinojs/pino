@@ -7,10 +7,24 @@ const events = require('./lib/events')
 const redaction = require('./lib/redaction')
 const time = require('./lib/time')
 const proto = require('./lib/proto')
-const { chindingsSym, redactFmtSym, serializersSym } = require('./lib/symbols')
 const { setLevelState, mappings } = require('./lib/levels')
 const { createArgsNormalizer, asChindings } = require('./lib/tools')
 const { LOG_VERSION } = require('./lib/meta')
+const { 
+  chindingsSym, 
+  redactFmtSym, 
+  serializersSym,
+  timeSym,
+  streamSym,
+  stringifySym,
+  stringifiersSym,
+  endSym,
+  timestampSym,
+  formatOptsSym,
+  onTerminatedSym,
+  messageKeySym,
+  messageKeyStringSym, 
+} = require('./lib/symbols')
 
 const { epochTime, nullTime } = time
 const { pid, exit } = process
@@ -59,8 +73,8 @@ function pino (...args) {
   const coreChindings = asChindings.bind(null, {
     [chindingsSym]: '',
     [serializersSym]: serializers,
-    stringifiers,
-    stringify
+    [stringifiersSym]: stringifiers,
+    [stringifySym]: stringify
   })
   const chindings = base === null ? '' : (name === undefined)
     ? coreChindings(base) : coreChindings(Object.assign({}, base, { name }))
@@ -69,16 +83,14 @@ function pino (...args) {
   const levels = mappings()
   const instance = {
     levels,
-    time,
-    stream,
-    stringify,
-    stringifiers,
-    end,
-    timestamp,
-    formatOpts,
-    onTerminated,
-    messageKey,
-    messageKeyString,
+    [streamSym]: stream,
+    [timeSym]: time,
+    [stringifySym]: stringify,
+    [stringifiersSym]: stringifiers,
+    [endSym]: end,
+    [formatOptsSym]: formatOpts,
+    [onTerminatedSym]: onTerminated,
+    [messageKeyStringSym]: messageKeyString,
     [serializersSym]: serializers,
     [chindingsSym]: chindings
   }
