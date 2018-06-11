@@ -7,7 +7,7 @@ const events = require('./lib/events')
 const redaction = require('./lib/redaction')
 const time = require('./lib/time')
 const proto = require('./lib/proto')
-const { chindingsSym, redactFmtSym } = require('./lib/symbols')
+const { chindingsSym, redactFmtSym, serializersSym } = require('./lib/symbols')
 const { setLevelState, mappings } = require('./lib/levels')
 const { createArgsNormalizer } = require('./lib/tools')
 const { LOG_VERSION } = require('./lib/meta')
@@ -57,7 +57,7 @@ function pino (...args) {
   const messageKeyString = `,"${messageKey}":`
   const end = ',"v":' + LOG_VERSION + '}' + (crlf ? '\r\n' : '\n')
   const chindings = ''
-  const time = (timestamp && timestamp instanceof Function)
+  const time = (timestamp instanceof Function)
     ? timestamp : (timestamp ? epochTime : nullTime)
   const levels = mappings()
 
@@ -67,13 +67,13 @@ function pino (...args) {
     stream,
     stringify,
     stringifiers,
-    serializers,
     end,
     timestamp,
     formatOpts,
     onTerminated,
     messageKey,
     messageKeyString,
+    [serializersSym]: serializers,
     [chindingsSym]: chindings
   }
   Object.setPrototypeOf(core, proto)
