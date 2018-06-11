@@ -22,7 +22,6 @@ const {
   isStandardLevelVal,
   isStandardLevel,
   lsCache,
-  levelMethods,
   setLevelVal,
   getLevelVal,
   getLevel,
@@ -64,6 +63,12 @@ const defaultOptions = {
 }
 
 const prototype = {
+  asJson,
+  child,
+  write,
+  flush,
+  addLevel,
+  isLevelEnabled,
   silent: noop,
   stream: process.stdout,
   pino: version,
@@ -76,16 +81,10 @@ const prototype = {
   [setLevelValSym]: setLevelVal,
   [getLevelSym]: getLevel,
   [setLevelSym]: setLevel,
-  asJson,
-  child,
-  write,
-  flush,
-  addLevel,
-  isLevelEnabled,
   LOG_VERSION
 }
+
 Object.setPrototypeOf(prototype, EventEmitter.prototype)
-Object.assign(prototype, levelMethods)
 
 module.exports = pino
 
