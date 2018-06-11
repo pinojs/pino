@@ -9,7 +9,7 @@ const time = require('./lib/time')
 const proto = require('./lib/proto')
 const { chindingsSym, redactFmtSym, serializersSym } = require('./lib/symbols')
 const { setLevelState, mappings } = require('./lib/levels')
-const { createArgsNormalizer } = require('./lib/tools')
+const { createArgsNormalizer, asChindings } = require('./lib/tools')
 const { LOG_VERSION } = require('./lib/meta')
 
 const { epochTime, nullTime } = time
@@ -56,12 +56,18 @@ function pino (...args) {
     : { stringify }
   const messageKeyString = `,"${messageKey}":`
   const end = ',"v":' + LOG_VERSION + '}' + (crlf ? '\r\n' : '\n')
-  const chindings = ''
+  const coreChindings = asChindings.bind(null, {
+    [chindingsSym]: '',
+    [serializersSym]: serializers,
+    stringifiers,
+    stringify
+  })
+  const chindings = base === null ? '' : (name === undefined)
+    ? coreChindings(base) : coreChindings(Object.assign({}, base, { name }))
   const time = (timestamp instanceof Function)
     ? timestamp : (timestamp ? epochTime : nullTime)
   const levels = mappings()
-
-  const core = {
+  const instance = {
     levels,
     time,
     stream,
@@ -76,16 +82,10 @@ function pino (...args) {
     [serializersSym]: serializers,
     [chindingsSym]: chindings
   }
-  Object.setPrototypeOf(core, proto)
+  Object.setPrototypeOf(instance, proto)
 
-  events(core)
-  setLevelState(core, level, levelVal)
-
-  const instance = base === null
-    ? core
-    : name === undefined
-      ? core.child(base)
-      : core.child(Object.assign({}, base, { name }))
+  events(instance)
+  setLevelState(instance, level, levelVal)
 
   return instance
 }
