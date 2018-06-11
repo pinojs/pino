@@ -31,7 +31,6 @@ const {
   isLevelEnabled
 } = require('./lib/levels')
 const {
-  copy,
   noop,
   getPrettyStream,
   asChindings,
@@ -76,7 +75,7 @@ const prototype = {
   set levelVal (num) { return this[setLevelValSym](num) },
   get level () { return this[getLevelSym]() },
   set level (lvl) { return this[setLevelSym](lvl) },
-  [lsCacheSym]: copy({}, lsCache),
+  [lsCacheSym]: Object.assign({}, lsCache),
   [getLevelValSym]: getLevelVal,
   [setLevelValSym]: setLevelVal,
   [getLevelSym]: getLevel,
