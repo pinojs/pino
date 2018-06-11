@@ -17,8 +17,8 @@
   ],
   "scripts": {
     "browser-test": "airtap --local 8080 test/browser*test.js",
-    "test": " NODE_OPTIONS='--no-warnings' tap -j 4 --no-cov test/*test.js",
-    "ci": "standard | snazzy &&  NODE_OPTIONS='--no-warnings' tap -j 4 --cov test/*test.js",
+    "test": "standard | snazzy && NODE_OPTIONS='--no-warnings' tap -j 4 --no-cov test/*test.js",
+    "ci": "standard | snazzy && NODE_OPTIONS='--no-warnings' tap -j 4 --cov test/*test.js",
     "bench-all": "node benchmarks/runbench all",
     "bench-basic": "node benchmarks/runbench basic",
     "bench-object": "node benchmarks/runbench object",

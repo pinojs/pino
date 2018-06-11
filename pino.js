@@ -10,20 +10,18 @@ const proto = require('./lib/proto')
 const { setLevelState, mappings } = require('./lib/levels')
 const { createArgsNormalizer, asChindings } = require('./lib/tools')
 const { LOG_VERSION } = require('./lib/meta')
-const { 
-  chindingsSym, 
-  redactFmtSym, 
+const {
+  chindingsSym,
+  redactFmtSym,
   serializersSym,
   timeSym,
   streamSym,
   stringifySym,
   stringifiersSym,
   endSym,
-  timestampSym,
   formatOptsSym,
   onTerminatedSym,
-  messageKeySym,
-  messageKeyStringSym, 
+  messageKeyStringSym
 } = require('./lib/symbols')
 
 const { epochTime, nullTime } = time
