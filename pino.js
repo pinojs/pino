@@ -21,16 +21,16 @@ const {
   needsMetadataGsym
 } = require('./lib/symbols')
 const {
-  isStandardLevelVal,
-  isStandardLevel,
   lsCache,
   setLevelVal,
   getLevelVal,
   getLevel,
   setLevel,
   addLevel,
+  setLevelState,
   mappings,
-  isLevelEnabled
+  isLevelEnabled,
+  isStandardLevelVal
 } = require('./lib/levels')
 const {
   noop,
@@ -99,11 +99,11 @@ pino.LOG_VERSION = LOG_VERSION
 
 function pino (opts, stream) {
   const { core, state } = create(opts, stream)
-  const { base, name, serializers, chindings, level, levelVal } = state
+  const { base, name, level, levelVal } = state
 
   Object.setPrototypeOf(core, prototype)
   events(core)
-  configure(core, {serializers, chindings, level, levelVal})
+  setLevelState(core, level, levelVal)
 
   const logger = base === null
     ? core
@@ -115,35 +115,22 @@ function pino (opts, stream) {
 }
 
 function child (bindings) {
-  const { stream, level, levelVal, serializers, stringifiers } = this
+  const { level, levelVal, serializers } = this
   const chindings = asChindings(this, bindings)
-  const opts = {
-    chindings,
-    stringifiers,
-    level: bindings.level || level,
-    levelVal: isStandardLevelVal(levelVal) ? undefined : levelVal,
-    serializers: bindings.hasOwnProperty('serializers')
-      ? Object.assign({}, serializers, bindings.serializers)
-      : serializers
-  }
-
-  const _child = Object.create(this)
-  _child.stream = stream
-  configure(_child, opts)
-  return _child
-}
-
-function configure (instance, {serializers, chindings, level, levelVal}) {
-  instance.serializers = serializers
-  instance[chindingsSym] = chindings
-
-  if (level && levelVal) {
-    const levelIsStandard = isStandardLevel(level)
-    const valIsStandard = isStandardLevelVal(levelVal)
-    if (valIsStandard) throw Error('level value is already used: ' + levelVal)
-    if (levelIsStandard === false && valIsStandard === false) instance.addLevel(level, levelVal)
-  }
-  instance[setLevelSym](level)
+  const logger = Object.create(this)
+  if (bindings.hasOwnProperty('serializers') === true) {
+    logger.serializers = {}
+    for (var k in serializers) {
+      logger.serializers[k] = serializers[k]
+    }
+    for (var bk in bindings.serializers) {
+      logger.serializers[bk] = bindings.serializers[bk]
+    }
+  } else logger.serializers = serializers
+  logger[chindingsSym] = chindings
+  if (isStandardLevelVal(levelVal) === true) logger[setLevelSym](bindings.level || level)
+  else setLevelState(logger, bindings.level || level, levelVal)
+  return logger
 }
 
 function write (obj, msg, num) {
@@ -177,7 +164,6 @@ function create (opts, stream) {
   opts = Object.assign({}, defaultOptions, opts)
 
   if (opts.enabled === false) opts.level = 'silent'
-
   const {
     base,
     prettyPrint,
@@ -226,18 +212,18 @@ function create (opts, stream) {
     stream,
     stringify,
     stringifiers,
+    serializers,
     end,
     timestamp,
     formatOpts,
     onTerminated,
     messageKey,
-    messageKeyString
+    messageKeyString,
+    [chindingsSym]: chindings
   }
   const state = {
     base,
     name,
-    serializers,
-    chindings,
     level,
     levelVal
   }
