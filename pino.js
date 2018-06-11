@@ -22,19 +22,17 @@ const {
   isStandardLevelVal,
   isStandardLevel,
   lsCache,
-  levels,
-  nums,
   levelMethods,
   setLevelVal,
   getLevelVal,
   getLevel,
   setLevel,
   addLevel,
+  mappings,
   isLevelEnabled
 } = require('./lib/levels')
 const {
   copy,
-  defineLevelsProperty,
   noop,
   getPrettyStream,
   asChindings,
@@ -91,11 +89,9 @@ Object.assign(prototype, levelMethods)
 
 module.exports = pino
 
-defineLevelsProperty(pino, {levels, nums})
-
 pino.extreme = (dest = process.stdout.fd) => new SonicBoom(dest, 4096)
 pino.destination = (dest = process.stdout.fd) => new SonicBoom(dest)
-
+pino.levels = mappings()
 pino.stdSerializers = Object.assign({}, serializers)
 pino.stdTimeFunctions = Object.assign({}, timeFmt)
 
@@ -106,7 +102,6 @@ function pino (opts, stream) {
   const { base, name, serializers, chindings, level, levelVal } = state
 
   Object.setPrototypeOf(core, prototype)
-  defineLevelsProperty(core, {levels, nums})
   events(core)
   configure(core, {serializers, chindings, level, levelVal})
 
@@ -224,7 +219,9 @@ function create (opts, stream) {
   const time = (timestamp && timestamp instanceof Function)
     ? timestamp
     : (timestamp ? epochTime : nullTime)
+  const levels = mappings()
   const core = {
+    levels,
     time,
     stream,
     stringify,
