@@ -16,6 +16,8 @@ const {
   setLevelSym,
   getLevelSym,
   chindingsSym,
+  asJsonSym,
+  writeSym,
   needsMetadataGsym
 } = require('./lib/symbols')
 const {
@@ -62,9 +64,7 @@ const defaultOptions = {
 }
 
 const prototype = {
-  asJson,
   child,
-  write,
   flush,
   addLevel,
   isLevelEnabled,
@@ -75,6 +75,8 @@ const prototype = {
   set levelVal (num) { return this[setLevelValSym](num) },
   get level () { return this[getLevelSym]() },
   set level (lvl) { return this[setLevelSym](lvl) },
+  [writeSym]: write,
+  [asJsonSym]: asJson,
   [lsCacheSym]: Object.assign({}, lsCache),
   [getLevelValSym]: getLevelVal,
   [setLevelValSym]: setLevelVal,
@@ -146,7 +148,7 @@ function configure (instance, {serializers, chindings, level, levelVal}) {
 
 function write (obj, msg, num) {
   const t = this.time()
-  const s = this.asJson(obj, msg, num, t)
+  const s = this[asJsonSym](obj, msg, num, t)
   const { stream } = this
   if (stream[needsMetadataGsym]) {
     stream.lastLevel = num
