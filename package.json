@@ -73,7 +73,7 @@
     "tap": "^11.1.5",
     "tape": "^4.9.0",
     "through2": "^2.0.3",
-    "winston": "^3.0.0-rc5"
+    "winston": "^3.0.0"
   },
   "dependencies": {
     "chalk": "^2.4.1",
