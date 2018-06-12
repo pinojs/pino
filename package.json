@@ -84,7 +84,7 @@
     "flatstr": "^1.0.5",
     "pino-std-serializers": "^2.0.0",
     "pump": "^3.0.0",
-    "quick-format-unescaped": "^2.0.1",
+    "quick-format-unescaped": "^3.0.0",
     "sonic-boom": "^0.5.0"
   }
 }

@@ -382,14 +382,6 @@ var pino = require('pino')({
 <a name="caveats"></a>
 ## Caveats
 
-There's some fine points to be aware of, which are a result of worthwhile trade-offs:
-
-### 11 Arguments
-
-The logger functions (e.g. `pino.info`) can take a maximum of 11 arguments.
-
-If you need more than that to write a log entry, you're probably doing it wrong.
-
 ### Duplicate Keys
 
 It's possible for naming conflicts to arise between child loggers and

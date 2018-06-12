@@ -10,11 +10,11 @@ var dest = fs.createWriteStream('/dev/null')
 var loglevel = require('./loglevelMock')(dest)
 var plog = pino(dest)
 delete require.cache[require.resolve('../')]
-var plogExtreme = require('../')({extreme: true}, dest)
+var plogExtreme = require('../')(pino.extreme('/dev/null'))
 delete require.cache[require.resolve('../')]
 var plogUnsafe = require('../')({safe: false}, dest)
 delete require.cache[require.resolve('../')]
-var plogUnsafeExtreme = require('../')({extreme: true, safe: false}, dest)
+var plogUnsafeExtreme = require('../')({safe: false}, pino.extreme('/dev/null'))
 
 process.env.DEBUG = 'dlog'
 var debug = require('debug')

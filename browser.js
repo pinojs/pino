@@ -209,8 +209,8 @@ function asObject (logger, level, args, ts) {
     while (lvl-- && typeof args[0] === 'object') {
       Object.assign(o, args.shift())
     }
-    msg = args.length ? format(args) : undefined
-  } else if (typeof msg === 'string') msg = format(args)
+    msg = args.length ? format(args.shift(), args) : undefined
+  } else if (typeof msg === 'string') msg = format(args.shift(), args)
   if (msg !== undefined) o.msg = msg
   return o
 }
