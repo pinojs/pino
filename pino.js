@@ -9,7 +9,6 @@ const time = require('./lib/time')
 const proto = require('./lib/proto')
 const { setLevelState, mappings } = require('./lib/levels')
 const { createArgsNormalizer, asChindings } = require('./lib/tools')
-const { LOG_VERSION } = require('./lib/meta')
 const {
   chindingsSym,
   redactFmtSym,
@@ -23,7 +22,7 @@ const {
   onTerminatedSym,
   messageKeyStringSym
 } = require('./lib/symbols')
-
+const { LOG_VERSION } = require('./lib/meta')
 const { epochTime, nullTime } = time
 const { pid, exit } = process
 const hostname = os.hostname()
