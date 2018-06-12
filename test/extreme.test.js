@@ -7,11 +7,6 @@ var path = require('path')
 var writeStream = require('flush-write-stream')
 var fork = require('child_process').fork
 
-if (process.version.indexOf('v0.10') >= 0) {
-  require('tap').comment('skipped because of node v0.10')
-  process.exit(0)
-}
-
 test('extreme mode', function (t) {
   var now = Date.now
   var hostname = os.hostname
@@ -106,7 +101,7 @@ test('extreme mode with child', function (t) {
   var expected2 = expected.split('\n')[0]
   var actual2 = ''
 
-  var child = fork(path.join(__dirname, '/fixtures/extreme_child.js'), {silent: true})
+  var child = fork(path.join(__dirname, '/fixtures/extreme-child.js'), {silent: true})
   child.stdout.pipe(writeStream(function (s, enc, cb) {
     actual2 += s
     cb()

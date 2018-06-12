@@ -7,7 +7,7 @@ var bole = require('bole')('bench')
 var winston = require('winston')
 var fs = require('fs')
 var dest = fs.createWriteStream('/dev/null')
-var loglevel = require('./loglevelMock')(dest)
+var loglevel = require('./log-level-mock')(dest)
 var plog = pino(dest)
 delete require.cache[require.resolve('../')]
 var plogExtreme = require('../')(pino.extreme('/dev/null'))

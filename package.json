@@ -22,12 +22,12 @@
     "bench-all": "node benchmarks/runbench all",
     "bench-basic": "node benchmarks/runbench basic",
     "bench-object": "node benchmarks/runbench object",
-    "bench-deepobject": "node benchmarks/runbench deepobject",
-    "bench-multiarg": "node benchmarks/runbench multiarg",
-    "bench-longstring": "node benchmarks/runbench longstring",
+    "bench-deepo-bject": "node benchmarks/runbench deep-object",
+    "bench-multi-arg": "node benchmarks/runbench multi-arg",
+    "bench-longs-tring": "node benchmarks/runbench long-string",
     "bench-child": "node benchmarks/runbench child",
-    "bench-grandchild": "node benchmarks/runbench grandchild",
-    "bench-conception": "node benchmarks/runbench conception"
+    "bench-child-child": "node benchmarks/runbench child-child",
+    "bench-child-creation": "node benchmarks/runbench child-creation"
   },
   "bin": {
     "pino": "./bin.js"

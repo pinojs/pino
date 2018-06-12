@@ -25,7 +25,7 @@ test('can be enabled via constructor', function (t) {
 test('can be enabled via constructor with pretty configuration', function (t) {
   t.plan(1)
   var actual = ''
-  var child = fork(path.join(__dirname, 'fixtures', 'pretty', 'levelFirst.js'), {silent: true})
+  var child = fork(path.join(__dirname, 'fixtures', 'pretty', 'level-first.js'), {silent: true})
 
   child.stdout.pipe(writeStream(function (s, enc, cb) {
     actual += s
@@ -40,7 +40,7 @@ test('can be enabled via constructor with pretty configuration', function (t) {
 test('can be enabled via constructor with prettifier', function (t) {
   t.plan(1)
   var actual = ''
-  var child = fork(path.join(__dirname, 'fixtures', 'pretty', 'prettyFactory.js'), {silent: true})
+  var child = fork(path.join(__dirname, 'fixtures', 'pretty', 'pretty-factory.js'), {silent: true})
 
   child.stdout.pipe(writeStream(function (s, enc, cb) {
     actual += s
@@ -80,7 +80,7 @@ test('can send pretty print to custom stream', function (t) {
 test('ignores `undefined` from prettifier', function (t) {
   t.plan(1)
   var actual = ''
-  var child = fork(path.join(__dirname, 'fixtures', 'pretty', 'skippedOutput.js'), {silent: true})
+  var child = fork(path.join(__dirname, 'fixtures', 'pretty', 'skipped-output.js'), {silent: true})
 
   child.stdout.pipe(writeStream(function (s, enc, cb) {
     actual += s

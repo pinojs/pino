@@ -27,7 +27,7 @@ This has a couple of important caveats:
 
   In all of these cases, except `SIGHUP`, the process is in a state that it
   *must* terminate. Thus, if you do not register an `onTerminated` function when
-  constructing your Pino instance (see [pino#constructor](API.md#constructor)),
+  constructing your Pino instance (see [pino#constructor](api.md#constructor)),
   then Pino will invoke `process.exit(0)` when no error has occurred, or
   `process.exit(1)` otherwise. If you do supply an `onTerminated` function, it
   is left up to you to fully terminate the process.

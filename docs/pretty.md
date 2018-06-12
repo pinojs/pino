@@ -17,7 +17,7 @@ purposes with other CLI based prettifiers.
 
 Pino prettifier modules are extra modules that provide a CLI for parsing NDJSON
 log lines piped via `stdin` and expose an API which conforms to the Pino
-[metadata streams](API.md#metadata) API.
+[metadata streams](api.md#metadata) API.
 
 The API requires modules provide a factory function which returns a prettifier
 function. This prettifier function must accept either a string of NDJSON or
