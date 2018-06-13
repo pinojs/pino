@@ -18,16 +18,16 @@
   "scripts": {
     "browser-test": "airtap --local 8080 test/browser*test.js",
     "test": "standard | snazzy && NODE_OPTIONS='--no-warnings' tap -j 4 --no-cov test/*test.js",
-    "ci": "standard | snazzy &&  NODE_OPTIONS='--no-warnings' tap -j 4 --cov test/*test.js",
+    "ci": "standard | snazzy && NODE_OPTIONS='--no-warnings' tap -j 4 --cov test/*test.js",
     "bench-all": "node benchmarks/runbench all",
     "bench-basic": "node benchmarks/runbench basic",
     "bench-object": "node benchmarks/runbench object",
-    "bench-deepobject": "node benchmarks/runbench deepobject",
-    "bench-multiarg": "node benchmarks/runbench multiarg",
-    "bench-longstring": "node benchmarks/runbench longstring",
+    "bench-deepo-bject": "node benchmarks/runbench deep-object",
+    "bench-multi-arg": "node benchmarks/runbench multi-arg",
+    "bench-longs-tring": "node benchmarks/runbench long-string",
     "bench-child": "node benchmarks/runbench child",
-    "bench-grandchild": "node benchmarks/runbench grandchild",
-    "bench-conception": "node benchmarks/runbench conception"
+    "bench-child-child": "node benchmarks/runbench child-child",
+    "bench-child-creation": "node benchmarks/runbench child-creation"
   },
   "bin": {
     "pino": "./bin.js"
@@ -84,7 +84,7 @@
     "flatstr": "^1.0.5",
     "pino-std-serializers": "^2.0.0",
     "pump": "^3.0.0",
-    "quick-format-unescaped": "^2.0.1",
+    "quick-format-unescaped": "^3.0.0",
     "sonic-boom": "^0.5.0"
   }
 }

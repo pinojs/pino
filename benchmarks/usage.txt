@@ -5,11 +5,11 @@
   ・all        ⁃ run all benchmarks (takes a while)
   ・basic      ⁃ log a simple string
   ・object     ⁃ logging a basic object
-  ・deepobject ⁃ logging a large object
-  ・multiarg   ⁃ multiple log method arguments
+  ・deep-object ⁃ logging a large object
+  ・multi-arg   ⁃ multiple log method arguments
   ・child      ⁃ child from a parent
-  ・grandchild ⁃ child from a child
-  ・conception ⁃ child constructor
+  ・child-child ⁃ child from a child
+  ・child-creation ⁃ child constructor
 
   Example:
 

@@ -15,7 +15,7 @@ var plogUnsafe = require('../')({safe: false}, dest)
 delete require.cache[require.resolve('../')]
 var plogUnsafeExtreme = require('../')({safe: false}, pino.extreme('/dev/null'))
 
-var loglevel = require('./loglevelMock')(dest)
+var loglevel = require('./log-level-mock')(dest)
 
 var deep = Object.assign({}, require('../package.json'), { level: 'info' })
 deep.deep = Object.assign({}, JSON.parse(JSON.stringify(deep)))

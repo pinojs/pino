@@ -1,6 +1,6 @@
 'use strict'
 
-var pino = require('./')()
+const pino = require('./')()
 
 pino.info('hello world')
 pino.error('this is at error level')
@@ -8,15 +8,15 @@ pino.info('the answer is %d', 42)
 pino.info({ obj: 42 }, 'hello world')
 pino.info({ obj: 42, b: 2 }, 'hello world')
 pino.info({ nested: { obj: 42 } }, 'nested')
-setImmediate(function () {
+setImmediate(() => {
   pino.info('after setImmediate')
 })
 pino.error(new Error('an error'))
 
-var child = pino.child({ a: 'property' })
+const child = pino.child({ a: 'property' })
 child.info('hello child!')
 
-var childsChild = child.child({ another: 'property' })
+const childsChild = child.child({ another: 'property' })
 childsChild.info('hello baby..')
 
 pino.debug('this should be mute')
