@@ -1,29 +1,38 @@
 'use strict'
 
-var bench = require('fastbench')
-var pino = require('../')
-var fs = require('fs')
-var dest = fs.createWriteStream('/dev/null')
-var plog = pino(dest)
+const bench = require('fastbench')
+const pino = require('../')
+const fs = require('fs')
+const dest = fs.createWriteStream('/dev/null')
+const plog = pino(dest)
 delete require.cache[require.resolve('../')]
-var plogExtreme = require('../')(pino.extreme('/dev/null'))
+const plogExtreme = require('../')(pino.extreme('/dev/null'))
 delete require.cache[require.resolve('../')]
-var plogUnsafe = require('../')({safe: false}, dest)
+const plogUnsafe = require('../')({safe: false}, dest)
 delete require.cache[require.resolve('../')]
-var plogUnsafeExtreme = require('../')({safe: false}, pino.extreme('/dev/null'))
-var plogRedact = pino({redact: ['a.b.c']}, dest)
+const plogUnsafeExtreme = require('../')(
+  {safe: false},
+  pino.extreme('/dev/null')
+)
+const plogRedact = pino({redact: ['a.b.c']}, dest)
 delete require.cache[require.resolve('../')]
-var plogExtremeRedact = require('../')({redact: ['a.b.c']}, pino.extreme('/dev/null'))
+const plogExtremeRedact = require('../')(
+  {redact: ['a.b.c']},
+  pino.extreme('/dev/null')
+)
 delete require.cache[require.resolve('../')]
-var plogUnsafeRedact = require('../')({redact: ['a.b.c'], safe: false}, dest)
+const plogUnsafeRedact = require('../')({redact: ['a.b.c'], safe: false}, dest)
 delete require.cache[require.resolve('../')]
-var plogUnsafeExtremeRedact = require('../')({redact: ['a.b.c'], safe: false}, pino.extreme('/dev/null'))
+const plogUnsafeExtremeRedact = require('../')(
+  {redact: ['a.b.c'], safe: false},
+  pino.extreme('/dev/null')
+)
 
-var max = 10
+const max = 10
 
 // note that "redact me." is the same amount of bytes as the censor: "[Redacted]"
 
-var run = bench([
+const run = bench([
   function benchPinoNoRedact (cb) {
     for (var i = 0; i < max; i++) {
       plog.info({a: {b: {c: 'redact me.', d: 'leave me'}}})

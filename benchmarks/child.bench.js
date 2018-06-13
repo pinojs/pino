@@ -1,17 +1,17 @@
 'use strict'
 
-var bench = require('fastbench')
-var pino = require('../')
-var bunyan = require('bunyan')
-var bole = require('bole')('bench')('child')
-var fs = require('fs')
-var dest = fs.createWriteStream('/dev/null')
-var plog = pino(dest).child({ a: 'property' })
+const bench = require('fastbench')
+const pino = require('../')
+const bunyan = require('bunyan')
+const bole = require('bole')('bench')('child')
+const fs = require('fs')
+const dest = fs.createWriteStream('/dev/null')
+const plog = pino(dest).child({ a: 'property' })
 delete require.cache[require.resolve('../')]
-var plogExtreme = require('../')(pino.extreme('/dev/null')).child({ a: 'property' })
+const plogExtreme = require('../')(pino.extreme('/dev/null')).child({ a: 'property' })
 
-var max = 10
-var blog = bunyan.createLogger({
+const max = 10
+const blog = bunyan.createLogger({
   name: 'myapp',
   streams: [{
     level: 'trace',
@@ -24,7 +24,7 @@ require('bole').output({
   stream: dest
 }).setFastTime(true)
 
-var run = bench([
+const run = bench([
   function benchBunyanChild (cb) {
     for (var i = 0; i < max; i++) {
       blog.info({ hello: 'world' })
