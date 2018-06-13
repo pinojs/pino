@@ -19,15 +19,15 @@
     "browser-test": "airtap --local 8080 test/browser*test.js",
     "test": "standard | snazzy && NODE_OPTIONS='--no-warnings' tap -j 4 --no-cov test/*test.js",
     "ci": "standard | snazzy && NODE_OPTIONS='--no-warnings' tap -j 4 --cov test/*test.js",
-    "bench-all": "node benchmarks/runbench all",
-    "bench-basic": "node benchmarks/runbench basic",
-    "bench-object": "node benchmarks/runbench object",
-    "bench-deepo-bject": "node benchmarks/runbench deep-object",
-    "bench-multi-arg": "node benchmarks/runbench multi-arg",
-    "bench-longs-tring": "node benchmarks/runbench long-string",
-    "bench-child": "node benchmarks/runbench child",
-    "bench-child-child": "node benchmarks/runbench child-child",
-    "bench-child-creation": "node benchmarks/runbench child-creation"
+    "bench": "node benchmarks/utils/runbench all",
+    "bench-basic": "node benchmarks/utils/runbench basic",
+    "bench-object": "node benchmarks/utils/runbench object",
+    "bench-deepo-bject": "node benchmarks/utils/runbench deep-object",
+    "bench-multi-arg": "node benchmarks/utils/runbench multi-arg",
+    "bench-longs-tring": "node benchmarks/utils/runbench long-string",
+    "bench-child": "node benchmarks/utils/runbench child",
+    "bench-child-child": "node benchmarks/utils/runbench child-child",
+    "bench-child-creation": "node benchmarks/utils/runbench child-creation"
   },
   "bin": {
     "pino": "./bin.js"
