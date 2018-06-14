@@ -9,10 +9,10 @@ var pid = process.pid
 var hostname = os.hostname()
 
 function testEscape (ch, key) {
-  test('correctly escape ' + ch, ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+  test('correctly escape ' + ch, ({end, same}) => {
     var instance = pino({
       name: 'hello'
-    }, sink(function (chunk, enc, cb) {
+    }, sink(function (chunk, enc) {
       delete chunk.time
       same(chunk, {
         pid: pid,
@@ -75,10 +75,10 @@ toEscape.forEach(function (key) {
   testEscape(JSON.stringify(key), key)
 })
 
-test('correctly escape `hello \\u001F world \\n \\u0022`', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('correctly escape `hello \\u001F world \\n \\u0022`', ({end, same}) => {
   var instance = pino({
     name: 'hello'
-  }, sink(function (chunk, enc, cb) {
+  }, sink(function (chunk, enc) {
     delete chunk.time
     same(chunk, {
       pid: pid,

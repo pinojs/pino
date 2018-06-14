@@ -7,7 +7,7 @@ var fork = require('child_process').fork
 var spawn = require('child_process').spawn
 var fixturesPath = path.join(__dirname, 'fixtures', 'events')
 
-test('no event loop logs successfully', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('no event loop logs successfully', ({end, is}) => {
   var output = ''
   var child = fork(path.join(fixturesPath, 'no-event-loop.js'), {silent: true})
 
@@ -22,7 +22,7 @@ test('no event loop logs successfully', ({plan, end, ok, same, is, isNot, throws
   })
 })
 
-test('terminates when uncaughtException is fired with onTerminate registered', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('terminates when uncaughtException is fired with onTerminate registered', ({end, is}) => {
   var output = ''
   var errorOutput = ''
   var child = spawn(process.argv[0], [path.join(fixturesPath, 'uncaught-exception.js')], {silent: true})
@@ -45,7 +45,7 @@ test('terminates when uncaughtException is fired with onTerminate registered', (
   })
 })
 
-test('terminates when uncaughtException is fired without onTerminate registered', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('terminates when uncaughtException is fired without onTerminate registered', ({end, is}) => {
   var output = ''
   var child = spawn(process.argv[0], [path.join(fixturesPath, 'uncaught-exception-no-terminate.js')], {silent: true})
 
@@ -64,7 +64,7 @@ test('terminates when uncaughtException is fired without onTerminate registered'
   })
 })
 
-test('terminates on SIGHUP when no other handlers registered', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('terminates on SIGHUP when no other handlers registered', ({end, is}) => {
   var output = ''
   var child = spawn(process.argv[0], [path.join(fixturesPath, 'sighup-no-handler.js')], {silent: true})
 
@@ -87,7 +87,7 @@ test('terminates on SIGHUP when no other handlers registered', ({plan, end, ok, 
   setTimeout(function () { child.kill('SIGHUP') }, 2000)
 })
 
-test('lets app terminate when SIGHUP received with multiple handlers', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('lets app terminate when SIGHUP received with multiple handlers', ({end, is}) => {
   var output = ''
   var child = spawn(process.argv[0], [path.join(fixturesPath, 'sighup-with-handler.js')], {silent: true})
 
@@ -109,7 +109,7 @@ test('lets app terminate when SIGHUP received with multiple handlers', ({plan, e
   setTimeout(function () { child.kill('SIGHUP') }, 2000)
 })
 
-test('destination', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('destination', ({end, is}) => {
   var output = ''
   var child = spawn(process.argv[0], [path.join(fixturesPath, 'destination.js')], {silent: true})
 

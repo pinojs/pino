@@ -2,7 +2,7 @@
 var test = require('tape')
 var pino = require('../browser')
 
-test('set the level by string', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('set the level by string', ({end, same, is}) => {
   var expected = [
     {
       level: 50,
@@ -29,7 +29,7 @@ test('set the level by string', ({plan, end, ok, same, is, isNot, throws, doesNo
   end()
 })
 
-test('set the level by string. init with silent', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('set the level by string. init with silent', ({end, same, is}) => {
   var expected = [
     {
       level: 50,
@@ -57,7 +57,7 @@ test('set the level by string. init with silent', ({plan, end, ok, same, is, isN
   end()
 })
 
-test('set the level by string. init with silent and transmit', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('set the level by string. init with silent and transmit', ({end, same, is}) => {
   var expected = [
     {
       level: 50,
@@ -89,7 +89,7 @@ test('set the level by string. init with silent and transmit', ({plan, end, ok, 
   end()
 })
 
-test('set the level via constructor', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('set the level via constructor', ({end, same, is}) => {
   var expected = [
     {
       level: 50,
@@ -116,7 +116,7 @@ test('set the level via constructor', ({plan, end, ok, same, is, isNot, throws, 
   end()
 })
 
-test('the wrong level throws', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('the wrong level throws', ({end, throws}) => {
   var instance = pino()
   throws(function () {
     instance.level = 'kaboom'
@@ -124,7 +124,7 @@ test('the wrong level throws', ({plan, end, ok, same, is, isNot, throws, doesNot
   end()
 })
 
-test('the wrong level by number throws', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('the wrong level by number throws', ({end, throws}) => {
   var instance = pino()
   throws(function () {
     instance.levelVal = 55
@@ -132,27 +132,27 @@ test('the wrong level by number throws', ({plan, end, ok, same, is, isNot, throw
   end()
 })
 
-test('exposes level string mappings', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('exposes level string mappings', ({end, is}) => {
   is(pino.levels.values.error, 50)
   end()
 })
 
-test('exposes level number mappings', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('exposes level number mappings', ({end, is}) => {
   is(pino.levels.labels[50], 'error')
   end()
 })
 
-test('returns level integer', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('returns level integer', ({end, is}) => {
   var instance = pino({level: 'error'})
   is(instance.levelVal, 50)
   end()
 })
 
-test('silent level via constructor', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('silent level via constructor', ({end, fail}) => {
   var instance = pino({
     level: 'silent',
     browser: {
-      write: function (actual) {
+      write: function () {
         fail('no data should be logged')
       }
     }
@@ -165,10 +165,10 @@ test('silent level via constructor', ({plan, end, ok, same, is, isNot, throws, d
   end()
 })
 
-test('silent level by string', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('silent level by string', ({end, fail}) => {
   var instance = pino({
     browser: {
-      write: function (actual) {
+      write: function () {
         fail('no data should be logged')
       }
     }
@@ -183,7 +183,7 @@ test('silent level by string', ({plan, end, ok, same, is, isNot, throws, doesNot
   end()
 })
 
-test('exposed levels', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('exposed levels', ({end, same}) => {
   same(Object.keys(pino.levels.values), [
     'fatal',
     'error',
@@ -195,7 +195,7 @@ test('exposed levels', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, f
   end()
 })
 
-test('exposed labels', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('exposed labels', ({end, same}) => {
   same(Object.keys(pino.levels.labels), [
     '10',
     '20',

@@ -10,21 +10,21 @@ var check = require('./helper').check
 var pid = process.pid
 var hostname = os.hostname()
 
-test('pino version is exposed', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('pino version is exposed', ({end, ok, is}) => {
   var instance = pino()
   ok(instance.pino)
   is(instance.pino, require('../package.json').version)
   end()
 })
 
-test('child exposes pino version', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('child exposes pino version', ({end, ok}) => {
   var child = pino().child({foo: 'bar'})
   ok(child.pino)
   end()
 })
 
 function levelTest (name, level) {
-  test(name + ' logs as ' + level, ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+  test(name + ' logs as ' + level, ({end, is}) => {
     var instance = pino(sink(function (chunk, enc, cb) {
       check(is, chunk, level, 'hello world')
       end()
@@ -35,8 +35,8 @@ function levelTest (name, level) {
     instance[name]('hello world')
   })
 
-  test('passing objects at level ' + name, ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
-    var instance = pino(sink(function (chunk, enc, cb) {
+  test('passing objects at level ' + name, ({end, ok, same}) => {
+    var instance = pino(sink(function (chunk, enc) {
       ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
       delete chunk.time
       same(chunk, {
@@ -53,8 +53,8 @@ function levelTest (name, level) {
     instance[name]({ hello: 'world' })
   })
 
-  test('passing an object and a string at level ' + name, ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
-    var instance = pino(sink(function (chunk, enc, cb) {
+  test('passing an object and a string at level ' + name, ({end, ok, same}) => {
+    var instance = pino(sink(function (chunk, enc) {
       ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
       delete chunk.time
       same(chunk, {
@@ -72,8 +72,8 @@ function levelTest (name, level) {
     instance[name]({ hello: 'world' }, 'a string')
   })
 
-  test('formatting logs as ' + name, ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
-    var instance = pino(sink(function (chunk, enc, cb) {
+  test('formatting logs as ' + name, ({end, is}) => {
+    var instance = pino(sink(function (chunk, enc) {
       check(is, chunk, level, 'hello 42')
       end()
     }))
@@ -82,13 +82,13 @@ function levelTest (name, level) {
     instance[name]('hello %d', 42)
   })
 
-  test('passing error with a serializer at level ' + name, ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+  test('passing error with a serializer at level ' + name, ({end, ok, same}) => {
     var err = new Error('myerror')
     var instance = pino({
       serializers: {
         err: pino.stdSerializers.err
       }
-    }, sink(function (chunk, enc, cb) {
+    }, sink(function (chunk, enc) {
       ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
       delete chunk.time
       same(chunk, {
@@ -109,8 +109,8 @@ function levelTest (name, level) {
     instance[name]({ err: err })
   })
 
-  test('child logger for level ' + name, ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
-    var instance = pino(sink(function (chunk, enc, cb) {
+  test('child logger for level ' + name, ({end, ok, same}) => {
+    var instance = pino(sink(function (chunk, enc) {
       ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
       delete chunk.time
       same(chunk, {
@@ -139,12 +139,12 @@ levelTest('info', 30)
 levelTest('debug', 20)
 levelTest('trace', 10)
 
-test('serializers can return undefined to strip field', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('serializers can return undefined to strip field', ({end, is}) => {
   var instance = pino({
     serializers: {
-      test: function (o) { return undefined }
+      test: function () { return undefined }
     }
-  }, sink(function (obj, enc, cb) {
+  }, sink(function (obj, enc) {
     is('test' in obj, false)
     end()
   }))
@@ -152,7 +152,7 @@ test('serializers can return undefined to strip field', ({plan, end, ok, same, i
   instance.info({ test: 'sensitive info' })
 })
 
-test('does not explode with a circular ref', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('does not explode with a circular ref', ({end}) => {
   var instance = pino(sink(() => {}))
   var b = {}
   var a = {
@@ -163,7 +163,7 @@ test('does not explode with a circular ref', ({plan, end, ok, same, is, isNot, t
   end()
 })
 
-test('explode with a circular ref with safe = false', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('explode with a circular ref with safe = false', ({end, throws}) => {
   var instance = pino({ safe: false }, sink())
   var b = {}
   var a = {
@@ -176,10 +176,10 @@ test('explode with a circular ref with safe = false', ({plan, end, ok, same, is,
   end()
 })
 
-test('set the name', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('set the name', ({end, ok, same}) => {
   var instance = pino({
     name: 'hello'
-  }, sink(function (chunk, enc, cb) {
+  }, sink(function (chunk, enc) {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     same(chunk, {
@@ -196,12 +196,12 @@ test('set the name', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fai
   instance.fatal('this is fatal')
 })
 
-test('set the messageKey', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('set the messageKey', ({end, ok, same}) => {
   var message = 'hello world'
   var messageKey = 'fooMessage'
   var instance = pino({
     messageKey: messageKey
-  }, sink(function (chunk, enc, cb) {
+  }, sink(function (chunk, enc) {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     same(chunk, {
@@ -217,8 +217,8 @@ test('set the messageKey', ({plan, end, ok, same, is, isNot, throws, doesNotThro
   instance.info(message)
 })
 
-test('set undefined properties', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
-  var instance = pino(sink(function (chunk, enc, cb) {
+test('set undefined properties', ({end, ok, same}) => {
+  var instance = pino(sink(function (chunk, enc) {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     same(chunk, {
@@ -234,8 +234,8 @@ test('set undefined properties', ({plan, end, ok, same, is, isNot, throws, doesN
   instance.info({ hello: 'world', property: undefined })
 })
 
-test('set properties defined in the prototype chain', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
-  var instance = pino(sink(function (chunk, enc, cb) {
+test('set properties defined in the prototype chain', ({end, ok, same}) => {
+  var instance = pino(sink(function (chunk, enc) {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     same(chunk, {
@@ -257,12 +257,12 @@ test('set properties defined in the prototype chain', ({plan, end, ok, same, is,
   instance.info(new MyObject())
 })
 
-test('set the base', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('set the base', ({end, ok, same}) => {
   var instance = pino({
     base: {
       a: 'b'
     }
-  }, sink(function (chunk, enc, cb) {
+  }, sink(function (chunk, enc) {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     same(chunk, {
@@ -277,10 +277,10 @@ test('set the base', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fai
   instance.fatal('this is fatal')
 })
 
-test('set the base to null', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('set the base to null', ({end, ok, same}) => {
   var instance = pino({
     base: null
-  }, sink(function (chunk, enc, cb) {
+  }, sink(function (chunk, enc) {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     same(chunk, {
@@ -294,16 +294,16 @@ test('set the base to null', ({plan, end, ok, same, is, isNot, throws, doesNotTh
   instance.fatal('this is fatal')
 })
 
-test('throw if creating child without bindings', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('throw if creating child without bindings', ({end, throws}) => {
   var instance = pino(sink())
   throws(() => instance.child())
   end()
 })
 
-test('correctly escape msg strings / 1', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('correctly escape msg strings / 1', ({end, same}) => {
   var instance = pino({
     name: 'hello'
-  }, sink(function (chunk, enc, cb) {
+  }, sink(function (chunk, enc) {
     delete chunk.time
     same(chunk, {
       pid: pid,
@@ -319,10 +319,10 @@ test('correctly escape msg strings / 1', ({plan, end, ok, same, is, isNot, throw
   instance.fatal('this contains "')
 })
 
-test('correctly escape msg strings / 2', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('correctly escape msg strings / 2', ({end, same}) => {
   var instance = pino({
     name: 'hello'
-  }, sink(function (chunk, enc, cb) {
+  }, sink(function (chunk, enc) {
     delete chunk.time
     same(chunk, {
       pid: pid,
@@ -339,8 +339,8 @@ test('correctly escape msg strings / 2', ({plan, end, ok, same, is, isNot, throw
 })
 
 // https://github.com/pinojs/pino/issues/139
-test('object and format string', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
-  var instance = pino(sink(function (chunk, enc, cb) {
+test('object and format string', ({end, same}) => {
+  var instance = pino(sink(function (chunk, enc) {
     delete chunk.time
     same(chunk, {
       pid: pid,
@@ -355,8 +355,8 @@ test('object and format string', ({plan, end, ok, same, is, isNot, throws, doesN
   instance.info({}, 'foo %s', 'bar')
 })
 
-test('object and format string property', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
-  var instance = pino(sink(function (chunk, enc, cb) {
+test('object and format string property', ({end, same}) => {
+  var instance = pino(sink(function (chunk, enc) {
     delete chunk.time
     same(chunk, {
       pid: pid,
@@ -372,10 +372,10 @@ test('object and format string property', ({plan, end, ok, same, is, isNot, thro
   instance.info({ answer: 42 }, 'foo %s', 'bar')
 })
 
-test('correctly strip undefined when returned from toJSON', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('correctly strip undefined when returned from toJSON', ({end, is}) => {
   var instance = pino({
     test: 'this'
-  }, sink(function (obj, enc, cb) {
+  }, sink(function (obj, enc) {
     is('test' in obj, false)
     end()
   }))
@@ -383,7 +383,7 @@ test('correctly strip undefined when returned from toJSON', ({plan, end, ok, sam
   instance.fatal({test: {toJSON: function () { return undefined }}})
 })
 
-test('correctly support node v4+ stderr', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('correctly support node v4+ stderr', ({end, same}) => {
   // stderr inherits from Stream, rather than Writable
   var dest = {
     writable: true,
@@ -406,8 +406,8 @@ test('correctly support node v4+ stderr', ({plan, end, ok, same, is, isNot, thro
   end()
 })
 
-test('normalize number to string', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
-  var instance = pino(sink(function (chunk, enc, cb) {
+test('normalize number to string', ({end, same}) => {
+  var instance = pino(sink(function (chunk, enc) {
     delete chunk.time
     same(chunk, {
       pid: pid,
@@ -422,8 +422,8 @@ test('normalize number to string', ({plan, end, ok, same, is, isNot, throws, doe
   instance.info(1)
 })
 
-test('normalize number to string with an object', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
-  var instance = pino(sink(function (chunk, enc, cb) {
+test('normalize number to string with an object', ({end, same}) => {
+  var instance = pino(sink(function (chunk, enc) {
     delete chunk.time
     same(chunk, {
       pid: pid,
@@ -439,8 +439,8 @@ test('normalize number to string with an object', ({plan, end, ok, same, is, isN
   instance.info({ answer: 42 }, 1)
 })
 
-test('handles objects with null prototype', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
-  var instance = pino(sink(function (chunk, enc, cb) {
+test('handles objects with null prototype', ({end, same}) => {
+  var instance = pino(sink(function (chunk, enc) {
     delete chunk.time
     same(chunk, {
       pid: pid,
@@ -457,8 +457,8 @@ test('handles objects with null prototype', ({plan, end, ok, same, is, isNot, th
 })
 
 // https://github.com/pinojs/pino/issues/222
-test('children with same names render in correct order', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
-  var root = pino(sink(function (chunk, enc, cb) {
+test('children with same names render in correct order', ({end, is}) => {
+  var root = pino(sink(function (chunk, enc) {
     is(chunk.a, 3, 'last logged object takes precedence')
     end()
   }))
@@ -467,7 +467,7 @@ test('children with same names render in correct order', ({plan, end, ok, same, 
 })
 
 // https://github.com/pinojs/pino/pull/251 - use this.stringify
-test('when safe is true it should ONLY use `fast-safe-stringify`', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('when safe is true it should ONLY use `fast-safe-stringify`', ({end, is}) => {
   var safeStates = [true, false]
   var isFastSafeStringifyCalled = null
   var mockedPino = proxyquire('../', {

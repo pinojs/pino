@@ -10,10 +10,10 @@ levelTest('info')
 levelTest('debug')
 levelTest('trace')
 
-test('silent level', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('silent level', ({end, fail, pass}) => {
   var instance = pino({
     level: 'silent',
-    browser: {write: function (o) {
+    browser: {write: function () {
       fail()
     }}
   })
@@ -27,10 +27,10 @@ test('silent level', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fai
   }, 0)
 })
 
-test('enabled false', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('enabled false', ({end, fail, pass}) => {
   var instance = pino({
     enabled: false,
-    browser: {write: function (o) {
+    browser: {write: function () {
       fail()
     }}
   })
@@ -44,13 +44,13 @@ test('enabled false', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fa
   }, 0)
 })
 
-test('throw if creating child without bindings', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('throw if creating child without bindings', ({end, throws}) => {
   const instance = pino()
   throws(() => instance.child())
   end()
 })
 
-test('stubs write, flush and ee methods on instance', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('stubs write, flush and ee methods on instance', ({end, ok, is}) => {
   var instance = pino()
 
   ok(isFunc(instance.setMaxListeners))
@@ -74,7 +74,7 @@ test('stubs write, flush and ee methods on instance', ({plan, end, ok, same, is,
   end()
 })
 
-test('exposes levels object', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('exposes levels object', ({end, same}) => {
   same(pino.levels, {
     values: {
       fatal: 60,
@@ -97,13 +97,13 @@ test('exposes levels object', ({plan, end, ok, same, is, isNot, throws, doesNotT
   end()
 })
 
-test('exposes LOG_VERSION', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('exposes LOG_VERSION', ({end, is}) => {
   is(pino.LOG_VERSION, 1)
 
   end()
 })
 
-test('exposes faux stdSerializers', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('exposes faux stdSerializers', ({end, ok, same}) => {
   ok(pino.stdSerializers)
   ok(pino.stdSerializers.req)
   ok(pino.stdSerializers.res)
@@ -114,7 +114,7 @@ test('exposes faux stdSerializers', ({plan, end, ok, same, is, isNot, throws, do
   end()
 })
 
-test('exposes err stdSerializer', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('exposes err stdSerializer', ({end, ok}) => {
   ok(pino.stdSerializers)
   ok(pino.stdSerializers.req)
   ok(pino.stdSerializers.res)
@@ -138,7 +138,7 @@ absentConsoleMethodTest('trace', 'log')
 
 // do not run this with airtap
 if (process.title !== 'browser') {
-  test('in absence of console, log methods become noops', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+  test('in absence of console, log methods become noops', ({end, ok}) => {
     var console = global.console
     delete global.console
     var instance = fresh('../browser', require)()
@@ -154,7 +154,7 @@ if (process.title !== 'browser') {
   })
 }
 
-test('opts.browser.asObject logs pino-like object to console', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('opts.browser.asObject logs pino-like object to console', ({end, ok, is}) => {
   var info = console.info
   console.info = function (o) {
     is(o.level, 30)
@@ -172,7 +172,7 @@ test('opts.browser.asObject logs pino-like object to console', ({plan, end, ok, 
   end()
 })
 
-test('opts.browser.write func log single string', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('opts.browser.write func log single string', ({end, ok, is}) => {
   var instance = pino({
     browser: {
       write: function (o) {
@@ -187,7 +187,7 @@ test('opts.browser.write func log single string', ({plan, end, ok, same, is, isN
   end()
 })
 
-test('opts.browser.write func string joining', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('opts.browser.write func string joining', ({end, ok, is}) => {
   var instance = pino({
     browser: {
       write: function (o) {
@@ -202,7 +202,7 @@ test('opts.browser.write func string joining', ({plan, end, ok, same, is, isNot,
   end()
 })
 
-test('opts.browser.write func string object joining', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('opts.browser.write func string object joining', ({end, ok, is}) => {
   var instance = pino({
     browser: {
       write: function (o) {
@@ -217,7 +217,7 @@ test('opts.browser.write func string object joining', ({plan, end, ok, same, is,
   end()
 })
 
-test('opts.browser.write func string interpolation', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('opts.browser.write func string interpolation', ({end, ok, is}) => {
   var instance = pino({
     browser: {
       write: function (o) {
@@ -232,7 +232,7 @@ test('opts.browser.write func string interpolation', ({plan, end, ok, same, is, 
   end()
 })
 
-test('opts.browser.write func number', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('opts.browser.write func number', ({end, ok, is}) => {
   var instance = pino({
     browser: {
       write: function (o) {
@@ -247,7 +247,7 @@ test('opts.browser.write func number', ({plan, end, ok, same, is, isNot, throws,
   end()
 })
 
-test('opts.browser.write func log single object', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('opts.browser.write func log single object', ({end, ok, is}) => {
   var instance = pino({
     browser: {
       write: function (o) {
@@ -262,7 +262,7 @@ test('opts.browser.write func log single object', ({plan, end, ok, same, is, isN
   end()
 })
 
-test('opts.browser.write obj writes to methods corresponding to level', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('opts.browser.write obj writes to methods corresponding to level', ({end, ok, is}) => {
   var instance = pino({
     browser: {
       write: {
@@ -279,7 +279,7 @@ test('opts.browser.write obj writes to methods corresponding to level', ({plan, 
   end()
 })
 
-test('opts.browser.asObject/write supports child loggers', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('opts.browser.asObject/write supports child loggers', ({end, ok, is}) => {
   var instance = pino({
     browser: {write: function (o) {
       is(o.level, 30)
@@ -294,7 +294,7 @@ test('opts.browser.asObject/write supports child loggers', ({plan, end, ok, same
   end()
 })
 
-test('opts.browser.asObject/write supports child child loggers', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('opts.browser.asObject/write supports child child loggers', ({end, ok, is}) => {
   var instance = pino({
     browser: {write: function (o) {
       is(o.level, 30)
@@ -310,7 +310,7 @@ test('opts.browser.asObject/write supports child child loggers', ({plan, end, ok
   end()
 })
 
-test('opts.browser.asObject/write supports child child child loggers', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('opts.browser.asObject/write supports child child child loggers', ({end, ok, is}) => {
   var instance = pino({
     browser: {write: function (o) {
       is(o.level, 30)
@@ -327,7 +327,7 @@ test('opts.browser.asObject/write supports child child child loggers', ({plan, e
   end()
 })
 
-test('opts.browser.asObject defensively mitigates naughty numbers', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('opts.browser.asObject defensively mitigates naughty numbers', ({end, pass}) => {
   var instance = pino({
     browser: {asObject: true, write: function () {}}
   })
@@ -339,7 +339,7 @@ test('opts.browser.asObject defensively mitigates naughty numbers', ({plan, end,
   end()
 })
 
-test('opts.browser.write obj falls back to console where a method is not supplied', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('opts.browser.write obj falls back to console where a method is not supplied', ({end, ok, is}) => {
   var info = console.info
   console.info = function (o) {
     is(o.level, 30)
@@ -365,7 +365,7 @@ test('opts.browser.write obj falls back to console where a method is not supplie
 })
 
 function levelTest (name) {
-  test(name + ' logs', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+  test(name + ' logs', ({end, is}) => {
     var msg = 'hello world'
     sink(name, function (args) {
       is(args[0], msg)
@@ -374,7 +374,7 @@ function levelTest (name) {
     pino({level: name})[name](msg)
   })
 
-  test('passing objects at level ' + name, ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+  test('passing objects at level ' + name, ({end, is}) => {
     var msg = { hello: 'world' }
     sink(name, function (args) {
       is(args[0], msg)
@@ -383,7 +383,7 @@ function levelTest (name) {
     pino({level: name})[name](msg)
   })
 
-  test('passing an object and a string at level ' + name, ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+  test('passing an object and a string at level ' + name, ({end, is}) => {
     var a = { hello: 'world' }
     var b = 'a string'
     sink(name, function (args) {
@@ -394,7 +394,7 @@ function levelTest (name) {
     pino({level: name})[name](a, b)
   })
 
-  test('formatting logs as ' + name, ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+  test('formatting logs as ' + name, ({end, is}) => {
     sink(name, function (args) {
       is(args[0], 'hello %d')
       is(args[1], 42)
@@ -403,7 +403,7 @@ function levelTest (name) {
     pino({level: name})[name]('hello %d', 42)
   })
 
-  test('passing error at level ' + name, ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+  test('passing error at level ' + name, ({end, is}) => {
     var err = new Error('myerror')
     sink(name, function (args) {
       is(args[0], err)
@@ -412,7 +412,7 @@ function levelTest (name) {
     pino({level: name})[name](err)
   })
 
-  test('passing error with a serializer at level ' + name, ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+  test('passing error with a serializer at level ' + name, ({end, is}) => {
     // in browser - should have no effect (should not crash)
     var err = new Error('myerror')
     sink(name, function (args) {
@@ -428,7 +428,7 @@ function levelTest (name) {
     instance[name]({err: err})
   })
 
-  test('child logger for level ' + name, ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+  test('child logger for level ' + name, ({end, is}) => {
     var msg = 'hello world'
     var parent = { hello: 'world' }
     sink(name, function (args) {
@@ -441,7 +441,7 @@ function levelTest (name) {
     child[name](msg)
   })
 
-  test('child-child logger for level ' + name, ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+  test('child-child logger for level ' + name, ({end, is}) => {
     var msg = 'hello world'
     var grandParent = { hello: 'world' }
     var parent = { hello: 'you' }
@@ -459,7 +459,7 @@ function levelTest (name) {
 
 function consoleMethodTest (level, method) {
   if (!method) method = level
-  test('pino().' + level + ' uses console.' + method, ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+  test('pino().' + level + ' uses console.' + method, ({end, is}) => {
     sink(method, function (args) {
       is(args[0], 'test')
       end()
@@ -470,7 +470,7 @@ function consoleMethodTest (level, method) {
 }
 
 function absentConsoleMethodTest (method, fallback) {
-  test('in absence of console.' + method + ', console.' + fallback + ' is used', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+  test('in absence of console.' + method + ', console.' + fallback + ' is used', ({end, is}) => {
     var fn = console[method]
     console[method] = undefined
     sink(fallback, function (args) {

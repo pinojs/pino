@@ -8,8 +8,8 @@ var sink = require('./helper').sink
 var pid = process.pid
 var hostname = os.hostname()
 
-test('metadata works', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
-  var dest = sink(function (chunk, enc, cb) {
+test('metadata works', ({end, ok, same, is}) => {
+  var dest = sink(function (chunk, enc) {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     same(chunk, {
@@ -38,8 +38,8 @@ test('metadata works', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, f
   end()
 })
 
-test('child loggers works', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
-  var dest = sink(function (chunk, enc, cb) {
+test('child loggers works', ({end, ok, same, is}) => {
+  var dest = sink(function (chunk, enc) {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     same(chunk, {
@@ -68,8 +68,8 @@ test('child loggers works', ({plan, end, ok, same, is, isNot, throws, doesNotThr
   end()
 })
 
-test('without object', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
-  var dest = sink(function (chunk, enc, cb) {
+test('without object', ({end, ok, same, is}) => {
+  var dest = sink(function (chunk, enc) {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     same(chunk, {
@@ -95,8 +95,8 @@ test('without object', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, f
   end()
 })
 
-test('without msg', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
-  var dest = sink(function (chunk, enc, cb) {
+test('without msg', ({end, ok, same, is}) => {
+  var dest = sink(function (chunk, enc) {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     same(chunk, {

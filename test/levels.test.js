@@ -5,7 +5,7 @@ var pino = require('../')
 var sink = require('./helper').sink
 var check = require('./helper').check
 
-test('set the level by string', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('set the level by string', ({end, is}) => {
   var expected = [{
     level: 50,
     msg: 'this is an error'
@@ -26,7 +26,7 @@ test('set the level by string', ({plan, end, ok, same, is, isNot, throws, doesNo
   end()
 })
 
-test('the wrong level throws', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('the wrong level throws', ({end, throws}) => {
   var instance = pino()
   throws(function () {
     instance.level = 'kaboom'
@@ -34,7 +34,7 @@ test('the wrong level throws', ({plan, end, ok, same, is, isNot, throws, doesNot
   end()
 })
 
-test('set the level by number', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('set the level by number', ({end, is}) => {
   var expected = [{
     level: 50,
     msg: 'this is an error'
@@ -55,7 +55,7 @@ test('set the level by number', ({plan, end, ok, same, is, isNot, throws, doesNo
   end()
 })
 
-test('set the level by number via string method', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('set the level by number via string method', ({end, is}) => {
   var expected = [{
     level: 50,
     msg: 'this is an error'
@@ -76,30 +76,30 @@ test('set the level by number via string method', ({plan, end, ok, same, is, isN
   end()
 })
 
-test('exposes level string mappings', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('exposes level string mappings', ({end, is}) => {
   is(pino.levels.values.error, 50)
   end()
 })
 
-test('exposes level number mappings', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('exposes level number mappings', ({end, is}) => {
   is(pino.levels.labels[50], 'error')
   end()
 })
 
-test('returns level integer', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('returns level integer', ({end, is}) => {
   var instance = pino({ level: 'error' })
   is(instance.levelVal, 50)
   end()
 })
 
-test('child returns level integer', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('child returns level integer', ({end, is}) => {
   var parent = pino({ level: 'error' })
   var child = parent.child({ foo: 'bar' })
   is(child.levelVal, 50)
   end()
 })
 
-test('set the level via constructor', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('set the level via constructor', ({end, is}) => {
   var expected = [{
     level: 50,
     msg: 'this is an error'
@@ -119,7 +119,7 @@ test('set the level via constructor', ({plan, end, ok, same, is, isNot, throws, 
   end()
 })
 
-test('level-change event', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('level-change event', ({end, is}) => {
   var instance = pino()
   var handle = function (lvl, val, prevLvl, prevVal) {
     is(lvl, 'trace')
@@ -154,11 +154,11 @@ test('level-change event', ({plan, end, ok, same, is, isNot, throws, doesNotThro
   end()
 })
 
-test('enable', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('enable', ({end, fail}) => {
   var instance = pino({
     level: 'trace',
     enabled: false
-  }, sink(function (chunk, enc, cb) {
+  }, sink(function (chunk, enc) {
     fail('no data should be logged')
   }))
 
@@ -169,10 +169,10 @@ test('enable', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pas
   end()
 })
 
-test('silent level', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('silent level', ({end, fail}) => {
   var instance = pino({
     level: 'silent'
-  }, sink(function (chunk, enc, cb) {
+  }, sink(function (chunk, enc) {
     fail('no data should be logged')
   }))
 
@@ -183,10 +183,10 @@ test('silent level', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fai
   end()
 })
 
-test('silent is a noop', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('silent is a noop', ({end, fail}) => {
   var instance = pino({
     level: 'silent'
-  }, sink(function (chunk, enc, cb) {
+  }, sink(function (chunk, enc) {
     fail('no data should be logged')
   }))
 
@@ -195,11 +195,11 @@ test('silent is a noop', ({plan, end, ok, same, is, isNot, throws, doesNotThrow,
   end()
 })
 
-test('silent stays a noop after level changes', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('silent stays a noop after level changes', ({end, is, isNot, fail}) => {
   var noop = require('../lib/tools').noop
   var instance = pino({
     level: 'silent'
-  }, sink(function (chunk, enc, cb) {
+  }, sink(function (chunk, enc) {
     fail('no data should be logged')
   }))
 
@@ -213,7 +213,7 @@ test('silent stays a noop after level changes', ({plan, end, ok, same, is, isNot
   end()
 })
 
-test('exposed levels', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('exposed levels', ({end, same}) => {
   same(Object.keys(pino.levels.values), [
     'fatal',
     'error',
@@ -225,7 +225,7 @@ test('exposed levels', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, f
   end()
 })
 
-test('exposed labels', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('exposed labels', ({end, same}) => {
   same(Object.keys(pino.levels.labels), [
     '10',
     '20',
@@ -237,7 +237,7 @@ test('exposed labels', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, f
   end()
 })
 
-test('setting level in child', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('setting level in child', ({end, is}) => {
   var expected = [{
     level: 50,
     msg: 'this is an error'

@@ -9,9 +9,9 @@ var http = require('http')
 var pid = process.pid
 var hostname = os.hostname()
 
-test('http request support', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError, teardown}) => {
+test('http request support', ({end, ok, same, error, teardown}) => {
   var originalReq
-  var instance = pino(sink(function (chunk, enc, cb) {
+  var instance = pino(sink(function (chunk, enc) {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     same(chunk, {
@@ -46,13 +46,13 @@ test('http request support', ({plan, end, ok, same, is, isNot, throws, doesNotTh
   server.unref()
 })
 
-test('http request support via serializer', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError, teardown}) => {
+test('http request support via serializer', ({end, ok, same, error, teardown}) => {
   var originalReq
   var instance = pino({
     serializers: {
       req: pino.stdSerializers.req
     }
-  }, sink(function (chunk, enc, cb) {
+  }, sink(function (chunk, enc) {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     same(chunk, {
@@ -87,13 +87,13 @@ test('http request support via serializer', ({plan, end, ok, same, is, isNot, th
   server.unref()
 })
 
-test('http request support via serializer without request connection', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError, teardown}) => {
+test('http request support via serializer without request connection', ({end, ok, same, error, teardown}) => {
   var originalReq
   var instance = pino({
     serializers: {
       req: pino.stdSerializers.req
     }
-  }, sink(function (chunk, enc, cb) {
+  }, sink(function (chunk, enc) {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     same(chunk, {
@@ -127,9 +127,9 @@ test('http request support via serializer without request connection', ({plan, e
   server.unref()
 })
 
-test('http response support', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError, teardown}) => {
+test('http response support', ({end, ok, same, error, teardown}) => {
   var originalRes
-  var instance = pino(sink(function (chunk, enc, cb) {
+  var instance = pino(sink(function (chunk, enc) {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     same(chunk, {
@@ -161,13 +161,13 @@ test('http response support', ({plan, end, ok, same, is, isNot, throws, doesNotT
   server.unref()
 })
 
-test('http response support via a serializer', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError, teardown}) => {
+test('http response support via a serializer', ({end, ok, same, error, teardown}) => {
   var originalRes
   var instance = pino({
     serializers: {
       res: pino.stdSerializers.res
     }
-  }, sink(function (chunk, enc, cb) {
+  }, sink(function (chunk, enc) {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     same(chunk, {
@@ -199,13 +199,13 @@ test('http response support via a serializer', ({plan, end, ok, same, is, isNot,
   server.unref()
 })
 
-test('http request support via serializer in a child', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError, teardown}) => {
+test('http request support via serializer in a child', ({end, ok, same, error, teardown}) => {
   var originalReq
   var instance = pino({
     serializers: {
       req: pino.stdSerializers.req
     }
-  }, sink(function (chunk, enc, cb) {
+  }, sink(function (chunk, enc) {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     same(chunk, {

@@ -9,7 +9,7 @@ var hostname = os.hostname()
 var level = 50
 var name = 'error'
 
-test('err is serialized with additional properties set on the Error object', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('err is serialized with additional properties set on the Error object', ({end, ok, same}) => {
   var err = Object.assign(new Error('myerror'), {foo: 'bar'})
   var instance = pino(sink(function (chunk, enc, cb) {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
@@ -32,7 +32,7 @@ test('err is serialized with additional properties set on the Error object', ({p
   end()
 })
 
-test('type should be retained, even if type is a property', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('type should be retained, even if type is a property', ({end, ok, same}) => {
   var err = Object.assign(new Error('myerror'), {type: 'bar'})
   var instance = pino(sink(function (chunk, enc, cb) {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
@@ -54,7 +54,7 @@ test('type should be retained, even if type is a property', ({plan, end, ok, sam
   end()
 })
 
-test('type, message and stack should be first level properties', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('type, message and stack should be first level properties', ({end, ok, same}) => {
   var err = Object.assign(new Error('foo'), { foo: 'bar' })
   var instance = pino(sink(function (chunk, enc, cb) {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
@@ -77,7 +77,7 @@ test('type, message and stack should be first level properties', ({plan, end, ok
   end()
 })
 
-test('err serializer', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('err serializer', ({end, ok, same}) => {
   var err = Object.assign(new Error('myerror'), {foo: 'bar'})
   var instance = pino({
     serializers: {
@@ -106,7 +106,7 @@ test('err serializer', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, f
   end()
 })
 
-test('an error with statusCode property is not confused for a http response', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('an error with statusCode property is not confused for a http response', ({end, ok, same}) => {
   var err = Object.assign(new Error('StatusCodeErr'), { statusCode: 500 })
   var instance = pino(sink(function (chunk, enc, cb) {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')

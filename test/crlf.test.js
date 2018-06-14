@@ -13,7 +13,7 @@ function capture () {
   return ws
 }
 
-test('pino uses LF by default', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('pino uses LF by default', ({end, ok}) => {
   var stream = capture()
   var logger = pino(stream)
   logger.info('foo')
@@ -23,7 +23,7 @@ test('pino uses LF by default', ({plan, end, ok, same, is, isNot, throws, doesNo
   end()
 })
 
-test('pino can log CRLF', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('pino can log CRLF', ({end, ok}) => {
   var stream = capture()
   var logger = pino({
     crlf: true

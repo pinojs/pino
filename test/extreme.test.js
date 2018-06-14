@@ -7,7 +7,7 @@ var path = require('path')
 var writeStream = require('flush-write-stream')
 var fork = require('child_process').fork
 
-test('extreme mode', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, teardown}) => {
+test('extreme mode', ({end, is, teardown}) => {
   var now = Date.now
   var hostname = os.hostname
   var proc = process
@@ -63,7 +63,7 @@ test('extreme mode', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fai
   })
 })
 
-test('extreme mode with child', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, teardown}) => {
+test('extreme mode with child', ({end, is, teardown}) => {
   var now = Date.now
   var hostname = os.hostname
   var proc = process
@@ -121,7 +121,7 @@ test('extreme mode with child', ({plan, end, ok, same, is, isNot, throws, doesNo
   })
 })
 
-test('throw an error if extreme is passed', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('throw an error if extreme is passed', ({end, throws}) => {
   var pino = require('..')
   throws(() => {
     pino({extreme: true})
@@ -130,7 +130,7 @@ test('throw an error if extreme is passed', ({plan, end, ok, same, is, isNot, th
   end()
 })
 
-test('flush does nothing without extreme mode', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('flush does nothing without extreme mode', ({end}) => {
   var instance = require('..')()
   instance.flush()
 

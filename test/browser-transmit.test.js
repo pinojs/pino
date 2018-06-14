@@ -4,7 +4,7 @@ var pino = require('../browser')
 
 function noop () {}
 
-test('throws if transmit object does not have send function', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('throws if transmit object does not have send function', ({end, throws}) => {
   throws(function () {
     pino({browser: {transmit: {}}})
   })
@@ -16,11 +16,11 @@ test('throws if transmit object does not have send function', ({plan, end, ok, s
   end()
 })
 
-test('calls send function after write', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('calls send function after write', ({end, is}) => {
   var c = 0
   var logger = pino({
     browser: {
-      write: function (o) {
+      write: function () {
         c++
       },
       transmit: {
@@ -35,10 +35,10 @@ test('calls send function after write', ({plan, end, ok, same, is, isNot, throws
   end()
 })
 
-test('passes send function the logged level', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('passes send function the logged level', ({end, is}) => {
   var logger = pino({
     browser: {
-      write: function (o) {
+      write: function () {
       },
       transmit: {
         send: function (level) {
@@ -52,7 +52,7 @@ test('passes send function the logged level', ({plan, end, ok, same, is, isNot, 
   end()
 })
 
-test('passes send function messages in logEvent object', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('passes send function messages in logEvent object', ({end, same, is}) => {
   var logger = pino({
     browser: {
       write: noop,
@@ -70,7 +70,7 @@ test('passes send function messages in logEvent object', ({plan, end, ok, same, 
   end()
 })
 
-test('supplies a timestamp (ts) in logEvent object which is exactly the same as the `time` property in asObject mode', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('supplies a timestamp (ts) in logEvent object which is exactly the same as the `time` property in asObject mode', ({end, is}) => {
   var expected
   var logger = pino({
     browser: {
@@ -90,7 +90,7 @@ test('supplies a timestamp (ts) in logEvent object which is exactly the same as 
   end()
 })
 
-test('passes send function child bindings via logEvent object', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('passes send function child bindings via logEvent object', ({end, same, is}) => {
   var logger = pino({
     browser: {
       write: noop,
@@ -114,7 +114,7 @@ test('passes send function child bindings via logEvent object', ({plan, end, ok,
   end()
 })
 
-test('passes send function level:{label, value} via logEvent object', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('passes send function level:{label, value} via logEvent object', ({end, is}) => {
   var logger = pino({
     browser: {
       write: noop,
@@ -134,7 +134,7 @@ test('passes send function level:{label, value} via logEvent object', ({plan, en
   end()
 })
 
-test('calls send function according to transmit.level', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('calls send function according to transmit.level', ({end, is}) => {
   var c = 0
   var logger = pino({
     browser: {
@@ -155,7 +155,7 @@ test('calls send function according to transmit.level', ({plan, end, ok, same, i
   end()
 })
 
-test('transmit.level defaults to logger level', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('transmit.level defaults to logger level', ({end, is}) => {
   var c = 0
   var logger = pino({
     level: 'error',
@@ -176,7 +176,7 @@ test('transmit.level defaults to logger level', ({plan, end, ok, same, is, isNot
   end()
 })
 
-test('transmit.level is effective even if lower than logger level', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('transmit.level is effective even if lower than logger level', ({end, is}) => {
   var c = 0
   var logger = pino({
     level: 'error',
@@ -199,7 +199,7 @@ test('transmit.level is effective even if lower than logger level', ({plan, end,
   end()
 })
 
-test('applies all serializers to messages and bindings (serialize:false - default)', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('applies all serializers to messages and bindings (serialize:false - default)', ({end, same, is}) => {
   var logger = pino({
     serializers: {
       first: function () { return 'first' },
@@ -228,7 +228,7 @@ test('applies all serializers to messages and bindings (serialize:false - defaul
   end()
 })
 
-test('applies all serializers to messages and bindings (serialize:true)', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+test('applies all serializers to messages and bindings (serialize:true)', ({end, same, is}) => {
   var logger = pino({
     serializers: {
       first: function () { return 'first' },
