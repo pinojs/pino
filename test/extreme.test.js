@@ -1,11 +1,11 @@
 'use strict'
 
-var test = require('tap').test
-var fs = require('fs')
-var os = require('os')
-var path = require('path')
-var writeStream = require('flush-write-stream')
-var fork = require('child_process').fork
+const os = require('os')
+const { createWriteStream } = require('fs')
+const { join } = require('path')
+const { test } = require('tap')
+const { fork } = require('child_process')
+const writer = require('flush-write-stream')
 
 test('extreme mode', ({end, is, teardown}) => {
   var now = Date.now
@@ -15,23 +15,21 @@ test('extreme mode', ({end, is, teardown}) => {
     __proto__: process,
     pid: 123456
   }
-  Date.now = function () {
-    return 1459875739796
-  }
-  os.hostname = function () {
-    return 'abcdefghijklmnopqr'
-  }
+  Date.now = () => 1459875739796
+  os.hostname = () => 'abcdefghijklmnopqr'
   delete require.cache[require.resolve('../')]
-  var pino = require('../')
+  const pino = require('../')
   var expected = ''
   var actual = ''
-  var normal = pino(writeStream(function (s, enc, cb) {
+  var normal = pino(writer((s, enc, cb) => {
     expected += s
     cb()
   }))
 
-  var dest = fs.createWriteStream('/dev/null')
-  dest.write = function (s) { actual += s }
+  var dest = createWriteStream('/dev/null')
+  dest.write = (s) => {
+    actual += s
+  }
   var extreme = pino(dest)
 
   var i = 44
@@ -43,8 +41,8 @@ test('extreme mode', ({end, is, teardown}) => {
   var expected2 = expected.split('\n')[0]
   var actual2 = ''
 
-  var child = fork(path.join(__dirname, '/fixtures/extreme.js'), {silent: true})
-  child.stdout.pipe(writeStream(function (s, enc, cb) {
+  var child = fork(join(__dirname, '/fixtures/extreme.js'), {silent: true})
+  child.stdout.pipe(writer((s, enc, cb) => {
     actual2 += s
     cb()
   }))
@@ -78,15 +76,15 @@ test('extreme mode with child', ({end, is, teardown}) => {
     return 'abcdefghijklmnopqr'
   }
   delete require.cache[require.resolve('../')]
-  var pino = require('../')
+  const pino = require('../')
   var expected = ''
   var actual = ''
-  var normal = pino(writeStream(function (s, enc, cb) {
+  var normal = pino(writer((s, enc, cb) => {
     expected += s
     cb()
   })).child({ hello: 'world' })
 
-  var dest = fs.createWriteStream('/dev/null')
+  var dest = createWriteStream('/dev/null')
   dest.write = function (s) { actual += s }
   var extreme = pino(dest).child({ hello: 'world' })
 
@@ -101,8 +99,8 @@ test('extreme mode with child', ({end, is, teardown}) => {
   var expected2 = expected.split('\n')[0]
   var actual2 = ''
 
-  var child = fork(path.join(__dirname, '/fixtures/extreme-child.js'), {silent: true})
-  child.stdout.pipe(writeStream(function (s, enc, cb) {
+  var child = fork(join(__dirname, '/fixtures/extreme-child.js'), {silent: true})
+  child.stdout.pipe(writer((s, enc, cb) => {
     actual2 += s
     cb()
   }))

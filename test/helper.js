@@ -1,15 +1,15 @@
 'use strict'
 
-const writeStream = require('flush-write-stream')
-const split = require('split2')
 const os = require('os')
+const writer = require('flush-write-stream')
+const split = require('split2')
 const pid = process.pid
 const hostname = os.hostname()
 const v = 1
 
 function sink (func = () => {}) {
   const result = split(JSON.parse)
-  result.pipe(writeStream.obj(func))
+  result.pipe(writer.obj(func))
   return result
 }
 

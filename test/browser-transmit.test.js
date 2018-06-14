@@ -1,6 +1,6 @@
 'use strict'
-var test = require('tape')
-var pino = require('../browser')
+const test = require('tape')
+const pino = require('../browser')
 
 function noop () {}
 

@@ -1,8 +1,8 @@
 'use strict'
 
-var test = require('tap').test
-var sink = require('./helper').sink
-var pino = require('../')
+const { test } = require('tap')
+const { sink } = require('./helper')
+const pino = require('../')
 
 test('can add a custom level via constructor', ({end, is}) => {
   var log = pino({level: 'foo', levelVal: 35}, sink((chunk, enc) => {

@@ -1,7 +1,7 @@
 'use strict'
-var test = require('tape')
-var fresh = require('fresh-require')
-var pino = require('../browser')
+const test = require('tape')
+const fresh = require('fresh-require')
+const pino = require('../browser')
 
 levelTest('fatal')
 levelTest('error')

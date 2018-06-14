@@ -2,16 +2,16 @@
 // eslint-disable-next-line
 if (typeof $1 !== 'undefined') $1 = arguments.callee.caller.arguments[0]
 
-var test = require('tape')
-var fresh = require('fresh-require')
-var pino = require('../browser')
+const test = require('tape')
+const fresh = require('fresh-require')
+const pino = require('../browser')
 
 var parentSerializers = {
-  test: function () { return 'parent' }
+  test: () => 'parent'
 }
 
 var childSerializers = {
-  test: function () { return 'child' }
+  test: () => 'child'
 }
 
 test('serializers override values', ({end, is}) => {

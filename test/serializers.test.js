@@ -1,14 +1,14 @@
 'use strict'
-var test = require('tap').test
-var pino = require('../')
-var sink = require('./helper').sink
+const { test } = require('tap')
+const { sink } = require('./helper')
+const pino = require('../')
 
-var parentSerializers = {
-  test: function () { return 'parent' }
+const parentSerializers = {
+  test: () => 'parent'
 }
 
-var childSerializers = {
-  test: function () { return 'child' }
+const childSerializers = {
+  test: () => 'child'
 }
 
 test('serializers override values', ({end, is}) => {

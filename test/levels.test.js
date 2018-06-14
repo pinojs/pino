@@ -1,9 +1,9 @@
 'use strict'
 
-var test = require('tap').test
-var pino = require('../')
-var sink = require('./helper').sink
-var check = require('./helper').check
+const { test } = require('tap')
+const { sink } = require('./helper')
+const { check } = require('./helper')
+const pino = require('../')
 
 test('set the level by string', ({end, is}) => {
   var expected = [{

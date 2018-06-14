@@ -1,8 +1,8 @@
 'use strict'
 
-var test = require('tap').test
-var pino = require('../')
-var sink = require('./helper').sink
+const { test } = require('tap')
+const { sink } = require('./helper')
+const pino = require('../')
 
 test('pino exposes standard time functions', ({end, ok}) => {
   ok(pino.stdTimeFunctions)

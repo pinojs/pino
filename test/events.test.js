@@ -1,17 +1,17 @@
 'use strict'
 
-var test = require('tap').test
-var path = require('path')
-var writeStream = require('flush-write-stream')
-var fork = require('child_process').fork
-var spawn = require('child_process').spawn
-var fixturesPath = path.join(__dirname, 'fixtures', 'events')
+const { test } = require('tap')
+const { join } = require('path')
+const { fork, spawn } = require('child_process')
+const writer = require('flush-write-stream')
+
+const fixtures = join(__dirname, 'fixtures', 'events')
 
 test('no event loop logs successfully', ({end, is}) => {
   var output = ''
-  var child = fork(path.join(fixturesPath, 'no-event-loop.js'), {silent: true})
+  var child = fork(join(fixtures, 'no-event-loop.js'), {silent: true})
 
-  child.stdout.pipe(writeStream((s, enc, cb) => {
+  child.stdout.pipe(writer((s, enc, cb) => {
     output += s
     cb()
   }))
@@ -25,14 +25,14 @@ test('no event loop logs successfully', ({end, is}) => {
 test('terminates when uncaughtException is fired with onTerminate registered', ({end, is}) => {
   var output = ''
   var errorOutput = ''
-  var child = spawn(process.argv[0], [path.join(fixturesPath, 'uncaught-exception.js')], {silent: true})
+  var child = spawn(process.argv[0], [join(fixtures, 'uncaught-exception.js')], {silent: true})
 
-  child.stdout.pipe(writeStream(function (s, enc, cb) {
+  child.stdout.pipe(writer(function (s, enc, cb) {
     output += s
     cb()
   }))
 
-  child.stderr.pipe(writeStream(function (s, enc, cb) {
+  child.stderr.pipe(writer(function (s, enc, cb) {
     errorOutput += s
     cb()
   }))
@@ -47,9 +47,9 @@ test('terminates when uncaughtException is fired with onTerminate registered', (
 
 test('terminates when uncaughtException is fired without onTerminate registered', ({end, is}) => {
   var output = ''
-  var child = spawn(process.argv[0], [path.join(fixturesPath, 'uncaught-exception-no-terminate.js')], {silent: true})
+  var child = spawn(process.argv[0], [join(fixtures, 'uncaught-exception-no-terminate.js')], {silent: true})
 
-  child.stdout.pipe(writeStream(function (s, enc, cb) {
+  child.stdout.pipe(writer(function (s, enc, cb) {
     output += s
     cb()
   }))
@@ -66,9 +66,9 @@ test('terminates when uncaughtException is fired without onTerminate registered'
 
 test('terminates on SIGHUP when no other handlers registered', ({end, is}) => {
   var output = ''
-  var child = spawn(process.argv[0], [path.join(fixturesPath, 'sighup-no-handler.js')], {silent: true})
+  var child = spawn(process.argv[0], [join(fixtures, 'sighup-no-handler.js')], {silent: true})
 
-  child.stdout.pipe(writeStream(function (s, enc, cb) {
+  child.stdout.pipe(writer(function (s, enc, cb) {
     output += s
     cb()
   }))
@@ -89,9 +89,9 @@ test('terminates on SIGHUP when no other handlers registered', ({end, is}) => {
 
 test('lets app terminate when SIGHUP received with multiple handlers', ({end, is}) => {
   var output = ''
-  var child = spawn(process.argv[0], [path.join(fixturesPath, 'sighup-with-handler.js')], {silent: true})
+  var child = spawn(process.argv[0], [join(fixtures, 'sighup-with-handler.js')], {silent: true})
 
-  child.stdout.pipe(writeStream(function (s, enc, cb) {
+  child.stdout.pipe(writer(function (s, enc, cb) {
     output += s
     cb()
   }))
@@ -111,9 +111,9 @@ test('lets app terminate when SIGHUP received with multiple handlers', ({end, is
 
 test('destination', ({end, is}) => {
   var output = ''
-  var child = spawn(process.argv[0], [path.join(fixturesPath, 'destination.js')], {silent: true})
+  var child = spawn(process.argv[0], [join(fixtures, 'destination.js')], {silent: true})
 
-  child.stdout.pipe(writeStream(function (s, enc, cb) {
+  child.stdout.pipe(writer(function (s, enc, cb) {
     output += s
     cb()
   }))

@@ -1,8 +1,8 @@
 'use strict'
 
-var test = require('tap').test
-var pino = require('../')
-var writer = require('flush-write-stream')
+const { test } = require('tap')
+const writer = require('flush-write-stream')
+const pino = require('../')
 
 function capture () {
   var ws = writer((chunk, enc, cb) => {

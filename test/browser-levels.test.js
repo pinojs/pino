@@ -1,6 +1,6 @@
 'use strict'
-var test = require('tape')
-var pino = require('../browser')
+const test = require('tape')
+const pino = require('../browser')
 
 test('set the level by string', ({end, same, is}) => {
   var expected = [

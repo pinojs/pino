@@ -1,10 +1,10 @@
 'use strict'
 
-var test = require('tap').test
-var os = require('os')
-var pino = require('../')
-var sink = require('./helper').sink
-var http = require('http')
+const http = require('http')
+const os = require('os')
+const { test } = require('tap')
+const { sink } = require('./helper')
+const pino = require('../')
 
 var pid = process.pid
 var hostname = os.hostname()

@@ -1,13 +1,13 @@
 'use strict'
-var test = require('tap').test
-var pino = require('../')
-var sink = require('./helper').sink
+const os = require('os')
+const { test } = require('tap')
+const { sink } = require('./helper')
+const pino = require('../')
 
-var os = require('os')
-var pid = process.pid
-var hostname = os.hostname()
-var level = 50
-var name = 'error'
+const { pid } = process
+const hostname = os.hostname()
+const level = 50
+const name = 'error'
 
 test('err is serialized with additional properties set on the Error object', ({end, ok, same}) => {
   var err = Object.assign(new Error('myerror'), {foo: 'bar'})

@@ -1,11 +1,9 @@
 'use strict'
-
-var test = require('tap').test
-var os = require('os')
-var proxyquire = require('proxyquire')
-var pino = require('../')
-var sink = require('./helper').sink
-var check = require('./helper').check
+const os = require('os')
+const { test } = require('tap')
+const { sink, check } = require('./helper')
+const proxyquire = require('proxyquire')
+const pino = require('../')
 
 var pid = process.pid
 var hostname = os.hostname()

@@ -1,7 +1,7 @@
 'use strict'
 
-var test = require('tap').test
-var pino = require('../')
+const { test } = require('tap')
+const pino = require('../')
 
 test('can check if current level enabled', ({end, is}) => {
   var log = pino({level: 'debug'})
