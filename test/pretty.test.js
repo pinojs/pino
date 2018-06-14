@@ -7,8 +7,7 @@ var path = require('path')
 var writeStream = require('flush-write-stream')
 var fork = require('child_process').fork
 
-test('can be enabled via constructor', function (t) {
-  t.plan(1)
+test('can be enabled via constructor', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var actual = ''
   var child = fork(path.join(__dirname, 'fixtures', 'pretty', 'basic.js'), {silent: true})
 
@@ -18,12 +17,12 @@ test('can be enabled via constructor', function (t) {
   }))
 
   child.on('close', function () {
-    t.notEqual(actual.match(/\(123456 on abcdefghijklmnopqr\): h/), null)
+    isNot(actual.match(/\(123456 on abcdefghijklmnopqr\): h/), null)
+    end()
   })
 })
 
-test('can be enabled via constructor with pretty configuration', function (t) {
-  t.plan(1)
+test('can be enabled via constructor with pretty configuration', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var actual = ''
   var child = fork(path.join(__dirname, 'fixtures', 'pretty', 'level-first.js'), {silent: true})
 
@@ -33,12 +32,12 @@ test('can be enabled via constructor with pretty configuration', function (t) {
   }))
 
   child.on('close', function () {
-    t.notEqual(actual.match(/^INFO.*h/), null)
+    isNot(actual.match(/^INFO.*h/), null)
+    end()
   })
 })
 
-test('can be enabled via constructor with prettifier', function (t) {
-  t.plan(1)
+test('can be enabled via constructor with prettifier', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var actual = ''
   var child = fork(path.join(__dirname, 'fixtures', 'pretty', 'pretty-factory.js'), {silent: true})
 
@@ -48,23 +47,23 @@ test('can be enabled via constructor with prettifier', function (t) {
   }))
 
   child.on('close', function () {
-    t.notEqual(actual.match(/^INFO.*h/), null)
+    isNot(actual.match(/^INFO.*h/), null)
+    end()
   })
 })
 
-test('does not throw error when enabled with stream specified', function (t) {
+test('does not throw error when enabled with stream specified', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   pino({prettyPrint: true}, process.stdout)
-  t.end()
+
+  end()
 })
 
-test('can send pretty print to custom stream', function (t) {
-  t.plan(1)
-
+test('can send pretty print to custom stream', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var dest = new Writable({
     objectMode: true,
     write (formatted, enc, cb) {
-      t.match(formatted, /^INFO.*foo\n$/)
-      cb()
+      is(/^INFO.*foo\n$/.test(formatted), true)
+      end()
     }
   })
 
@@ -77,17 +76,16 @@ test('can send pretty print to custom stream', function (t) {
   log.info('foo')
 })
 
-test('ignores `undefined` from prettifier', function (t) {
-  t.plan(1)
+test('ignores `undefined` from prettifier', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var actual = ''
   var child = fork(path.join(__dirname, 'fixtures', 'pretty', 'skipped-output.js'), {silent: true})
 
   child.stdout.pipe(writeStream(function (s, enc, cb) {
     actual += s
-    cb()
   }))
 
   child.on('close', function () {
-    t.is(actual, '')
+    is(actual, '')
+    end()
   })
 })

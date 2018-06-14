@@ -2,8 +2,7 @@
 var test = require('tape')
 var pino = require('../browser')
 
-test('set the level by string', function (t) {
-  t.plan(4)
+test('set the level by string', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var expected = [
     {
       level: 50,
@@ -17,7 +16,7 @@ test('set the level by string', function (t) {
   var instance = pino({
     browser: {
       write: function (actual) {
-        checkLogObjects(t, actual, expected.shift())
+        checkLogObjects(is, same, actual, expected.shift())
       }
     }
   })
@@ -26,11 +25,11 @@ test('set the level by string', function (t) {
   instance.info('hello world')
   instance.error('this is an error')
   instance.fatal('this is fatal')
-  t.end()
+
+  end()
 })
 
-test('set the level by string. init with silent', function (t) {
-  t.plan(4)
+test('set the level by string. init with silent', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var expected = [
     {
       level: 50,
@@ -45,7 +44,7 @@ test('set the level by string. init with silent', function (t) {
     level: 'silent',
     browser: {
       write: function (actual) {
-        checkLogObjects(t, actual, expected.shift())
+        checkLogObjects(is, same, actual, expected.shift())
       }
     }
   })
@@ -54,11 +53,11 @@ test('set the level by string. init with silent', function (t) {
   instance.info('hello world')
   instance.error('this is an error')
   instance.fatal('this is fatal')
-  t.end()
+
+  end()
 })
 
-test('set the level by string. init with silent and transmit', function (t) {
-  t.plan(4)
+test('set the level by string. init with silent and transmit', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var expected = [
     {
       level: 50,
@@ -73,7 +72,7 @@ test('set the level by string. init with silent and transmit', function (t) {
     level: 'silent',
     browser: {
       write: function (actual) {
-        checkLogObjects(t, actual, expected.shift())
+        checkLogObjects(is, same, actual, expected.shift())
       }
     },
     transmit: {
@@ -86,11 +85,11 @@ test('set the level by string. init with silent and transmit', function (t) {
   instance.info('hello world')
   instance.error('this is an error')
   instance.fatal('this is fatal')
-  t.end()
+
+  end()
 })
 
-test('set the level via constructor', function (t) {
-  t.plan(4)
+test('set the level via constructor', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var expected = [
     {
       level: 50,
@@ -105,7 +104,7 @@ test('set the level via constructor', function (t) {
     level: 'error',
     browser: {
       write: function (actual) {
-        checkLogObjects(t, actual, expected.shift())
+        checkLogObjects(is, same, actual, expected.shift())
       }
     }
   })
@@ -113,47 +112,48 @@ test('set the level via constructor', function (t) {
   instance.info('hello world')
   instance.error('this is an error')
   instance.fatal('this is fatal')
-  t.end()
+
+  end()
 })
 
-test('the wrong level throws', function (t) {
-  t.plan(1)
+test('the wrong level throws', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var instance = pino()
-  t.throws(function () {
+  throws(function () {
     instance.level = 'kaboom'
   })
+  end()
 })
 
-test('the wrong level by number throws', function (t) {
-  t.plan(1)
+test('the wrong level by number throws', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var instance = pino()
-  t.throws(function () {
+  throws(function () {
     instance.levelVal = 55
   })
+  end()
 })
 
-test('exposes level string mappings', function (t) {
-  t.plan(1)
-  t.equal(pino.levels.values.error, 50)
+test('exposes level string mappings', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+  is(pino.levels.values.error, 50)
+  end()
 })
 
-test('exposes level number mappings', function (t) {
-  t.plan(1)
-  t.equal(pino.levels.labels[50], 'error')
+test('exposes level number mappings', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+  is(pino.levels.labels[50], 'error')
+  end()
 })
 
-test('returns level integer', function (t) {
-  t.plan(1)
+test('returns level integer', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var instance = pino({level: 'error'})
-  t.equal(instance.levelVal, 50)
+  is(instance.levelVal, 50)
+  end()
 })
 
-test('silent level via constructor', function (t) {
+test('silent level via constructor', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var instance = pino({
     level: 'silent',
     browser: {
       write: function (actual) {
-        t.fail('no data should be logged')
+        fail('no data should be logged')
       }
     }
   })
@@ -161,14 +161,15 @@ test('silent level via constructor', function (t) {
   Object.keys(pino.levels.values).forEach(function (level) {
     instance[level]('hello world')
   })
-  t.end()
+
+  end()
 })
 
-test('silent level by string', function (t) {
+test('silent level by string', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var instance = pino({
     browser: {
       write: function (actual) {
-        t.fail('no data should be logged')
+        fail('no data should be logged')
       }
     }
   })
@@ -178,12 +179,12 @@ test('silent level by string', function (t) {
   Object.keys(pino.levels.values).forEach(function (level) {
     instance[level]('hello world')
   })
-  t.end()
+
+  end()
 })
 
-test('exposed levels', function (t) {
-  t.plan(1)
-  t.deepEqual(Object.keys(pino.levels.values), [
+test('exposed levels', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+  same(Object.keys(pino.levels.values), [
     'fatal',
     'error',
     'warn',
@@ -191,11 +192,11 @@ test('exposed levels', function (t) {
     'debug',
     'trace'
   ])
+  end()
 })
 
-test('exposed labels', function (t) {
-  t.plan(1)
-  t.deepEqual(Object.keys(pino.levels.labels), [
+test('exposed labels', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+  same(Object.keys(pino.levels.labels), [
     '10',
     '20',
     '30',
@@ -203,15 +204,16 @@ test('exposed labels', function (t) {
     '50',
     '60'
   ])
+  end()
 })
 
-function checkLogObjects (t, actual, expected) {
-  t.ok(actual.time <= Date.now(), 'time is greater than Date.now()')
+function checkLogObjects (is, same, actual, expected) {
+  is(actual.time <= Date.now(), true, 'time is greater than Date.now()')
 
   var actualCopy = Object.assign({}, actual)
   var expectedCopy = Object.assign({}, expected)
   delete actualCopy.time
   delete expectedCopy.time
 
-  t.deepEqual(actualCopy, expectedCopy)
+  same(actualCopy, expectedCopy)
 }

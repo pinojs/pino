@@ -4,67 +4,58 @@ var test = require('tap').test
 var sink = require('./helper').sink
 var pino = require('../')
 
-test('can add a custom level via constructor', function (t) {
-  t.plan(2)
-
+test('can add a custom level via constructor', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var log = pino({level: 'foo', levelVal: 35}, sink(function (chunk, enc, cb) {
-    t.is(chunk.msg, 'bar')
-    cb()
+    is(chunk.msg, 'bar')
+    end()
   }))
 
-  t.is(typeof log.foo, 'function')
+  is(typeof log.foo, 'function')
   log.foo('bar')
 })
 
-test('can add a custom level to a prior instance', function (t) {
-  t.plan(2)
-
+test('can add a custom level to a prior instance', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var log = pino(sink(function (chunk, enc, cb) {
-    t.is(chunk.msg, 'bar')
+    is(chunk.msg, 'bar')
+    end()
   }))
 
   log.addLevel('foo2', 35)
-  t.is(typeof log.foo2, 'function')
+  is(typeof log.foo2, 'function')
   log.foo2('bar')
 })
 
-test('custom level via constructor does not affect other instances', function (t) {
-  t.plan(2)
-
+test('custom level via constructor does not affect other instances', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var log = pino({level: 'foo3', levelVal: 36})
   var other = pino()
-  t.is(typeof log.foo3, 'function')
-  t.is(typeof other.foo3, 'undefined')
+  is(typeof log.foo3, 'function')
+  is(typeof other.foo3, 'undefined')
+  end()
 })
 
-test('custom level on one instance does not affect other instances', function (t) {
-  t.plan(2)
-
+test('custom level on one instance does not affect other instances', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var log = pino()
   log.addLevel('foo4', 37)
   var other = pino()
   log.addLevel('foo5', 38)
-  t.is(typeof other.foo4, 'undefined')
-  t.is(typeof other.foo5, 'undefined')
+  is(typeof other.foo4, 'undefined')
+  is(typeof other.foo5, 'undefined')
+  end()
 })
 
-test('custom levels encompass higher levels', function (t) {
-  t.plan(1)
-
+test('custom levels encompass higher levels', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var log = pino({level: 'foo', levelVal: 35}, sink(function (chunk, enc, cb) {
-    t.is(chunk.msg, 'bar')
-    cb()
+    is(chunk.msg, 'bar')
+    end()
   }))
 
   log.warn('bar')
 })
 
-test('after the fact add level does not include lower levels', function (t) {
-  t.plan(1)
-
+test('after the fact add level does not include lower levels', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var log = pino(sink(function (chunk, enc, cb) {
-    t.is(chunk.msg, 'bar')
-    cb()
+    is(chunk.msg, 'bar')
+    end()
   }))
 
   log.addLevel('foo', 35)
@@ -73,12 +64,10 @@ test('after the fact add level does not include lower levels', function (t) {
   log.foo('bar')
 })
 
-test('after the fact add of a lower level does not include it', function (t) {
-  t.plan(1)
-
+test('after the fact add of a lower level does not include it', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var log = pino(sink(function (chunk, enc, cb) {
-    t.is(chunk.msg, 'bar')
-    cb()
+    is(chunk.msg, 'bar')
+    end()
   }))
 
   log.level = 'info'
@@ -87,68 +76,64 @@ test('after the fact add of a lower level does not include it', function (t) {
   log.foo('nope')
 })
 
-test('children can be set to custom level', function (t) {
-  t.plan(2)
-
+test('children can be set to custom level', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var parent = pino({level: 'foo', levelVal: 35}, sink(function (chunk, enc, cb) {
-    t.is(chunk.msg, 'bar')
-    t.is(chunk.child, 'yes')
-    cb()
+    is(chunk.msg, 'bar')
+    is(chunk.child, 'yes')
+    end()
   }))
   var child = parent.child({child: 'yes'})
   child.foo('bar')
 })
 
-test('custom levels exists on children', function (t) {
-  t.plan(2)
-
+test('custom levels exists on children', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var parent = pino({}, sink(function (chunk, enc, cb) {
-    t.is(chunk.msg, 'bar')
-    t.is(chunk.child, 'yes')
-    cb()
+    is(chunk.msg, 'bar')
+    is(chunk.child, 'yes')
+    end()
   }))
   parent.addLevel('foo', 35)
   var child = parent.child({child: 'yes'})
   child.foo('bar')
 })
 
-test('rejects already known labels', function (t) {
-  t.plan(1)
+test('rejects already known labels', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var log = pino({level: 'info', levelVal: 900})
-  t.is(log.levelVal, 30)
+  is(log.levelVal, 30)
+  end()
 })
 
-test('reject already known values', function (t) {
-  t.plan(1)
+test('reject already known values', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   try {
     pino({level: 'foo', levelVal: 30})
   } catch (e) {
-    t.is(e.message.indexOf('level value') > -1, true)
+    is(e.message.indexOf('level value') > -1, true)
+  } finally {
+    end()
   }
 })
 
-test('reject values of Infinity', function (t) {
-  t.plan(1)
-  t.throws(function () {
+test('reject values of Infinity', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+  throws(function () {
     pino({level: 'foo', levelVal: Infinity})
   }, /.*level value is already used.*/)
+  end()
 })
 
-test('level numbers are logged correctly after level change', function (t) {
-  t.plan(1)
+test('level numbers are logged correctly after level change', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var log = pino({level: 'foo', levelVal: 25}, sink(function (chunk, enc, cb) {
-    t.is(chunk.level, 25)
+    is(chunk.level, 25)
+    end()
   }))
   log.level = 'debug'
   log.foo('bar')
 })
 
-test('levels state is not shared between instances', function (t) {
-  t.plan(2)
-
+test('levels state is not shared between instances', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var instance1 = pino({level: 'foo', levelVal: 35})
-  t.is(typeof instance1.foo, 'function')
+  is(typeof instance1.foo, 'function')
 
   var instance2 = pino()
-  t.is(instance2.hasOwnProperty('foo'), false)
+  is(instance2.hasOwnProperty('foo'), false)
+  end()
 })

@@ -7,23 +7,22 @@ var fork = require('child_process').fork
 var spawn = require('child_process').spawn
 var fixturesPath = path.join(__dirname, 'fixtures', 'events')
 
-test('no event loop logs successfully', function (t) {
-  t.plan(1)
+test('no event loop logs successfully', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var output = ''
   var child = fork(path.join(fixturesPath, 'no-event-loop.js'), {silent: true})
 
-  child.stdout.pipe(writeStream(function (s, enc, cb) {
+  child.stdout.pipe(writeStream((s, enc, cb) => {
     output += s
     cb()
   }))
 
-  child.on('close', function () {
-    t.match(output, /"msg":"h"/)
+  child.on('close', () => {
+    is(/"msg":"h"/.test(output), true)
+    end()
   })
 })
 
-test('terminates when uncaughtException is fired with onTerminate registered', function (t) {
-  t.plan(3)
+test('terminates when uncaughtException is fired with onTerminate registered', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var output = ''
   var errorOutput = ''
   var child = spawn(process.argv[0], [path.join(fixturesPath, 'uncaught-exception.js')], {silent: true})
@@ -39,14 +38,14 @@ test('terminates when uncaughtException is fired with onTerminate registered', f
   }))
 
   child.on('close', function () {
-    t.match(output, /"msg":"h"/)
-    t.match(output, /terminated/g)
-    t.match(errorOutput, /this is not caught/g)
+    is(/"msg":"h"/.test(output), true)
+    is(/terminated/g.test(output), true)
+    is(/this is not caught/g.test(errorOutput), true)
+    end()
   })
 })
 
-test('terminates when uncaughtException is fired without onTerminate registered', function (t) {
-  t.plan(2)
+test('terminates when uncaughtException is fired without onTerminate registered', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var output = ''
   var child = spawn(process.argv[0], [path.join(fixturesPath, 'uncaught-exception-no-terminate.js')], {silent: true})
 
@@ -55,17 +54,17 @@ test('terminates when uncaughtException is fired without onTerminate registered'
     cb()
   }))
 
-  child.on('exit', function (code) {
-    t.is(code, 1)
+  child.on('exit', (code) => {
+    is(code, 1)
   })
 
-  child.on('close', function () {
-    t.match(output, /"msg":"h"/)
+  child.on('close', () => {
+    is(/"msg":"h"/.test(output), true)
+    end()
   })
 })
 
-test('terminates on SIGHUP when no other handlers registered', function (t) {
-  t.plan(2)
+test('terminates on SIGHUP when no other handlers registered', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var output = ''
   var child = spawn(process.argv[0], [path.join(fixturesPath, 'sighup-no-handler.js')], {silent: true})
 
@@ -77,18 +76,18 @@ test('terminates on SIGHUP when no other handlers registered', function (t) {
   child.stderr.pipe(process.stdout)
 
   child.on('exit', function (code) {
-    t.is(code, 0)
+    is(code, 0)
   })
 
   child.on('close', function () {
-    t.match(output, /"msg":"h"/)
+    is(/"msg":"h"/.test(output), true)
+    end()
   })
 
   setTimeout(function () { child.kill('SIGHUP') }, 2000)
 })
 
-test('lets app terminate when SIGHUP received with multiple handlers', function (t) {
-  t.plan(3)
+test('lets app terminate when SIGHUP received with multiple handlers', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var output = ''
   var child = spawn(process.argv[0], [path.join(fixturesPath, 'sighup-with-handler.js')], {silent: true})
 
@@ -98,19 +97,19 @@ test('lets app terminate when SIGHUP received with multiple handlers', function 
   }))
 
   child.on('exit', function (code) {
-    t.is(code, 0)
+    is(code, 0)
   })
 
   child.on('close', function () {
-    t.match(output, /"msg":"h"/)
-    t.match(output, /app sighup/)
+    is(/"msg":"h"/.test(output), true)
+    is(/app sighup/.test(output), true)
+    end()
   })
 
   setTimeout(function () { child.kill('SIGHUP') }, 2000)
 })
 
-test('destination', function (t) {
-  t.plan(2)
+test('destination', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var output = ''
   var child = spawn(process.argv[0], [path.join(fixturesPath, 'destination.js')], {silent: true})
 
@@ -121,11 +120,12 @@ test('destination', function (t) {
 
   child.stderr.pipe(process.stdout)
 
-  child.on('exit', function (code) {
-    t.is(code, 0)
+  child.on('exit', (code) => {
+    is(code, 0)
   })
 
-  child.on('close', function () {
-    t.notEqual(null, output.match(/"msg":"h"/))
+  child.on('close', () => {
+    is(/"msg":"h"/.test(output), true)
+    end()
   })
 })

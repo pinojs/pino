@@ -3,51 +3,45 @@
 var test = require('tap').test
 var pino = require('../')
 
-test('can check if current level enabled', function (t) {
-  t.plan(1)
-
+test('can check if current level enabled', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var log = pino({level: 'debug'})
-  t.is(true, log.isLevelEnabled('debug'))
+  is(true, log.isLevelEnabled('debug'))
+  end()
 })
 
-test('can check if level enabled after level set', function (t) {
-  t.plan(2)
-
+test('can check if level enabled after level set', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var log = pino()
-  t.is(false, log.isLevelEnabled('debug'))
+  is(false, log.isLevelEnabled('debug'))
   log.level = 'debug'
-  t.is(true, log.isLevelEnabled('debug'))
+  is(true, log.isLevelEnabled('debug'))
+  end()
 })
 
-test('can check if higher level enabled', function (t) {
-  t.plan(1)
-
+test('can check if higher level enabled', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var log = pino({level: 'debug'})
-  t.is(true, log.isLevelEnabled('error'))
+  is(true, log.isLevelEnabled('error'))
+  end()
 })
 
-test('can check if lower level is disabled', function (t) {
-  t.plan(1)
-
+test('can check if lower level is disabled', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var log = pino({level: 'error'})
-  t.is(false, log.isLevelEnabled('trace'))
+  is(false, log.isLevelEnabled('trace'))
+  end()
 })
 
-test('can check if child has current level enabled', function (t) {
-  t.plan(3)
-
+test('can check if child has current level enabled', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var log = pino().child({level: 'debug'})
-  t.is(true, log.isLevelEnabled('debug'))
-  t.is(true, log.isLevelEnabled('error'))
-  t.is(false, log.isLevelEnabled('trace'))
+  is(true, log.isLevelEnabled('debug'))
+  is(true, log.isLevelEnabled('error'))
+  is(false, log.isLevelEnabled('trace'))
+  end()
 })
 
-test('can check if custom level is enabled', function (t) {
-  t.plan(3)
-
+test('can check if custom level is enabled', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var log = pino({level: 'debug'})
   log.addLevel('foo', 35)
-  t.is(true, log.isLevelEnabled('foo'))
-  t.is(true, log.isLevelEnabled('error'))
-  t.is(false, log.isLevelEnabled('trace'))
+  is(true, log.isLevelEnabled('foo'))
+  is(true, log.isLevelEnabled('error'))
+  is(false, log.isLevelEnabled('trace'))
+  end()
 })

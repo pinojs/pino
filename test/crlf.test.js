@@ -13,24 +13,24 @@ function capture () {
   return ws
 }
 
-test('pino uses LF by default', function (t) {
-  t.plan(1)
+test('pino uses LF by default', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var stream = capture()
   var logger = pino(stream)
   logger.info('foo')
   logger.error('bar')
-  t.ok(/foo[^\r\n]+\n[^\r\n]+bar[^\r\n]+\n/.test(stream.data))
-  t.end()
+  ok(/foo[^\r\n]+\n[^\r\n]+bar[^\r\n]+\n/.test(stream.data))
+
+  end()
 })
 
-test('pino can log CRLF', function (t) {
-  t.plan(1)
+test('pino can log CRLF', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var stream = capture()
   var logger = pino({
     crlf: true
   }, stream)
   logger.info('foo')
   logger.error('bar')
-  t.ok(/foo[^\n]+\r\n[^\n]+bar[^\n]+\r\n/.test(stream.data))
-  t.end()
+  ok(/foo[^\n]+\r\n[^\n]+bar[^\n]+\r\n/.test(stream.data))
+
+  end()
 })

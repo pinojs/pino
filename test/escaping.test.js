@@ -9,14 +9,12 @@ var pid = process.pid
 var hostname = os.hostname()
 
 function testEscape (ch, key) {
-  test('correctly escape ' + ch, function (t) {
-    t.plan(1)
-
+  test('correctly escape ' + ch, ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
     var instance = pino({
       name: 'hello'
     }, sink(function (chunk, enc, cb) {
       delete chunk.time
-      t.deepEqual(chunk, {
+      same(chunk, {
         pid: pid,
         hostname: hostname,
         level: 60,
@@ -24,7 +22,7 @@ function testEscape (ch, key) {
         msg: 'this contains ' + key,
         v: 1
       })
-      cb()
+      end()
     }))
 
     instance.fatal('this contains ' + key)
@@ -77,13 +75,12 @@ toEscape.forEach(function (key) {
   testEscape(JSON.stringify(key), key)
 })
 
-test('correctly escape `hello \\u001F world \\n \\u0022`', function (t) {
-  t.plan(1)
+test('correctly escape `hello \\u001F world \\n \\u0022`', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var instance = pino({
     name: 'hello'
   }, sink(function (chunk, enc, cb) {
     delete chunk.time
-    t.deepEqual(chunk, {
+    same(chunk, {
       pid: pid,
       hostname: hostname,
       level: 60,
@@ -91,7 +88,7 @@ test('correctly escape `hello \\u001F world \\n \\u0022`', function (t) {
       msg: 'hello \u001F world \n \u0022',
       v: 1
     })
-    cb()
+    end()
   }))
 
   instance.fatal('hello \u001F world \n \u0022')

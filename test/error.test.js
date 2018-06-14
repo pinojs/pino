@@ -9,13 +9,12 @@ var hostname = os.hostname()
 var level = 50
 var name = 'error'
 
-test('err is serialized with additional properties set on the Error object', function (t) {
-  t.plan(2)
+test('err is serialized with additional properties set on the Error object', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var err = Object.assign(new Error('myerror'), {foo: 'bar'})
   var instance = pino(sink(function (chunk, enc, cb) {
-    t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
+    ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
-    t.deepEqual(chunk, {
+    same(chunk, {
       pid: pid,
       hostname: hostname,
       level: level,
@@ -30,15 +29,15 @@ test('err is serialized with additional properties set on the Error object', fun
 
   instance.level = name
   instance[name](err)
+  end()
 })
 
-test('type should be retained, even if type is a property', function (t) {
-  t.plan(2)
+test('type should be retained, even if type is a property', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var err = Object.assign(new Error('myerror'), {type: 'bar'})
   var instance = pino(sink(function (chunk, enc, cb) {
-    t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
+    ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
-    t.deepEqual(chunk, {
+    same(chunk, {
       pid: pid,
       hostname: hostname,
       level: level,
@@ -52,15 +51,15 @@ test('type should be retained, even if type is a property', function (t) {
 
   instance.level = name
   instance[name](err)
+  end()
 })
 
-test('type, message and stack should be first level properties', function (t) {
-  t.plan(2)
+test('type, message and stack should be first level properties', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var err = Object.assign(new Error('foo'), { foo: 'bar' })
   var instance = pino(sink(function (chunk, enc, cb) {
-    t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
+    ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
-    t.deepEqual(chunk, {
+    same(chunk, {
       pid: pid,
       hostname: hostname,
       level: level,
@@ -75,19 +74,19 @@ test('type, message and stack should be first level properties', function (t) {
 
   instance.level = name
   instance[name](err)
+  end()
 })
 
-test('err serializer', function (t) {
-  t.plan(2)
+test('err serializer', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var err = Object.assign(new Error('myerror'), {foo: 'bar'})
   var instance = pino({
     serializers: {
       err: pino.stdSerializers.err
     }
   }, sink(function (chunk, enc, cb) {
-    t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
+    ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
-    t.deepEqual(chunk, {
+    same(chunk, {
       pid: pid,
       hostname: hostname,
       level: level,
@@ -104,15 +103,15 @@ test('err serializer', function (t) {
 
   instance.level = name
   instance[name]({ err })
+  end()
 })
 
-test('an error with statusCode property is not confused for a http response', function (t) {
-  t.plan(2)
+test('an error with statusCode property is not confused for a http response', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var err = Object.assign(new Error('StatusCodeErr'), { statusCode: 500 })
   var instance = pino(sink(function (chunk, enc, cb) {
-    t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
+    ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
-    t.deepEqual(chunk, {
+    same(chunk, {
       pid: pid,
       hostname: hostname,
       level: level,
@@ -127,4 +126,5 @@ test('an error with statusCode property is not confused for a http response', fu
 
   instance.level = name
   instance[name](err)
+  end()
 })

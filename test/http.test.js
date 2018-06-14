@@ -9,14 +9,12 @@ var http = require('http')
 var pid = process.pid
 var hostname = os.hostname()
 
-test('http request support', function (t) {
-  t.plan(3)
-
+test('http request support', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError, teardown}) => {
   var originalReq
   var instance = pino(sink(function (chunk, enc, cb) {
-    t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
+    ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
-    t.deepEqual(chunk, {
+    same(chunk, {
       pid: pid,
       hostname: hostname,
       level: 30,
@@ -30,7 +28,7 @@ test('http request support', function (t) {
         remotePort: originalReq.connection.remotePort
       }
     })
-    cb()
+    end()
   }))
 
   var server = http.createServer(function (req, res) {
@@ -38,27 +36,26 @@ test('http request support', function (t) {
     instance.info(req, 'my request')
     res.end('hello')
   }).listen(function (err) {
-    t.error(err)
-    t.teardown(server.close.bind(server))
+    error(err)
+    teardown(server.close.bind(server))
 
     http.get('http://localhost:' + server.address().port, function (res) {
       res.resume()
     })
   })
+  server.unref()
 })
 
-test('http request support via serializer', function (t) {
-  t.plan(3)
-
+test('http request support via serializer', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError, teardown}) => {
   var originalReq
   var instance = pino({
     serializers: {
       req: pino.stdSerializers.req
     }
   }, sink(function (chunk, enc, cb) {
-    t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
+    ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
-    t.deepEqual(chunk, {
+    same(chunk, {
       pid: pid,
       hostname: hostname,
       level: 30,
@@ -72,7 +69,7 @@ test('http request support via serializer', function (t) {
         remotePort: originalReq.connection.remotePort
       }
     })
-    cb()
+    end()
   }))
 
   var server = http.createServer(function (req, res) {
@@ -80,27 +77,26 @@ test('http request support via serializer', function (t) {
     instance.info({ req: req }, 'my request')
     res.end('hello')
   }).listen(function (err) {
-    t.error(err)
-    t.teardown(server.close.bind(server))
+    error(err)
+    teardown(server.close.bind(server))
 
     http.get('http://localhost:' + server.address().port, function (res) {
       res.resume()
     })
   })
+  server.unref()
 })
 
-test('http request support via serializer without request connection', function (t) {
-  t.plan(3)
-
+test('http request support via serializer without request connection', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError, teardown}) => {
   var originalReq
   var instance = pino({
     serializers: {
       req: pino.stdSerializers.req
     }
   }, sink(function (chunk, enc, cb) {
-    t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
+    ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
-    t.deepEqual(chunk, {
+    same(chunk, {
       pid: pid,
       hostname: hostname,
       level: 30,
@@ -112,7 +108,7 @@ test('http request support via serializer without request connection', function 
         headers: originalReq.headers
       }
     })
-    cb()
+    end()
   }))
 
   var server = http.createServer(function (req, res) {
@@ -121,23 +117,22 @@ test('http request support via serializer without request connection', function 
     instance.info({ req: req }, 'my request')
     res.end('hello')
   }).listen(function (err) {
-    t.error(err)
-    t.teardown(server.close.bind(server))
+    error(err)
+    teardown(server.close.bind(server))
 
     http.get('http://localhost:' + server.address().port, function (res) {
       res.resume()
     })
   })
+  server.unref()
 })
 
-test('http response support', function (t) {
-  t.plan(3)
-
+test('http response support', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError, teardown}) => {
   var originalRes
   var instance = pino(sink(function (chunk, enc, cb) {
-    t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
+    ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
-    t.deepEqual(chunk, {
+    same(chunk, {
       pid: pid,
       hostname: hostname,
       level: 30,
@@ -148,7 +143,7 @@ test('http response support', function (t) {
         header: originalRes._header
       }
     })
-    cb()
+    end()
   }))
 
   var server = http.createServer(function (req, res) {
@@ -156,27 +151,26 @@ test('http response support', function (t) {
     res.end('hello')
     instance.info(res, 'my response')
   }).listen(function (err) {
-    t.error(err)
-    t.teardown(server.close.bind(server))
+    error(err)
+    teardown(server.close.bind(server))
 
     http.get('http://localhost:' + server.address().port, function (res) {
       res.resume()
     })
   })
+  server.unref()
 })
 
-test('http response support via a serializer', function (t) {
-  t.plan(3)
-
+test('http response support via a serializer', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError, teardown}) => {
   var originalRes
   var instance = pino({
     serializers: {
       res: pino.stdSerializers.res
     }
   }, sink(function (chunk, enc, cb) {
-    t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
+    ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
-    t.deepEqual(chunk, {
+    same(chunk, {
       pid: pid,
       hostname: hostname,
       level: 30,
@@ -187,7 +181,7 @@ test('http response support via a serializer', function (t) {
         header: originalRes._header
       }
     })
-    cb()
+    end()
   }))
 
   var server = http.createServer(function (req, res) {
@@ -195,27 +189,26 @@ test('http response support via a serializer', function (t) {
     res.end('hello')
     instance.info({ res: res }, 'my response')
   }).listen(function (err) {
-    t.error(err)
-    t.teardown(server.close.bind(server))
+    error(err)
+    teardown(server.close.bind(server))
 
     http.get('http://localhost:' + server.address().port, function (res) {
       res.resume()
     })
   })
+  server.unref()
 })
 
-test('http request support via serializer in a child', function (t) {
-  t.plan(3)
-
+test('http request support via serializer in a child', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError, teardown}) => {
   var originalReq
   var instance = pino({
     serializers: {
       req: pino.stdSerializers.req
     }
   }, sink(function (chunk, enc, cb) {
-    t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
+    ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
-    t.deepEqual(chunk, {
+    same(chunk, {
       pid: pid,
       hostname: hostname,
       level: 30,
@@ -229,7 +222,7 @@ test('http request support via serializer in a child', function (t) {
         remotePort: originalReq.connection.remotePort
       }
     })
-    cb()
+    end()
   }))
 
   var server = http.createServer(function (req, res) {
@@ -238,11 +231,12 @@ test('http request support via serializer in a child', function (t) {
     child.info('my request')
     res.end('hello')
   }).listen(function (err) {
-    t.error(err)
-    t.teardown(server.close.bind(server))
+    error(err)
+    teardown(server.close.bind(server))
 
     http.get('http://localhost:' + server.address().port, function (res) {
       res.resume()
     })
   })
+  server.unref()
 })

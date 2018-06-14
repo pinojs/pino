@@ -4,67 +4,67 @@ var test = require('tap').test
 var pino = require('../')
 var sink = require('./helper').sink
 
-test('pino exposes standard time functions', function (t) {
-  t.plan(4)
-  t.ok(pino.stdTimeFunctions)
-  t.ok(pino.stdTimeFunctions.epochTime)
-  t.ok(pino.stdTimeFunctions.unixTime)
-  t.ok(pino.stdTimeFunctions.nullTime)
+test('pino exposes standard time functions', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
+  ok(pino.stdTimeFunctions)
+  ok(pino.stdTimeFunctions.epochTime)
+  ok(pino.stdTimeFunctions.unixTime)
+  ok(pino.stdTimeFunctions.nullTime)
+  end()
 })
 
-test('pino accepts external time functions', function (t) {
-  t.plan(2)
+test('pino accepts external time functions', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var opts = {
     timestamp: function () {
       return ',"time":"none"'
     }
   }
   var instance = pino(opts, sink(function (chunk, enc, cb) {
-    t.equal(chunk.hasOwnProperty('time'), true)
-    t.equal(chunk.time, 'none')
+    is(chunk.hasOwnProperty('time'), true)
+    is(chunk.time, 'none')
+    end()
   }))
   instance.info('foobar')
 })
 
-test('inserts timestamp by default', function (t) {
+test('inserts timestamp by default', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var instance = pino(sink(function (chunk, enc, cb) {
-    t.equal(chunk.hasOwnProperty('time'), true)
-    t.ok(new Date(chunk.time) <= new Date(), 'time is greater than timestamp')
-    t.equal(chunk.msg, 'foobar')
+    is(chunk.hasOwnProperty('time'), true)
+    ok(new Date(chunk.time) <= new Date(), 'time is greater than timestamp')
+    is(chunk.msg, 'foobar')
     cb()
-    t.end()
+    end()
   }))
   instance.info('foobar')
 })
 
-test('omits timestamp with option', function (t) {
+test('omits timestamp with option', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var instance = pino({timestamp: false}, sink(function (chunk, enc, cb) {
-    t.equal(chunk.hasOwnProperty('time'), false)
-    t.equal(chunk.msg, 'foobar')
+    is(chunk.hasOwnProperty('time'), false)
+    is(chunk.msg, 'foobar')
     cb()
-    t.end()
+    end()
   }))
   instance.info('foobar')
 })
 
-test('child inserts timestamp by default', function (t) {
+test('child inserts timestamp by default', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var logger = pino(sink(function (chunk, enc, cb) {
-    t.equal(chunk.hasOwnProperty('time'), true)
-    t.ok(new Date(chunk.time) <= new Date(), 'time is greater than timestamp')
-    t.equal(chunk.msg, 'foobar')
+    is(chunk.hasOwnProperty('time'), true)
+    ok(new Date(chunk.time) <= new Date(), 'time is greater than timestamp')
+    is(chunk.msg, 'foobar')
     cb()
-    t.end()
+    end()
   }))
   var instance = logger.child({component: 'child'})
   instance.info('foobar')
 })
 
-test('child omits timestamp with option', function (t) {
+test('child omits timestamp with option', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var logger = pino({timestamp: false}, sink(function (chunk, enc, cb) {
-    t.equal(chunk.hasOwnProperty('time'), false)
-    t.equal(chunk.msg, 'foobar')
+    is(chunk.hasOwnProperty('time'), false)
+    is(chunk.msg, 'foobar')
     cb()
-    t.end()
+    end()
   }))
   var instance = logger.child({component: 'child'})
   instance.info('foobar')

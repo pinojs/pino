@@ -8,12 +8,11 @@ var sink = require('./helper').sink
 var pid = process.pid
 var hostname = os.hostname()
 
-test('metadata works', function (t) {
-  t.plan(7)
+test('metadata works', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var dest = sink(function (chunk, enc, cb) {
-    t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
+    ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
-    t.deepEqual(chunk, {
+    same(chunk, {
       pid: pid,
       hostname: hostname,
       level: 30,
@@ -26,24 +25,24 @@ test('metadata works', function (t) {
   var instance = pino({}, {
     [Symbol.for('needsMetadata')]: true,
     write: function (chunk) {
-      t.equal(instance, this.lastLogger)
-      t.equal(30, this.lastLevel)
-      t.equal('a msg', this.lastMsg)
-      t.ok(Number(this.lastTime) >= now)
-      t.deepEqual({ hello: 'world' }, this.lastObj)
+      is(instance, this.lastLogger)
+      is(30, this.lastLevel)
+      is('a msg', this.lastMsg)
+      ok(Number(this.lastTime) >= now)
+      same({ hello: 'world' }, this.lastObj)
       dest.write(chunk)
     }
   })
 
   instance.info({ hello: 'world' }, 'a msg')
+  end()
 })
 
-test('child loggers works', function (t) {
-  t.plan(6)
+test('child loggers works', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var dest = sink(function (chunk, enc, cb) {
-    t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
+    ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
-    t.deepEqual(chunk, {
+    same(chunk, {
       pid: pid,
       hostname: hostname,
       level: 30,
@@ -56,24 +55,24 @@ test('child loggers works', function (t) {
   var instance = pino({}, {
     [Symbol.for('needsMetadata')]: true,
     write: function (chunk) {
-      t.equal(child, this.lastLogger)
-      t.equal(30, this.lastLevel)
-      t.equal('a msg', this.lastMsg)
-      t.deepEqual({ from: 'child' }, this.lastObj)
+      is(child, this.lastLogger)
+      is(30, this.lastLevel)
+      is('a msg', this.lastMsg)
+      same({ from: 'child' }, this.lastObj)
       dest.write(chunk)
     }
   })
 
   var child = instance.child({ hello: 'world' })
   child.info({ from: 'child' }, 'a msg')
+  end()
 })
 
-test('without object', function (t) {
-  t.plan(6)
+test('without object', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var dest = sink(function (chunk, enc, cb) {
-    t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
+    ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
-    t.deepEqual(chunk, {
+    same(chunk, {
       pid: pid,
       hostname: hostname,
       level: 30,
@@ -84,23 +83,23 @@ test('without object', function (t) {
   var instance = pino({}, {
     [Symbol.for('needsMetadata')]: true,
     write: function (chunk) {
-      t.equal(instance, this.lastLogger)
-      t.equal(30, this.lastLevel)
-      t.equal('a msg', this.lastMsg)
-      t.equal(null, this.lastObj)
+      is(instance, this.lastLogger)
+      is(30, this.lastLevel)
+      is('a msg', this.lastMsg)
+      is(null, this.lastObj)
       dest.write(chunk)
     }
   })
 
   instance.info('a msg')
+  end()
 })
 
-test('without msg', function (t) {
-  t.plan(6)
+test('without msg', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var dest = sink(function (chunk, enc, cb) {
-    t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
+    ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
-    t.deepEqual(chunk, {
+    same(chunk, {
       pid: pid,
       hostname: hostname,
       level: 30,
@@ -111,13 +110,14 @@ test('without msg', function (t) {
   var instance = pino({}, {
     [Symbol.for('needsMetadata')]: true,
     write: function (chunk) {
-      t.equal(instance, this.lastLogger)
-      t.equal(30, this.lastLevel)
-      t.equal(undefined, this.lastMsg)
-      t.deepEqual({ hello: 'world' }, this.lastObj)
+      is(instance, this.lastLogger)
+      is(30, this.lastLevel)
+      is(undefined, this.lastMsg)
+      same({ hello: 'world' }, this.lastObj)
       dest.write(chunk)
     }
   })
 
   instance.info({ hello: 'world' })
+  end()
 })

@@ -14,33 +14,30 @@ var childSerializers = {
   test: function () { return 'child' }
 }
 
-test('serializers override values', function (t) {
-  t.plan(1)
-
+test('serializers override values', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var parent = pino({ serializers: parentSerializers,
     browser: { serialize: true,
       write: function (o) {
-        t.is(o.test, 'parent')
+        is(o.test, 'parent')
+        end()
       }}})
 
   parent.fatal({test: 'test'})
 })
 
-test('without the serialize option, serializers do not override values', function (t) {
-  t.plan(1)
-
+test('without the serialize option, serializers do not override values', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var parent = pino({ serializers: parentSerializers,
     browser: {
       write: function (o) {
-        t.is(o.test, 'test')
+        is(o.test, 'test')
+        end()
       }}})
 
   parent.fatal({test: 'test'})
 })
 
 if (process.title !== 'browser') {
-  test('if serialize option is true, standard error serializer is auto enabled', function (t) {
-    t.plan(1)
+  test('if serialize option is true, standard error serializer is auto enabled', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
     var err = Error('test')
     err.code = 'test'
     err.type = 'Error' // get that cov
@@ -48,7 +45,7 @@ if (process.title !== 'browser') {
 
     var consoleError = console.error
     console.error = function (err) {
-      t.deepEqual(err, expect)
+      same(err, expect)
     }
 
     var logger = fresh('../browser', require)({
@@ -58,17 +55,17 @@ if (process.title !== 'browser') {
     console.error = consoleError
 
     logger.fatal(err)
+    end()
   })
 
-  test('if serialize option is array, standard error serializer is auto enabled', function (t) {
-    t.plan(1)
+  test('if serialize option is array, standard error serializer is auto enabled', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
     var err = Error('test')
     err.code = 'test'
     var expect = pino.stdSerializers.err(err)
 
     var consoleError = console.error
     console.error = function (err) {
-      t.deepEqual(err, expect)
+      same(err, expect)
     }
 
     var logger = fresh('../browser', require)({
@@ -78,17 +75,17 @@ if (process.title !== 'browser') {
     console.error = consoleError
 
     logger.fatal(err)
+    end()
   })
 
-  test('if serialize option is array containing !stdSerializers.err, standard error serializer is disabled', function (t) {
-    t.plan(1)
+  test('if serialize option is array containing !stdSerializers.err, standard error serializer is disabled', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
     var err = Error('test')
     err.code = 'test'
     var expect = err
 
     var consoleError = console.error
     console.error = function (err) {
-      t.is(err, expect)
+      is(err, expect)
     }
 
     var logger = fresh('../browser', require)({
@@ -98,15 +95,15 @@ if (process.title !== 'browser') {
     console.error = consoleError
 
     logger.fatal(err)
+    end()
   })
 
-  test('in browser, serializers apply to all objects', function (t) {
-    t.plan(3)
+  test('in browser, serializers apply to all objects', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
     var consoleError = console.error
     console.error = function (test, test2, test3, test4, test5) {
-      t.is(test.key, 'serialized')
-      t.is(test2.key2, 'serialized2')
-      t.is(test5.key3, 'serialized3')
+      is(test.key, 'serialized')
+      is(test2.key2, 'serialized2')
+      is(test5.key3, 'serialized3')
     }
 
     var logger = fresh('../browser', require)({
@@ -121,15 +118,15 @@ if (process.title !== 'browser') {
     console.error = consoleError
 
     logger.fatal({key: 'test'}, {key2: 'test'}, 'str should skip', [{foo: 'array should skip'}], {key3: 'test'})
+    end()
   })
 
-  test('serialize can be an array of selected serializers', function (t) {
-    t.plan(3)
+  test('serialize can be an array of selected serializers', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
     var consoleError = console.error
     console.error = function (test, test2, test3, test4, test5) {
-      t.is(test.key, 'test')
-      t.is(test2.key2, 'serialized2')
-      t.is(test5.key3, 'test')
+      is(test.key, 'test')
+      is(test2.key2, 'serialized2')
+      is(test5.key3, 'test')
     }
 
     var logger = fresh('../browser', require)({
@@ -144,15 +141,15 @@ if (process.title !== 'browser') {
     console.error = consoleError
 
     logger.fatal({key: 'test'}, {key2: 'test'}, 'str should skip', [{foo: 'array should skip'}], {key3: 'test'})
+    end()
   })
 
-  test('serialize filter applies to child loggers', function (t) {
-    t.plan(3)
+  test('serialize filter applies to child loggers', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
     var consoleError = console.error
     console.error = function (binding, test, test2, test3, test4, test5) {
-      t.is(test.key, 'test')
-      t.is(test2.key2, 'serialized2')
-      t.is(test5.key3, 'test')
+      is(test.key, 'test')
+      is(test2.key2, 'serialized2')
+      is(test5.key3, 'test')
     }
 
     var logger = fresh('../browser', require)({
@@ -167,13 +164,13 @@ if (process.title !== 'browser') {
         key2: function () { return 'serialized2' },
         key3: function () { return 'serialized3' }
       }}).fatal({key: 'test'}, {key2: 'test'}, 'str should skip', [{foo: 'array should skip'}], {key3: 'test'})
+    end()
   })
 
-  test('parent serializers apply to child bindings', function (t) {
-    t.plan(1)
+  test('parent serializers apply to child bindings', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
     var consoleError = console.error
     console.error = function (binding) {
-      t.is(binding.key, 'serialized')
+      is(binding.key, 'serialized')
     }
 
     var logger = fresh('../browser', require)({
@@ -186,13 +183,13 @@ if (process.title !== 'browser') {
     console.error = consoleError
 
     logger.child({key: 'test'}).fatal({test: 'test'})
+    end()
   })
 
-  test('child serializers apply to child bindings', function (t) {
-    t.plan(1)
+  test('child serializers apply to child bindings', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
     var consoleError = console.error
     console.error = function (binding) {
-      t.is(binding.key, 'serialized')
+      is(binding.key, 'serialized')
     }
 
     var logger = fresh('../browser', require)({
@@ -205,19 +202,21 @@ if (process.title !== 'browser') {
       serializers: {
         key: function () { return 'serialized' }
       }}).fatal({test: 'test'})
+    end()
   })
 }
 
-test('child does not overwrite parent serializers', function (t) {
-  t.plan(2)
-
+test('child does not overwrite parent serializers', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var c = 0
   var parent = pino({ serializers: parentSerializers,
     browser: { serialize: true,
       write: function (o) {
         c++
-        if (c === 1) t.is(o.test, 'parent')
-        if (c === 2) t.is(o.test, 'child')
+        if (c === 1) is(o.test, 'parent')
+        if (c === 2) {
+          is(o.test, 'child')
+          end()
+        }
       }}})
   var child = parent.child({ serializers: childSerializers })
 
@@ -225,52 +224,48 @@ test('child does not overwrite parent serializers', function (t) {
   child.fatal({test: 'test'})
 })
 
-test('children inherit parent serializers', function (t) {
-  t.plan(1)
-
+test('children inherit parent serializers', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var parent = pino({ serializers: parentSerializers,
     browser: { serialize: true,
       write: function (o) {
-        t.is(o.test, 'parent')
+        is(o.test, 'parent')
       }}})
 
   var child = parent.child({a: 'property'})
   child.fatal({test: 'test'})
+  end()
 })
 
-test('children serializers get called', function (t) {
-  t.plan(1)
-
+test('children serializers get called', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var parent = pino({
     test: 'this',
     browser: { serialize: true,
       write: function (o) {
-        t.is(o.test, 'child')
+        is(o.test, 'child')
       }}})
 
   var child = parent.child({ 'a': 'property', serializers: childSerializers })
 
   child.fatal({test: 'test'})
+  end()
 })
 
-test('children serializers get called when inherited from parent', function (t) {
-  t.plan(1)
-
+test('children serializers get called when inherited from parent', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var parent = pino({
     test: 'this',
     serializers: parentSerializers,
     browser: { serialize: true,
       write: function (o) {
-        t.is(o.test, 'pass')
+        is(o.test, 'pass')
       }}})
 
   var child = parent.child({serializers: {test: function () { return 'pass' }}})
 
   child.fatal({test: 'fail'})
+  end()
 })
 
-test('non overriden serializers are available in the children', function (t) {
-  t.plan(4)
+test('non overriden serializers are available in the children', ({plan, end, ok, same, is, isNot, throws, doesNotThrow, fail, pass, error, notError}) => {
   var pSerializers = {
     onlyParent: function () { return 'parent' },
     shared: function () { return 'parent' }
@@ -287,10 +282,10 @@ test('non overriden serializers are available in the children', function (t) {
     browser: { serialize: true,
       write: function (o) {
         c++
-        if (c === 1) t.is(o.shared, 'child')
-        if (c === 2) t.is(o.onlyParent, 'parent')
-        if (c === 3) t.is(o.onlyChild, 'child')
-        if (c === 4) t.is(o.onlyChild, 'test')
+        if (c === 1) is(o.shared, 'child')
+        if (c === 2) is(o.onlyParent, 'parent')
+        if (c === 3) is(o.onlyChild, 'child')
+        if (c === 4) is(o.onlyChild, 'test')
       }}})
 
   var child = parent.child({ serializers: cSerializers })
@@ -299,4 +294,5 @@ test('non overriden serializers are available in the children', function (t) {
   child.fatal({onlyParent: 'test'})
   child.fatal({onlyChild: 'test'})
   parent.fatal({onlyChild: 'test'})
+  end()
 })
