@@ -5,7 +5,7 @@ var sink = require('./helper').sink
 var pino = require('../')
 
 test('can add a custom level via constructor', ({end, is}) => {
-  var log = pino({level: 'foo', levelVal: 35}, sink(function (chunk, enc) {
+  var log = pino({level: 'foo', levelVal: 35}, sink((chunk, enc) => {
     is(chunk.msg, 'bar')
     end()
   }))
@@ -15,7 +15,7 @@ test('can add a custom level via constructor', ({end, is}) => {
 })
 
 test('can add a custom level to a prior instance', ({end, is}) => {
-  var log = pino(sink(function (chunk, enc) {
+  var log = pino(sink((chunk, enc) => {
     is(chunk.msg, 'bar')
     end()
   }))
@@ -44,7 +44,7 @@ test('custom level on one instance does not affect other instances', ({end, is})
 })
 
 test('custom levels encompass higher levels', ({end, is}) => {
-  var log = pino({level: 'foo', levelVal: 35}, sink(function (chunk, enc) {
+  var log = pino({level: 'foo', levelVal: 35}, sink((chunk, enc) => {
     is(chunk.msg, 'bar')
     end()
   }))
@@ -53,7 +53,7 @@ test('custom levels encompass higher levels', ({end, is}) => {
 })
 
 test('after the fact add level does not include lower levels', ({end, is}) => {
-  var log = pino(sink(function (chunk, enc) {
+  var log = pino(sink((chunk, enc) => {
     is(chunk.msg, 'bar')
     end()
   }))
@@ -65,7 +65,7 @@ test('after the fact add level does not include lower levels', ({end, is}) => {
 })
 
 test('after the fact add of a lower level does not include it', ({end, is}) => {
-  var log = pino(sink(function (chunk, enc) {
+  var log = pino(sink((chunk, enc) => {
     is(chunk.msg, 'bar')
     end()
   }))
@@ -77,7 +77,7 @@ test('after the fact add of a lower level does not include it', ({end, is}) => {
 })
 
 test('children can be set to custom level', ({end, is}) => {
-  var parent = pino({level: 'foo', levelVal: 35}, sink(function (chunk, enc) {
+  var parent = pino({level: 'foo', levelVal: 35}, sink((chunk, enc) => {
     is(chunk.msg, 'bar')
     is(chunk.child, 'yes')
     end()
@@ -87,7 +87,7 @@ test('children can be set to custom level', ({end, is}) => {
 })
 
 test('custom levels exists on children', ({end, is}) => {
-  var parent = pino({}, sink(function (chunk, enc) {
+  var parent = pino({}, sink((chunk, enc) => {
     is(chunk.msg, 'bar')
     is(chunk.child, 'yes')
     end()
@@ -114,14 +114,14 @@ test('reject already known values', ({end, is}) => {
 })
 
 test('reject values of Infinity', ({end, throws}) => {
-  throws(function () {
+  throws(() => {
     pino({level: 'foo', levelVal: Infinity})
   }, /.*level value is already used.*/)
   end()
 })
 
 test('level numbers are logged correctly after level change', ({end, is}) => {
-  var log = pino({level: 'foo', levelVal: 25}, sink(function (chunk, enc) {
+  var log = pino({level: 'foo', levelVal: 25}, sink((chunk, enc) => {
     is(chunk.level, 25)
     end()
   }))

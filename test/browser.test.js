@@ -13,15 +13,13 @@ levelTest('trace')
 test('silent level', ({end, fail, pass}) => {
   var instance = pino({
     level: 'silent',
-    browser: {write: function () {
-      fail()
-    }}
+    browser: {write: fail}
   })
   instance.info('test')
   var child = instance.child({test: 'test'})
   child.info('msg-test')
   // use setTimeout because setImmediate isn't supported in most browsers
-  setTimeout(function () {
+  setTimeout(() => {
     pass()
     end()
   }, 0)
@@ -30,15 +28,13 @@ test('silent level', ({end, fail, pass}) => {
 test('enabled false', ({end, fail, pass}) => {
   var instance = pino({
     enabled: false,
-    browser: {write: function () {
-      fail()
-    }}
+    browser: {write: fail}
   })
   instance.info('test')
   var child = instance.child({test: 'test'})
   child.info('msg-test')
   // use setTimeout because setImmediate isn't supported in most browsers
-  setTimeout(function () {
+  setTimeout(() => {
     pass()
     end()
   }, 0)
@@ -281,12 +277,14 @@ test('opts.browser.write obj writes to methods corresponding to level', ({end, o
 
 test('opts.browser.asObject/write supports child loggers', ({end, ok, is}) => {
   var instance = pino({
-    browser: {write: function (o) {
-      is(o.level, 30)
-      is(o.test, 'test')
-      is(o.msg, 'msg-test')
-      ok(o.time)
-    }}
+    browser: {
+      write (o) {
+        is(o.level, 30)
+        is(o.test, 'test')
+        is(o.msg, 'msg-test')
+        ok(o.time)
+      }
+    }
   })
   var child = instance.child({test: 'test'})
   child.info('msg-test')
@@ -296,13 +294,15 @@ test('opts.browser.asObject/write supports child loggers', ({end, ok, is}) => {
 
 test('opts.browser.asObject/write supports child child loggers', ({end, ok, is}) => {
   var instance = pino({
-    browser: {write: function (o) {
-      is(o.level, 30)
-      is(o.test, 'test')
-      is(o.foo, 'bar')
-      is(o.msg, 'msg-test')
-      ok(o.time)
-    }}
+    browser: {
+      write (o) {
+        is(o.level, 30)
+        is(o.test, 'test')
+        is(o.foo, 'bar')
+        is(o.msg, 'msg-test')
+        ok(o.time)
+      }
+    }
   })
   var child = instance.child({test: 'test'}).child({foo: 'bar'})
   child.info('msg-test')
@@ -312,14 +312,16 @@ test('opts.browser.asObject/write supports child child loggers', ({end, ok, is})
 
 test('opts.browser.asObject/write supports child child child loggers', ({end, ok, is}) => {
   var instance = pino({
-    browser: {write: function (o) {
-      is(o.level, 30)
-      is(o.test, 'test')
-      is(o.foo, 'bar')
-      is(o.baz, 'bop')
-      is(o.msg, 'msg-test')
-      ok(o.time)
-    }}
+    browser: {
+      write (o) {
+        is(o.level, 30)
+        is(o.test, 'test')
+        is(o.foo, 'bar')
+        is(o.baz, 'bop')
+        is(o.msg, 'msg-test')
+        ok(o.time)
+      }
+    }
   })
   var child = instance.child({test: 'test'}).child({foo: 'bar'}).child({baz: 'bop'})
   child.info('msg-test')
@@ -329,7 +331,7 @@ test('opts.browser.asObject/write supports child child child loggers', ({end, ok
 
 test('opts.browser.asObject defensively mitigates naughty numbers', ({end, pass}) => {
   var instance = pino({
-    browser: {asObject: true, write: function () {}}
+    browser: {asObject: true, write: () => {}}
   })
   var child = instance.child({test: 'test'})
   child._childLevel = -10
@@ -341,7 +343,7 @@ test('opts.browser.asObject defensively mitigates naughty numbers', ({end, pass}
 
 test('opts.browser.write obj falls back to console where a method is not supplied', ({end, ok, is}) => {
   var info = console.info
-  console.info = function (o) {
+  console.info = (o) => {
     is(o.level, 30)
     is(o.msg, 'test')
     ok(o.time)
@@ -350,7 +352,7 @@ test('opts.browser.write obj falls back to console where a method is not supplie
   var instance = require('../browser')({
     browser: {
       write: {
-        error: function (o) {
+        error (o) {
           is(o.level, 50)
           is(o.test, 'test')
           ok(o.time)
@@ -367,7 +369,7 @@ test('opts.browser.write obj falls back to console where a method is not supplie
 function levelTest (name) {
   test(name + ' logs', ({end, is}) => {
     var msg = 'hello world'
-    sink(name, function (args) {
+    sink(name, (args) => {
       is(args[0], msg)
       end()
     })
@@ -376,7 +378,7 @@ function levelTest (name) {
 
   test('passing objects at level ' + name, ({end, is}) => {
     var msg = { hello: 'world' }
-    sink(name, function (args) {
+    sink(name, (args) => {
       is(args[0], msg)
       end()
     })
@@ -386,7 +388,7 @@ function levelTest (name) {
   test('passing an object and a string at level ' + name, ({end, is}) => {
     var a = { hello: 'world' }
     var b = 'a string'
-    sink(name, function (args) {
+    sink(name, (args) => {
       is(args[0], a)
       is(args[1], b)
       end()
@@ -395,7 +397,7 @@ function levelTest (name) {
   })
 
   test('formatting logs as ' + name, ({end, is}) => {
-    sink(name, function (args) {
+    sink(name, (args) => {
       is(args[0], 'hello %d')
       is(args[1], 42)
       end()
@@ -405,7 +407,7 @@ function levelTest (name) {
 
   test('passing error at level ' + name, ({end, is}) => {
     var err = new Error('myerror')
-    sink(name, function (args) {
+    sink(name, (args) => {
       is(args[0], err)
       end()
     })
@@ -415,7 +417,7 @@ function levelTest (name) {
   test('passing error with a serializer at level ' + name, ({end, is}) => {
     // in browser - should have no effect (should not crash)
     var err = new Error('myerror')
-    sink(name, function (args) {
+    sink(name, (args) => {
       is(args[0].err, err)
       end()
     })
@@ -431,7 +433,7 @@ function levelTest (name) {
   test('child logger for level ' + name, ({end, is}) => {
     var msg = 'hello world'
     var parent = { hello: 'world' }
-    sink(name, function (args) {
+    sink(name, (args) => {
       is(args[0], parent)
       is(args[1], msg)
       end()
@@ -445,7 +447,7 @@ function levelTest (name) {
     var msg = 'hello world'
     var grandParent = { hello: 'world' }
     var parent = { hello: 'you' }
-    sink(name, function (args) {
+    sink(name, (args) => {
       is(args[0], grandParent)
       is(args[1], parent)
       is(args[2], msg)
@@ -460,7 +462,7 @@ function levelTest (name) {
 function consoleMethodTest (level, method) {
   if (!method) method = level
   test('pino().' + level + ' uses console.' + method, ({end, is}) => {
-    sink(method, function (args) {
+    sink(method, (args) => {
       is(args[0], 'test')
       end()
     })

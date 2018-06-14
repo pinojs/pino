@@ -13,7 +13,7 @@ test('set the level by string', ({end, is}) => {
     level: 60,
     msg: 'this is fatal'
   }]
-  var instance = pino(sink(function (chunk, enc, cb) {
+  var instance = pino(sink((chunk, enc, cb) => {
     var current = expected.shift()
     check(is, chunk, current.level, current.msg)
     cb()
@@ -28,7 +28,7 @@ test('set the level by string', ({end, is}) => {
 
 test('the wrong level throws', ({end, throws}) => {
   var instance = pino()
-  throws(function () {
+  throws(() => {
     instance.level = 'kaboom'
   })
   end()
@@ -42,7 +42,7 @@ test('set the level by number', ({end, is}) => {
     level: 60,
     msg: 'this is fatal'
   }]
-  var instance = pino(sink(function (chunk, enc, cb) {
+  var instance = pino(sink((chunk, enc, cb) => {
     var current = expected.shift()
     check(is, chunk, current.level, current.msg)
     cb()
@@ -63,7 +63,7 @@ test('set the level by number via string method', ({end, is}) => {
     level: 60,
     msg: 'this is fatal'
   }]
-  var instance = pino(sink(function (chunk, enc, cb) {
+  var instance = pino(sink((chunk, enc, cb) => {
     var current = expected.shift()
     check(is, chunk, current.level, current.msg)
     cb()
@@ -107,7 +107,7 @@ test('set the level via constructor', ({end, is}) => {
     level: 60,
     msg: 'this is fatal'
   }]
-  var instance = pino({ level: 'error' }, sink(function (chunk, enc, cb) {
+  var instance = pino({ level: 'error' }, sink((chunk, enc, cb) => {
     var current = expected.shift()
     check(is, chunk, current.level, current.msg)
     cb()
@@ -121,7 +121,7 @@ test('set the level via constructor', ({end, is}) => {
 
 test('level-change event', ({end, is}) => {
   var instance = pino()
-  var handle = function (lvl, val, prevLvl, prevVal) {
+  function handle (lvl, val, prevLvl, prevVal) {
     is(lvl, 'trace')
     is(val, 10)
     is(prevLvl, 'info')
@@ -134,9 +134,9 @@ test('level-change event', ({end, is}) => {
 
   var count = 0
 
-  var l1 = function () { count += 1 }
-  var l2 = function () { count += 1 }
-  var l3 = function () { count += 1 }
+  const l1 = () => count++
+  const l2 = () => count++
+  const l3 = () => count++
   instance.on('level-change', l1)
   instance.on('level-change', l2)
   instance.on('level-change', l3)
@@ -158,11 +158,11 @@ test('enable', ({end, fail}) => {
   var instance = pino({
     level: 'trace',
     enabled: false
-  }, sink(function (chunk, enc) {
+  }, sink((chunk, enc) => {
     fail('no data should be logged')
   }))
 
-  Object.keys(pino.levels.values).forEach(function (level) {
+  Object.keys(pino.levels.values).forEach((level) => {
     instance[level]('hello world')
   })
 
@@ -172,11 +172,11 @@ test('enable', ({end, fail}) => {
 test('silent level', ({end, fail}) => {
   var instance = pino({
     level: 'silent'
-  }, sink(function (chunk, enc) {
+  }, sink((chunk, enc) => {
     fail('no data should be logged')
   }))
 
-  Object.keys(pino.levels.values).forEach(function (level) {
+  Object.keys(pino.levels.values).forEach((level) => {
     instance[level]('hello world')
   })
 
@@ -186,7 +186,7 @@ test('silent level', ({end, fail}) => {
 test('silent is a noop', ({end, fail}) => {
   var instance = pino({
     level: 'silent'
-  }, sink(function (chunk, enc) {
+  }, sink((chunk, enc) => {
     fail('no data should be logged')
   }))
 
@@ -199,7 +199,7 @@ test('silent stays a noop after level changes', ({end, is, isNot, fail}) => {
   var noop = require('../lib/tools').noop
   var instance = pino({
     level: 'silent'
-  }, sink(function (chunk, enc) {
+  }, sink((chunk, enc) => {
     fail('no data should be logged')
   }))
 
@@ -245,7 +245,7 @@ test('setting level in child', ({end, is}) => {
     level: 60,
     msg: 'this is fatal'
   }]
-  var instance = pino(sink(function (chunk, enc, cb) {
+  var instance = pino(sink((chunk, enc, cb) => {
     var current = expected.shift()
     check(is, chunk, current.level, current.msg)
     cb()

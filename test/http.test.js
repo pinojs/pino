@@ -11,7 +11,7 @@ var hostname = os.hostname()
 
 test('http request support', ({end, ok, same, error, teardown}) => {
   var originalReq
-  var instance = pino(sink(function (chunk, enc) {
+  var instance = pino(sink((chunk, enc) => {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     same(chunk, {
@@ -52,7 +52,7 @@ test('http request support via serializer', ({end, ok, same, error, teardown}) =
     serializers: {
       req: pino.stdSerializers.req
     }
-  }, sink(function (chunk, enc) {
+  }, sink((chunk, enc) => {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     same(chunk, {
@@ -93,7 +93,7 @@ test('http request support via serializer without request connection', ({end, ok
     serializers: {
       req: pino.stdSerializers.req
     }
-  }, sink(function (chunk, enc) {
+  }, sink((chunk, enc) => {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     same(chunk, {
@@ -129,7 +129,7 @@ test('http request support via serializer without request connection', ({end, ok
 
 test('http response support', ({end, ok, same, error, teardown}) => {
   var originalRes
-  var instance = pino(sink(function (chunk, enc) {
+  var instance = pino(sink((chunk, enc) => {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     same(chunk, {
@@ -167,7 +167,7 @@ test('http response support via a serializer', ({end, ok, same, error, teardown}
     serializers: {
       res: pino.stdSerializers.res
     }
-  }, sink(function (chunk, enc) {
+  }, sink((chunk, enc) => {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     same(chunk, {
@@ -205,7 +205,7 @@ test('http request support via serializer in a child', ({end, ok, same, error, t
     serializers: {
       req: pino.stdSerializers.req
     }
-  }, sink(function (chunk, enc) {
+  }, sink((chunk, enc) => {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     same(chunk, {

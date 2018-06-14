@@ -5,11 +5,11 @@ var pino = require('../browser')
 function noop () {}
 
 test('throws if transmit object does not have send function', ({end, throws}) => {
-  throws(function () {
+  throws(() => {
     pino({browser: {transmit: {}}})
   })
 
-  throws(function () {
+  throws(() => {
     pino({browser: {transmit: {send: 'not a func'}}})
   })
 
@@ -20,13 +20,11 @@ test('calls send function after write', ({end, is}) => {
   var c = 0
   var logger = pino({
     browser: {
-      write: function () {
+      write: () => {
         c++
       },
       transmit: {
-        send: function () {
-          is(c, 1)
-        }
+        send () { is(c, 1) }
       }
     }
   })
@@ -38,10 +36,9 @@ test('calls send function after write', ({end, is}) => {
 test('passes send function the logged level', ({end, is}) => {
   var logger = pino({
     browser: {
-      write: function () {
-      },
+      write () {},
       transmit: {
-        send: function (level) {
+        send (level) {
           is(level, 'fatal')
         }
       }
@@ -57,8 +54,7 @@ test('passes send function messages in logEvent object', ({end, same, is}) => {
     browser: {
       write: noop,
       transmit: {
-        send: function (level, logEvent) {
-          var messages = logEvent.messages
+        send (level, {messages}) {
           same(messages[0], {test: 'test'})
           is(messages[1], 'another test')
         }
@@ -75,11 +71,11 @@ test('supplies a timestamp (ts) in logEvent object which is exactly the same as 
   var logger = pino({
     browser: {
       asObject: true, // implict because `write`, but just to be explicit
-      write: function (o) {
+      write (o) {
         expected = o.time
       },
       transmit: {
-        send: function (level, logEvent) {
+        send (level, logEvent) {
           is(logEvent.ts, expected)
         }
       }
@@ -95,7 +91,7 @@ test('passes send function child bindings via logEvent object', ({end, same, is}
     browser: {
       write: noop,
       transmit: {
-        send: function (level, logEvent) {
+        send (level, logEvent) {
           var messages = logEvent.messages
           var bindings = logEvent.bindings
           same(bindings[0], {first: 'binding'})
@@ -119,7 +115,7 @@ test('passes send function level:{label, value} via logEvent object', ({end, is}
     browser: {
       write: noop,
       transmit: {
-        send: function (level, logEvent) {
+        send (level, logEvent) {
           var label = logEvent.level.label
           var value = logEvent.level.value
 
@@ -141,7 +137,7 @@ test('calls send function according to transmit.level', ({end, is}) => {
       write: noop,
       transmit: {
         level: 'error',
-        send: function (level) {
+        send (level) {
           c++
           if (c === 1) is(level, 'error')
           if (c === 2) is(level, 'fatal')
@@ -162,7 +158,7 @@ test('transmit.level defaults to logger level', ({end, is}) => {
     browser: {
       write: noop,
       transmit: {
-        send: function (level) {
+        send (level) {
           c++
           if (c === 1) is(level, 'error')
           if (c === 2) is(level, 'fatal')
@@ -184,7 +180,7 @@ test('transmit.level is effective even if lower than logger level', ({end, is}) 
       write: noop,
       transmit: {
         level: 'info',
-        send: function (level) {
+        send (level) {
           c++
           if (c === 1) is(level, 'warn')
           if (c === 2) is(level, 'error')
@@ -202,14 +198,14 @@ test('transmit.level is effective even if lower than logger level', ({end, is}) 
 test('applies all serializers to messages and bindings (serialize:false - default)', ({end, same, is}) => {
   var logger = pino({
     serializers: {
-      first: function () { return 'first' },
-      second: function () { return 'second' },
-      test: function () { return 'serialize it' }
+      first: () => 'first',
+      second: () => 'second',
+      test: () => 'serialize it'
     },
     browser: {
       write: noop,
       transmit: {
-        send: function (level, logEvent) {
+        send (level, logEvent) {
           var messages = logEvent.messages
           var bindings = logEvent.bindings
           same(bindings[0], {first: 'first'})
@@ -231,15 +227,15 @@ test('applies all serializers to messages and bindings (serialize:false - defaul
 test('applies all serializers to messages and bindings (serialize:true)', ({end, same, is}) => {
   var logger = pino({
     serializers: {
-      first: function () { return 'first' },
-      second: function () { return 'second' },
-      test: function () { return 'serialize it' }
+      first: () => 'first',
+      second: () => 'second',
+      test: () => 'serialize it'
     },
     browser: {
       serialize: true,
       write: noop,
       transmit: {
-        send: function (level, logEvent) {
+        send (level, logEvent) {
           var messages = logEvent.messages
           var bindings = logEvent.bindings
           same(bindings[0], {first: 'first'})

@@ -12,7 +12,7 @@ function testEscape (ch, key) {
   test('correctly escape ' + ch, ({end, same}) => {
     var instance = pino({
       name: 'hello'
-    }, sink(function (chunk, enc) {
+    }, sink((chunk, enc) => {
       delete chunk.time
       same(chunk, {
         pid: pid,
@@ -71,14 +71,14 @@ var toEscape = [
   '\u001F' // US   Unit Separator
 ]
 
-toEscape.forEach(function (key) {
+toEscape.forEach((key) => {
   testEscape(JSON.stringify(key), key)
 })
 
 test('correctly escape `hello \\u001F world \\n \\u0022`', ({end, same}) => {
   var instance = pino({
     name: 'hello'
-  }, sink(function (chunk, enc) {
+  }, sink((chunk, enc) => {
     delete chunk.time
     same(chunk, {
       pid: pid,

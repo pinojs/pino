@@ -15,12 +15,16 @@ var childSerializers = {
 }
 
 test('serializers override values', ({end, is}) => {
-  var parent = pino({ serializers: parentSerializers,
-    browser: { serialize: true,
-      write: function (o) {
+  var parent = pino({
+    serializers: parentSerializers,
+    browser: {
+      serialize: true,
+      write (o) {
         is(o.test, 'parent')
         end()
-      }}})
+      }
+    }
+  })
 
   parent.fatal({test: 'test'})
 })
@@ -28,10 +32,12 @@ test('serializers override values', ({end, is}) => {
 test('without the serialize option, serializers do not override values', ({end, is}) => {
   var parent = pino({ serializers: parentSerializers,
     browser: {
-      write: function (o) {
+      write (o) {
         is(o.test, 'test')
         end()
-      }}})
+      }
+    }
+  })
 
   parent.fatal({test: 'test'})
 })
@@ -108,9 +114,9 @@ if (process.title !== 'browser') {
 
     var logger = fresh('../browser', require)({
       serializers: {
-        key: function () { return 'serialized' },
-        key2: function () { return 'serialized2' },
-        key3: function () { return 'serialized3' }
+        key: () => 'serialized',
+        key2: () => 'serialized2',
+        key3: () => 'serialized3'
       },
       browser: { serialize: true }
     })
@@ -131,9 +137,9 @@ if (process.title !== 'browser') {
 
     var logger = fresh('../browser', require)({
       serializers: {
-        key: function () { return 'serialized' },
-        key2: function () { return 'serialized2' },
-        key3: function () { return 'serialized3' }
+        key: () => 'serialized',
+        key2: () => 'serialized2',
+        key3: () => 'serialized3'
       },
       browser: { serialize: ['key2'] }
     })
@@ -160,9 +166,9 @@ if (process.title !== 'browser') {
 
     logger.child({aBinding: 'test',
       serializers: {
-        key: function () { return 'serialized' },
-        key2: function () { return 'serialized2' },
-        key3: function () { return 'serialized3' }
+        key: () => 'serialized',
+        key2: () => 'serialized2',
+        key3: () => 'serialized3'
       }}).fatal({key: 'test'}, {key2: 'test'}, 'str should skip', [{foo: 'array should skip'}], {key3: 'test'})
     end()
   })
@@ -175,7 +181,7 @@ if (process.title !== 'browser') {
 
     var logger = fresh('../browser', require)({
       serializers: {
-        key: function () { return 'serialized' }
+        key: () => 'serialized'
       },
       browser: { serialize: true }
     })
@@ -200,7 +206,7 @@ if (process.title !== 'browser') {
 
     logger.child({key: 'test',
       serializers: {
-        key: function () { return 'serialized' }
+        key: () => 'serialized'
       }}).fatal({test: 'test'})
     end()
   })
@@ -209,8 +215,9 @@ if (process.title !== 'browser') {
 test('child does not overwrite parent serializers', ({end, is}) => {
   var c = 0
   var parent = pino({ serializers: parentSerializers,
-    browser: { serialize: true,
-      write: function (o) {
+    browser: {
+      serialize: true,
+      write (o) {
         c++
         if (c === 1) is(o.test, 'parent')
         if (c === 2) {
@@ -226,10 +233,13 @@ test('child does not overwrite parent serializers', ({end, is}) => {
 
 test('children inherit parent serializers', ({end, is}) => {
   var parent = pino({ serializers: parentSerializers,
-    browser: { serialize: true,
-      write: function (o) {
+    browser: {
+      serialize: true,
+      write (o) {
         is(o.test, 'parent')
-      }}})
+      }
+    }
+  })
 
   var child = parent.child({a: 'property'})
   child.fatal({test: 'test'})
@@ -239,10 +249,13 @@ test('children inherit parent serializers', ({end, is}) => {
 test('children serializers get called', ({end, is}) => {
   var parent = pino({
     test: 'this',
-    browser: { serialize: true,
-      write: function (o) {
+    browser: {
+      serialize: true,
+      write (o) {
         is(o.test, 'child')
-      }}})
+      }
+    }
+  })
 
   var child = parent.child({ 'a': 'property', serializers: childSerializers })
 
@@ -254,12 +267,15 @@ test('children serializers get called when inherited from parent', ({end, is}) =
   var parent = pino({
     test: 'this',
     serializers: parentSerializers,
-    browser: { serialize: true,
-      write: function (o) {
+    browser: {
+      serialize: true,
+      write: (o) => {
         is(o.test, 'pass')
-      }}})
+      }
+    }
+  })
 
-  var child = parent.child({serializers: {test: function () { return 'pass' }}})
+  var child = parent.child({serializers: { test: () => 'pass' }})
 
   child.fatal({test: 'fail'})
   end()
@@ -267,26 +283,30 @@ test('children serializers get called when inherited from parent', ({end, is}) =
 
 test('non overriden serializers are available in the children', ({end, is}) => {
   var pSerializers = {
-    onlyParent: function () { return 'parent' },
-    shared: function () { return 'parent' }
+    onlyParent: () => 'parent',
+    shared: () => 'parent'
   }
 
   var cSerializers = {
-    shared: function () { return 'child' },
-    onlyChild: function () { return 'child' }
+    shared: () => 'child',
+    onlyChild: () => 'child'
   }
 
   var c = 0
 
-  var parent = pino({ serializers: pSerializers,
-    browser: { serialize: true,
-      write: function (o) {
+  var parent = pino({
+    serializers: pSerializers,
+    browser: {
+      serialize: true,
+      write (o) {
         c++
         if (c === 1) is(o.shared, 'child')
         if (c === 2) is(o.onlyParent, 'parent')
         if (c === 3) is(o.onlyChild, 'child')
         if (c === 4) is(o.onlyChild, 'test')
-      }}})
+      }
+    }
+  })
 
   var child = parent.child({ serializers: cSerializers })
 

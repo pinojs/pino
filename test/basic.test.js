@@ -25,7 +25,7 @@ test('child exposes pino version', ({end, ok}) => {
 
 function levelTest (name, level) {
   test(name + ' logs as ' + level, ({end, is}) => {
-    var instance = pino(sink(function (chunk, enc, cb) {
+    var instance = pino(sink((chunk, enc, cb) => {
       check(is, chunk, level, 'hello world')
       end()
       cb()
@@ -36,7 +36,7 @@ function levelTest (name, level) {
   })
 
   test('passing objects at level ' + name, ({end, ok, same}) => {
-    var instance = pino(sink(function (chunk, enc) {
+    var instance = pino(sink((chunk, enc) => {
       ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
       delete chunk.time
       same(chunk, {
@@ -54,7 +54,7 @@ function levelTest (name, level) {
   })
 
   test('passing an object and a string at level ' + name, ({end, ok, same}) => {
-    var instance = pino(sink(function (chunk, enc) {
+    var instance = pino(sink((chunk, enc) => {
       ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
       delete chunk.time
       same(chunk, {
@@ -73,7 +73,7 @@ function levelTest (name, level) {
   })
 
   test('formatting logs as ' + name, ({end, is}) => {
-    var instance = pino(sink(function (chunk, enc) {
+    var instance = pino(sink((chunk, enc) => {
       check(is, chunk, level, 'hello 42')
       end()
     }))
@@ -88,7 +88,7 @@ function levelTest (name, level) {
       serializers: {
         err: pino.stdSerializers.err
       }
-    }, sink(function (chunk, enc) {
+    }, sink((chunk, enc) => {
       ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
       delete chunk.time
       same(chunk, {
@@ -110,7 +110,7 @@ function levelTest (name, level) {
   })
 
   test('child logger for level ' + name, ({end, ok, same}) => {
-    var instance = pino(sink(function (chunk, enc) {
+    var instance = pino(sink((chunk, enc) => {
       ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
       delete chunk.time
       same(chunk, {
@@ -142,9 +142,9 @@ levelTest('trace', 10)
 test('serializers can return undefined to strip field', ({end, is}) => {
   var instance = pino({
     serializers: {
-      test: function () { return undefined }
+      test () { return undefined }
     }
-  }, sink(function (obj, enc) {
+  }, sink((obj, enc) => {
     is('test' in obj, false)
     end()
   }))
@@ -170,16 +170,14 @@ test('explode with a circular ref with safe = false', ({end, throws}) => {
     hello: b
   }
   b.a = a // circular ref
-  throws(function () {
-    instance.info(a)
-  })
+  throws(() => instance.info(a))
   end()
 })
 
 test('set the name', ({end, ok, same}) => {
   var instance = pino({
     name: 'hello'
-  }, sink(function (chunk, enc) {
+  }, sink((chunk, enc) => {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     same(chunk, {
@@ -200,8 +198,8 @@ test('set the messageKey', ({end, ok, same}) => {
   var message = 'hello world'
   var messageKey = 'fooMessage'
   var instance = pino({
-    messageKey: messageKey
-  }, sink(function (chunk, enc) {
+    messageKey
+  }, sink((chunk, enc) => {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     same(chunk, {
@@ -218,7 +216,7 @@ test('set the messageKey', ({end, ok, same}) => {
 })
 
 test('set undefined properties', ({end, ok, same}) => {
-  var instance = pino(sink(function (chunk, enc) {
+  var instance = pino(sink((chunk, enc) => {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     same(chunk, {
@@ -234,27 +232,14 @@ test('set undefined properties', ({end, ok, same}) => {
   instance.info({ hello: 'world', property: undefined })
 })
 
-test('set properties defined in the prototype chain', ({end, ok, same}) => {
-  var instance = pino(sink(function (chunk, enc) {
-    ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
-    delete chunk.time
-    same(chunk, {
-      pid: pid,
-      hostname: hostname,
-      level: 30,
-      hello: 'world',
-      v: 1
-    })
+test('prototype properties are not logged', ({end, ok, is}) => {
+  var instance = pino(sink(({hello, time}, enc) => {
+    ok(new Date(time) <= new Date(), 'time is greater than Date.now()')
+    is(hello, undefined)
     end()
   }))
 
-  function MyObject () {
-    this.hello = 'world'
-  }
-
-  MyObject.prototype.some = function () {}
-
-  instance.info(new MyObject())
+  instance.info(Object.create({hello: 'world'}))
 })
 
 test('set the base', ({end, ok, same}) => {
@@ -262,7 +247,7 @@ test('set the base', ({end, ok, same}) => {
     base: {
       a: 'b'
     }
-  }, sink(function (chunk, enc) {
+  }, sink((chunk, enc) => {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     same(chunk, {
@@ -280,7 +265,7 @@ test('set the base', ({end, ok, same}) => {
 test('set the base to null', ({end, ok, same}) => {
   var instance = pino({
     base: null
-  }, sink(function (chunk, enc) {
+  }, sink((chunk, enc) => {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     same(chunk, {
@@ -300,10 +285,10 @@ test('throw if creating child without bindings', ({end, throws}) => {
   end()
 })
 
-test('correctly escape msg strings / 1', ({end, same}) => {
+test('correctly escapes msg strings with stray double quote at end', ({end, same}) => {
   var instance = pino({
     name: 'hello'
-  }, sink(function (chunk, enc) {
+  }, sink((chunk, enc) => {
     delete chunk.time
     same(chunk, {
       pid: pid,
@@ -319,10 +304,10 @@ test('correctly escape msg strings / 1', ({end, same}) => {
   instance.fatal('this contains "')
 })
 
-test('correctly escape msg strings / 2', ({end, same}) => {
+test('correctly escape msg strings with unclosed double quote', ({end, same}) => {
   var instance = pino({
     name: 'hello'
-  }, sink(function (chunk, enc) {
+  }, sink((chunk, enc) => {
     delete chunk.time
     same(chunk, {
       pid: pid,
@@ -340,7 +325,7 @@ test('correctly escape msg strings / 2', ({end, same}) => {
 
 // https://github.com/pinojs/pino/issues/139
 test('object and format string', ({end, same}) => {
-  var instance = pino(sink(function (chunk, enc) {
+  var instance = pino(sink((chunk, enc) => {
     delete chunk.time
     same(chunk, {
       pid: pid,
@@ -356,7 +341,7 @@ test('object and format string', ({end, same}) => {
 })
 
 test('object and format string property', ({end, same}) => {
-  var instance = pino(sink(function (chunk, enc) {
+  var instance = pino(sink((chunk, enc) => {
     delete chunk.time
     same(chunk, {
       pid: pid,
@@ -375,19 +360,19 @@ test('object and format string property', ({end, same}) => {
 test('correctly strip undefined when returned from toJSON', ({end, is}) => {
   var instance = pino({
     test: 'this'
-  }, sink(function (obj, enc) {
+  }, sink((obj, enc) => {
     is('test' in obj, false)
     end()
   }))
 
-  instance.fatal({test: {toJSON: function () { return undefined }}})
+  instance.fatal({test: {toJSON () { return undefined }}})
 })
 
-test('correctly support node v4+ stderr', ({end, same}) => {
+test('correctly supports stderr', ({end, same}) => {
   // stderr inherits from Stream, rather than Writable
   var dest = {
     writable: true,
-    write: function (chunk) {
+    write (chunk) {
       chunk = JSON.parse(chunk)
       delete chunk.time
       same(chunk, {
@@ -407,7 +392,7 @@ test('correctly support node v4+ stderr', ({end, same}) => {
 })
 
 test('normalize number to string', ({end, same}) => {
-  var instance = pino(sink(function (chunk, enc) {
+  var instance = pino(sink((chunk, enc) => {
     delete chunk.time
     same(chunk, {
       pid: pid,
@@ -423,7 +408,7 @@ test('normalize number to string', ({end, same}) => {
 })
 
 test('normalize number to string with an object', ({end, same}) => {
-  var instance = pino(sink(function (chunk, enc) {
+  var instance = pino(sink((chunk, enc) => {
     delete chunk.time
     same(chunk, {
       pid: pid,
@@ -440,7 +425,7 @@ test('normalize number to string with an object', ({end, same}) => {
 })
 
 test('handles objects with null prototype', ({end, same}) => {
-  var instance = pino(sink(function (chunk, enc) {
+  var instance = pino(sink((chunk, enc) => {
     delete chunk.time
     same(chunk, {
       pid: pid,
@@ -458,8 +443,8 @@ test('handles objects with null prototype', ({end, same}) => {
 
 // https://github.com/pinojs/pino/issues/222
 test('children with same names render in correct order', ({end, is}) => {
-  var root = pino(sink(function (chunk, enc) {
-    is(chunk.a, 3, 'last logged object takes precedence')
+  var root = pino(sink(({a}, enc) => {
+    is(a, 3, 'last logged object takes precedence')
     end()
   }))
 
@@ -471,12 +456,12 @@ test('when safe is true it should ONLY use `fast-safe-stringify`', ({end, is}) =
   var safeStates = [true, false]
   var isFastSafeStringifyCalled = null
   var mockedPino = proxyquire('../', {
-    'fast-safe-stringify': function () {
+    'fast-safe-stringify' () {
       isFastSafeStringifyCalled = true
       return '{ "hello": "world" }'
     }
   })
-  safeStates.forEach(function (safeState) {
+  safeStates.forEach((safeState) => {
     isFastSafeStringifyCalled = false
     var instance = mockedPino({ safe: safeState }, sink())
     instance.info({ hello: 'world' })

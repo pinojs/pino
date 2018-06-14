@@ -5,8 +5,8 @@ var pino = require('../')
 var writer = require('flush-write-stream')
 
 function capture () {
-  var ws = writer(function (chunk, enc, cb) {
-    this.data += chunk.toString()
+  var ws = writer((chunk, enc, cb) => {
+    ws.data += chunk.toString()
     cb()
   })
   ws.data = ''

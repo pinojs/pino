@@ -84,7 +84,7 @@ test('terminates on SIGHUP when no other handlers registered', ({end, is}) => {
     end()
   })
 
-  setTimeout(function () { child.kill('SIGHUP') }, 2000)
+  setTimeout(() => { child.kill('SIGHUP') }, 2000)
 })
 
 test('lets app terminate when SIGHUP received with multiple handlers', ({end, is}) => {
@@ -106,7 +106,7 @@ test('lets app terminate when SIGHUP received with multiple handlers', ({end, is
     end()
   })
 
-  setTimeout(function () { child.kill('SIGHUP') }, 2000)
+  setTimeout(() => { child.kill('SIGHUP') }, 2000)
 })
 
 test('destination', ({end, is}) => {

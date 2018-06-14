@@ -9,7 +9,7 @@ var pid = process.pid
 var hostname = os.hostname()
 
 test('metadata works', ({end, ok, same, is}) => {
-  var dest = sink(function (chunk, enc) {
+  var dest = sink((chunk, enc) => {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     same(chunk, {
@@ -24,7 +24,7 @@ test('metadata works', ({end, ok, same, is}) => {
   var now = Date.now()
   var instance = pino({}, {
     [Symbol.for('needsMetadata')]: true,
-    write: function (chunk) {
+    write (chunk) {
       is(instance, this.lastLogger)
       is(30, this.lastLevel)
       is('a msg', this.lastMsg)
@@ -39,7 +39,7 @@ test('metadata works', ({end, ok, same, is}) => {
 })
 
 test('child loggers works', ({end, ok, same, is}) => {
-  var dest = sink(function (chunk, enc) {
+  var dest = sink((chunk, enc) => {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     same(chunk, {
@@ -54,7 +54,7 @@ test('child loggers works', ({end, ok, same, is}) => {
   })
   var instance = pino({}, {
     [Symbol.for('needsMetadata')]: true,
-    write: function (chunk) {
+    write (chunk) {
       is(child, this.lastLogger)
       is(30, this.lastLevel)
       is('a msg', this.lastMsg)
@@ -69,7 +69,7 @@ test('child loggers works', ({end, ok, same, is}) => {
 })
 
 test('without object', ({end, ok, same, is}) => {
-  var dest = sink(function (chunk, enc) {
+  var dest = sink((chunk, enc) => {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     same(chunk, {
@@ -82,7 +82,7 @@ test('without object', ({end, ok, same, is}) => {
   })
   var instance = pino({}, {
     [Symbol.for('needsMetadata')]: true,
-    write: function (chunk) {
+    write (chunk) {
       is(instance, this.lastLogger)
       is(30, this.lastLevel)
       is('a msg', this.lastMsg)
@@ -96,7 +96,7 @@ test('without object', ({end, ok, same, is}) => {
 })
 
 test('without msg', ({end, ok, same, is}) => {
-  var dest = sink(function (chunk, enc) {
+  var dest = sink((chunk, enc) => {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     same(chunk, {
@@ -109,7 +109,7 @@ test('without msg', ({end, ok, same, is}) => {
   })
   var instance = pino({}, {
     [Symbol.for('needsMetadata')]: true,
-    write: function (chunk) {
+    write (chunk) {
       is(instance, this.lastLogger)
       is(30, this.lastLevel)
       is(undefined, this.lastMsg)

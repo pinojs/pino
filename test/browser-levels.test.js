@@ -15,7 +15,7 @@ test('set the level by string', ({end, same, is}) => {
   ]
   var instance = pino({
     browser: {
-      write: function (actual) {
+      write (actual) {
         checkLogObjects(is, same, actual, expected.shift())
       }
     }
@@ -43,7 +43,7 @@ test('set the level by string. init with silent', ({end, same, is}) => {
   var instance = pino({
     level: 'silent',
     browser: {
-      write: function (actual) {
+      write (actual) {
         checkLogObjects(is, same, actual, expected.shift())
       }
     }
@@ -71,13 +71,12 @@ test('set the level by string. init with silent and transmit', ({end, same, is})
   var instance = pino({
     level: 'silent',
     browser: {
-      write: function (actual) {
+      write (actual) {
         checkLogObjects(is, same, actual, expected.shift())
       }
     },
     transmit: {
-      send: function () {
-      }
+      send () {}
     }
   })
 
@@ -103,7 +102,7 @@ test('set the level via constructor', ({end, same, is}) => {
   var instance = pino({
     level: 'error',
     browser: {
-      write: function (actual) {
+      write (actual) {
         checkLogObjects(is, same, actual, expected.shift())
       }
     }
@@ -118,7 +117,7 @@ test('set the level via constructor', ({end, same, is}) => {
 
 test('the wrong level throws', ({end, throws}) => {
   var instance = pino()
-  throws(function () {
+  throws(() => {
     instance.level = 'kaboom'
   })
   end()
@@ -126,7 +125,7 @@ test('the wrong level throws', ({end, throws}) => {
 
 test('the wrong level by number throws', ({end, throws}) => {
   var instance = pino()
-  throws(function () {
+  throws(() => {
     instance.levelVal = 55
   })
   end()
@@ -152,13 +151,13 @@ test('silent level via constructor', ({end, fail}) => {
   var instance = pino({
     level: 'silent',
     browser: {
-      write: function () {
+      write () {
         fail('no data should be logged')
       }
     }
   })
 
-  Object.keys(pino.levels.values).forEach(function (level) {
+  Object.keys(pino.levels.values).forEach((level) => {
     instance[level]('hello world')
   })
 
@@ -168,7 +167,7 @@ test('silent level via constructor', ({end, fail}) => {
 test('silent level by string', ({end, fail}) => {
   var instance = pino({
     browser: {
-      write: function () {
+      write () {
         fail('no data should be logged')
       }
     }
@@ -176,7 +175,7 @@ test('silent level by string', ({end, fail}) => {
 
   instance.level = 'silent'
 
-  Object.keys(pino.levels.values).forEach(function (level) {
+  Object.keys(pino.levels.values).forEach((level) => {
     instance[level]('hello world')
   })
 
