@@ -9,7 +9,7 @@ const fixtures = join(__dirname, 'fixtures', 'events')
 
 test('no event loop logs successfully', ({end, is}) => {
   var output = ''
-  var child = fork(join(fixtures, 'no-event-loop.js'), {silent: true})
+  const child = fork(join(fixtures, 'no-event-loop.js'), {silent: true})
 
   child.stdout.pipe(writer((s, enc, cb) => {
     output += s
@@ -25,7 +25,7 @@ test('no event loop logs successfully', ({end, is}) => {
 test('terminates when uncaughtException is fired with onTerminate registered', ({end, is}) => {
   var output = ''
   var errorOutput = ''
-  var child = spawn(process.argv[0], [join(fixtures, 'uncaught-exception.js')], {silent: true})
+  const child = spawn(process.argv[0], [join(fixtures, 'uncaught-exception.js')], {silent: true})
 
   child.stdout.pipe(writer(function (s, enc, cb) {
     output += s
@@ -47,7 +47,7 @@ test('terminates when uncaughtException is fired with onTerminate registered', (
 
 test('terminates when uncaughtException is fired without onTerminate registered', ({end, is}) => {
   var output = ''
-  var child = spawn(process.argv[0], [join(fixtures, 'uncaught-exception-no-terminate.js')], {silent: true})
+  const child = spawn(process.argv[0], [join(fixtures, 'uncaught-exception-no-terminate.js')], {silent: true})
 
   child.stdout.pipe(writer(function (s, enc, cb) {
     output += s
@@ -66,7 +66,7 @@ test('terminates when uncaughtException is fired without onTerminate registered'
 
 test('terminates on SIGHUP when no other handlers registered', ({end, is}) => {
   var output = ''
-  var child = spawn(process.argv[0], [join(fixtures, 'sighup-no-handler.js')], {silent: true})
+  const child = spawn(process.argv[0], [join(fixtures, 'sighup-no-handler.js')], {silent: true})
 
   child.stdout.pipe(writer(function (s, enc, cb) {
     output += s
@@ -89,7 +89,7 @@ test('terminates on SIGHUP when no other handlers registered', ({end, is}) => {
 
 test('lets app terminate when SIGHUP received with multiple handlers', ({end, is}) => {
   var output = ''
-  var child = spawn(process.argv[0], [join(fixtures, 'sighup-with-handler.js')], {silent: true})
+  const child = spawn(process.argv[0], [join(fixtures, 'sighup-with-handler.js')], {silent: true})
 
   child.stdout.pipe(writer(function (s, enc, cb) {
     output += s
@@ -111,7 +111,7 @@ test('lets app terminate when SIGHUP received with multiple handlers', ({end, is
 
 test('destination', ({end, is}) => {
   var output = ''
-  var child = spawn(process.argv[0], [join(fixtures, 'destination.js')], {silent: true})
+  const child = spawn(process.argv[0], [join(fixtures, 'destination.js')], {silent: true})
 
   child.stdout.pipe(writer(function (s, enc, cb) {
     output += s

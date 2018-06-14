@@ -5,12 +5,12 @@ const { test } = require('tap')
 const { sink } = require('./helper')
 const pino = require('../')
 
-var pid = process.pid
-var hostname = os.hostname()
+const { pid } = process
+const hostname = os.hostname()
 
 function testEscape (ch, key) {
   test('correctly escape ' + ch, ({end, same}) => {
-    var instance = pino({
+    const instance = pino({
       name: 'hello'
     }, sink((chunk, enc) => {
       delete chunk.time
@@ -36,7 +36,7 @@ testEscape('\\r', '\r')
 testEscape('\\t', '\t')
 testEscape('\\b', '\b')
 
-var toEscape = [
+const toEscape = [
   '\u0000', // NUL  Null character
   '\u0001', // SOH  Start of Heading
   '\u0002', // STX  Start of Text
@@ -76,7 +76,7 @@ toEscape.forEach((key) => {
 })
 
 test('correctly escape `hello \\u001F world \\n \\u0022`', ({end, same}) => {
-  var instance = pino({
+  const instance = pino({
     name: 'hello'
   }, sink((chunk, enc) => {
     delete chunk.time

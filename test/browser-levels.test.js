@@ -3,7 +3,7 @@ const test = require('tape')
 const pino = require('../browser')
 
 test('set the level by string', ({end, same, is}) => {
-  var expected = [
+  const expected = [
     {
       level: 50,
       msg: 'this is an error'
@@ -13,7 +13,7 @@ test('set the level by string', ({end, same, is}) => {
       msg: 'this is fatal'
     }
   ]
-  var instance = pino({
+  const instance = pino({
     browser: {
       write (actual) {
         checkLogObjects(is, same, actual, expected.shift())
@@ -30,7 +30,7 @@ test('set the level by string', ({end, same, is}) => {
 })
 
 test('set the level by string. init with silent', ({end, same, is}) => {
-  var expected = [
+  const expected = [
     {
       level: 50,
       msg: 'this is an error'
@@ -40,7 +40,7 @@ test('set the level by string. init with silent', ({end, same, is}) => {
       msg: 'this is fatal'
     }
   ]
-  var instance = pino({
+  const instance = pino({
     level: 'silent',
     browser: {
       write (actual) {
@@ -58,7 +58,7 @@ test('set the level by string. init with silent', ({end, same, is}) => {
 })
 
 test('set the level by string. init with silent and transmit', ({end, same, is}) => {
-  var expected = [
+  const expected = [
     {
       level: 50,
       msg: 'this is an error'
@@ -68,7 +68,7 @@ test('set the level by string. init with silent and transmit', ({end, same, is})
       msg: 'this is fatal'
     }
   ]
-  var instance = pino({
+  const instance = pino({
     level: 'silent',
     browser: {
       write (actual) {
@@ -89,7 +89,7 @@ test('set the level by string. init with silent and transmit', ({end, same, is})
 })
 
 test('set the level via constructor', ({end, same, is}) => {
-  var expected = [
+  const expected = [
     {
       level: 50,
       msg: 'this is an error'
@@ -99,7 +99,7 @@ test('set the level via constructor', ({end, same, is}) => {
       msg: 'this is fatal'
     }
   ]
-  var instance = pino({
+  const instance = pino({
     level: 'error',
     browser: {
       write (actual) {
@@ -116,7 +116,7 @@ test('set the level via constructor', ({end, same, is}) => {
 })
 
 test('the wrong level throws', ({end, throws}) => {
-  var instance = pino()
+  const instance = pino()
   throws(() => {
     instance.level = 'kaboom'
   })
@@ -124,7 +124,7 @@ test('the wrong level throws', ({end, throws}) => {
 })
 
 test('the wrong level by number throws', ({end, throws}) => {
-  var instance = pino()
+  const instance = pino()
   throws(() => {
     instance.levelVal = 55
   })
@@ -142,13 +142,13 @@ test('exposes level number mappings', ({end, is}) => {
 })
 
 test('returns level integer', ({end, is}) => {
-  var instance = pino({level: 'error'})
+  const instance = pino({level: 'error'})
   is(instance.levelVal, 50)
   end()
 })
 
 test('silent level via constructor', ({end, fail}) => {
-  var instance = pino({
+  const instance = pino({
     level: 'silent',
     browser: {
       write () {
@@ -165,7 +165,7 @@ test('silent level via constructor', ({end, fail}) => {
 })
 
 test('silent level by string', ({end, fail}) => {
-  var instance = pino({
+  const instance = pino({
     browser: {
       write () {
         fail('no data should be logged')
@@ -209,8 +209,8 @@ test('exposed labels', ({end, same}) => {
 function checkLogObjects (is, same, actual, expected) {
   is(actual.time <= Date.now(), true, 'time is greater than Date.now()')
 
-  var actualCopy = Object.assign({}, actual)
-  var expectedCopy = Object.assign({}, expected)
+  const actualCopy = Object.assign({}, actual)
+  const expectedCopy = Object.assign({}, expected)
   delete actualCopy.time
   delete expectedCopy.time
 

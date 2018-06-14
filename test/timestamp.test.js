@@ -13,10 +13,10 @@ test('pino exposes standard time functions', ({end, ok}) => {
 })
 
 test('pino accepts external time functions', ({end, is}) => {
-  var opts = {
+  const opts = {
     timestamp: () => ',"time":"none"'
   }
-  var instance = pino(opts, sink((chunk, enc) => {
+  const instance = pino(opts, sink((chunk, enc) => {
     is(chunk.hasOwnProperty('time'), true)
     is(chunk.time, 'none')
     end()
@@ -25,7 +25,7 @@ test('pino accepts external time functions', ({end, is}) => {
 })
 
 test('inserts timestamp by default', ({end, ok, is}) => {
-  var instance = pino(sink((chunk, enc, cb) => {
+  const instance = pino(sink((chunk, enc, cb) => {
     is(chunk.hasOwnProperty('time'), true)
     ok(new Date(chunk.time) <= new Date(), 'time is greater than timestamp')
     is(chunk.msg, 'foobar')
@@ -36,7 +36,7 @@ test('inserts timestamp by default', ({end, ok, is}) => {
 })
 
 test('omits timestamp with option', ({end, is}) => {
-  var instance = pino({timestamp: false}, sink((chunk, enc, cb) => {
+  const instance = pino({timestamp: false}, sink((chunk, enc, cb) => {
     is(chunk.hasOwnProperty('time'), false)
     is(chunk.msg, 'foobar')
     cb()
@@ -46,24 +46,24 @@ test('omits timestamp with option', ({end, is}) => {
 })
 
 test('child inserts timestamp by default', ({end, ok, is}) => {
-  var logger = pino(sink((chunk, enc, cb) => {
+  const logger = pino(sink((chunk, enc, cb) => {
     is(chunk.hasOwnProperty('time'), true)
     ok(new Date(chunk.time) <= new Date(), 'time is greater than timestamp')
     is(chunk.msg, 'foobar')
     cb()
     end()
   }))
-  var instance = logger.child({component: 'child'})
+  const instance = logger.child({component: 'child'})
   instance.info('foobar')
 })
 
 test('child omits timestamp with option', ({end, is}) => {
-  var logger = pino({timestamp: false}, sink((chunk, enc, cb) => {
+  const logger = pino({timestamp: false}, sink((chunk, enc, cb) => {
     is(chunk.hasOwnProperty('time'), false)
     is(chunk.msg, 'foobar')
     cb()
     end()
   }))
-  var instance = logger.child({component: 'child'})
+  const instance = logger.child({component: 'child'})
   instance.info('foobar')
 })

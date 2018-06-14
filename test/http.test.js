@@ -6,12 +6,12 @@ const { test } = require('tap')
 const { sink } = require('./helper')
 const pino = require('../')
 
-var pid = process.pid
-var hostname = os.hostname()
+const { pid } = process
+const hostname = os.hostname()
 
 test('http request support', ({end, ok, same, error, teardown}) => {
   var originalReq
-  var instance = pino(sink((chunk, enc) => {
+  const instance = pino(sink((chunk, enc) => {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     same(chunk, {
@@ -31,7 +31,7 @@ test('http request support', ({end, ok, same, error, teardown}) => {
     end()
   }))
 
-  var server = http.createServer(function (req, res) {
+  const server = http.createServer(function (req, res) {
     originalReq = req
     instance.info(req, 'my request')
     res.end('hello')
@@ -48,7 +48,7 @@ test('http request support', ({end, ok, same, error, teardown}) => {
 
 test('http request support via serializer', ({end, ok, same, error, teardown}) => {
   var originalReq
-  var instance = pino({
+  const instance = pino({
     serializers: {
       req: pino.stdSerializers.req
     }
@@ -72,7 +72,7 @@ test('http request support via serializer', ({end, ok, same, error, teardown}) =
     end()
   }))
 
-  var server = http.createServer(function (req, res) {
+  const server = http.createServer(function (req, res) {
     originalReq = req
     instance.info({ req: req }, 'my request')
     res.end('hello')
@@ -89,7 +89,7 @@ test('http request support via serializer', ({end, ok, same, error, teardown}) =
 
 test('http request support via serializer without request connection', ({end, ok, same, error, teardown}) => {
   var originalReq
-  var instance = pino({
+  const instance = pino({
     serializers: {
       req: pino.stdSerializers.req
     }
@@ -111,7 +111,7 @@ test('http request support via serializer without request connection', ({end, ok
     end()
   }))
 
-  var server = http.createServer(function (req, res) {
+  const server = http.createServer(function (req, res) {
     originalReq = req
     delete req.connection
     instance.info({ req: req }, 'my request')
@@ -129,7 +129,7 @@ test('http request support via serializer without request connection', ({end, ok
 
 test('http response support', ({end, ok, same, error, teardown}) => {
   var originalRes
-  var instance = pino(sink((chunk, enc) => {
+  const instance = pino(sink((chunk, enc) => {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     same(chunk, {
@@ -146,7 +146,7 @@ test('http response support', ({end, ok, same, error, teardown}) => {
     end()
   }))
 
-  var server = http.createServer(function (req, res) {
+  const server = http.createServer(function (req, res) {
     originalRes = res
     res.end('hello')
     instance.info(res, 'my response')
@@ -163,7 +163,7 @@ test('http response support', ({end, ok, same, error, teardown}) => {
 
 test('http response support via a serializer', ({end, ok, same, error, teardown}) => {
   var originalRes
-  var instance = pino({
+  const instance = pino({
     serializers: {
       res: pino.stdSerializers.res
     }
@@ -184,7 +184,7 @@ test('http response support via a serializer', ({end, ok, same, error, teardown}
     end()
   }))
 
-  var server = http.createServer(function (req, res) {
+  const server = http.createServer(function (req, res) {
     originalRes = res
     res.end('hello')
     instance.info({ res: res }, 'my response')
@@ -201,7 +201,7 @@ test('http response support via a serializer', ({end, ok, same, error, teardown}
 
 test('http request support via serializer in a child', ({end, ok, same, error, teardown}) => {
   var originalReq
-  var instance = pino({
+  const instance = pino({
     serializers: {
       req: pino.stdSerializers.req
     }
@@ -225,9 +225,9 @@ test('http request support via serializer in a child', ({end, ok, same, error, t
     end()
   }))
 
-  var server = http.createServer(function (req, res) {
+  const server = http.createServer(function (req, res) {
     originalReq = req
-    var child = instance.child({ req: req })
+    const child = instance.child({ req: req })
     child.info('my request')
     res.end('hello')
   }).listen(function (err) {

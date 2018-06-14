@@ -5,7 +5,7 @@ const { sink } = require('./helper')
 const pino = require('../')
 
 test('can add a custom level via constructor', ({end, is}) => {
-  var log = pino({level: 'foo', levelVal: 35}, sink((chunk, enc) => {
+  const log = pino({level: 'foo', levelVal: 35}, sink((chunk, enc) => {
     is(chunk.msg, 'bar')
     end()
   }))
@@ -15,7 +15,7 @@ test('can add a custom level via constructor', ({end, is}) => {
 })
 
 test('can add a custom level to a prior instance', ({end, is}) => {
-  var log = pino(sink((chunk, enc) => {
+  const log = pino(sink((chunk, enc) => {
     is(chunk.msg, 'bar')
     end()
   }))
@@ -26,17 +26,17 @@ test('can add a custom level to a prior instance', ({end, is}) => {
 })
 
 test('custom level via constructor does not affect other instances', ({end, is}) => {
-  var log = pino({level: 'foo3', levelVal: 36})
-  var other = pino()
+  const log = pino({level: 'foo3', levelVal: 36})
+  const other = pino()
   is(typeof log.foo3, 'function')
   is(typeof other.foo3, 'undefined')
   end()
 })
 
 test('custom level on one instance does not affect other instances', ({end, is}) => {
-  var log = pino()
+  const log = pino()
   log.addLevel('foo4', 37)
-  var other = pino()
+  const other = pino()
   log.addLevel('foo5', 38)
   is(typeof other.foo4, 'undefined')
   is(typeof other.foo5, 'undefined')
@@ -44,7 +44,7 @@ test('custom level on one instance does not affect other instances', ({end, is})
 })
 
 test('custom levels encompass higher levels', ({end, is}) => {
-  var log = pino({level: 'foo', levelVal: 35}, sink((chunk, enc) => {
+  const log = pino({level: 'foo', levelVal: 35}, sink((chunk, enc) => {
     is(chunk.msg, 'bar')
     end()
   }))
@@ -53,7 +53,7 @@ test('custom levels encompass higher levels', ({end, is}) => {
 })
 
 test('after the fact add level does not include lower levels', ({end, is}) => {
-  var log = pino(sink((chunk, enc) => {
+  const log = pino(sink((chunk, enc) => {
     is(chunk.msg, 'bar')
     end()
   }))
@@ -65,7 +65,7 @@ test('after the fact add level does not include lower levels', ({end, is}) => {
 })
 
 test('after the fact add of a lower level does not include it', ({end, is}) => {
-  var log = pino(sink((chunk, enc) => {
+  const log = pino(sink((chunk, enc) => {
     is(chunk.msg, 'bar')
     end()
   }))
@@ -77,28 +77,28 @@ test('after the fact add of a lower level does not include it', ({end, is}) => {
 })
 
 test('children can be set to custom level', ({end, is}) => {
-  var parent = pino({level: 'foo', levelVal: 35}, sink((chunk, enc) => {
+  const parent = pino({level: 'foo', levelVal: 35}, sink((chunk, enc) => {
     is(chunk.msg, 'bar')
     is(chunk.child, 'yes')
     end()
   }))
-  var child = parent.child({child: 'yes'})
+  const child = parent.child({child: 'yes'})
   child.foo('bar')
 })
 
 test('custom levels exists on children', ({end, is}) => {
-  var parent = pino({}, sink((chunk, enc) => {
+  const parent = pino({}, sink((chunk, enc) => {
     is(chunk.msg, 'bar')
     is(chunk.child, 'yes')
     end()
   }))
   parent.addLevel('foo', 35)
-  var child = parent.child({child: 'yes'})
+  const child = parent.child({child: 'yes'})
   child.foo('bar')
 })
 
 test('rejects already known labels', ({end, is}) => {
-  var log = pino({level: 'info', levelVal: 900})
+  const log = pino({level: 'info', levelVal: 900})
   is(log.levelVal, 30)
   end()
 })
@@ -121,7 +121,7 @@ test('reject values of Infinity', ({end, throws}) => {
 })
 
 test('level numbers are logged correctly after level change', ({end, is}) => {
-  var log = pino({level: 'foo', levelVal: 25}, sink((chunk, enc) => {
+  const log = pino({level: 'foo', levelVal: 25}, sink((chunk, enc) => {
     is(chunk.level, 25)
     end()
   }))
@@ -130,10 +130,10 @@ test('level numbers are logged correctly after level change', ({end, is}) => {
 })
 
 test('levels state is not shared between instances', ({end, is}) => {
-  var instance1 = pino({level: 'foo', levelVal: 35})
+  const instance1 = pino({level: 'foo', levelVal: 35})
   is(typeof instance1.foo, 'function')
 
-  var instance2 = pino()
+  const instance2 = pino()
   is(instance2.hasOwnProperty('foo'), false)
   end()
 })

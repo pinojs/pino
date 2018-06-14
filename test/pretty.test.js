@@ -9,7 +9,7 @@ const pino = require('../')
 
 test('can be enabled via constructor', ({end, isNot}) => {
   var actual = ''
-  var child = fork(join(__dirname, 'fixtures', 'pretty', 'basic.js'), {silent: true})
+  const child = fork(join(__dirname, 'fixtures', 'pretty', 'basic.js'), {silent: true})
 
   child.stdout.pipe(writer((s, enc, cb) => {
     actual += s
@@ -24,7 +24,7 @@ test('can be enabled via constructor', ({end, isNot}) => {
 
 test('can be enabled via constructor with pretty configuration', ({end, isNot}) => {
   var actual = ''
-  var child = fork(join(__dirname, 'fixtures', 'pretty', 'level-first.js'), {silent: true})
+  const child = fork(join(__dirname, 'fixtures', 'pretty', 'level-first.js'), {silent: true})
 
   child.stdout.pipe(writer((s, enc, cb) => {
     actual += s
@@ -39,7 +39,7 @@ test('can be enabled via constructor with pretty configuration', ({end, isNot}) 
 
 test('can be enabled via constructor with prettifier', ({end, isNot}) => {
   var actual = ''
-  var child = fork(join(__dirname, 'fixtures', 'pretty', 'pretty-factory.js'), {silent: true})
+  const child = fork(join(__dirname, 'fixtures', 'pretty', 'pretty-factory.js'), {silent: true})
 
   child.stdout.pipe(writer((s, enc, cb) => {
     actual += s
@@ -59,7 +59,7 @@ test('does not throw error when enabled with stream specified', ({end}) => {
 })
 
 test('can send pretty print to custom stream', ({end, is}) => {
-  var dest = new Writable({
+  const dest = new Writable({
     objectMode: true,
     write (formatted, enc) {
       is(/^INFO.*foo\n$/.test(formatted), true)
@@ -67,7 +67,7 @@ test('can send pretty print to custom stream', ({end, is}) => {
     }
   })
 
-  var log = pino({
+  const log = pino({
     prettifier: require('pino-pretty'),
     prettyPrint: {
       levelFirst: true
@@ -78,7 +78,7 @@ test('can send pretty print to custom stream', ({end, is}) => {
 
 test('ignores `undefined` from prettifier', ({end, is}) => {
   var actual = ''
-  var child = fork(join(__dirname, 'fixtures', 'pretty', 'skipped-output.js'), {silent: true})
+  const child = fork(join(__dirname, 'fixtures', 'pretty', 'skipped-output.js'), {silent: true})
 
   child.stdout.pipe(writer((s, enc) => {
     actual += s

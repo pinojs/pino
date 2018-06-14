@@ -10,8 +10,8 @@ const level = 50
 const name = 'error'
 
 test('err is serialized with additional properties set on the Error object', ({end, ok, same}) => {
-  var err = Object.assign(new Error('myerror'), {foo: 'bar'})
-  var instance = pino(sink((chunk, enc, cb) => {
+  const err = Object.assign(new Error('myerror'), {foo: 'bar'})
+  const instance = pino(sink((chunk, enc, cb) => {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     same(chunk, {
@@ -33,8 +33,8 @@ test('err is serialized with additional properties set on the Error object', ({e
 })
 
 test('type should be retained, even if type is a property', ({end, ok, same}) => {
-  var err = Object.assign(new Error('myerror'), {type: 'bar'})
-  var instance = pino(sink((chunk, enc, cb) => {
+  const err = Object.assign(new Error('myerror'), {type: 'bar'})
+  const instance = pino(sink((chunk, enc, cb) => {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     same(chunk, {
@@ -55,8 +55,8 @@ test('type should be retained, even if type is a property', ({end, ok, same}) =>
 })
 
 test('type, message and stack should be first level properties', ({end, ok, same}) => {
-  var err = Object.assign(new Error('foo'), { foo: 'bar' })
-  var instance = pino(sink((chunk, enc, cb) => {
+  const err = Object.assign(new Error('foo'), { foo: 'bar' })
+  const instance = pino(sink((chunk, enc, cb) => {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     same(chunk, {
@@ -78,8 +78,8 @@ test('type, message and stack should be first level properties', ({end, ok, same
 })
 
 test('err serializer', ({end, ok, same}) => {
-  var err = Object.assign(new Error('myerror'), {foo: 'bar'})
-  var instance = pino({
+  const err = Object.assign(new Error('myerror'), {foo: 'bar'})
+  const instance = pino({
     serializers: {
       err: pino.stdSerializers.err
     }
@@ -107,8 +107,8 @@ test('err serializer', ({end, ok, same}) => {
 })
 
 test('an error with statusCode property is not confused for a http response', ({end, ok, same}) => {
-  var err = Object.assign(new Error('StatusCodeErr'), { statusCode: 500 })
-  var instance = pino(sink((chunk, enc, cb) => {
+  const err = Object.assign(new Error('StatusCodeErr'), { statusCode: 500 })
+  const instance = pino(sink((chunk, enc, cb) => {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     same(chunk, {

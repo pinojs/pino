@@ -8,9 +8,9 @@ const { fork } = require('child_process')
 const writer = require('flush-write-stream')
 
 test('extreme mode', ({end, is, teardown}) => {
-  var now = Date.now
-  var hostname = os.hostname
-  var proc = process
+  const now = Date.now
+  const hostname = os.hostname
+  const proc = process
   global.process = {
     __proto__: process,
     pid: 123456
@@ -21,16 +21,16 @@ test('extreme mode', ({end, is, teardown}) => {
   const pino = require('../')
   var expected = ''
   var actual = ''
-  var normal = pino(writer((s, enc, cb) => {
+  const normal = pino(writer((s, enc, cb) => {
     expected += s
     cb()
   }))
 
-  var dest = createWriteStream('/dev/null')
+  const dest = createWriteStream('/dev/null')
   dest.write = (s) => {
     actual += s
   }
-  var extreme = pino(dest)
+  const extreme = pino(dest)
 
   var i = 44
   while (i--) {
@@ -41,7 +41,7 @@ test('extreme mode', ({end, is, teardown}) => {
   var expected2 = expected.split('\n')[0]
   var actual2 = ''
 
-  var child = fork(join(__dirname, '/fixtures/extreme.js'), {silent: true})
+  const child = fork(join(__dirname, '/fixtures/extreme.js'), {silent: true})
   child.stdout.pipe(writer((s, enc, cb) => {
     actual2 += s
     cb()
@@ -62,9 +62,9 @@ test('extreme mode', ({end, is, teardown}) => {
 })
 
 test('extreme mode with child', ({end, is, teardown}) => {
-  var now = Date.now
-  var hostname = os.hostname
-  var proc = process
+  const now = Date.now
+  const hostname = os.hostname
+  const proc = process
   global.process = {
     __proto__: process,
     pid: 123456
@@ -79,14 +79,14 @@ test('extreme mode with child', ({end, is, teardown}) => {
   const pino = require('../')
   var expected = ''
   var actual = ''
-  var normal = pino(writer((s, enc, cb) => {
+  const normal = pino(writer((s, enc, cb) => {
     expected += s
     cb()
   })).child({ hello: 'world' })
 
-  var dest = createWriteStream('/dev/null')
+  const dest = createWriteStream('/dev/null')
   dest.write = function (s) { actual += s }
-  var extreme = pino(dest).child({ hello: 'world' })
+  const extreme = pino(dest).child({ hello: 'world' })
 
   var i = 500
   while (i--) {
@@ -99,7 +99,7 @@ test('extreme mode with child', ({end, is, teardown}) => {
   var expected2 = expected.split('\n')[0]
   var actual2 = ''
 
-  var child = fork(join(__dirname, '/fixtures/extreme-child.js'), {silent: true})
+  const child = fork(join(__dirname, '/fixtures/extreme-child.js'), {silent: true})
   child.stdout.pipe(writer((s, enc, cb) => {
     actual2 += s
     cb()
@@ -120,7 +120,7 @@ test('extreme mode with child', ({end, is, teardown}) => {
 })
 
 test('throw an error if extreme is passed', ({end, throws}) => {
-  var pino = require('..')
+  const pino = require('..')
   throws(() => {
     pino({extreme: true})
   })

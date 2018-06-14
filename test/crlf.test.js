@@ -5,7 +5,7 @@ const writer = require('flush-write-stream')
 const pino = require('../')
 
 function capture () {
-  var ws = writer((chunk, enc, cb) => {
+  const ws = writer((chunk, enc, cb) => {
     ws.data += chunk.toString()
     cb()
   })
@@ -14,8 +14,8 @@ function capture () {
 }
 
 test('pino uses LF by default', ({end, ok}) => {
-  var stream = capture()
-  var logger = pino(stream)
+  const stream = capture()
+  const logger = pino(stream)
   logger.info('foo')
   logger.error('bar')
   ok(/foo[^\r\n]+\n[^\r\n]+bar[^\r\n]+\n/.test(stream.data))
@@ -24,8 +24,8 @@ test('pino uses LF by default', ({end, ok}) => {
 })
 
 test('pino can log CRLF', ({end, ok}) => {
-  var stream = capture()
-  var logger = pino({
+  const stream = capture()
+  const logger = pino({
     crlf: true
   }, stream)
   logger.info('foo')
