@@ -1,7 +1,7 @@
 'use strict'
 
 const { test } = require('tap')
-const { sink } = require('./helper')
+const { sink, once } = require('./helper')
 const pino = require('../')
 
 test('can add a custom level via constructor', async ({is}) => {
@@ -9,7 +9,7 @@ test('can add a custom level via constructor', async ({is}) => {
   const instance = pino({level: 'foo', levelVal: 35}, stream)
   is(typeof instance.foo, 'function')
   instance.foo('bar')
-  const { msg } = await stream.next
+  const { msg } = await once(stream, 'data')
   is(msg, 'bar')
 })
 
@@ -19,7 +19,7 @@ test('can add a custom level to a prior instance', async ({is}) => {
   instance.addLevel('foo2', 35)
   is(typeof instance.foo2, 'function')
   instance.foo2('bar')
-  const { msg } = await stream.next
+  const { msg } = await once(stream, 'data')
   is(msg, 'bar')
 })
 
@@ -43,7 +43,7 @@ test('custom levels encompass higher levels', async ({is}) => {
   const stream = sink()
   const instance = pino({level: 'foo', levelVal: 35}, stream)
   instance.warn('bar')
-  const { msg } = await stream.next
+  const { msg } = await once(stream, 'data')
   is(msg, 'bar')
 })
 
@@ -54,7 +54,7 @@ test('after the fact add level does not include lower levels', async ({is}) => {
   instance.level = 'foo'
   instance.info('nope')
   instance.foo('bar')
-  const { msg } = await stream.next
+  const { msg } = await once(stream, 'data')
   is(msg, 'bar')
 })
 
@@ -65,7 +65,7 @@ test('after the fact add of a lower level does not include it', async ({is}) => 
   instance.addLevel('foo', 15)
   instance.info('bar')
   instance.foo('nope')
-  const { msg } = await stream.next
+  const { msg } = await once(stream, 'data')
   is(msg, 'bar')
 })
 
@@ -74,7 +74,7 @@ test('children can be set to custom level', async ({is}) => {
   const parent = pino({level: 'foo', levelVal: 35}, stream)
   const child = parent.child({childMsg: 'yes'})
   child.foo('bar')
-  const { msg, childMsg } = await stream.next
+  const { msg, childMsg } = await once(stream, 'data')
   is(msg, 'bar')
   is(childMsg, 'yes')
 })
@@ -85,7 +85,7 @@ test('custom levels exists on children', async ({is}) => {
   parent.addLevel('foo', 35)
   const child = parent.child({childMsg: 'yes'})
   child.foo('bar')
-  const { msg, childMsg } = await stream.next
+  const { msg, childMsg } = await once(stream, 'data')
   is(msg, 'bar')
   is(childMsg, 'yes')
 })
@@ -114,7 +114,7 @@ test('level numbers are logged correctly after level change', async ({is}) => {
   const instance = pino({level: 'foo', levelVal: 25}, stream)
   instance.level = 'debug'
   instance.foo('bar')
-  const { level } = await stream.next
+  const { level } = await once(stream, 'data')
   is(level, 25)
 })
 

@@ -1,7 +1,7 @@
 'use strict'
 const os = require('os')
 const { test } = require('tap')
-const { sink, check } = require('./helper')
+const { sink, check, once } = require('./helper')
 const proxyquire = require('proxyquire')
 const pino = require('../')
 const { version } = require('../package.json')
@@ -24,7 +24,7 @@ function levelTest (name, level) {
     const instance = pino(stream)
     instance.level = name
     instance[name]('hello world')
-    check(is, await stream.next, level, 'hello world')
+    check(is, await once(stream, 'data'), level, 'hello world')
   })
 
   test(`passing objects at level ${name}`, async ({is}) => {
@@ -33,7 +33,7 @@ function levelTest (name, level) {
     instance.level = name
     instance[name]({ hello: 'world' })
 
-    const result = await stream.next
+    const result = await once(stream, 'data')
     is(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
     is(result.pid, pid)
     is(result.hostname, hostname)
@@ -47,7 +47,7 @@ function levelTest (name, level) {
     const instance = pino(stream)
     instance.level = name
     instance[name]({ hello: 'world' }, 'a string')
-    const result = await stream.next
+    const result = await once(stream, 'data')
     is(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
     delete result.time
     same(result, {
@@ -65,7 +65,7 @@ function levelTest (name, level) {
     const instance = pino(stream)
     instance.level = name
     instance[name]('hello %d', 42)
-    const result = await stream.next
+    const result = await once(stream, 'data')
     check(is, result, level, 'hello 42')
   })
 
@@ -79,7 +79,7 @@ function levelTest (name, level) {
     }, stream)
     instance.level = name
     instance[name]({ err })
-    const result = await stream.next
+    const result = await once(stream, 'data')
     is(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
     delete result.time
     same(result, {
@@ -101,7 +101,7 @@ function levelTest (name, level) {
     instance.level = name
     const child = instance.child({ hello: 'world' })
     child[name]('hello world')
-    const result = await stream.next
+    const result = await once(stream, 'data')
     is(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
     delete result.time
     same(result, {
@@ -131,7 +131,7 @@ test('serializers can return undefined to strip field', async ({is}) => {
   }, stream)
 
   instance.info({ test: 'sensitive info' })
-  const result = await stream.next
+  const result = await once(stream, 'data')
   is('test' in result, false)
 })
 
@@ -163,7 +163,7 @@ test('set the name', async ({is, same}) => {
     name: 'hello'
   }, stream)
   instance.fatal('this is fatal')
-  const result = await stream.next
+  const result = await once(stream, 'data')
   is(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
   delete result.time
   same(result, {
@@ -184,7 +184,7 @@ test('set the messageKey', async ({is, same}) => {
     messageKey
   }, stream)
   instance.info(message)
-  const result = await stream.next
+  const result = await once(stream, 'data')
   is(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
   delete result.time
   same(result, {
@@ -200,7 +200,7 @@ test('set undefined properties', async ({is, same}) => {
   const stream = sink()
   const instance = pino(stream)
   instance.info({ hello: 'world', property: undefined })
-  const result = await stream.next
+  const result = await once(stream, 'data')
   is(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
   delete result.time
   same(result, {
@@ -216,7 +216,7 @@ test('prototype properties are not logged', async ({is}) => {
   const stream = sink()
   const instance = pino(stream)
   instance.info(Object.create({hello: 'world'}))
-  const { hello } = await stream.next
+  const { hello } = await once(stream, 'data')
   is(hello, undefined)
 })
 
@@ -229,7 +229,7 @@ test('set the base', async ({is, same}) => {
   }, stream)
 
   instance.fatal('this is fatal')
-  const result = await stream.next
+  const result = await once(stream, 'data')
   is(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
   delete result.time
   same(result, {
@@ -246,7 +246,7 @@ test('set the base to null', async ({is, same}) => {
     base: null
   }, stream)
   instance.fatal('this is fatal')
-  const result = await stream.next
+  const result = await once(stream, 'data')
   is(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
   delete result.time
   same(result, {
@@ -269,7 +269,7 @@ test('correctly escapes msg strings with stray double quote at end', async ({sam
   }, stream)
 
   instance.fatal('this contains "')
-  const result = await stream.next
+  const result = await once(stream, 'data')
   delete result.time
   same(result, {
     pid: pid,
@@ -287,7 +287,7 @@ test('correctly escape msg strings with unclosed double quote', async ({same}) =
     name: 'hello'
   }, stream)
   instance.fatal('" this contains')
-  const result = await stream.next
+  const result = await once(stream, 'data')
   delete result.time
   same(result, {
     pid: pid,
@@ -305,7 +305,7 @@ test('object and format string', async ({same}) => {
   const instance = pino(stream)
   instance.info({}, 'foo %s', 'bar')
 
-  const result = await stream.next
+  const result = await once(stream, 'data')
   delete result.time
   same(result, {
     pid: pid,
@@ -320,7 +320,7 @@ test('object and format string property', async ({same}) => {
   const stream = sink()
   const instance = pino(stream)
   instance.info({ answer: 42 }, 'foo %s', 'bar')
-  const result = await stream.next
+  const result = await once(stream, 'data')
   delete result.time
   same(result, {
     pid: pid,
@@ -338,7 +338,7 @@ test('correctly strip undefined when returned from toJSON', async ({is}) => {
     test: 'this'
   }, stream)
   instance.fatal({test: {toJSON () { return undefined }}})
-  const result = await stream.next
+  const result = await once(stream, 'data')
   is('test' in result, false)
 })
 
@@ -366,7 +366,7 @@ test('normalize number to string', async ({same}) => {
   const stream = sink()
   const instance = pino(stream)
   instance.info(1)
-  const result = await stream.next
+  const result = await once(stream, 'data')
   delete result.time
   same(result, {
     pid: pid,
@@ -381,7 +381,7 @@ test('normalize number to string with an object', async ({same}) => {
   const stream = sink()
   const instance = pino(stream)
   instance.info({ answer: 42 }, 1)
-  const result = await stream.next
+  const result = await once(stream, 'data')
   delete result.time
   same(result, {
     pid: pid,
@@ -399,7 +399,7 @@ test('handles objects with null prototype', async ({same}) => {
   const o = Object.create(null)
   o.test = 'test'
   instance.info(o)
-  const result = await stream.next
+  const result = await once(stream, 'data')
   delete result.time
   same(result, {
     pid: pid,
@@ -415,7 +415,7 @@ test('children with same names render in correct order', async ({is}) => {
   const stream = sink()
   const root = pino(stream)
   root.child({a: 1}).child({a: 2}).info({a: 3})
-  const { a } = await stream.next
+  const { a } = await once(stream, 'data')
   is(a, 3, 'last logged object takes precedence')
 })
 

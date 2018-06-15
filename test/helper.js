@@ -13,13 +13,7 @@ function once (emitter, name) {
 
 function sink (func) {
   const result = split(JSON.parse)
-  var extract
-  const next = () => new Promise((resolve) => { extract = resolve })
-  result.pipe(writer.obj(func || ((value, enc, cb) => {
-    result.next = next()
-    extract(value)
-    result.next.then(() => cb())
-  })))
+  if (func) result.pipe(writer.obj(func))
   return result
 }
 
