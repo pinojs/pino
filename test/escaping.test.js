@@ -2,7 +2,7 @@
 
 const os = require('os')
 const { test } = require('tap')
-const { sink } = require('./helper')
+const { sink, once } = require('./helper')
 const pino = require('../')
 
 const { pid } = process
@@ -10,21 +10,21 @@ const hostname = os.hostname()
 
 function testEscape (ch, key) {
   test('correctly escape ' + ch, async ({same}) => {
+    const stream = sink()
     const instance = pino({
       name: 'hello'
-    }, sink((chunk, enc) => {
-      delete chunk.time
-      same(chunk, {
-        pid: pid,
-        hostname: hostname,
-        level: 60,
-        name: 'hello',
-        msg: 'this contains ' + key,
-        v: 1
-      })
-    }))
-
+    }, stream)
     instance.fatal('this contains ' + key)
+    const result = await once(stream, 'data')
+    delete result.time
+    same(result, {
+      pid: pid,
+      hostname: hostname,
+      level: 60,
+      name: 'hello',
+      msg: 'this contains ' + key,
+      v: 1
+    })
   })
 }
 
@@ -75,19 +75,19 @@ toEscape.forEach((key) => {
 })
 
 test('correctly escape `hello \\u001F world \\n \\u0022`', async ({same}) => {
+  const stream = sink()
   const instance = pino({
     name: 'hello'
-  }, sink((chunk, enc) => {
-    delete chunk.time
-    same(chunk, {
-      pid: pid,
-      hostname: hostname,
-      level: 60,
-      name: 'hello',
-      msg: 'hello \u001F world \n \u0022',
-      v: 1
-    })
-  }))
-
+  }, stream)
   instance.fatal('hello \u001F world \n \u0022')
+  const result = await once(stream, 'data')
+  delete result.time
+  same(result, {
+    pid: pid,
+    hostname: hostname,
+    level: 60,
+    name: 'hello',
+    msg: 'hello \u001F world \n \u0022',
+    v: 1
+  })
 })

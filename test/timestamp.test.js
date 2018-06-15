@@ -1,7 +1,7 @@
 'use strict'
 
 const { test } = require('tap')
-const { sink } = require('./helper')
+const { sink, once } = require('./helper')
 const pino = require('../')
 
 test('pino exposes standard time functions', async ({ok}) => {
@@ -15,49 +15,50 @@ test('pino accepts external time functions', async ({is}) => {
   const opts = {
     timestamp: () => ',"time":"none"'
   }
-  const instance = pino(opts, sink((chunk, enc) => {
-    is(chunk.hasOwnProperty('time'), true)
-    is(chunk.time, 'none')
-  }))
+  const stream = sink()
+  const instance = pino(opts, stream)
   instance.info('foobar')
+  const result = await once(stream, 'data')
+  is(result.hasOwnProperty('time'), true)
+  is(result.time, 'none')
 })
 
 test('inserts timestamp by default', async ({ok, is}) => {
-  const instance = pino(sink((chunk, enc, cb) => {
-    is(chunk.hasOwnProperty('time'), true)
-    ok(new Date(chunk.time) <= new Date(), 'time is greater than timestamp')
-    is(chunk.msg, 'foobar')
-    cb()
-  }))
+  const stream = sink()
+  const instance = pino(stream)
   instance.info('foobar')
+  const result = await once(stream, 'data')
+  is(result.hasOwnProperty('time'), true)
+  ok(new Date(result.time) <= new Date(), 'time is greater than timestamp')
+  is(result.msg, 'foobar')
 })
 
 test('omits timestamp with option', async ({is}) => {
-  const instance = pino({timestamp: false}, sink((chunk, enc, cb) => {
-    is(chunk.hasOwnProperty('time'), false)
-    is(chunk.msg, 'foobar')
-    cb()
-  }))
+  const stream = sink()
+  const instance = pino({timestamp: false}, stream)
   instance.info('foobar')
+  const result = await once(stream, 'data')
+  is(result.hasOwnProperty('time'), false)
+  is(result.msg, 'foobar')
 })
 
 test('child inserts timestamp by default', async ({ok, is}) => {
-  const logger = pino(sink((chunk, enc, cb) => {
-    is(chunk.hasOwnProperty('time'), true)
-    ok(new Date(chunk.time) <= new Date(), 'time is greater than timestamp')
-    is(chunk.msg, 'foobar')
-    cb()
-  }))
+  const stream = sink()
+  const logger = pino(stream)
   const instance = logger.child({component: 'child'})
   instance.info('foobar')
+  const result = await once(stream, 'data')
+  is(result.hasOwnProperty('time'), true)
+  ok(new Date(result.time) <= new Date(), 'time is greater than timestamp')
+  is(result.msg, 'foobar')
 })
 
 test('child omits timestamp with option', async ({is}) => {
-  const logger = pino({timestamp: false}, sink((chunk, enc, cb) => {
-    is(chunk.hasOwnProperty('time'), false)
-    is(chunk.msg, 'foobar')
-    cb()
-  }))
+  const stream = sink()
+  const logger = pino({timestamp: false}, stream)
   const instance = logger.child({component: 'child'})
   instance.info('foobar')
+  const result = await once(stream, 'data')
+  is(result.hasOwnProperty('time'), false)
+  is(result.msg, 'foobar')
 })

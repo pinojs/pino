@@ -2,25 +2,12 @@
 
 const os = require('os')
 const { test } = require('tap')
-const { sink } = require('./helper')
 const pino = require('../')
 
 const { pid } = process
 const hostname = os.hostname()
 
 test('metadata works', async ({ok, same, is}) => {
-  const dest = sink((chunk, enc) => {
-    ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
-    delete chunk.time
-    same(chunk, {
-      pid: pid,
-      hostname: hostname,
-      level: 30,
-      hello: 'world',
-      msg: 'a msg',
-      v: 1
-    })
-  })
   const now = Date.now()
   const instance = pino({}, {
     [Symbol.for('needsMetadata')]: true,
@@ -30,7 +17,17 @@ test('metadata works', async ({ok, same, is}) => {
       is('a msg', this.lastMsg)
       ok(Number(this.lastTime) >= now)
       same({ hello: 'world' }, this.lastObj)
-      dest.write(chunk)
+      const result = JSON.parse(chunk)
+      ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
+      delete result.time
+      same(result, {
+        pid: pid,
+        hostname: hostname,
+        level: 30,
+        hello: 'world',
+        msg: 'a msg',
+        v: 1
+      })
     }
   })
 
@@ -38,19 +35,6 @@ test('metadata works', async ({ok, same, is}) => {
 })
 
 test('child loggers works', async ({ok, same, is}) => {
-  const dest = sink((chunk, enc) => {
-    ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
-    delete chunk.time
-    same(chunk, {
-      pid: pid,
-      hostname: hostname,
-      level: 30,
-      hello: 'world',
-      from: 'child',
-      msg: 'a msg',
-      v: 1
-    })
-  })
   const instance = pino({}, {
     [Symbol.for('needsMetadata')]: true,
     write (chunk) {
@@ -58,7 +42,18 @@ test('child loggers works', async ({ok, same, is}) => {
       is(30, this.lastLevel)
       is('a msg', this.lastMsg)
       same({ from: 'child' }, this.lastObj)
-      dest.write(chunk)
+      const result = JSON.parse(chunk)
+      ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
+      delete result.time
+      same(result, {
+        pid: pid,
+        hostname: hostname,
+        level: 30,
+        hello: 'world',
+        from: 'child',
+        msg: 'a msg',
+        v: 1
+      })
     }
   })
 
@@ -67,17 +62,6 @@ test('child loggers works', async ({ok, same, is}) => {
 })
 
 test('without object', async ({ok, same, is}) => {
-  const dest = sink((chunk, enc) => {
-    ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
-    delete chunk.time
-    same(chunk, {
-      pid: pid,
-      hostname: hostname,
-      level: 30,
-      msg: 'a msg',
-      v: 1
-    })
-  })
   const instance = pino({}, {
     [Symbol.for('needsMetadata')]: true,
     write (chunk) {
@@ -85,7 +69,16 @@ test('without object', async ({ok, same, is}) => {
       is(30, this.lastLevel)
       is('a msg', this.lastMsg)
       is(null, this.lastObj)
-      dest.write(chunk)
+      const result = JSON.parse(chunk)
+      ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
+      delete result.time
+      same(result, {
+        pid: pid,
+        hostname: hostname,
+        level: 30,
+        msg: 'a msg',
+        v: 1
+      })
     }
   })
 
@@ -93,17 +86,6 @@ test('without object', async ({ok, same, is}) => {
 })
 
 test('without msg', async ({ok, same, is}) => {
-  const dest = sink((chunk, enc) => {
-    ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
-    delete chunk.time
-    same(chunk, {
-      pid: pid,
-      hostname: hostname,
-      level: 30,
-      hello: 'world',
-      v: 1
-    })
-  })
   const instance = pino({}, {
     [Symbol.for('needsMetadata')]: true,
     write (chunk) {
@@ -111,7 +93,16 @@ test('without msg', async ({ok, same, is}) => {
       is(30, this.lastLevel)
       is(undefined, this.lastMsg)
       same({ hello: 'world' }, this.lastObj)
-      dest.write(chunk)
+      const result = JSON.parse(chunk)
+      ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
+      delete result.time
+      same(result, {
+        pid: pid,
+        hostname: hostname,
+        level: 30,
+        hello: 'world',
+        v: 1
+      })
     }
   })
 

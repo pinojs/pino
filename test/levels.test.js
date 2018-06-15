@@ -1,7 +1,7 @@
 'use strict'
 
 const { test } = require('tap')
-const { sink } = require('./helper')
+const { sink, once } = require('./helper')
 const { check } = require('./helper')
 const pino = require('../')
 
@@ -13,16 +13,15 @@ test('set the level by string', async ({is}) => {
     level: 60,
     msg: 'this is fatal'
   }]
-  const instance = pino(sink((chunk, enc, cb) => {
-    const current = expected.shift()
-    check(is, chunk, current.level, current.msg)
-    cb()
-  }))
-
+  const stream = sink()
+  const instance = pino(stream)
   instance.level = 'error'
   instance.info('hello world')
   instance.error('this is an error')
   instance.fatal('this is fatal')
+  const result = await once(stream, 'data')
+  const current = expected.shift()
+  check(is, result, current.level, current.msg)
 })
 
 test('the wrong level throws', async ({throws}) => {
@@ -40,16 +39,16 @@ test('set the level by number', async ({is}) => {
     level: 60,
     msg: 'this is fatal'
   }]
-  const instance = pino(sink((chunk, enc, cb) => {
-    const current = expected.shift()
-    check(is, chunk, current.level, current.msg)
-    cb()
-  }))
+  const stream = sink()
+  const instance = pino(stream)
 
   instance.levelVal = 50
   instance.info('hello world')
   instance.error('this is an error')
   instance.fatal('this is fatal')
+  const result = await once(stream, 'data')
+  const current = expected.shift()
+  check(is, result, current.level, current.msg)
 })
 
 test('set the level by number via string method', async ({is}) => {
@@ -60,16 +59,17 @@ test('set the level by number via string method', async ({is}) => {
     level: 60,
     msg: 'this is fatal'
   }]
-  const instance = pino(sink((chunk, enc, cb) => {
-    const current = expected.shift()
-    check(is, chunk, current.level, current.msg)
-    cb()
-  }))
+  const stream = sink()
+  const instance = pino(stream)
 
   instance.level = 50
   instance.info('hello world')
   instance.error('this is an error')
   instance.fatal('this is fatal')
+
+  const result = await once(stream, 'data')
+  const current = expected.shift()
+  check(is, result, current.level, current.msg)
 })
 
 test('exposes level string mappings', async ({is}) => {
@@ -99,15 +99,15 @@ test('set the level via constructor', async ({is}) => {
     level: 60,
     msg: 'this is fatal'
   }]
-  const instance = pino({ level: 'error' }, sink((chunk, enc, cb) => {
-    const current = expected.shift()
-    check(is, chunk, current.level, current.msg)
-    cb()
-  }))
+  const stream = sink()
+  const instance = pino({ level: 'error' }, stream)
 
   instance.info('hello world')
   instance.error('this is an error')
   instance.fatal('this is fatal')
+  const result = await once(stream, 'data')
+  const current = expected.shift()
+  check(is, result, current.level, current.msg)
 })
 
 test('level-change event', async ({is}) => {
@@ -147,7 +147,7 @@ test('enable', async ({fail}) => {
   const instance = pino({
     level: 'trace',
     enabled: false
-  }, sink((chunk, enc) => {
+  }, sink((result, enc) => {
     fail('no data should be logged')
   }))
 
@@ -159,7 +159,7 @@ test('enable', async ({fail}) => {
 test('silent level', async ({fail}) => {
   const instance = pino({
     level: 'silent'
-  }, sink((chunk, enc) => {
+  }, sink((result, enc) => {
     fail('no data should be logged')
   }))
 
@@ -171,7 +171,7 @@ test('silent level', async ({fail}) => {
 test('silent is a noop', async ({fail}) => {
   const instance = pino({
     level: 'silent'
-  }, sink((chunk, enc) => {
+  }, sink((result, enc) => {
     fail('no data should be logged')
   }))
 
@@ -182,7 +182,7 @@ test('silent stays a noop after level changes', async ({is, isNot, fail}) => {
   const noop = require('../lib/tools').noop
   const instance = pino({
     level: 'silent'
-  }, sink((chunk, enc) => {
+  }, sink((result, enc) => {
     fail('no data should be logged')
   }))
 
@@ -224,9 +224,9 @@ test('setting level in child', async ({is}) => {
     level: 60,
     msg: 'this is fatal'
   }]
-  const instance = pino(sink((chunk, enc, cb) => {
+  const instance = pino(sink((result, enc, cb) => {
     const current = expected.shift()
-    check(is, chunk, current.level, current.msg)
+    check(is, result, current.level, current.msg)
     cb()
   })).child({ level: 30 })
 

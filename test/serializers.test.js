@@ -1,6 +1,6 @@
 'use strict'
 const { test } = require('tap')
-const { sink } = require('./helper')
+const { sink, once } = require('./helper')
 const pino = require('../')
 
 const parentSerializers = {
@@ -12,65 +12,68 @@ const childSerializers = {
 }
 
 test('serializers override values', async ({is}) => {
-  const parent = pino({ serializers: parentSerializers }, sink(function (o, enc) {
-    is(o.test, 'parent')
-  }))
+  const stream = sink()
+  const parent = pino({ serializers: parentSerializers }, stream)
   parent.child({ serializers: childSerializers })
 
   parent.fatal({test: 'test'})
+  const o = await once(stream, 'data')
+  is(o.test, 'parent')
 })
 
 test('child does not overwrite parent serializers', async ({is}) => {
-  var c = 0
-  const parent = pino({ serializers: parentSerializers }, sink(function (o, enc, cb) {
-    c++
-    if (c === 1) is(o.test, 'parent')
-    if (c === 2) {
-      is(o.test, 'child')
-    }
-    cb()
-  }))
+  const stream = sink()
+  const parent = pino({ serializers: parentSerializers }, stream)
   const child = parent.child({ serializers: childSerializers })
 
   parent.fatal({test: 'test'})
+
+  const o = once(stream, 'data')
+  is((await o).test, 'parent')
+  const o2 = once(stream, 'data')
   child.fatal({test: 'test'})
+  is((await o2).test, 'child')
 })
 
 test('children inherit parent serializers', async ({is}) => {
-  const parent = pino({ serializers: parentSerializers }, sink(function (o, enc) {
-    is(o.test, 'parent')
-  }))
+  const stream = sink()
+  const parent = pino({ serializers: parentSerializers }, stream)
 
   const child = parent.child({a: 'property'})
   child.fatal({test: 'test'})
+  const o = await once(stream, 'data')
+  is(o.test, 'parent')
 })
 
 test('children serializers get called', async ({is}) => {
+  const stream = sink()
   const parent = pino({
     test: 'this'
-  }, sink(function (o, enc) {
-    is(o.test, 'child')
-  }))
+  }, stream)
 
   const child = parent.child({ 'a': 'property', serializers: childSerializers })
 
   child.fatal({test: 'test'})
+  const o = await once(stream, 'data')
+  is(o.test, 'child')
 })
 
 test('children serializers get called when inherited from parent', async ({is}) => {
+  const stream = sink()
   const parent = pino({
     test: 'this',
     serializers: parentSerializers
-  }, sink(function (o, enc) {
-    is(o.test, 'pass')
-  }))
+  }, stream)
 
   const child = parent.child({serializers: {test: function () { return 'pass' }}})
 
   child.fatal({test: 'fail'})
+  const o = await once(stream, 'data')
+  is(o.test, 'pass')
 })
 
 test('non-overridden serializers are available in the children', async ({is}) => {
+  const stream = sink()
   const pSerializers = {
     onlyParent: function () { return 'parent' },
     shared: function () { return 'parent' }
@@ -81,28 +84,26 @@ test('non-overridden serializers are available in the children', async ({is}) =>
     onlyChild: function () { return 'child' }
   }
 
-  var c = 0
-
-  const parent = pino({ serializers: pSerializers }, sink(function (o, enc, cb) {
-    c++
-    if (c === 1) is(o.shared, 'child')
-    if (c === 2) is(o.onlyParent, 'parent')
-    if (c === 3) is(o.onlyChild, 'child')
-    if (c === 4) {
-      is(o.onlyChild, 'test')
-    }
-    cb()
-  }))
+  const parent = pino({ serializers: pSerializers }, stream)
 
   const child = parent.child({ serializers: cSerializers })
 
+  const o = once(stream, 'data')
   child.fatal({shared: 'test'})
+  is((await o).shared, 'child')
+  const o2 = once(stream, 'data')
   child.fatal({onlyParent: 'test'})
+  is((await o2).onlyParent, 'parent')
+  const o3 = once(stream, 'data')
   child.fatal({onlyChild: 'test'})
+  is((await o3).onlyChild, 'child')
+  const o4 = once(stream, 'data')
   parent.fatal({onlyChild: 'test'})
+  is((await o4).onlyChild, 'test')
 })
 
 test('Symbol.for(\'pino.*\') serializer', async ({notSame, is, isNot}) => {
+  const stream = sink()
   const globalSerializer = {
     [Symbol.for('pino.*')]: function (obj) {
       if (obj.lionel === 'richie') {
@@ -111,33 +112,29 @@ test('Symbol.for(\'pino.*\') serializer', async ({notSame, is, isNot}) => {
       return {lionel: 'richie'}
     }
   }
-  var c = 0
-  const logger = pino({serializers: globalSerializer}, sink(function (o, enc, cb) {
-    c++
-    if (c === 1) {
-      is(o.lionel, 'richie')
-      isNot(o.hello, 'is')
-      isNot(o.it, 'me')
-      isNot(o.you, 'are')
-      isNot(o.looking, 'for')
-    }
-    if (c === 2) {
-      is(o.lionel, 'richie')
-      is(o.hello, 'is')
-      is(o.it, 'me')
-      is(o.you, 'are')
-      is(o.looking, 'for')
-    }
-    if (c === 3) {
-      is(o.lionel, 'richie')
-      is('pid' in o, false)
-      is('hostname' in o, false)
-      notSame(o, ['pid', 'hostname'])
-    }
-    cb()
-  }))
 
+  const logger = pino({serializers: globalSerializer}, stream)
+
+  const o = once(stream, 'data')
   logger.info({hello: 'is', it: 'me', you: 'are', looking: 'for'})
+  is((await o).lionel, 'richie')
+  isNot((await o).hello, 'is')
+  isNot((await o).it, 'me')
+  isNot((await o).you, 'are')
+  isNot((await o).looking, 'for')
+
+  const o2 = once(stream, 'data')
   logger.info({lionel: 'richie'})
+  is((await o2).lionel, 'richie')
+  is((await o2).hello, 'is')
+  is((await o2).it, 'me')
+  is((await o2).you, 'are')
+  is((await o2).looking, 'for')
+
+  const o3 = once(stream, 'data')
   logger.info('message')
+  is((await o3).lionel, 'richie')
+  is('pid' in (await o3), false)
+  is('hostname' in (await o3), false)
+  notSame(await o3, ['pid', 'hostname'])
 })
