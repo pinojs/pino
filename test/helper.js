@@ -8,7 +8,13 @@ const hostname = os.hostname()
 const v = 1
 
 function once (emitter, name) {
-  return new Promise((resolve) => emitter.once(name, resolve))
+  return new Promise((resolve, reject) => {
+    if (name !== 'error') emitter.once('error', reject)
+    emitter.once(name, (...args) => {
+      emitter.removeListener('error', reject)
+      resolve(...args)
+    })
+  })
 }
 
 function sink (func) {
