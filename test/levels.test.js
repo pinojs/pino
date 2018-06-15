@@ -5,7 +5,7 @@ const { sink } = require('./helper')
 const { check } = require('./helper')
 const pino = require('../')
 
-test('set the level by string', ({end, is}) => {
+test('set the level by string', async ({is}) => {
   const expected = [{
     level: 50,
     msg: 'this is an error'
@@ -23,18 +23,16 @@ test('set the level by string', ({end, is}) => {
   instance.info('hello world')
   instance.error('this is an error')
   instance.fatal('this is fatal')
-  end()
 })
 
-test('the wrong level throws', ({end, throws}) => {
+test('the wrong level throws', async ({throws}) => {
   const instance = pino()
   throws(() => {
     instance.level = 'kaboom'
   })
-  end()
 })
 
-test('set the level by number', ({end, is}) => {
+test('set the level by number', async ({is}) => {
   const expected = [{
     level: 50,
     msg: 'this is an error'
@@ -52,10 +50,9 @@ test('set the level by number', ({end, is}) => {
   instance.info('hello world')
   instance.error('this is an error')
   instance.fatal('this is fatal')
-  end()
 })
 
-test('set the level by number via string method', ({end, is}) => {
+test('set the level by number via string method', async ({is}) => {
   const expected = [{
     level: 50,
     msg: 'this is an error'
@@ -73,33 +70,28 @@ test('set the level by number via string method', ({end, is}) => {
   instance.info('hello world')
   instance.error('this is an error')
   instance.fatal('this is fatal')
-  end()
 })
 
-test('exposes level string mappings', ({end, is}) => {
+test('exposes level string mappings', async ({is}) => {
   is(pino.levels.values.error, 50)
-  end()
 })
 
-test('exposes level number mappings', ({end, is}) => {
+test('exposes level number mappings', async ({is}) => {
   is(pino.levels.labels[50], 'error')
-  end()
 })
 
-test('returns level integer', ({end, is}) => {
+test('returns level integer', async ({is}) => {
   const instance = pino({ level: 'error' })
   is(instance.levelVal, 50)
-  end()
 })
 
-test('child returns level integer', ({end, is}) => {
+test('child returns level integer', async ({is}) => {
   const parent = pino({ level: 'error' })
   const child = parent.child({ foo: 'bar' })
   is(child.levelVal, 50)
-  end()
 })
 
-test('set the level via constructor', ({end, is}) => {
+test('set the level via constructor', async ({is}) => {
   const expected = [{
     level: 50,
     msg: 'this is an error'
@@ -116,10 +108,9 @@ test('set the level via constructor', ({end, is}) => {
   instance.info('hello world')
   instance.error('this is an error')
   instance.fatal('this is fatal')
-  end()
 })
 
-test('level-change event', ({end, is}) => {
+test('level-change event', async ({is}) => {
   const instance = pino()
   function handle (lvl, val, prevLvl, prevVal) {
     is(lvl, 'trace')
@@ -150,11 +141,9 @@ test('level-change event', ({end, is}) => {
   instance.level = 'info'
 
   is(count, 6)
-
-  end()
 })
 
-test('enable', ({end, fail}) => {
+test('enable', async ({fail}) => {
   const instance = pino({
     level: 'trace',
     enabled: false
@@ -165,11 +154,9 @@ test('enable', ({end, fail}) => {
   Object.keys(pino.levels.values).forEach((level) => {
     instance[level]('hello world')
   })
-
-  end()
 })
 
-test('silent level', ({end, fail}) => {
+test('silent level', async ({fail}) => {
   const instance = pino({
     level: 'silent'
   }, sink((chunk, enc) => {
@@ -179,11 +166,9 @@ test('silent level', ({end, fail}) => {
   Object.keys(pino.levels.values).forEach((level) => {
     instance[level]('hello world')
   })
-
-  end()
 })
 
-test('silent is a noop', ({end, fail}) => {
+test('silent is a noop', async ({fail}) => {
   const instance = pino({
     level: 'silent'
   }, sink((chunk, enc) => {
@@ -191,11 +176,9 @@ test('silent is a noop', ({end, fail}) => {
   }))
 
   instance['silent']('hello world')
-
-  end()
 })
 
-test('silent stays a noop after level changes', ({end, is, isNot, fail}) => {
+test('silent stays a noop after level changes', async ({is, isNot, fail}) => {
   const noop = require('../lib/tools').noop
   const instance = pino({
     level: 'silent'
@@ -209,11 +192,9 @@ test('silent stays a noop after level changes', ({end, is, isNot, fail}) => {
   instance.level = 'silent'
   instance['silent']('hello world')
   is(instance[instance.level], noop)
-
-  end()
 })
 
-test('exposed levels', ({end, same}) => {
+test('exposed levels', async ({same}) => {
   same(Object.keys(pino.levels.values), [
     'fatal',
     'error',
@@ -222,10 +203,9 @@ test('exposed levels', ({end, same}) => {
     'debug',
     'trace'
   ])
-  end()
 })
 
-test('exposed labels', ({end, same}) => {
+test('exposed labels', async ({same}) => {
   same(Object.keys(pino.levels.labels), [
     '10',
     '20',
@@ -234,10 +214,9 @@ test('exposed labels', ({end, same}) => {
     '50',
     '60'
   ])
-  end()
 })
 
-test('setting level in child', ({end, is}) => {
+test('setting level in child', async ({is}) => {
   const expected = [{
     level: 50,
     msg: 'this is an error'
@@ -255,5 +234,4 @@ test('setting level in child', ({end, is}) => {
   instance.info('hello world')
   instance.error('this is an error')
   instance.fatal('this is fatal')
-  end()
 })

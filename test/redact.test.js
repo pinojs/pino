@@ -4,76 +4,60 @@ const { test } = require('tap')
 const { sink } = require('./helper')
 const pino = require('../')
 
-test('redact option – throws if not array', ({end, throws}) => {
+test('redact option – throws if not array', async ({throws}) => {
   throws(() => {
     pino({redact: 'req.headers.cookie'})
   })
-
-  end()
 })
 
-test('redact option – throws if array does not only contain strings', ({end, throws}) => {
+test('redact option – throws if array does not only contain strings', async ({throws}) => {
   throws(() => {
     pino({redact: ['req.headers.cookie', {}]})
   })
-
-  end()
 })
 
-test('redact option – throws if array contains an invalid path', ({end, throws}) => {
+test('redact option – throws if array contains an invalid path', async ({throws}) => {
   throws(() => {
     pino({redact: ['req,headers.cookie']})
   })
-
-  end()
 })
 
-test('redact.paths option – throws if not array', ({end, throws}) => {
+test('redact.paths option – throws if not array', async ({throws}) => {
   throws(() => {
     pino({redact: {paths: 'req.headers.cookie'}})
   })
-
-  end()
 })
 
-test('redact.paths option – throws if array does not only contain strings', ({end, throws}) => {
+test('redact.paths option – throws if array does not only contain strings', async ({throws}) => {
   throws(() => {
     pino({redact: {paths: ['req.headers.cookie', {}]}})
   })
-
-  end()
 })
 
-test('redact.paths option – throws if array contains an invalid path', ({end, throws}) => {
+test('redact.paths option – throws if array contains an invalid path', async ({throws}) => {
   throws(() => {
     pino({redact: {paths: ['req,headers.cookie']}})
   })
-
-  end()
 })
 
-test('redact.censor option – throws if censor is a function', ({end, throws}) => {
+test('redact.censor option – throws if censor is a function', async ({throws}) => {
   throws(() => {
     pino({redact: {paths: ['req.headers.cookie'], censor: () => {}}})
   })
-
-  end()
 })
 
-test('redact option – top level key', ({end, is}) => {
+test('redact option – top level key', async ({is}) => {
   const instance = pino({redact: ['key']}, sink(function (o, enc) {
     is(o.key, '[Redacted]')
-    end()
   }))
   instance.info({
     key: {redact: 'me'}
   })
 })
 
-test('redact option – object', ({end, is}) => {
+test('redact option – object', async ({is}) => {
   const instance = pino({redact: ['req.headers.cookie']}, sink(function (o, enc) {
     is(o.req.headers.cookie, '[Redacted]')
-    end()
   }))
   instance.info({
     req: {
@@ -91,10 +75,9 @@ test('redact option – object', ({end, is}) => {
   })
 })
 
-test('redact option – child object', ({end, is}) => {
+test('redact option – child object', async ({is}) => {
   const instance = pino({redact: ['req.headers.cookie']}, sink(function (o, enc) {
     is(o.req.headers.cookie, '[Redacted]')
-    end()
   }))
 
   instance.child({
@@ -113,10 +96,9 @@ test('redact option – child object', ({end, is}) => {
   }).info('message completed')
 })
 
-test('redact option – interpolated object', ({end, is}) => {
+test('redact option – interpolated object', async ({is}) => {
   const instance = pino({redact: ['req.headers.cookie']}, sink(function (o, enc) {
     is(JSON.parse(o.msg.replace(/test /, '')).req.headers.cookie, '[Redacted]')
-    end()
   }))
 
   instance.info('test', {
@@ -135,10 +117,9 @@ test('redact option – interpolated object', ({end, is}) => {
   })
 })
 
-test('redact.paths option – object', ({end, is}) => {
+test('redact.paths option – object', async ({is}) => {
   const instance = pino({redact: {paths: ['req.headers.cookie']}}, sink(function (o, enc) {
     is(o.req.headers.cookie, '[Redacted]')
-    end()
   }))
   instance.info({
     req: {
@@ -156,10 +137,9 @@ test('redact.paths option – object', ({end, is}) => {
   })
 })
 
-test('redact.paths option – child object', ({end, is}) => {
+test('redact.paths option – child object', async ({is}) => {
   const instance = pino({redact: {paths: ['req.headers.cookie']}}, sink(function (o, enc) {
     is(o.req.headers.cookie, '[Redacted]')
-    end()
   }))
 
   instance.child({
@@ -178,10 +158,9 @@ test('redact.paths option – child object', ({end, is}) => {
   }).info('message completed')
 })
 
-test('redact.paths option – interpolated object', ({end, is}) => {
+test('redact.paths option – interpolated object', async ({is}) => {
   const instance = pino({redact: {paths: ['req.headers.cookie']}}, sink(function (o, enc) {
     is(JSON.parse(o.msg.replace(/test /, '')).req.headers.cookie, '[Redacted]')
-    end()
   }))
 
   instance.info('test', {
@@ -200,10 +179,9 @@ test('redact.paths option – interpolated object', ({end, is}) => {
   })
 })
 
-test('redact.censor option – sets the redact value', ({end, is}) => {
+test('redact.censor option – sets the redact value', async ({is}) => {
   const instance = pino({redact: {paths: ['req.headers.cookie'], censor: 'test'}}, sink(function (o, enc) {
     is(o.req.headers.cookie, 'test')
-    end()
   }))
   instance.info({
     req: {
@@ -221,10 +199,9 @@ test('redact.censor option – sets the redact value', ({end, is}) => {
   })
 })
 
-test('redact.remove option – removes both key and value', ({end, is}) => {
+test('redact.remove option – removes both key and value', async ({is}) => {
   const instance = pino({redact: {paths: ['req.headers.cookie'], remove: true}}, sink(function (o, enc) {
     is('cookie' in o.req.headers, false)
-    end()
   }))
   instance.info({
     req: {
@@ -242,21 +219,19 @@ test('redact.remove option – removes both key and value', ({end, is}) => {
   })
 })
 
-test('redact.remove – top level key', ({end, is}) => {
+test('redact.remove – top level key', async ({is}) => {
   const instance = pino({redact: {paths: ['key'], remove: true}}, sink(function (o, enc) {
     is('key' in o, false)
-    end()
   }))
   instance.info({
     key: {redact: 'me'}
   })
 })
 
-test('redact.paths preserves original object values after the log write', ({end, is}) => {
+test('redact.paths preserves original object values after the log write', async ({is}) => {
   const instance = pino({redact: ['req.headers.cookie']}, sink(function (o, enc) {
     is(o.req.headers.cookie, '[Redacted]')
     is(obj.req.headers.cookie, 'SESSID=298zf09hf012fh2; csrftoken=u32t4o3tb3gg43; _gat=1;')
-    end()
   }))
   const obj = {
     req: {
@@ -275,11 +250,10 @@ test('redact.paths preserves original object values after the log write', ({end,
   instance.info(obj)
 })
 
-test('redact.paths preserves original object values after the log write', ({end, is}) => {
+test('redact.paths preserves original object values after the log write', async ({is}) => {
   const instance = pino({redact: {paths: ['req.headers.cookie']}}, sink(function (o, enc) {
     is(o.req.headers.cookie, '[Redacted]')
     is(obj.req.headers.cookie, 'SESSID=298zf09hf012fh2; csrftoken=u32t4o3tb3gg43; _gat=1;')
-    end()
   }))
   const obj = {
     req: {
@@ -298,11 +272,10 @@ test('redact.paths preserves original object values after the log write', ({end,
   instance.info(obj)
 })
 
-test('redact.censor preserves original object values after the log write', ({end, is}) => {
+test('redact.censor preserves original object values after the log write', async ({is}) => {
   const instance = pino({redact: {paths: ['req.headers.cookie'], censor: 'test'}}, sink(function (o, enc) {
     is(o.req.headers.cookie, 'test')
     is(obj.req.headers.cookie, 'SESSID=298zf09hf012fh2; csrftoken=u32t4o3tb3gg43; _gat=1;')
-    end()
   }))
   const obj = {
     req: {
@@ -321,11 +294,10 @@ test('redact.censor preserves original object values after the log write', ({end
   instance.info(obj)
 })
 
-test('redact.remove preserves original object values after the log write', ({end, is}) => {
+test('redact.remove preserves original object values after the log write', async ({is}) => {
   const instance = pino({redact: {paths: ['req.headers.cookie'], remove: true}}, sink(function (o, enc) {
     is('cookie' in o.req.headers, false)
     is('cookie' in obj.req.headers, true)
-    end()
   }))
   const obj = {
     req: {
@@ -344,12 +316,11 @@ test('redact.remove preserves original object values after the log write', ({end
   instance.info(obj)
 })
 
-test('redact – supports last position wildcard paths', ({end, is}) => {
+test('redact – supports last position wildcard paths', async ({is}) => {
   const instance = pino({redact: ['req.headers.*']}, sink(function (o, enc) {
     is(o.req.headers.cookie, '[Redacted]')
     is(o.req.headers.host, '[Redacted]')
     is(o.req.headers.connection, '[Redacted]')
-    end()
   }))
   instance.info({
     req: {
@@ -367,10 +338,9 @@ test('redact – supports last position wildcard paths', ({end, is}) => {
   })
 })
 
-test('redact – supports intermediate wildcard paths', ({end, is}) => {
+test('redact – supports intermediate wildcard paths', async ({is}) => {
   const instance = pino({redact: ['req.*.cookie']}, sink(function (o, enc) {
     is(o.req.headers.cookie, '[Redacted]')
-    end()
   }))
   instance.info({
     req: {

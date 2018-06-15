@@ -3,13 +3,13 @@
 const http = require('http')
 const os = require('os')
 const { test } = require('tap')
-const { sink } = require('./helper')
+const { sink, once } = require('./helper')
 const pino = require('../')
 
 const { pid } = process
 const hostname = os.hostname()
 
-test('http request support', ({end, ok, same, error, teardown}) => {
+test('http request support', async ({ok, same, error, teardown}) => {
   var originalReq
   const instance = pino(sink((chunk, enc) => {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
@@ -28,25 +28,23 @@ test('http request support', ({end, ok, same, error, teardown}) => {
         remotePort: originalReq.connection.remotePort
       }
     })
-    end()
   }))
 
-  const server = http.createServer(function (req, res) {
+  const server = http.createServer((req, res) => {
     originalReq = req
     instance.info(req, 'my request')
     res.end('hello')
-  }).listen(function (err) {
-    error(err)
-    teardown(server.close.bind(server))
-
-    http.get('http://localhost:' + server.address().port, function (res) {
-      res.resume()
-    })
   })
   server.unref()
+  server.listen()
+  const err = await once(server, 'listening')
+  error(err)
+  const res = await once(http.get('http://localhost:' + server.address().port), 'response')
+  res.resume()
+  server.close()
 })
 
-test('http request support via serializer', ({end, ok, same, error, teardown}) => {
+test('http request support via serializer', async ({ok, same, error, teardown}) => {
   var originalReq
   const instance = pino({
     serializers: {
@@ -69,25 +67,24 @@ test('http request support via serializer', ({end, ok, same, error, teardown}) =
         remotePort: originalReq.connection.remotePort
       }
     })
-    end()
   }))
 
   const server = http.createServer(function (req, res) {
     originalReq = req
     instance.info({ req: req }, 'my request')
     res.end('hello')
-  }).listen(function (err) {
-    error(err)
-    teardown(server.close.bind(server))
-
-    http.get('http://localhost:' + server.address().port, function (res) {
-      res.resume()
-    })
   })
   server.unref()
+  server.listen()
+  const err = await once(server, 'listening')
+  error(err)
+
+  const res = await once(http.get('http://localhost:' + server.address().port), 'response')
+  res.resume()
+  server.close()
 })
 
-test('http request support via serializer without request connection', ({end, ok, same, error, teardown}) => {
+test('http request support via serializer without request connection', async ({ok, same, error, teardown}) => {
   var originalReq
   const instance = pino({
     serializers: {
@@ -108,7 +105,6 @@ test('http request support via serializer without request connection', ({end, ok
         headers: originalReq.headers
       }
     })
-    end()
   }))
 
   const server = http.createServer(function (req, res) {
@@ -116,18 +112,18 @@ test('http request support via serializer without request connection', ({end, ok
     delete req.connection
     instance.info({ req: req }, 'my request')
     res.end('hello')
-  }).listen(function (err) {
-    error(err)
-    teardown(server.close.bind(server))
-
-    http.get('http://localhost:' + server.address().port, function (res) {
-      res.resume()
-    })
   })
   server.unref()
+  server.listen()
+  const err = await once(server, 'listening')
+  error(err)
+
+  const res = await once(http.get('http://localhost:' + server.address().port), 'response')
+  res.resume()
+  server.close()
 })
 
-test('http response support', ({end, ok, same, error, teardown}) => {
+test('http response support', async ({ok, same, error, teardown}) => {
   var originalRes
   const instance = pino(sink((chunk, enc) => {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
@@ -143,25 +139,25 @@ test('http response support', ({end, ok, same, error, teardown}) => {
         header: originalRes._header
       }
     })
-    end()
   }))
 
   const server = http.createServer(function (req, res) {
     originalRes = res
     res.end('hello')
     instance.info(res, 'my response')
-  }).listen(function (err) {
-    error(err)
-    teardown(server.close.bind(server))
-
-    http.get('http://localhost:' + server.address().port, function (res) {
-      res.resume()
-    })
   })
   server.unref()
+  server.listen()
+  const err = await once(server, 'listening')
+
+  error(err)
+
+  const res = await once(http.get('http://localhost:' + server.address().port), 'response')
+  res.resume()
+  server.close()
 })
 
-test('http response support via a serializer', ({end, ok, same, error, teardown}) => {
+test('http response support via a serializer', async ({ok, same, error, teardown}) => {
   var originalRes
   const instance = pino({
     serializers: {
@@ -181,25 +177,25 @@ test('http response support via a serializer', ({end, ok, same, error, teardown}
         header: originalRes._header
       }
     })
-    end()
   }))
 
   const server = http.createServer(function (req, res) {
     originalRes = res
     res.end('hello')
     instance.info({ res: res }, 'my response')
-  }).listen(function (err) {
-    error(err)
-    teardown(server.close.bind(server))
-
-    http.get('http://localhost:' + server.address().port, function (res) {
-      res.resume()
-    })
   })
+
   server.unref()
+  server.listen()
+  const err = await once(server, 'listening')
+  error(err)
+
+  const res = await once(http.get('http://localhost:' + server.address().port), 'response')
+  res.resume()
+  server.close()
 })
 
-test('http request support via serializer in a child', ({end, ok, same, error, teardown}) => {
+test('http request support via serializer in a child', async ({ok, same, error, teardown}) => {
   var originalReq
   const instance = pino({
     serializers: {
@@ -222,7 +218,6 @@ test('http request support via serializer in a child', ({end, ok, same, error, t
         remotePort: originalReq.connection.remotePort
       }
     })
-    end()
   }))
 
   const server = http.createServer(function (req, res) {
@@ -230,13 +225,14 @@ test('http request support via serializer in a child', ({end, ok, same, error, t
     const child = instance.child({ req: req })
     child.info('my request')
     res.end('hello')
-  }).listen(function (err) {
-    error(err)
-    teardown(server.close.bind(server))
-
-    http.get('http://localhost:' + server.address().port, function (res) {
-      res.resume()
-    })
   })
+
   server.unref()
+  server.listen()
+  const err = await once(server, 'listening')
+  error(err)
+
+  const res = await once(http.get('http://localhost:' + server.address().port), 'response')
+  res.resume()
+  server.close()
 })

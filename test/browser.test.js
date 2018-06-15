@@ -135,7 +135,7 @@ absentConsoleMethodTest('trace', 'log')
 // do not run this with airtap
 if (process.title !== 'browser') {
   test('in absence of console, log methods become noops', ({end, ok}) => {
-    const console = global.console
+    var console = global.console
     delete global.console
     const instance = fresh('../browser', require)()
     global.console = console
@@ -151,7 +151,7 @@ if (process.title !== 'browser') {
 }
 
 test('opts.browser.asObject logs pino-like object to console', ({end, ok, is}) => {
-  const info = console.info
+  var info = console.info
   console.info = function (o) {
     is(o.level, 30)
     is(o.msg, 'test')
@@ -342,7 +342,7 @@ test('opts.browser.asObject defensively mitigates naughty numbers', ({end, pass}
 })
 
 test('opts.browser.write obj falls back to console where a method is not supplied', ({end, ok, is}) => {
-  const info = console.info
+  var info = console.info
   console.info = (o) => {
     is(o.level, 30)
     is(o.msg, 'test')
@@ -368,7 +368,7 @@ test('opts.browser.write obj falls back to console where a method is not supplie
 
 function levelTest (name) {
   test(name + ' logs', ({end, is}) => {
-    const msg = 'hello world'
+    var msg = 'hello world'
     sink(name, (args) => {
       is(args[0], msg)
       end()
@@ -377,7 +377,7 @@ function levelTest (name) {
   })
 
   test('passing objects at level ' + name, ({end, is}) => {
-    const msg = { hello: 'world' }
+    var msg = { hello: 'world' }
     sink(name, (args) => {
       is(args[0], msg)
       end()
@@ -386,8 +386,8 @@ function levelTest (name) {
   })
 
   test('passing an object and a string at level ' + name, ({end, is}) => {
-    const a = { hello: 'world' }
-    const b = 'a string'
+    var a = { hello: 'world' }
+    var b = 'a string'
     sink(name, (args) => {
       is(args[0], a)
       is(args[1], b)
@@ -406,7 +406,7 @@ function levelTest (name) {
   })
 
   test('passing error at level ' + name, ({end, is}) => {
-    const err = new Error('myerror')
+    var err = new Error('myerror')
     sink(name, (args) => {
       is(args[0], err)
       end()
@@ -416,7 +416,7 @@ function levelTest (name) {
 
   test('passing error with a serializer at level ' + name, ({end, is}) => {
     // in browser - should have no effect (should not crash)
-    const err = new Error('myerror')
+    var err = new Error('myerror')
     sink(name, (args) => {
       is(args[0].err, err)
       end()
@@ -431,8 +431,8 @@ function levelTest (name) {
   })
 
   test('child logger for level ' + name, ({end, is}) => {
-    const msg = 'hello world'
-    const parent = { hello: 'world' }
+    var msg = 'hello world'
+    var parent = { hello: 'world' }
     sink(name, (args) => {
       is(args[0], parent)
       is(args[1], msg)
@@ -444,9 +444,9 @@ function levelTest (name) {
   })
 
   test('child-child logger for level ' + name, ({end, is}) => {
-    const msg = 'hello world'
-    const grandParent = { hello: 'world' }
-    const parent = { hello: 'you' }
+    var msg = 'hello world'
+    var grandParent = { hello: 'world' }
+    var parent = { hello: 'you' }
     sink(name, (args) => {
       is(args[0], grandParent)
       is(args[1], parent)
@@ -473,7 +473,7 @@ function consoleMethodTest (level, method) {
 
 function absentConsoleMethodTest (method, fallback) {
   test('in absence of console.' + method + ', console.' + fallback + ' is used', ({end, is}) => {
-    const fn = console[method]
+    var fn = console[method]
     console[method] = undefined
     sink(fallback, function (args) {
       is(args[0], 'test')
@@ -487,13 +487,13 @@ function absentConsoleMethodTest (method, fallback) {
 
 function isFunc (fn) { return typeof fn === 'function' }
 function fnName (fn) {
-  const rx = /^\s*function\s*([^(]*)/i
-  const match = rx.exec(fn)
+  var rx = /^\s*function\s*([^(]*)/i
+  var match = rx.exec(fn)
   return match && match[1]
 }
 function sink (method, fn) {
   if (method === 'fatal') method = 'error'
-  const orig = console[method]
+  var orig = console[method]
   console[method] = function () {
     console[method] = orig
     fn(Array.prototype.slice.call(arguments))

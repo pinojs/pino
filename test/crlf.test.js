@@ -13,17 +13,15 @@ function capture () {
   return ws
 }
 
-test('pino uses LF by default', ({end, ok}) => {
+test('pino uses LF by default', async ({ok}) => {
   const stream = capture()
   const logger = pino(stream)
   logger.info('foo')
   logger.error('bar')
   ok(/foo[^\r\n]+\n[^\r\n]+bar[^\r\n]+\n/.test(stream.data))
-
-  end()
 })
 
-test('pino can log CRLF', ({end, ok}) => {
+test('pino can log CRLF', async ({ok}) => {
   const stream = capture()
   const logger = pino({
     crlf: true
@@ -31,6 +29,4 @@ test('pino can log CRLF', ({end, ok}) => {
   logger.info('foo')
   logger.error('bar')
   ok(/foo[^\n]+\r\n[^\n]+bar[^\n]+\r\n/.test(stream.data))
-
-  end()
 })

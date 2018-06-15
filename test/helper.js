@@ -7,9 +7,19 @@ const pid = process.pid
 const hostname = os.hostname()
 const v = 1
 
-function sink (func = () => {}) {
+function once (emitter, name) {
+  return new Promise((resolve) => emitter.once(name, resolve))
+}
+
+function sink (func) {
   const result = split(JSON.parse)
-  result.pipe(writer.obj(func))
+  var extract
+  const next = () => new Promise((resolve) => { extract = resolve })
+  result.pipe(writer.obj(func || ((value, enc, cb) => {
+    result.next = next()
+    extract(value)
+    result.next.then(() => cb())
+  })))
   return result
 }
 
@@ -23,5 +33,4 @@ function check (is, chunk, level, msg) {
   is(chunk.v, v)
 }
 
-module.exports.sink = sink
-module.exports.check = check
+module.exports = { sink, check, once }

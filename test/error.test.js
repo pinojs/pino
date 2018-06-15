@@ -9,7 +9,7 @@ const hostname = os.hostname()
 const level = 50
 const name = 'error'
 
-test('err is serialized with additional properties set on the Error object', ({end, ok, same}) => {
+test('err is serialized with additional properties set on the Error object', async ({ok, same}) => {
   const err = Object.assign(new Error('myerror'), {foo: 'bar'})
   const instance = pino(sink((chunk, enc, cb) => {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
@@ -29,10 +29,9 @@ test('err is serialized with additional properties set on the Error object', ({e
 
   instance.level = name
   instance[name](err)
-  end()
 })
 
-test('type should be retained, even if type is a property', ({end, ok, same}) => {
+test('type should be retained, even if type is a property', async ({ok, same}) => {
   const err = Object.assign(new Error('myerror'), {type: 'bar'})
   const instance = pino(sink((chunk, enc, cb) => {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
@@ -51,10 +50,9 @@ test('type should be retained, even if type is a property', ({end, ok, same}) =>
 
   instance.level = name
   instance[name](err)
-  end()
 })
 
-test('type, message and stack should be first level properties', ({end, ok, same}) => {
+test('type, message and stack should be first level properties', async ({ok, same}) => {
   const err = Object.assign(new Error('foo'), { foo: 'bar' })
   const instance = pino(sink((chunk, enc, cb) => {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
@@ -74,10 +72,9 @@ test('type, message and stack should be first level properties', ({end, ok, same
 
   instance.level = name
   instance[name](err)
-  end()
 })
 
-test('err serializer', ({end, ok, same}) => {
+test('err serializer', async ({ok, same}) => {
   const err = Object.assign(new Error('myerror'), {foo: 'bar'})
   const instance = pino({
     serializers: {
@@ -103,10 +100,9 @@ test('err serializer', ({end, ok, same}) => {
 
   instance.level = name
   instance[name]({ err })
-  end()
 })
 
-test('an error with statusCode property is not confused for a http response', ({end, ok, same}) => {
+test('an error with statusCode property is not confused for a http response', async ({ok, same}) => {
   const err = Object.assign(new Error('StatusCodeErr'), { statusCode: 500 })
   const instance = pino(sink((chunk, enc, cb) => {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
@@ -126,5 +122,4 @@ test('an error with statusCode property is not confused for a http response', ({
 
   instance.level = name
   instance[name](err)
-  end()
 })

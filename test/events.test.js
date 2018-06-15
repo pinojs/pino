@@ -3,68 +3,56 @@
 const { test } = require('tap')
 const { join } = require('path')
 const { fork, spawn } = require('child_process')
+const { once } = require('./helper')
 const writer = require('flush-write-stream')
 
 const fixtures = join(__dirname, 'fixtures', 'events')
 
-test('no event loop logs successfully', ({end, is}) => {
+test('no event loop logs successfully', async ({is}) => {
   var output = ''
   const child = fork(join(fixtures, 'no-event-loop.js'), {silent: true})
+  child.stdout.pipe(writer((s, enc, cb) => {
+    output += s
+    cb()
+  }))
+  await once(child, 'close')
+  is(/"msg":"h"/.test(output), true)
+})
+
+test('terminates when uncaughtException is fired with onTerminate registered', async ({is}) => {
+  var output = ''
+  var errorOutput = ''
+  const child = spawn(process.argv[0], [join(fixtures, 'uncaught-exception.js')], {silent: true})
 
   child.stdout.pipe(writer((s, enc, cb) => {
     output += s
     cb()
   }))
 
-  child.on('close', () => {
-    is(/"msg":"h"/.test(output), true)
-    end()
-  })
-})
-
-test('terminates when uncaughtException is fired with onTerminate registered', ({end, is}) => {
-  var output = ''
-  var errorOutput = ''
-  const child = spawn(process.argv[0], [join(fixtures, 'uncaught-exception.js')], {silent: true})
-
-  child.stdout.pipe(writer(function (s, enc, cb) {
-    output += s
-    cb()
-  }))
-
-  child.stderr.pipe(writer(function (s, enc, cb) {
+  child.stderr.pipe(writer((s, enc, cb) => {
     errorOutput += s
     cb()
   }))
-
-  child.on('close', function () {
-    is(/"msg":"h"/.test(output), true)
-    is(/terminated/g.test(output), true)
-    is(/this is not caught/g.test(errorOutput), true)
-    end()
-  })
+  await once(child, 'close')
+  is(/"msg":"h"/.test(output), true)
+  is(/terminated/g.test(output), true)
+  is(/this is not caught/g.test(errorOutput), true)
 })
 
-test('terminates when uncaughtException is fired without onTerminate registered', ({end, is}) => {
+test('terminates when uncaughtException is fired without onTerminate registered', async ({is}) => {
   var output = ''
   const child = spawn(process.argv[0], [join(fixtures, 'uncaught-exception-no-terminate.js')], {silent: true})
 
-  child.stdout.pipe(writer(function (s, enc, cb) {
+  child.stdout.pipe(writer((s, enc, cb) => {
     output += s
     cb()
   }))
-
-  child.on('exit', (code) => {
-    is(code, 1)
-  })
-
-  child.on('close', () => {
-    is(/"msg":"h"/.test(output), true)
-    end()
-  })
+  const code = await once(child, 'exit')
+  is(code, 1)
+  is(/"msg":"h"/.test(output), true)
 })
 
-test('terminates on SIGHUP when no other handlers registered', ({end, is}) => {
+test('terminates on SIGHUP when no other handlers registered', async ({is}) => {
   var output = ''
   const child = spawn(process.argv[0], [join(fixtures, 'sighup-no-handler.js')], {silent: true})
 
@@ -74,20 +62,13 @@ test('terminates on SIGHUP when no other handlers registered', ({end, is}) => {
   }))
 
   child.stderr.pipe(process.stdout)
-
-  child.on('exit', function (code) {
-    is(code, 0)
-  })
-
-  child.on('close', function () {
-    is(/"msg":"h"/.test(output), true)
-    end()
-  })
-
-  setTimeout(() => { child.kill('SIGHUP') }, 2000)
+  setTimeout(() => child.kill('SIGHUP'), 2000)
+  const code = await once(child, 'exit')
+  is(code, 0)
+  is(/"msg":"h"/.test(output), true)
 })
 
-test('lets app terminate when SIGHUP received with multiple handlers', ({end, is}) => {
+test('lets app terminate when SIGHUP received with multiple handlers', async ({is}) => {
   var output = ''
   const child = spawn(process.argv[0], [join(fixtures, 'sighup-with-handler.js')], {silent: true})
 
@@ -95,21 +76,14 @@ test('lets app terminate when SIGHUP received with multiple handlers', ({end, is
     output += s
     cb()
   }))
-
-  child.on('exit', function (code) {
-    is(code, 0)
-  })
-
-  child.on('close', function () {
-    is(/"msg":"h"/.test(output), true)
-    is(/app sighup/.test(output), true)
-    end()
-  })
-
-  setTimeout(() => { child.kill('SIGHUP') }, 2000)
+  setTimeout(() => child.kill('SIGHUP'), 2000)
+  const code = await once(child, 'exit')
+  is(code, 0)
+  is(/"msg":"h"/.test(output), true)
+  is(/app sighup/.test(output), true)
 })
 
-test('destination', ({end, is}) => {
+test('destination', async ({is}) => {
   var output = ''
   const child = spawn(process.argv[0], [join(fixtures, 'destination.js')], {silent: true})
 
@@ -120,12 +94,7 @@ test('destination', ({end, is}) => {
 
   child.stderr.pipe(process.stdout)
 
-  child.on('exit', (code) => {
-    is(code, 0)
-  })
-
-  child.on('close', () => {
-    is(/"msg":"h"/.test(output), true)
-    end()
-  })
+  const code = await once(child, 'exit')
+  is(code, 0)
+  is(/"msg":"h"/.test(output), true)
 })

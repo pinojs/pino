@@ -8,7 +8,7 @@ const pino = require('../')
 const { pid } = process
 const hostname = os.hostname()
 
-test('metadata works', ({end, ok, same, is}) => {
+test('metadata works', async ({ok, same, is}) => {
   const dest = sink((chunk, enc) => {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
@@ -35,10 +35,9 @@ test('metadata works', ({end, ok, same, is}) => {
   })
 
   instance.info({ hello: 'world' }, 'a msg')
-  end()
 })
 
-test('child loggers works', ({end, ok, same, is}) => {
+test('child loggers works', async ({ok, same, is}) => {
   const dest = sink((chunk, enc) => {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
@@ -65,10 +64,9 @@ test('child loggers works', ({end, ok, same, is}) => {
 
   const child = instance.child({ hello: 'world' })
   child.info({ from: 'child' }, 'a msg')
-  end()
 })
 
-test('without object', ({end, ok, same, is}) => {
+test('without object', async ({ok, same, is}) => {
   const dest = sink((chunk, enc) => {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
@@ -92,10 +90,9 @@ test('without object', ({end, ok, same, is}) => {
   })
 
   instance.info('a msg')
-  end()
 })
 
-test('without msg', ({end, ok, same, is}) => {
+test('without msg', async ({ok, same, is}) => {
   const dest = sink((chunk, enc) => {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
@@ -119,5 +116,4 @@ test('without msg', ({end, ok, same, is}) => {
   })
 
   instance.info({ hello: 'world' })
-  end()
 })

@@ -6,8 +6,9 @@ const { join } = require('path')
 const { test } = require('tap')
 const { fork } = require('child_process')
 const writer = require('flush-write-stream')
+const { once } = require('./helper')
 
-test('extreme mode', ({end, is, teardown}) => {
+test('extreme mode', async ({is, teardown}) => {
   const now = Date.now
   const hostname = os.hostname
   const proc = process
@@ -46,22 +47,18 @@ test('extreme mode', ({end, is, teardown}) => {
     actual2 += s
     cb()
   }))
+  await once(child, 'close')
+  is(actual, expected)
+  is(actual2.trim(), expected2)
 
-  child.on('close', function () {
-    is(actual, expected)
-    is(actual2.trim(), expected2)
-
-    teardown(() => {
-      os.hostname = hostname
-      Date.now = now
-      global.process = proc
-    })
-
-    end()
+  teardown(() => {
+    os.hostname = hostname
+    Date.now = now
+    global.process = proc
   })
 })
 
-test('extreme mode with child', ({end, is, teardown}) => {
+test('extreme mode with child', async ({is, teardown}) => {
   const now = Date.now
   const hostname = os.hostname
   const proc = process
@@ -104,33 +101,25 @@ test('extreme mode with child', ({end, is, teardown}) => {
     actual2 += s
     cb()
   }))
+  await once(child, 'close')
+  is(actual, expected)
+  is(actual2.trim(), expected2)
 
-  child.on('close', function () {
-    is(actual, expected)
-    is(actual2.trim(), expected2)
-
-    teardown(() => {
-      os.hostname = hostname
-      Date.now = now
-      global.process = proc
-    })
-
-    end()
+  teardown(() => {
+    os.hostname = hostname
+    Date.now = now
+    global.process = proc
   })
 })
 
-test('throw an error if extreme is passed', ({end, throws}) => {
+test('throw an error if extreme is passed', async ({throws}) => {
   const pino = require('..')
   throws(() => {
     pino({extreme: true})
   })
-
-  end()
 })
 
-test('flush does nothing without extreme mode', ({end}) => {
+test('flush does nothing without extreme mode', async () => {
   var instance = require('..')()
   instance.flush()
-
-  end()
 })

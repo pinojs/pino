@@ -11,24 +11,22 @@ const childSerializers = {
   test: () => 'child'
 }
 
-test('serializers override values', ({end, is}) => {
+test('serializers override values', async ({is}) => {
   const parent = pino({ serializers: parentSerializers }, sink(function (o, enc) {
     is(o.test, 'parent')
-    end()
   }))
   parent.child({ serializers: childSerializers })
 
   parent.fatal({test: 'test'})
 })
 
-test('child does not overwrite parent serializers', ({end, is}) => {
+test('child does not overwrite parent serializers', async ({is}) => {
   var c = 0
   const parent = pino({ serializers: parentSerializers }, sink(function (o, enc, cb) {
     c++
     if (c === 1) is(o.test, 'parent')
     if (c === 2) {
       is(o.test, 'child')
-      end()
     }
     cb()
   }))
@@ -38,22 +36,20 @@ test('child does not overwrite parent serializers', ({end, is}) => {
   child.fatal({test: 'test'})
 })
 
-test('children inherit parent serializers', ({end, is}) => {
+test('children inherit parent serializers', async ({is}) => {
   const parent = pino({ serializers: parentSerializers }, sink(function (o, enc) {
     is(o.test, 'parent')
-    end()
   }))
 
   const child = parent.child({a: 'property'})
   child.fatal({test: 'test'})
 })
 
-test('children serializers get called', ({end, is}) => {
+test('children serializers get called', async ({is}) => {
   const parent = pino({
     test: 'this'
   }, sink(function (o, enc) {
     is(o.test, 'child')
-    end()
   }))
 
   const child = parent.child({ 'a': 'property', serializers: childSerializers })
@@ -61,13 +57,12 @@ test('children serializers get called', ({end, is}) => {
   child.fatal({test: 'test'})
 })
 
-test('children serializers get called when inherited from parent', ({end, is}) => {
+test('children serializers get called when inherited from parent', async ({is}) => {
   const parent = pino({
     test: 'this',
     serializers: parentSerializers
   }, sink(function (o, enc) {
     is(o.test, 'pass')
-    end()
   }))
 
   const child = parent.child({serializers: {test: function () { return 'pass' }}})
@@ -75,7 +70,7 @@ test('children serializers get called when inherited from parent', ({end, is}) =
   child.fatal({test: 'fail'})
 })
 
-test('non-overridden serializers are available in the children', ({end, is}) => {
+test('non-overridden serializers are available in the children', async ({is}) => {
   const pSerializers = {
     onlyParent: function () { return 'parent' },
     shared: function () { return 'parent' }
@@ -95,7 +90,6 @@ test('non-overridden serializers are available in the children', ({end, is}) => 
     if (c === 3) is(o.onlyChild, 'child')
     if (c === 4) {
       is(o.onlyChild, 'test')
-      end()
     }
     cb()
   }))
@@ -108,7 +102,7 @@ test('non-overridden serializers are available in the children', ({end, is}) => 
   parent.fatal({onlyChild: 'test'})
 })
 
-test('Symbol.for(\'pino.*\') serializer', ({end, notSame, is, isNot}) => {
+test('Symbol.for(\'pino.*\') serializer', async ({notSame, is, isNot}) => {
   const globalSerializer = {
     [Symbol.for('pino.*')]: function (obj) {
       if (obj.lionel === 'richie') {
@@ -139,7 +133,6 @@ test('Symbol.for(\'pino.*\') serializer', ({end, notSame, is, isNot}) => {
       is('pid' in o, false)
       is('hostname' in o, false)
       notSame(o, ['pid', 'hostname'])
-      end()
     }
     cb()
   }))
