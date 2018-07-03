@@ -1,131 +1,122 @@
 'use strict'
 
-var test = require('tap').test
-var pino = require('../')
-var sink = require('./helper').sink
-var check = require('./helper').check
+const { test } = require('tap')
+const { sink, once } = require('./helper')
+const { check } = require('./helper')
+const pino = require('../')
 
-test('set the level by string', function (t) {
-  t.plan(4)
-  var expected = [{
+test('set the level by string', async ({is}) => {
+  const expected = [{
     level: 50,
     msg: 'this is an error'
   }, {
     level: 60,
     msg: 'this is fatal'
   }]
-  var instance = pino(sink(function (chunk, enc, cb) {
-    var current = expected.shift()
-    check(t, chunk, current.level, current.msg)
-    cb()
-  }))
-
+  const stream = sink()
+  const instance = pino(stream)
   instance.level = 'error'
   instance.info('hello world')
   instance.error('this is an error')
   instance.fatal('this is fatal')
+  const result = await once(stream, 'data')
+  const current = expected.shift()
+  check(is, result, current.level, current.msg)
 })
 
-test('the wrong level throws', function (t) {
-  t.plan(1)
-  var instance = pino()
-  t.throws(function () {
+test('the wrong level throws', async ({throws}) => {
+  const instance = pino()
+  throws(() => {
     instance.level = 'kaboom'
   })
 })
 
-test('set the level by number', function (t) {
-  t.plan(4)
-  var expected = [{
+test('set the level by number', async ({is}) => {
+  const expected = [{
     level: 50,
     msg: 'this is an error'
   }, {
     level: 60,
     msg: 'this is fatal'
   }]
-  var instance = pino(sink(function (chunk, enc, cb) {
-    var current = expected.shift()
-    check(t, chunk, current.level, current.msg)
-    cb()
-  }))
+  const stream = sink()
+  const instance = pino(stream)
 
   instance.levelVal = 50
   instance.info('hello world')
   instance.error('this is an error')
   instance.fatal('this is fatal')
+  const result = await once(stream, 'data')
+  const current = expected.shift()
+  check(is, result, current.level, current.msg)
 })
 
-test('set the level by number via string method', function (t) {
-  t.plan(4)
-  var expected = [{
+test('set the level by number via string method', async ({is}) => {
+  const expected = [{
     level: 50,
     msg: 'this is an error'
   }, {
     level: 60,
     msg: 'this is fatal'
   }]
-  var instance = pino(sink(function (chunk, enc, cb) {
-    var current = expected.shift()
-    check(t, chunk, current.level, current.msg)
-    cb()
-  }))
+  const stream = sink()
+  const instance = pino(stream)
 
   instance.level = 50
   instance.info('hello world')
   instance.error('this is an error')
   instance.fatal('this is fatal')
+
+  const result = await once(stream, 'data')
+  const current = expected.shift()
+  check(is, result, current.level, current.msg)
 })
 
-test('exposes level string mappings', function (t) {
-  t.plan(1)
-  t.equal(pino.levels.values.error, 50)
+test('exposes level string mappings', async ({is}) => {
+  is(pino.levels.values.error, 50)
 })
 
-test('exposes level number mappings', function (t) {
-  t.plan(1)
-  t.equal(pino.levels.labels[50], 'error')
+test('exposes level number mappings', async ({is}) => {
+  is(pino.levels.labels[50], 'error')
 })
 
-test('returns level integer', function (t) {
-  t.plan(1)
-  var instance = pino({ level: 'error' })
-  t.equal(instance.levelVal, 50)
+test('returns level integer', async ({is}) => {
+  const instance = pino({ level: 'error' })
+  is(instance.levelVal, 50)
 })
 
-test('child returns level integer', function (t) {
-  t.plan(1)
-  var parent = pino({ level: 'error' })
-  var child = parent.child({ foo: 'bar' })
-  t.equal(child.levelVal, 50)
+test('child returns level integer', async ({is}) => {
+  const parent = pino({ level: 'error' })
+  const child = parent.child({ foo: 'bar' })
+  is(child.levelVal, 50)
 })
 
-test('set the level via constructor', function (t) {
-  t.plan(4)
-  var expected = [{
+test('set the level via constructor', async ({is}) => {
+  const expected = [{
     level: 50,
     msg: 'this is an error'
   }, {
     level: 60,
     msg: 'this is fatal'
   }]
-  var instance = pino({ level: 'error' }, sink(function (chunk, enc, cb) {
-    var current = expected.shift()
-    check(t, chunk, current.level, current.msg)
-    cb()
-  }))
+  const stream = sink()
+  const instance = pino({ level: 'error' }, stream)
 
   instance.info('hello world')
   instance.error('this is an error')
   instance.fatal('this is fatal')
+  const result = await once(stream, 'data')
+  const current = expected.shift()
+  check(is, result, current.level, current.msg)
 })
 
-test('level-change event', function (t) {
-  var instance = pino()
-  var handle = function (lvl, val, prevLvl, prevVal) {
-    t.is(lvl, 'trace')
-    t.is(val, 10)
-    t.is(prevLvl, 'info')
-    t.is(prevVal, 30)
+test('level-change event', async ({is}) => {
+  const instance = pino()
+  function handle (lvl, val, prevLvl, prevVal) {
+    is(lvl, 'trace')
+    is(val, 10)
+    is(prevLvl, 'info')
+    is(prevVal, 30)
   }
   instance.on('level-change', handle)
   instance.level = 'trace'
@@ -134,9 +125,9 @@ test('level-change event', function (t) {
 
   var count = 0
 
-  var l1 = function () { count += 1 }
-  var l2 = function () { count += 1 }
-  var l3 = function () { count += 1 }
+  const l1 = () => count++
+  const l2 = () => count++
+  const l3 = () => count++
   instance.on('level-change', l1)
   instance.on('level-change', l2)
   instance.on('level-change', l3)
@@ -149,69 +140,62 @@ test('level-change event', function (t) {
   instance.removeListener('level-change', l2)
   instance.level = 'info'
 
-  t.is(count, 6)
-  t.end()
+  is(count, 6)
 })
 
-test('enable', function (t) {
-  var instance = pino({
+test('enable', async ({fail}) => {
+  const instance = pino({
     level: 'trace',
     enabled: false
-  }, sink(function (chunk, enc, cb) {
-    t.fail('no data should be logged')
+  }, sink((result, enc) => {
+    fail('no data should be logged')
   }))
 
-  Object.keys(pino.levels.values).forEach(function (level) {
+  Object.keys(pino.levels.values).forEach((level) => {
     instance[level]('hello world')
   })
-  t.end()
 })
 
-test('silent level', function (t) {
-  var instance = pino({
+test('silent level', async ({fail}) => {
+  const instance = pino({
     level: 'silent'
-  }, sink(function (chunk, enc, cb) {
-    t.fail('no data should be logged')
+  }, sink((result, enc) => {
+    fail('no data should be logged')
   }))
 
-  Object.keys(pino.levels.values).forEach(function (level) {
+  Object.keys(pino.levels.values).forEach((level) => {
     instance[level]('hello world')
   })
-  t.end()
 })
 
-test('silent is a noop', function (t) {
-  var instance = pino({
+test('silent is a noop', async ({fail}) => {
+  const instance = pino({
     level: 'silent'
-  }, sink(function (chunk, enc, cb) {
-    t.fail('no data should be logged')
+  }, sink((result, enc) => {
+    fail('no data should be logged')
   }))
 
   instance['silent']('hello world')
-  t.end()
 })
 
-test('silent stays a noop after level changes', function (t) {
-  var noop = require('../lib/tools').noop
-  var instance = pino({
+test('silent stays a noop after level changes', async ({is, isNot, fail}) => {
+  const noop = require('../lib/tools').noop
+  const instance = pino({
     level: 'silent'
-  }, sink(function (chunk, enc, cb) {
-    t.fail('no data should be logged')
+  }, sink((result, enc) => {
+    fail('no data should be logged')
   }))
 
   instance.level = 'trace'
-  t.notEqual(instance[instance.level], noop)
+  isNot(instance[instance.level], noop)
 
   instance.level = 'silent'
   instance['silent']('hello world')
-  t.is(instance[instance.level], noop)
-
-  t.end()
+  is(instance[instance.level], noop)
 })
 
-test('exposed levels', function (t) {
-  t.plan(1)
-  t.deepEqual(Object.keys(pino.levels.values), [
+test('exposed levels', async ({same}) => {
+  same(Object.keys(pino.levels.values), [
     'fatal',
     'error',
     'warn',
@@ -221,9 +205,8 @@ test('exposed levels', function (t) {
   ])
 })
 
-test('exposed labels', function (t) {
-  t.plan(1)
-  t.deepEqual(Object.keys(pino.levels.labels), [
+test('exposed labels', async ({same}) => {
+  same(Object.keys(pino.levels.labels), [
     '10',
     '20',
     '30',
@@ -233,18 +216,17 @@ test('exposed labels', function (t) {
   ])
 })
 
-test('setting level in child', function (t) {
-  t.plan(4)
-  var expected = [{
+test('setting level in child', async ({is}) => {
+  const expected = [{
     level: 50,
     msg: 'this is an error'
   }, {
     level: 60,
     msg: 'this is fatal'
   }]
-  var instance = pino(sink(function (chunk, enc, cb) {
-    var current = expected.shift()
-    check(t, chunk, current.level, current.msg)
+  const instance = pino(sink((result, enc, cb) => {
+    const current = expected.shift()
+    check(is, result, current.level, current.msg)
     cb()
   })).child({ level: 30 })
 

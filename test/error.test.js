@@ -1,130 +1,124 @@
 'use strict'
-var test = require('tap').test
-var pino = require('../')
-var sink = require('./helper').sink
+const os = require('os')
+const { test } = require('tap')
+const { sink, once } = require('./helper')
+const pino = require('../')
 
-var os = require('os')
-var pid = process.pid
-var hostname = os.hostname()
-var level = 50
-var name = 'error'
+const { pid } = process
+const hostname = os.hostname()
+const level = 50
+const name = 'error'
 
-test('err is serialized with additional properties set on the Error object', function (t) {
-  t.plan(2)
-  var err = Object.assign(new Error('myerror'), {foo: 'bar'})
-  var instance = pino(sink(function (chunk, enc, cb) {
-    t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
-    delete chunk.time
-    t.deepEqual(chunk, {
-      pid: pid,
-      hostname: hostname,
-      level: level,
-      type: 'Error',
-      msg: err.message,
-      stack: err.stack,
-      foo: err.foo,
-      v: 1
-    })
-    cb()
-  }))
-
+test('err is serialized with additional properties set on the Error object', async ({ok, same}) => {
+  const stream = sink()
+  const err = Object.assign(new Error('myerror'), {foo: 'bar'})
+  const instance = pino(stream)
   instance.level = name
   instance[name](err)
+  const result = await once(stream, 'data')
+  ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
+  delete result.time
+  same(result, {
+    pid: pid,
+    hostname: hostname,
+    level: level,
+    type: 'Error',
+    msg: err.message,
+    stack: err.stack,
+    foo: err.foo,
+    v: 1
+  })
 })
 
-test('type should be retained, even if type is a property', function (t) {
-  t.plan(2)
-  var err = Object.assign(new Error('myerror'), {type: 'bar'})
-  var instance = pino(sink(function (chunk, enc, cb) {
-    t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
-    delete chunk.time
-    t.deepEqual(chunk, {
-      pid: pid,
-      hostname: hostname,
-      level: level,
-      type: 'bar',
-      msg: err.message,
-      stack: err.stack,
-      v: 1
-    })
-    cb()
-  }))
-
+test('type should be retained, even if type is a property', async ({ok, same}) => {
+  const stream = sink()
+  const err = Object.assign(new Error('myerror'), {type: 'bar'})
+  const instance = pino(stream)
   instance.level = name
   instance[name](err)
+  const result = await once(stream, 'data')
+  ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
+  delete result.time
+  same(result, {
+    pid: pid,
+    hostname: hostname,
+    level: level,
+    type: 'bar',
+    msg: err.message,
+    stack: err.stack,
+    v: 1
+  })
 })
 
-test('type, message and stack should be first level properties', function (t) {
-  t.plan(2)
-  var err = Object.assign(new Error('foo'), { foo: 'bar' })
-  var instance = pino(sink(function (chunk, enc, cb) {
-    t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
-    delete chunk.time
-    t.deepEqual(chunk, {
-      pid: pid,
-      hostname: hostname,
-      level: level,
-      type: 'Error',
-      msg: err.message,
-      stack: err.stack,
-      foo: err.foo,
-      v: 1
-    })
-    cb()
-  }))
-
+test('type, message and stack should be first level properties', async ({ok, same}) => {
+  const stream = sink()
+  const err = Object.assign(new Error('foo'), { foo: 'bar' })
+  const instance = pino(stream)
   instance.level = name
   instance[name](err)
+
+  const result = await once(stream, 'data')
+  ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
+  delete result.time
+  same(result, {
+    pid: pid,
+    hostname: hostname,
+    level: level,
+    type: 'Error',
+    msg: err.message,
+    stack: err.stack,
+    foo: err.foo,
+    v: 1
+  })
 })
 
-test('err serializer', function (t) {
-  t.plan(2)
-  var err = Object.assign(new Error('myerror'), {foo: 'bar'})
-  var instance = pino({
+test('err serializer', async ({ok, same}) => {
+  const stream = sink()
+  const err = Object.assign(new Error('myerror'), {foo: 'bar'})
+  const instance = pino({
     serializers: {
       err: pino.stdSerializers.err
     }
-  }, sink(function (chunk, enc, cb) {
-    t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
-    delete chunk.time
-    t.deepEqual(chunk, {
-      pid: pid,
-      hostname: hostname,
-      level: level,
-      err: {
-        type: 'Error',
-        message: err.message,
-        stack: err.stack,
-        foo: err.foo
-      },
-      v: 1
-    })
-    cb()
-  }))
+  }, stream)
 
   instance.level = name
   instance[name]({ err })
+  const result = await once(stream, 'data')
+  ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
+  delete result.time
+  same(result, {
+    pid: pid,
+    hostname: hostname,
+    level: level,
+    err: {
+      type: 'Error',
+      message: err.message,
+      stack: err.stack,
+      foo: err.foo
+    },
+    v: 1
+  })
 })
 
-test('an error with statusCode property is not confused for a http response', function (t) {
-  t.plan(2)
-  var err = Object.assign(new Error('StatusCodeErr'), { statusCode: 500 })
-  var instance = pino(sink(function (chunk, enc, cb) {
-    t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
-    delete chunk.time
-    t.deepEqual(chunk, {
-      pid: pid,
-      hostname: hostname,
-      level: level,
-      type: 'Error',
-      msg: err.message,
-      stack: err.stack,
-      statusCode: err.statusCode,
-      v: 1
-    })
-    cb()
-  }))
+test('an error with statusCode property is not confused for a http response', async ({ok, same}) => {
+  const stream = sink()
+  const err = Object.assign(new Error('StatusCodeErr'), { statusCode: 500 })
+  const instance = pino(stream)
 
   instance.level = name
   instance[name](err)
+  const result = await once(stream, 'data')
+
+  ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
+  delete result.time
+  same(result, {
+    pid: pid,
+    hostname: hostname,
+    level: level,
+    type: 'Error',
+    msg: err.message,
+    stack: err.stack,
+    statusCode: err.statusCode,
+    v: 1
+  })
 })

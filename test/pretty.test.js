@@ -1,74 +1,63 @@
 'use strict'
 
-var Writable = require('stream').Writable
-var test = require('tap').test
-var pino = require('../')
-var path = require('path')
-var writeStream = require('flush-write-stream')
-var fork = require('child_process').fork
+const { Writable } = require('stream')
+const { test } = require('tap')
+const { join } = require('path')
+const { fork } = require('child_process')
+const writer = require('flush-write-stream')
+const { once } = require('./helper')
+const pino = require('../')
 
-test('can be enabled via constructor', function (t) {
-  t.plan(1)
+test('can be enabled via constructor', async ({isNot}) => {
   var actual = ''
-  var child = fork(path.join(__dirname, 'fixtures', 'pretty', 'basic.js'), {silent: true})
+  const child = fork(join(__dirname, 'fixtures', 'pretty', 'basic.js'), {silent: true})
 
-  child.stdout.pipe(writeStream(function (s, enc, cb) {
+  child.stdout.pipe(writer((s, enc, cb) => {
+    actual += s
+    cb()
+  }))
+  await once(child, 'close')
+  isNot(actual.match(/\(123456 on abcdefghijklmnopqr\): h/), null)
+})
+
+test('can be enabled via constructor with pretty configuration', async ({isNot}) => {
+  var actual = ''
+  const child = fork(join(__dirname, 'fixtures', 'pretty', 'level-first.js'), {silent: true})
+
+  child.stdout.pipe(writer((s, enc, cb) => {
+    actual += s
+    cb()
+  }))
+  await once(child, 'close')
+  isNot(actual.match(/^INFO.*h/), null)
+})
+
+test('can be enabled via constructor with prettifier', async ({isNot}) => {
+  var actual = ''
+  const child = fork(join(__dirname, 'fixtures', 'pretty', 'pretty-factory.js'), {silent: true})
+
+  child.stdout.pipe(writer((s, enc, cb) => {
     actual += s
     cb()
   }))
 
-  child.on('close', function () {
-    t.notEqual(actual.match(/\(123456 on abcdefghijklmnopqr\): h/), null)
-  })
+  await once(child, 'close')
+  isNot(actual.match(/^INFO.*h/), null)
 })
 
-test('can be enabled via constructor with pretty configuration', function (t) {
-  t.plan(1)
-  var actual = ''
-  var child = fork(path.join(__dirname, 'fixtures', 'pretty', 'level-first.js'), {silent: true})
-
-  child.stdout.pipe(writeStream(function (s, enc, cb) {
-    actual += s
-    cb()
-  }))
-
-  child.on('close', function () {
-    t.notEqual(actual.match(/^INFO.*h/), null)
-  })
-})
-
-test('can be enabled via constructor with prettifier', function (t) {
-  t.plan(1)
-  var actual = ''
-  var child = fork(path.join(__dirname, 'fixtures', 'pretty', 'pretty-factory.js'), {silent: true})
-
-  child.stdout.pipe(writeStream(function (s, enc, cb) {
-    actual += s
-    cb()
-  }))
-
-  child.on('close', function () {
-    t.notEqual(actual.match(/^INFO.*h/), null)
-  })
-})
-
-test('does not throw error when enabled with stream specified', function (t) {
+test('does not throw error when enabled with stream specified', async () => {
   pino({prettyPrint: true}, process.stdout)
-  t.end()
 })
 
-test('can send pretty print to custom stream', function (t) {
-  t.plan(1)
-
-  var dest = new Writable({
+test('can send pretty print to custom stream', async ({is}) => {
+  const dest = new Writable({
     objectMode: true,
-    write (formatted, enc, cb) {
-      t.match(formatted, /^INFO.*foo\n$/)
-      cb()
+    write (formatted, enc) {
+      is(/^INFO.*foo\n$/.test(formatted), true)
     }
   })
 
-  var log = pino({
+  const log = pino({
     prettifier: require('pino-pretty'),
     prettyPrint: {
       levelFirst: true
@@ -77,17 +66,14 @@ test('can send pretty print to custom stream', function (t) {
   log.info('foo')
 })
 
-test('ignores `undefined` from prettifier', function (t) {
-  t.plan(1)
+test('ignores `undefined` from prettifier', async ({is}) => {
   var actual = ''
-  var child = fork(path.join(__dirname, 'fixtures', 'pretty', 'skipped-output.js'), {silent: true})
+  const child = fork(join(__dirname, 'fixtures', 'pretty', 'skipped-output.js'), {silent: true})
 
-  child.stdout.pipe(writeStream(function (s, enc, cb) {
+  child.stdout.pipe(writer((s, enc) => {
     actual += s
-    cb()
   }))
 
-  child.on('close', function () {
-    t.is(actual, '')
-  })
+  await once(child, 'close')
+  is(actual, '')
 })

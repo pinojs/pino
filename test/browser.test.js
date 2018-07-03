@@ -1,7 +1,7 @@
 'use strict'
-var test = require('tape')
-var fresh = require('fresh-require')
-var pino = require('../browser')
+const test = require('tape')
+const fresh = require('fresh-require')
+const pino = require('../browser')
 
 levelTest('fatal')
 levelTest('error')
@@ -10,76 +10,68 @@ levelTest('info')
 levelTest('debug')
 levelTest('trace')
 
-test('silent level', function (t) {
-  var instance = pino({
+test('silent level', ({end, fail, pass}) => {
+  const instance = pino({
     level: 'silent',
-    browser: {write: function (o) {
-      t.fail()
-    }}
+    browser: {write: fail}
   })
   instance.info('test')
-  var child = instance.child({test: 'test'})
+  const child = instance.child({test: 'test'})
   child.info('msg-test')
   // use setTimeout because setImmediate isn't supported in most browsers
-  setTimeout(function () {
-    t.pass()
-    t.end()
+  setTimeout(() => {
+    pass()
+    end()
   }, 0)
 })
 
-test('enabled false', function (t) {
-  var instance = pino({
+test('enabled false', ({end, fail, pass}) => {
+  const instance = pino({
     enabled: false,
-    browser: {write: function (o) {
-      t.fail()
-    }}
+    browser: {write: fail}
   })
   instance.info('test')
-  var child = instance.child({test: 'test'})
+  const child = instance.child({test: 'test'})
   child.info('msg-test')
   // use setTimeout because setImmediate isn't supported in most browsers
-  setTimeout(function () {
-    t.pass()
-    t.end()
+  setTimeout(() => {
+    pass()
+    end()
   }, 0)
 })
 
-test('throw if creating child without bindings', function (t) {
-  t.plan(1)
-
-  var instance = pino()
-
-  t.throws(function () {
-    instance.child()
-  })
+test('throw if creating child without bindings', ({end, throws}) => {
+  const instance = pino()
+  throws(() => instance.child())
+  end()
 })
 
-test('stubs write, flush and ee methods on instance', function (t) {
-  var instance = pino()
+test('stubs write, flush and ee methods on instance', ({end, ok, is}) => {
+  const instance = pino()
 
-  t.ok(isFunc(instance.setMaxListeners))
-  t.ok(isFunc(instance.getMaxListeners))
-  t.ok(isFunc(instance.emit))
-  t.ok(isFunc(instance.addListener))
-  t.ok(isFunc(instance.on))
-  t.ok(isFunc(instance.prependListener))
-  t.ok(isFunc(instance.once))
-  t.ok(isFunc(instance.prependOnceListener))
-  t.ok(isFunc(instance.removeListener))
-  t.ok(isFunc(instance.removeAllListeners))
-  t.ok(isFunc(instance.listeners))
-  t.ok(isFunc(instance.listenerCount))
-  t.ok(isFunc(instance.eventNames))
-  t.ok(isFunc(instance.write))
-  t.ok(isFunc(instance.flush))
+  ok(isFunc(instance.setMaxListeners))
+  ok(isFunc(instance.getMaxListeners))
+  ok(isFunc(instance.emit))
+  ok(isFunc(instance.addListener))
+  ok(isFunc(instance.on))
+  ok(isFunc(instance.prependListener))
+  ok(isFunc(instance.once))
+  ok(isFunc(instance.prependOnceListener))
+  ok(isFunc(instance.removeListener))
+  ok(isFunc(instance.removeAllListeners))
+  ok(isFunc(instance.listeners))
+  ok(isFunc(instance.listenerCount))
+  ok(isFunc(instance.eventNames))
+  ok(isFunc(instance.write))
+  ok(isFunc(instance.flush))
 
-  t.is(instance.on(), undefined)
+  is(instance.on(), undefined)
 
-  t.end()
+  end()
 })
 
-test('exposes levels object', function (t) {
-  t.deepEqual(pino.levels, {
+test('exposes levels object', ({end, same}) => {
+  same(pino.levels, {
     values: {
       fatal: 60,
       error: 50,
@@ -97,31 +89,35 @@ test('exposes levels object', function (t) {
       '60': 'fatal'
     }
   })
-  t.end()
+
+  end()
 })
 
-test('exposes LOG_VERSION', function (t) {
-  t.is(pino.LOG_VERSION, 1)
-  t.end()
+test('exposes LOG_VERSION', ({end, is}) => {
+  is(pino.LOG_VERSION, 1)
+
+  end()
 })
 
-test('exposes faux stdSerializers', function (t) {
-  t.ok(pino.stdSerializers)
-  t.ok(pino.stdSerializers.req)
-  t.ok(pino.stdSerializers.res)
-  t.ok(pino.stdSerializers.err)
-  t.deepEqual(pino.stdSerializers.req(), {})
-  t.deepEqual(pino.stdSerializers.res(), {})
-  t.end()
+test('exposes faux stdSerializers', ({end, ok, same}) => {
+  ok(pino.stdSerializers)
+  ok(pino.stdSerializers.req)
+  ok(pino.stdSerializers.res)
+  ok(pino.stdSerializers.err)
+  same(pino.stdSerializers.req(), {})
+  same(pino.stdSerializers.res(), {})
+
+  end()
 })
 
-test('exposes err stdSerializer', function (t) {
-  t.ok(pino.stdSerializers)
-  t.ok(pino.stdSerializers.req)
-  t.ok(pino.stdSerializers.res)
-  t.ok(pino.stdSerializers.err)
-  t.ok(pino.stdSerializers.err(Error()))
-  t.end()
+test('exposes err stdSerializer', ({end, ok}) => {
+  ok(pino.stdSerializers)
+  ok(pino.stdSerializers.req)
+  ok(pino.stdSerializers.res)
+  ok(pino.stdSerializers.err)
+  ok(pino.stdSerializers.err(Error()))
+
+  end()
 })
 
 consoleMethodTest('error')
@@ -138,284 +134,294 @@ absentConsoleMethodTest('trace', 'log')
 
 // do not run this with airtap
 if (process.title !== 'browser') {
-  test('in absence of console, log methods become noops', function (t) {
+  test('in absence of console, log methods become noops', ({end, ok}) => {
     var console = global.console
     delete global.console
-    var instance = fresh('../browser', require)()
+    const instance = fresh('../browser', require)()
     global.console = console
-    t.ok(fnName(instance.log).match(/noop/))
-    t.ok(fnName(instance.fatal).match(/noop/))
-    t.ok(fnName(instance.error).match(/noop/))
-    t.ok(fnName(instance.warn).match(/noop/))
-    t.ok(fnName(instance.info).match(/noop/))
-    t.ok(fnName(instance.debug).match(/noop/))
-    t.ok(fnName(instance.trace).match(/noop/))
-    t.end()
+    ok(fnName(instance.log).match(/noop/))
+    ok(fnName(instance.fatal).match(/noop/))
+    ok(fnName(instance.error).match(/noop/))
+    ok(fnName(instance.warn).match(/noop/))
+    ok(fnName(instance.info).match(/noop/))
+    ok(fnName(instance.debug).match(/noop/))
+    ok(fnName(instance.trace).match(/noop/))
+    end()
   })
 }
 
-test('opts.browser.asObject logs pino-like object to console', function (t) {
-  t.plan(3)
+test('opts.browser.asObject logs pino-like object to console', ({end, ok, is}) => {
   var info = console.info
   console.info = function (o) {
-    t.is(o.level, 30)
-    t.is(o.msg, 'test')
-    t.ok(o.time)
+    is(o.level, 30)
+    is(o.msg, 'test')
+    ok(o.time)
     console.info = info
   }
-  var instance = require('../browser')({
+  const instance = require('../browser')({
     browser: {
       asObject: true
     }
   })
 
   instance.info('test')
+  end()
 })
 
-test('opts.browser.write func log single string', function (t) {
-  t.plan(3)
-  var instance = pino({
+test('opts.browser.write func log single string', ({end, ok, is}) => {
+  const instance = pino({
     browser: {
       write: function (o) {
-        t.is(o.level, 30)
-        t.is(o.msg, 'test')
-        t.ok(o.time)
+        is(o.level, 30)
+        is(o.msg, 'test')
+        ok(o.time)
       }
     }
   })
   instance.info('test')
-  t.end()
+
+  end()
 })
 
-test('opts.browser.write func string joining', function (t) {
-  t.plan(3)
-  var instance = pino({
+test('opts.browser.write func string joining', ({end, ok, is}) => {
+  const instance = pino({
     browser: {
       write: function (o) {
-        t.is(o.level, 30)
-        t.is(o.msg, 'test test2 test3')
-        t.ok(o.time)
+        is(o.level, 30)
+        is(o.msg, 'test test2 test3')
+        ok(o.time)
       }
     }
   })
   instance.info('test', 'test2', 'test3')
-  t.end()
+
+  end()
 })
 
-test('opts.browser.write func string object joining', function (t) {
-  t.plan(3)
-  var instance = pino({
+test('opts.browser.write func string object joining', ({end, ok, is}) => {
+  const instance = pino({
     browser: {
       write: function (o) {
-        t.is(o.level, 30)
-        t.is(o.msg, 'test {"test":"test2"} {"test":"test3"}')
-        t.ok(o.time)
+        is(o.level, 30)
+        is(o.msg, 'test {"test":"test2"} {"test":"test3"}')
+        ok(o.time)
       }
     }
   })
   instance.info('test', {test: 'test2'}, {test: 'test3'})
-  t.end()
+
+  end()
 })
 
-test('opts.browser.write func string interpolation', function (t) {
-  t.plan(3)
-  var instance = pino({
+test('opts.browser.write func string interpolation', ({end, ok, is}) => {
+  const instance = pino({
     browser: {
       write: function (o) {
-        t.is(o.level, 30)
-        t.is(o.msg, 'test2 test ({"test":"test3"})')
-        t.ok(o.time)
+        is(o.level, 30)
+        is(o.msg, 'test2 test ({"test":"test3"})')
+        ok(o.time)
       }
     }
   })
   instance.info('%s test (%j)', 'test2', {test: 'test3'})
-  t.end()
+
+  end()
 })
 
-test('opts.browser.write func number', function (t) {
-  t.plan(3)
-  var instance = pino({
+test('opts.browser.write func number', ({end, ok, is}) => {
+  const instance = pino({
     browser: {
       write: function (o) {
-        t.is(o.level, 30)
-        t.is(o.msg, 1)
-        t.ok(o.time)
+        is(o.level, 30)
+        is(o.msg, 1)
+        ok(o.time)
       }
     }
   })
   instance.info(1)
-  t.end()
+
+  end()
 })
 
-test('opts.browser.write func log single object', function (t) {
-  t.plan(3)
-  var instance = pino({
+test('opts.browser.write func log single object', ({end, ok, is}) => {
+  const instance = pino({
     browser: {
       write: function (o) {
-        t.is(o.level, 30)
-        t.is(o.test, 'test')
-        t.ok(o.time)
+        is(o.level, 30)
+        is(o.test, 'test')
+        ok(o.time)
       }
     }
   })
   instance.info({test: 'test'})
-  t.end()
+
+  end()
 })
 
-test('opts.browser.write obj writes to methods corresponding to level', function (t) {
-  t.plan(3)
-  var instance = pino({
+test('opts.browser.write obj writes to methods corresponding to level', ({end, ok, is}) => {
+  const instance = pino({
     browser: {
       write: {
         error: function (o) {
-          t.is(o.level, 50)
-          t.is(o.test, 'test')
-          t.ok(o.time)
+          is(o.level, 50)
+          is(o.test, 'test')
+          ok(o.time)
         }
       }
     }
   })
   instance.error({test: 'test'})
-  t.end()
+
+  end()
 })
 
-test('opts.browser.asObject/write supports child loggers', function (t) {
-  var instance = pino({
-    browser: {write: function (o) {
-      t.is(o.level, 30)
-      t.is(o.test, 'test')
-      t.is(o.msg, 'msg-test')
-      t.ok(o.time)
-    }}
+test('opts.browser.asObject/write supports child loggers', ({end, ok, is}) => {
+  const instance = pino({
+    browser: {
+      write (o) {
+        is(o.level, 30)
+        is(o.test, 'test')
+        is(o.msg, 'msg-test')
+        ok(o.time)
+      }
+    }
   })
-  var child = instance.child({test: 'test'})
+  const child = instance.child({test: 'test'})
   child.info('msg-test')
-  t.end()
+
+  end()
 })
 
-test('opts.browser.asObject/write supports child child loggers', function (t) {
-  var instance = pino({
-    browser: {write: function (o) {
-      t.is(o.level, 30)
-      t.is(o.test, 'test')
-      t.is(o.foo, 'bar')
-      t.is(o.msg, 'msg-test')
-      t.ok(o.time)
-    }}
+test('opts.browser.asObject/write supports child child loggers', ({end, ok, is}) => {
+  const instance = pino({
+    browser: {
+      write (o) {
+        is(o.level, 30)
+        is(o.test, 'test')
+        is(o.foo, 'bar')
+        is(o.msg, 'msg-test')
+        ok(o.time)
+      }
+    }
   })
-  var child = instance.child({test: 'test'}).child({foo: 'bar'})
+  const child = instance.child({test: 'test'}).child({foo: 'bar'})
   child.info('msg-test')
-  t.end()
+
+  end()
 })
 
-test('opts.browser.asObject/write supports child child child loggers', function (t) {
-  var instance = pino({
-    browser: {write: function (o) {
-      t.is(o.level, 30)
-      t.is(o.test, 'test')
-      t.is(o.foo, 'bar')
-      t.is(o.baz, 'bop')
-      t.is(o.msg, 'msg-test')
-      t.ok(o.time)
-    }}
+test('opts.browser.asObject/write supports child child child loggers', ({end, ok, is}) => {
+  const instance = pino({
+    browser: {
+      write (o) {
+        is(o.level, 30)
+        is(o.test, 'test')
+        is(o.foo, 'bar')
+        is(o.baz, 'bop')
+        is(o.msg, 'msg-test')
+        ok(o.time)
+      }
+    }
   })
-  var child = instance.child({test: 'test'}).child({foo: 'bar'}).child({baz: 'bop'})
+  const child = instance.child({test: 'test'}).child({foo: 'bar'}).child({baz: 'bop'})
   child.info('msg-test')
-  t.end()
+
+  end()
 })
 
-test('opts.browser.asObject defensively mitigates naughty numbers', function (t) {
-  var instance = pino({
-    browser: {asObject: true, write: function () {}}
+test('opts.browser.asObject defensively mitigates naughty numbers', ({end, pass}) => {
+  const instance = pino({
+    browser: {asObject: true, write: () => {}}
   })
-  var child = instance.child({test: 'test'})
+  const child = instance.child({test: 'test'})
   child._childLevel = -10
   child.info('test')
-  t.pass() // if we reached here, there was no infinite loop, so, .. pass.
-  t.end()
+  pass() // if we reached here, there was no infinite loop, so, .. pass.
+
+  end()
 })
 
-test('opts.browser.write obj falls back to console where a method is not supplied', function (t) {
-  t.plan(6)
+test('opts.browser.write obj falls back to console where a method is not supplied', ({end, ok, is}) => {
   var info = console.info
-  console.info = function (o) {
-    t.is(o.level, 30)
-    t.is(o.msg, 'test')
-    t.ok(o.time)
+  console.info = (o) => {
+    is(o.level, 30)
+    is(o.msg, 'test')
+    ok(o.time)
     console.info = info
   }
-  var instance = require('../browser')({
+  const instance = require('../browser')({
     browser: {
       write: {
-        error: function (o) {
-          t.is(o.level, 50)
-          t.is(o.test, 'test')
-          t.ok(o.time)
+        error (o) {
+          is(o.level, 50)
+          is(o.test, 'test')
+          ok(o.time)
         }
       }
     }
   })
   instance.error({test: 'test'})
   instance.info('test')
-  t.end()
+
+  end()
 })
 
 function levelTest (name) {
-  test(name + ' logs', function (t) {
+  test(name + ' logs', ({end, is}) => {
     var msg = 'hello world'
-    sink(name, function (args) {
-      t.is(args[0], msg)
-      t.end()
+    sink(name, (args) => {
+      is(args[0], msg)
+      end()
     })
     pino({level: name})[name](msg)
   })
 
-  test('passing objects at level ' + name, function (t) {
+  test('passing objects at level ' + name, ({end, is}) => {
     var msg = { hello: 'world' }
-    sink(name, function (args) {
-      t.is(args[0], msg)
-      t.end()
+    sink(name, (args) => {
+      is(args[0], msg)
+      end()
     })
     pino({level: name})[name](msg)
   })
 
-  test('passing an object and a string at level ' + name, function (t) {
+  test('passing an object and a string at level ' + name, ({end, is}) => {
     var a = { hello: 'world' }
     var b = 'a string'
-    sink(name, function (args) {
-      t.is(args[0], a)
-      t.is(args[1], b)
-      t.end()
+    sink(name, (args) => {
+      is(args[0], a)
+      is(args[1], b)
+      end()
     })
     pino({level: name})[name](a, b)
   })
 
-  test('formatting logs as ' + name, function (t) {
-    sink(name, function (args) {
-      t.is(args[0], 'hello %d')
-      t.is(args[1], 42)
-      t.end()
+  test('formatting logs as ' + name, ({end, is}) => {
+    sink(name, (args) => {
+      is(args[0], 'hello %d')
+      is(args[1], 42)
+      end()
     })
     pino({level: name})[name]('hello %d', 42)
   })
 
-  test('passing error at level ' + name, function (t) {
+  test('passing error at level ' + name, ({end, is}) => {
     var err = new Error('myerror')
-    sink(name, function (args) {
-      t.is(args[0], err)
-      t.end()
+    sink(name, (args) => {
+      is(args[0], err)
+      end()
     })
     pino({level: name})[name](err)
   })
 
-  test('passing error with a serializer at level ' + name, function (t) {
+  test('passing error with a serializer at level ' + name, ({end, is}) => {
     // in browser - should have no effect (should not crash)
     var err = new Error('myerror')
-    sink(name, function (args) {
-      t.is(args[0].err, err)
-      t.end()
+    sink(name, (args) => {
+      is(args[0].err, err)
+      end()
     })
-    var instance = pino({
+    const instance = pino({
       level: name,
       serializers: {
         err: pino.stdSerializers.err
@@ -424,57 +430,57 @@ function levelTest (name) {
     instance[name]({err: err})
   })
 
-  test('child logger for level ' + name, function (t) {
+  test('child logger for level ' + name, ({end, is}) => {
     var msg = 'hello world'
     var parent = { hello: 'world' }
-    sink(name, function (args) {
-      t.is(args[0], parent)
-      t.is(args[1], msg)
-      t.end()
+    sink(name, (args) => {
+      is(args[0], parent)
+      is(args[1], msg)
+      end()
     })
-    var instance = pino({level: name})
-    var child = instance.child(parent)
+    const instance = pino({level: name})
+    const child = instance.child(parent)
     child[name](msg)
   })
 
-  test('child-child logger for level ' + name, function (t) {
+  test('child-child logger for level ' + name, ({end, is}) => {
     var msg = 'hello world'
     var grandParent = { hello: 'world' }
     var parent = { hello: 'you' }
-    sink(name, function (args) {
-      t.is(args[0], grandParent)
-      t.is(args[1], parent)
-      t.is(args[2], msg)
-      t.end()
+    sink(name, (args) => {
+      is(args[0], grandParent)
+      is(args[1], parent)
+      is(args[2], msg)
+      end()
     })
-    var instance = pino({level: name})
-    var child = instance.child(grandParent).child(parent)
+    const instance = pino({level: name})
+    const child = instance.child(grandParent).child(parent)
     child[name](msg)
   })
 }
 
 function consoleMethodTest (level, method) {
   if (!method) method = level
-  test('pino().' + level + ' uses console.' + method, function (t) {
-    sink(method, function (args) {
-      t.is(args[0], 'test')
-      t.end()
+  test('pino().' + level + ' uses console.' + method, ({end, is}) => {
+    sink(method, (args) => {
+      is(args[0], 'test')
+      end()
     })
-    var instance = require('../browser')({level: level})
+    const instance = require('../browser')({level: level})
     instance[level]('test')
   })
 }
 
 function absentConsoleMethodTest (method, fallback) {
-  test('in absence of console.' + method + ', console.' + fallback + ' is used', function (t) {
+  test('in absence of console.' + method + ', console.' + fallback + ' is used', ({end, is}) => {
     var fn = console[method]
     console[method] = undefined
     sink(fallback, function (args) {
-      t.is(args[0], 'test')
-      t.end()
+      is(args[0], 'test')
+      end()
       console[method] = fn
     })
-    var instance = require('../browser')({level: method})
+    const instance = require('../browser')({level: method})
     instance[method]('test')
   })
 }

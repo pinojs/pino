@@ -19,4 +19,5 @@ log.info('h')
 function foo () {
   setTimeout(foo, 500)
 }
+console.log('ready')
 foo()

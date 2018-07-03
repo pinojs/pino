@@ -1,131 +1,59 @@
 'use strict'
 
-var test = require('tap').test
-var path = require('path')
-var writeStream = require('flush-write-stream')
-var fork = require('child_process').fork
-var spawn = require('child_process').spawn
-var fixturesPath = path.join(__dirname, 'fixtures', 'events')
+const { test } = require('tap')
+const { join } = require('path')
+const { fork, spawn, spawnSync } = require('child_process')
+const { once } = require('./helper')
 
-test('no event loop logs successfully', function (t) {
-  t.plan(1)
-  var output = ''
-  var child = fork(path.join(fixturesPath, 'no-event-loop.js'), {silent: true})
+const fixtures = join(__dirname, 'fixtures', 'events')
 
-  child.stdout.pipe(writeStream(function (s, enc, cb) {
-    output += s
-    cb()
-  }))
-
-  child.on('close', function () {
-    t.match(output, /"msg":"h"/)
-  })
+test('logs successfully in a single tick process', async ({is}) => {
+  const child = fork(join(fixtures, 'single-tick.js'), {silent: true})
+  const output = await once(child.stdout, 'data')
+  await once(child, 'close')
+  is(/"msg":"h"/.test(await output), true)
 })
 
-test('terminates when uncaughtException is fired with onTerminate registered', function (t) {
-  t.plan(3)
-  var output = ''
-  var errorOutput = ''
-  var child = spawn(process.argv[0], [path.join(fixturesPath, 'uncaught-exception.js')], {silent: true})
-
-  child.stdout.pipe(writeStream(function (s, enc, cb) {
-    output += s
-    cb()
-  }))
-
-  child.stderr.pipe(writeStream(function (s, enc, cb) {
-    errorOutput += s
-    cb()
-  }))
-
-  child.on('close', function () {
-    t.match(output, /"msg":"h"/)
-    t.match(output, /terminated/g)
-    t.match(errorOutput, /this is not caught/g)
-  })
+test('terminates when uncaughtException is fired with onTerminated registered', async ({is}) => {
+  const { stdout, stderr, status } = spawnSync(process.argv[0], [join(fixtures, 'uncaught-exception.js')], {timeout: 30000})
+  is(status, 0)
+  is(/"msg":"h"/.test(stdout), true)
+  is(/terminated/g.test(stdout), true)
+  is(/this is not caught/g.test(stderr), true)
 })
 
-test('terminates when uncaughtException is fired without onTerminate registered', function (t) {
-  t.plan(2)
-  var output = ''
-  var child = spawn(process.argv[0], [path.join(fixturesPath, 'uncaught-exception-no-terminate.js')], {silent: true})
-
-  child.stdout.pipe(writeStream(function (s, enc, cb) {
-    output += s
-    cb()
-  }))
-
-  child.on('exit', function (code) {
-    t.is(code, 1)
-  })
-
-  child.on('close', function () {
-    t.match(output, /"msg":"h"/)
-  })
+test('terminates when uncaughtException is fired without onTerminated registered', async ({is}) => {
+  const { stdout, status } = spawnSync(process.argv[0], [join(fixtures, 'uncaught-exception-no-terminate.js')], {timeout: 30000})
+  is(status, 1)
+  is(/"msg":"h"/.test(stdout), true)
 })
 
-test('terminates on SIGHUP when no other handlers registered', function (t) {
-  t.plan(2)
-  var output = ''
-  var child = spawn(process.argv[0], [path.join(fixturesPath, 'sighup-no-handler.js')], {silent: true})
-
-  child.stdout.pipe(writeStream(function (s, enc, cb) {
-    output += s
-    cb()
-  }))
-
-  child.stderr.pipe(process.stdout)
-
-  child.on('exit', function (code) {
-    t.is(code, 0)
-  })
-
-  child.on('close', function () {
-    t.match(output, /"msg":"h"/)
-  })
-
-  setTimeout(function () { child.kill('SIGHUP') }, 2000)
+test('terminates on SIGHUP when no other handlers registered', async ({is}) => {
+  const child = spawn(process.argv[0], [join(fixtures, 'sighup-no-handler.js')])
+  await once(child.stdout, 'data')
+  const output = once(child.stdout, 'data')
+  child.kill('SIGHUP')
+  const code = await once(child, 'exit')
+  is(code, 0)
+  is(/"msg":"h"/.test(await output), true)
 })
 
-test('lets app terminate when SIGHUP received with multiple handlers', function (t) {
-  t.plan(3)
-  var output = ''
-  var child = spawn(process.argv[0], [path.join(fixturesPath, 'sighup-with-handler.js')], {silent: true})
-
-  child.stdout.pipe(writeStream(function (s, enc, cb) {
-    output += s
-    cb()
-  }))
-
-  child.on('exit', function (code) {
-    t.is(code, 0)
-  })
-
-  child.on('close', function () {
-    t.match(output, /"msg":"h"/)
-    t.match(output, /app sighup/)
-  })
-
-  setTimeout(function () { child.kill('SIGHUP') }, 2000)
+test('lets app terminate when SIGHUP received with multiple handlers', async ({is}) => {
+  const child = spawn(process.argv[0], [join(fixtures, 'sighup-with-handler.js')])
+  await once(child.stdout, 'data')
+  const output = once(child.stdout, 'data')
+  const output2 = output.then(() => once(child.stdout, 'data'))
+  child.kill('SIGHUP')
+  const code = await once(child, 'exit')
+  is(code, 0)
+  is(/"msg":"h"/.test(await output + ''), true)
+  is(/app sighup/.test(await output2 + ''), true)
 })
 
-test('destination', function (t) {
-  t.plan(2)
-  var output = ''
-  var child = spawn(process.argv[0], [path.join(fixturesPath, 'destination.js')], {silent: true})
-
-  child.stdout.pipe(writeStream(function (s, enc, cb) {
-    output += s
-    cb()
-  }))
-
-  child.stderr.pipe(process.stdout)
-
-  child.on('exit', function (code) {
-    t.is(code, 0)
-  })
-
-  child.on('close', function () {
-    t.notEqual(null, output.match(/"msg":"h"/))
-  })
+test('destination', async ({is}) => {
+  const child = spawn(process.argv[0], [join(fixtures, 'destination.js')], {silent: true})
+  const output = once(child.stdout, 'data')
+  const code = await once(child, 'exit')
+  is(code, 0)
+  is(/"msg":"h"/.test(await output), true)
 })

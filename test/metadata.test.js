@@ -1,121 +1,108 @@
 'use strict'
 
-var test = require('tap').test
-var os = require('os')
-var pino = require('../')
-var sink = require('./helper').sink
+const os = require('os')
+const { test } = require('tap')
+const pino = require('../')
 
-var pid = process.pid
-var hostname = os.hostname()
+const { pid } = process
+const hostname = os.hostname()
 
-test('metadata works', function (t) {
-  t.plan(7)
-  var dest = sink(function (chunk, enc, cb) {
-    t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
-    delete chunk.time
-    t.deepEqual(chunk, {
-      pid: pid,
-      hostname: hostname,
-      level: 30,
-      hello: 'world',
-      msg: 'a msg',
-      v: 1
-    })
-  })
-  var now = Date.now()
-  var instance = pino({}, {
+test('metadata works', async ({ok, same, is}) => {
+  const now = Date.now()
+  const instance = pino({}, {
     [Symbol.for('needsMetadata')]: true,
-    write: function (chunk) {
-      t.equal(instance, this.lastLogger)
-      t.equal(30, this.lastLevel)
-      t.equal('a msg', this.lastMsg)
-      t.ok(Number(this.lastTime) >= now)
-      t.deepEqual({ hello: 'world' }, this.lastObj)
-      dest.write(chunk)
+    write (chunk) {
+      is(instance, this.lastLogger)
+      is(30, this.lastLevel)
+      is('a msg', this.lastMsg)
+      ok(Number(this.lastTime) >= now)
+      same({ hello: 'world' }, this.lastObj)
+      const result = JSON.parse(chunk)
+      ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
+      delete result.time
+      same(result, {
+        pid: pid,
+        hostname: hostname,
+        level: 30,
+        hello: 'world',
+        msg: 'a msg',
+        v: 1
+      })
     }
   })
 
   instance.info({ hello: 'world' }, 'a msg')
 })
 
-test('child loggers works', function (t) {
-  t.plan(6)
-  var dest = sink(function (chunk, enc, cb) {
-    t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
-    delete chunk.time
-    t.deepEqual(chunk, {
-      pid: pid,
-      hostname: hostname,
-      level: 30,
-      hello: 'world',
-      from: 'child',
-      msg: 'a msg',
-      v: 1
-    })
-  })
-  var instance = pino({}, {
+test('child loggers works', async ({ok, same, is}) => {
+  const instance = pino({}, {
     [Symbol.for('needsMetadata')]: true,
-    write: function (chunk) {
-      t.equal(child, this.lastLogger)
-      t.equal(30, this.lastLevel)
-      t.equal('a msg', this.lastMsg)
-      t.deepEqual({ from: 'child' }, this.lastObj)
-      dest.write(chunk)
+    write (chunk) {
+      is(child, this.lastLogger)
+      is(30, this.lastLevel)
+      is('a msg', this.lastMsg)
+      same({ from: 'child' }, this.lastObj)
+      const result = JSON.parse(chunk)
+      ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
+      delete result.time
+      same(result, {
+        pid: pid,
+        hostname: hostname,
+        level: 30,
+        hello: 'world',
+        from: 'child',
+        msg: 'a msg',
+        v: 1
+      })
     }
   })
 
-  var child = instance.child({ hello: 'world' })
+  const child = instance.child({ hello: 'world' })
   child.info({ from: 'child' }, 'a msg')
 })
 
-test('without object', function (t) {
-  t.plan(6)
-  var dest = sink(function (chunk, enc, cb) {
-    t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
-    delete chunk.time
-    t.deepEqual(chunk, {
-      pid: pid,
-      hostname: hostname,
-      level: 30,
-      msg: 'a msg',
-      v: 1
-    })
-  })
-  var instance = pino({}, {
+test('without object', async ({ok, same, is}) => {
+  const instance = pino({}, {
     [Symbol.for('needsMetadata')]: true,
-    write: function (chunk) {
-      t.equal(instance, this.lastLogger)
-      t.equal(30, this.lastLevel)
-      t.equal('a msg', this.lastMsg)
-      t.equal(null, this.lastObj)
-      dest.write(chunk)
+    write (chunk) {
+      is(instance, this.lastLogger)
+      is(30, this.lastLevel)
+      is('a msg', this.lastMsg)
+      is(null, this.lastObj)
+      const result = JSON.parse(chunk)
+      ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
+      delete result.time
+      same(result, {
+        pid: pid,
+        hostname: hostname,
+        level: 30,
+        msg: 'a msg',
+        v: 1
+      })
     }
   })
 
   instance.info('a msg')
 })
 
-test('without msg', function (t) {
-  t.plan(6)
-  var dest = sink(function (chunk, enc, cb) {
-    t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
-    delete chunk.time
-    t.deepEqual(chunk, {
-      pid: pid,
-      hostname: hostname,
-      level: 30,
-      hello: 'world',
-      v: 1
-    })
-  })
-  var instance = pino({}, {
+test('without msg', async ({ok, same, is}) => {
+  const instance = pino({}, {
     [Symbol.for('needsMetadata')]: true,
-    write: function (chunk) {
-      t.equal(instance, this.lastLogger)
-      t.equal(30, this.lastLevel)
-      t.equal(undefined, this.lastMsg)
-      t.deepEqual({ hello: 'world' }, this.lastObj)
-      dest.write(chunk)
+    write (chunk) {
+      is(instance, this.lastLogger)
+      is(30, this.lastLevel)
+      is(undefined, this.lastMsg)
+      same({ hello: 'world' }, this.lastObj)
+      const result = JSON.parse(chunk)
+      ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
+      delete result.time
+      same(result, {
+        pid: pid,
+        hostname: hostname,
+        level: 30,
+        hello: 'world',
+        v: 1
+      })
     }
   })
 

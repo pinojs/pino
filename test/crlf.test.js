@@ -1,36 +1,32 @@
 'use strict'
 
-var test = require('tap').test
-var pino = require('../')
-var writer = require('flush-write-stream')
+const { test } = require('tap')
+const writer = require('flush-write-stream')
+const pino = require('../')
 
 function capture () {
-  var ws = writer(function (chunk, enc, cb) {
-    this.data += chunk.toString()
+  const ws = writer((chunk, enc, cb) => {
+    ws.data += chunk.toString()
     cb()
   })
   ws.data = ''
   return ws
 }
 
-test('pino uses LF by default', function (t) {
-  t.plan(1)
-  var stream = capture()
-  var logger = pino(stream)
+test('pino uses LF by default', async ({ok}) => {
+  const stream = capture()
+  const logger = pino(stream)
   logger.info('foo')
   logger.error('bar')
-  t.ok(/foo[^\r\n]+\n[^\r\n]+bar[^\r\n]+\n/.test(stream.data))
-  t.end()
+  ok(/foo[^\r\n]+\n[^\r\n]+bar[^\r\n]+\n/.test(stream.data))
 })
 
-test('pino can log CRLF', function (t) {
-  t.plan(1)
-  var stream = capture()
-  var logger = pino({
+test('pino can log CRLF', async ({ok}) => {
+  const stream = capture()
+  const logger = pino({
     crlf: true
   }, stream)
   logger.info('foo')
   logger.error('bar')
-  t.ok(/foo[^\n]+\r\n[^\n]+bar[^\n]+\r\n/.test(stream.data))
-  t.end()
+  ok(/foo[^\n]+\r\n[^\n]+bar[^\n]+\r\n/.test(stream.data))
 })

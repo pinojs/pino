@@ -17,8 +17,8 @@
   ],
   "scripts": {
     "browser-test": "airtap --local 8080 test/browser*test.js",
-    "test": "standard | snazzy && NODE_OPTIONS='--no-warnings' tap -j 4 --no-cov test/*test.js",
-    "ci": "standard | snazzy && NODE_OPTIONS='--no-warnings' tap -j 4 --cov test/*test.js",
+    "test": "standard | snazzy && NODE_OPTIONS='--no-warnings -r qodaa' tap -j 4 --no-cov test/*test.js",
+    "ci": "standard | snazzy && TAP_TIMEOUT=480000 NODE_OPTIONS='--no-warnings -r qodaa' tap -j 4 --cov test/*test.js",
     "bench": "node benchmarks/utils/runbench all",
     "bench-basic": "node benchmarks/utils/runbench basic",
     "bench-object": "node benchmarks/utils/runbench object",
@@ -68,6 +68,7 @@
     "pino-pretty": "^1.0.1",
     "pre-commit": "^1.2.2",
     "proxyquire": "^2.0.1",
+    "qodaa": "^1.0.1",
     "snazzy": "^7.1.1",
     "split2": "^2.2.0",
     "standard": "^11.0.1",

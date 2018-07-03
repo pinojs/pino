@@ -1,154 +1,126 @@
 'use strict'
 
-var test = require('tap').test
-var sink = require('./helper').sink
-var pino = require('../')
+const { test } = require('tap')
+const { sink, once } = require('./helper')
+const pino = require('../')
 
-test('can add a custom level via constructor', function (t) {
-  t.plan(2)
-
-  var log = pino({level: 'foo', levelVal: 35}, sink(function (chunk, enc, cb) {
-    t.is(chunk.msg, 'bar')
-    cb()
-  }))
-
-  t.is(typeof log.foo, 'function')
-  log.foo('bar')
+test('can add a custom level via constructor', async ({is}) => {
+  const stream = sink()
+  const instance = pino({level: 'foo', levelVal: 35}, stream)
+  is(typeof instance.foo, 'function')
+  instance.foo('bar')
+  const { msg } = await once(stream, 'data')
+  is(msg, 'bar')
 })
 
-test('can add a custom level to a prior instance', function (t) {
-  t.plan(2)
-
-  var log = pino(sink(function (chunk, enc, cb) {
-    t.is(chunk.msg, 'bar')
-  }))
-
-  log.addLevel('foo2', 35)
-  t.is(typeof log.foo2, 'function')
-  log.foo2('bar')
+test('can add a custom level to a prior instance', async ({is}) => {
+  const stream = sink()
+  const instance = pino(stream)
+  instance.addLevel('foo2', 35)
+  is(typeof instance.foo2, 'function')
+  instance.foo2('bar')
+  const { msg } = await once(stream, 'data')
+  is(msg, 'bar')
 })
 
-test('custom level via constructor does not affect other instances', function (t) {
-  t.plan(2)
-
-  var log = pino({level: 'foo3', levelVal: 36})
-  var other = pino()
-  t.is(typeof log.foo3, 'function')
-  t.is(typeof other.foo3, 'undefined')
+test('custom level via constructor does not affect other instances', async ({is}) => {
+  const instance = pino({level: 'foo3', levelVal: 36})
+  const other = pino()
+  is(typeof instance.foo3, 'function')
+  is(typeof other.foo3, 'undefined')
 })
 
-test('custom level on one instance does not affect other instances', function (t) {
-  t.plan(2)
-
-  var log = pino()
-  log.addLevel('foo4', 37)
-  var other = pino()
-  log.addLevel('foo5', 38)
-  t.is(typeof other.foo4, 'undefined')
-  t.is(typeof other.foo5, 'undefined')
+test('custom level on one instance does not affect other instances', async ({is}) => {
+  const instance = pino()
+  instance.addLevel('foo4', 37)
+  const other = pino()
+  instance.addLevel('foo5', 38)
+  is(typeof other.foo4, 'undefined')
+  is(typeof other.foo5, 'undefined')
 })
 
-test('custom levels encompass higher levels', function (t) {
-  t.plan(1)
-
-  var log = pino({level: 'foo', levelVal: 35}, sink(function (chunk, enc, cb) {
-    t.is(chunk.msg, 'bar')
-    cb()
-  }))
-
-  log.warn('bar')
+test('custom levels encompass higher levels', async ({is}) => {
+  const stream = sink()
+  const instance = pino({level: 'foo', levelVal: 35}, stream)
+  instance.warn('bar')
+  const { msg } = await once(stream, 'data')
+  is(msg, 'bar')
 })
 
-test('after the fact add level does not include lower levels', function (t) {
-  t.plan(1)
-
-  var log = pino(sink(function (chunk, enc, cb) {
-    t.is(chunk.msg, 'bar')
-    cb()
-  }))
-
-  log.addLevel('foo', 35)
-  log.level = 'foo'
-  log.info('nope')
-  log.foo('bar')
+test('after the fact add level does not include lower levels', async ({is}) => {
+  const stream = sink()
+  const instance = pino(stream)
+  instance.addLevel('foo', 35)
+  instance.level = 'foo'
+  instance.info('nope')
+  instance.foo('bar')
+  const { msg } = await once(stream, 'data')
+  is(msg, 'bar')
 })
 
-test('after the fact add of a lower level does not include it', function (t) {
-  t.plan(1)
-
-  var log = pino(sink(function (chunk, enc, cb) {
-    t.is(chunk.msg, 'bar')
-    cb()
-  }))
-
-  log.level = 'info'
-  log.addLevel('foo', 15)
-  log.info('bar')
-  log.foo('nope')
+test('after the fact add of a lower level does not include it', async ({is}) => {
+  const stream = sink()
+  const instance = pino(stream)
+  instance.level = 'info'
+  instance.addLevel('foo', 15)
+  instance.info('bar')
+  instance.foo('nope')
+  const { msg } = await once(stream, 'data')
+  is(msg, 'bar')
 })
 
-test('children can be set to custom level', function (t) {
-  t.plan(2)
-
-  var parent = pino({level: 'foo', levelVal: 35}, sink(function (chunk, enc, cb) {
-    t.is(chunk.msg, 'bar')
-    t.is(chunk.child, 'yes')
-    cb()
-  }))
-  var child = parent.child({child: 'yes'})
+test('children can be set to custom level', async ({is}) => {
+  const stream = sink()
+  const parent = pino({level: 'foo', levelVal: 35}, stream)
+  const child = parent.child({childMsg: 'yes'})
   child.foo('bar')
+  const { msg, childMsg } = await once(stream, 'data')
+  is(msg, 'bar')
+  is(childMsg, 'yes')
 })
 
-test('custom levels exists on children', function (t) {
-  t.plan(2)
-
-  var parent = pino({}, sink(function (chunk, enc, cb) {
-    t.is(chunk.msg, 'bar')
-    t.is(chunk.child, 'yes')
-    cb()
-  }))
+test('custom levels exists on children', async ({is}) => {
+  const stream = sink()
+  const parent = pino({}, stream)
   parent.addLevel('foo', 35)
-  var child = parent.child({child: 'yes'})
+  const child = parent.child({childMsg: 'yes'})
   child.foo('bar')
+  const { msg, childMsg } = await once(stream, 'data')
+  is(msg, 'bar')
+  is(childMsg, 'yes')
 })
 
-test('rejects already known labels', function (t) {
-  t.plan(1)
-  var log = pino({level: 'info', levelVal: 900})
-  t.is(log.levelVal, 30)
+test('rejects already known labels', async ({is}) => {
+  const instance = pino({level: 'info', levelVal: 900})
+  is(instance.levelVal, 30)
 })
 
-test('reject already known values', function (t) {
-  t.plan(1)
+test('reject already known values', async ({is}) => {
   try {
     pino({level: 'foo', levelVal: 30})
   } catch (e) {
-    t.is(e.message.indexOf('level value') > -1, true)
+    is(e.message.indexOf('level value') > -1, true)
   }
 })
 
-test('reject values of Infinity', function (t) {
-  t.plan(1)
-  t.throws(function () {
+test('reject values of Infinity', async ({throws}) => {
+  throws(() => {
     pino({level: 'foo', levelVal: Infinity})
   }, /.*level value is already used.*/)
 })
 
-test('level numbers are logged correctly after level change', function (t) {
-  t.plan(1)
-  var log = pino({level: 'foo', levelVal: 25}, sink(function (chunk, enc, cb) {
-    t.is(chunk.level, 25)
-  }))
-  log.level = 'debug'
-  log.foo('bar')
+test('level numbers are logged correctly after level change', async ({is}) => {
+  const stream = sink()
+  const instance = pino({level: 'foo', levelVal: 25}, stream)
+  instance.level = 'debug'
+  instance.foo('bar')
+  const { level } = await once(stream, 'data')
+  is(level, 25)
 })
 
-test('levels state is not shared between instances', function (t) {
-  t.plan(2)
-
-  var instance1 = pino({level: 'foo', levelVal: 35})
-  t.is(typeof instance1.foo, 'function')
-
-  var instance2 = pino()
-  t.is(instance2.hasOwnProperty('foo'), false)
+test('levels state is not shared between instances', async ({is}) => {
+  const instance1 = pino({level: 'foo', levelVal: 35})
+  is(typeof instance1.foo, 'function')
+  const instance2 = pino()
+  is(instance2.hasOwnProperty('foo'), false)
 })

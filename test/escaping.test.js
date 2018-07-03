@@ -1,33 +1,30 @@
 'use strict'
 
-var test = require('tap').test
-var pino = require('../')
-var sink = require('./helper').sink
-var os = require('os')
+const os = require('os')
+const { test } = require('tap')
+const { sink, once } = require('./helper')
+const pino = require('../')
 
-var pid = process.pid
-var hostname = os.hostname()
+const { pid } = process
+const hostname = os.hostname()
 
 function testEscape (ch, key) {
-  test('correctly escape ' + ch, function (t) {
-    t.plan(1)
-
-    var instance = pino({
+  test('correctly escape ' + ch, async ({same}) => {
+    const stream = sink()
+    const instance = pino({
       name: 'hello'
-    }, sink(function (chunk, enc, cb) {
-      delete chunk.time
-      t.deepEqual(chunk, {
-        pid: pid,
-        hostname: hostname,
-        level: 60,
-        name: 'hello',
-        msg: 'this contains ' + key,
-        v: 1
-      })
-      cb()
-    }))
-
+    }, stream)
     instance.fatal('this contains ' + key)
+    const result = await once(stream, 'data')
+    delete result.time
+    same(result, {
+      pid: pid,
+      hostname: hostname,
+      level: 60,
+      name: 'hello',
+      msg: 'this contains ' + key,
+      v: 1
+    })
   })
 }
 
@@ -38,7 +35,7 @@ testEscape('\\r', '\r')
 testEscape('\\t', '\t')
 testEscape('\\b', '\b')
 
-var toEscape = [
+const toEscape = [
   '\u0000', // NUL  Null character
   '\u0001', // SOH  Start of Heading
   '\u0002', // STX  Start of Text
@@ -73,26 +70,24 @@ var toEscape = [
   '\u001F' // US   Unit Separator
 ]
 
-toEscape.forEach(function (key) {
+toEscape.forEach((key) => {
   testEscape(JSON.stringify(key), key)
 })
 
-test('correctly escape `hello \\u001F world \\n \\u0022`', function (t) {
-  t.plan(1)
-  var instance = pino({
+test('correctly escape `hello \\u001F world \\n \\u0022`', async ({same}) => {
+  const stream = sink()
+  const instance = pino({
     name: 'hello'
-  }, sink(function (chunk, enc, cb) {
-    delete chunk.time
-    t.deepEqual(chunk, {
-      pid: pid,
-      hostname: hostname,
-      level: 60,
-      name: 'hello',
-      msg: 'hello \u001F world \n \u0022',
-      v: 1
-    })
-    cb()
-  }))
-
+  }, stream)
   instance.fatal('hello \u001F world \n \u0022')
+  const result = await once(stream, 'data')
+  delete result.time
+  same(result, {
+    pid: pid,
+    hostname: hostname,
+    level: 60,
+    name: 'hello',
+    msg: 'hello \u001F world \n \u0022',
+    v: 1
+  })
 })

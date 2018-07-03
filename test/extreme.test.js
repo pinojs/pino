@@ -1,38 +1,37 @@
 'use strict'
 
-var test = require('tap').test
-var fs = require('fs')
-var os = require('os')
-var path = require('path')
-var writeStream = require('flush-write-stream')
-var fork = require('child_process').fork
+const os = require('os')
+const { createWriteStream } = require('fs')
+const { join } = require('path')
+const { test } = require('tap')
+const { fork } = require('child_process')
+const writer = require('flush-write-stream')
+const { once } = require('./helper')
 
-test('extreme mode', function (t) {
-  var now = Date.now
-  var hostname = os.hostname
-  var proc = process
+test('extreme mode', async ({is, teardown}) => {
+  const now = Date.now
+  const hostname = os.hostname
+  const proc = process
   global.process = {
     __proto__: process,
     pid: 123456
   }
-  Date.now = function () {
-    return 1459875739796
-  }
-  os.hostname = function () {
-    return 'abcdefghijklmnopqr'
-  }
+  Date.now = () => 1459875739796
+  os.hostname = () => 'abcdefghijklmnopqr'
   delete require.cache[require.resolve('../')]
-  var pino = require('../')
+  const pino = require('../')
   var expected = ''
   var actual = ''
-  var normal = pino(writeStream(function (s, enc, cb) {
+  const normal = pino(writer((s, enc, cb) => {
     expected += s
     cb()
   }))
 
-  var dest = fs.createWriteStream('/dev/null')
-  dest.write = function (s) { actual += s }
-  var extreme = pino(dest)
+  const dest = createWriteStream('/dev/null')
+  dest.write = (s) => {
+    actual += s
+  }
+  const extreme = pino(dest)
 
   var i = 44
   while (i--) {
@@ -43,30 +42,26 @@ test('extreme mode', function (t) {
   var expected2 = expected.split('\n')[0]
   var actual2 = ''
 
-  var child = fork(path.join(__dirname, '/fixtures/extreme.js'), {silent: true})
-  child.stdout.pipe(writeStream(function (s, enc, cb) {
+  const child = fork(join(__dirname, '/fixtures/extreme.js'), {silent: true})
+  child.stdout.pipe(writer((s, enc, cb) => {
     actual2 += s
     cb()
   }))
+  await once(child, 'close')
+  is(actual, expected)
+  is(actual2.trim(), expected2)
 
-  child.on('close', function () {
-    t.is(actual, expected)
-    t.is(actual2.trim(), expected2)
-
-    t.teardown(function () {
-      os.hostname = hostname
-      Date.now = now
-      global.process = proc
-    })
-
-    t.end()
+  teardown(() => {
+    os.hostname = hostname
+    Date.now = now
+    global.process = proc
   })
 })
 
-test('extreme mode with child', function (t) {
-  var now = Date.now
-  var hostname = os.hostname
-  var proc = process
+test('extreme mode with child', async ({is, teardown}) => {
+  const now = Date.now
+  const hostname = os.hostname
+  const proc = process
   global.process = {
     __proto__: process,
     pid: 123456
@@ -78,17 +73,17 @@ test('extreme mode with child', function (t) {
     return 'abcdefghijklmnopqr'
   }
   delete require.cache[require.resolve('../')]
-  var pino = require('../')
+  const pino = require('../')
   var expected = ''
   var actual = ''
-  var normal = pino(writeStream(function (s, enc, cb) {
+  const normal = pino(writer((s, enc, cb) => {
     expected += s
     cb()
   })).child({ hello: 'world' })
 
-  var dest = fs.createWriteStream('/dev/null')
+  const dest = createWriteStream('/dev/null')
   dest.write = function (s) { actual += s }
-  var extreme = pino(dest).child({ hello: 'world' })
+  const extreme = pino(dest).child({ hello: 'world' })
 
   var i = 500
   while (i--) {
@@ -101,36 +96,30 @@ test('extreme mode with child', function (t) {
   var expected2 = expected.split('\n')[0]
   var actual2 = ''
 
-  var child = fork(path.join(__dirname, '/fixtures/extreme-child.js'), {silent: true})
-  child.stdout.pipe(writeStream(function (s, enc, cb) {
+  const child = fork(join(__dirname, '/fixtures/extreme-child.js'), {silent: true})
+  child.stdout.pipe(writer((s, enc, cb) => {
     actual2 += s
     cb()
   }))
+  await once(child, 'close')
+  is(actual, expected)
+  is(actual2.trim(), expected2)
 
-  child.on('close', function () {
-    t.is(actual, expected)
-    t.is(actual2.trim(), expected2)
-
-    t.teardown(function () {
-      os.hostname = hostname
-      Date.now = now
-      global.process = proc
-    })
-
-    t.end()
+  teardown(() => {
+    os.hostname = hostname
+    Date.now = now
+    global.process = proc
   })
 })
 
-test('throw an error if extreme is passed', function (t) {
-  var pino = require('..')
-  t.throws(() => {
+test('throw an error if extreme is passed', async ({throws}) => {
+  const pino = require('..')
+  throws(() => {
     pino({extreme: true})
   })
-  t.end()
 })
 
-test('flush does nothing without extreme mode', function (t) {
+test('flush does nothing without extreme mode', async () => {
   var instance = require('..')()
   instance.flush()
-  t.end()
 })
