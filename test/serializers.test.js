@@ -18,9 +18,53 @@ test('default err namespace error serializer', async ({is}) => {
   parent.info({err: ReferenceError('test')})
   const o = await once(stream, 'data')
   is(typeof o.err, 'object')
-  is(o.err.message, 'test')
   is(o.err.type, 'ReferenceError')
+  is(o.err.message, 'test')
   is(typeof o.err.stack, 'string')
+})
+
+test('custom serializer overrides default err namespace error serializer', async ({is}) => {
+  const stream = sink()
+  const parent = pino({
+    serializers: {
+      err: (e) => ({
+        t: e.constructor.name,
+        m: e.message,
+        s: e.stack
+      })
+    }
+  }, stream)
+
+  parent.info({err: ReferenceError('test')})
+  const o = await once(stream, 'data')
+  is(typeof o.err, 'object')
+  is(o.err.t, 'ReferenceError')
+  is(o.err.m, 'test')
+  is(typeof o.err.s, 'string')
+})
+
+test('null overrides default err namespace error serializer', async ({is}) => {
+  const stream = sink()
+  const parent = pino({serializers: {err: null}}, stream)
+
+  parent.info({err: ReferenceError('test')})
+  const o = await once(stream, 'data')
+  is(typeof o.err, 'object')
+  is(typeof o.err.type, 'undefined')
+  is(typeof o.err.message, 'undefined')
+  is(typeof o.err.stack, 'undefined')
+})
+
+test('undefined overrides default err namespace error serializer', async ({is}) => {
+  const stream = sink()
+  const parent = pino({serializers: {err: undefined}}, stream)
+
+  parent.info({err: ReferenceError('test')})
+  const o = await once(stream, 'data')
+  is(typeof o.err, 'object')
+  is(typeof o.err.type, 'undefined')
+  is(typeof o.err.message, 'undefined')
+  is(typeof o.err.stack, 'undefined')
 })
 
 test('serializers override values', async ({is}) => {
