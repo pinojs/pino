@@ -1,14 +1,14 @@
 'use strict'
 
 const bench = require('fastbench')
-const pino = require('../')
+const pino = require('../../')
 const fs = require('fs')
 const dest = fs.createWriteStream('/dev/null')
 const plog = pino(dest)
-delete require.cache[require.resolve('../')]
-const plogDest = require('../')(pino.destination('/dev/null'))
-delete require.cache[require.resolve('../')]
-const plogExtreme = require('../')(pino.extreme('/dev/null'))
+delete require.cache[require.resolve('../../')]
+const plogDest = require('../../')(pino.destination('/dev/null'))
+delete require.cache[require.resolve('../../')]
+const plogExtreme = require('../../')(pino.extreme('/dev/null'))
 const plogChild = plog.child({a: 'property'})
 const plogDestChild = plogDest.child({a: 'property'})
 const plogExtremeChild = plogExtreme.child({a: 'property'})

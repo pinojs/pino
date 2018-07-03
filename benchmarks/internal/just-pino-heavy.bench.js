@@ -1,15 +1,15 @@
 'use strict'
 
 const bench = require('fastbench')
-const pino = require('../')
+const pino = require('../../')
 const fs = require('fs')
 const dest = fs.createWriteStream('/dev/null')
 const plog = pino(dest)
-delete require.cache[require.resolve('../')]
-const plogDest = require('../')(pino.destination('/dev/null'))
-delete require.cache[require.resolve('../')]
-const plogExtreme = require('../')(pino.extreme('/dev/null'))
-const deep = require('../package.json')
+delete require.cache[require.resolve('../../')]
+const plogDest = require('../../')(pino.destination('/dev/null'))
+delete require.cache[require.resolve('../../')]
+const plogExtreme = require('../../')(pino.extreme('/dev/null'))
+const deep = require('../../package.json')
 deep.deep = JSON.parse(JSON.stringify(deep))
 deep.deep.deep = JSON.parse(JSON.stringify(deep))
 const longStr = JSON.stringify(deep)

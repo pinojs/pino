@@ -1,29 +1,29 @@
 'use strict'
 
 const bench = require('fastbench')
-const pino = require('../')
+const pino = require('../../')
 const fs = require('fs')
 const dest = fs.createWriteStream('/dev/null')
 const plog = pino(dest)
-delete require.cache[require.resolve('../')]
-const plogExtreme = require('../')(pino.extreme('/dev/null'))
-delete require.cache[require.resolve('../')]
-const plogUnsafe = require('../')({safe: false}, dest)
-delete require.cache[require.resolve('../')]
-const plogUnsafeExtreme = require('../')(
+delete require.cache[require.resolve('../../')]
+const plogExtreme = require('../../')(pino.extreme('/dev/null'))
+delete require.cache[require.resolve('../../')]
+const plogUnsafe = require('../../')({safe: false}, dest)
+delete require.cache[require.resolve('../../')]
+const plogUnsafeExtreme = require('../../')(
   {safe: false},
   pino.extreme('/dev/null')
 )
 const plogRedact = pino({redact: ['a.b.c']}, dest)
-delete require.cache[require.resolve('../')]
-const plogExtremeRedact = require('../')(
+delete require.cache[require.resolve('../../')]
+const plogExtremeRedact = require('../../')(
   {redact: ['a.b.c']},
   pino.extreme('/dev/null')
 )
-delete require.cache[require.resolve('../')]
-const plogUnsafeRedact = require('../')({redact: ['a.b.c'], safe: false}, dest)
-delete require.cache[require.resolve('../')]
-const plogUnsafeExtremeRedact = require('../')(
+delete require.cache[require.resolve('../../')]
+const plogUnsafeRedact = require('../../')({redact: ['a.b.c'], safe: false}, dest)
+delete require.cache[require.resolve('../../')]
+const plogUnsafeExtremeRedact = require('../../')(
   {redact: ['a.b.c'], safe: false},
   pino.extreme('/dev/null')
 )
