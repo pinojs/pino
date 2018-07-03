@@ -26,7 +26,7 @@ const { LOG_VERSION } = require('./lib/meta')
 const { epochTime, nullTime } = time
 const { pid, exit } = process
 const hostname = os.hostname()
-
+const defaultErrorSerializer = serializers.err
 const defaultOptions = {
   level: 'info',
   messageKey: 'msg',
@@ -34,7 +34,7 @@ const defaultOptions = {
   enabled: true,
   prettyPrint: false,
   base: { pid, hostname },
-  serializers: {},
+  serializers: {err: defaultErrorSerializer},
   timestamp: epochTime,
   onTerminated: (evt, err) => err ? exit(1) : exit(0),
   name: undefined,

@@ -11,6 +11,18 @@ const childSerializers = {
   test: () => 'child'
 }
 
+test('default err namespace error serializer', async ({is}) => {
+  const stream = sink()
+  const parent = pino(stream)
+
+  parent.info({err: ReferenceError('test')})
+  const o = await once(stream, 'data')
+  is(typeof o.err, 'object')
+  is(o.err.message, 'test')
+  is(o.err.type, 'ReferenceError')
+  is(typeof o.err.stack, 'string')
+})
+
 test('serializers override values', async ({is}) => {
   const stream = sink()
   const parent = pino({ serializers: parentSerializers }, stream)
