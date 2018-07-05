@@ -7,8 +7,10 @@ const events = require('./lib/events')
 const redaction = require('./lib/redaction')
 const time = require('./lib/time')
 const proto = require('./lib/proto')
+const symbols = require('./lib/symbols')
 const { setLevelState, mappings } = require('./lib/levels')
 const { createArgsNormalizer, asChindings } = require('./lib/tools')
+const { LOG_VERSION } = require('./lib/meta')
 const {
   chindingsSym,
   redactFmtSym,
@@ -21,8 +23,7 @@ const {
   formatOptsSym,
   onTerminatedSym,
   messageKeyStringSym
-} = require('./lib/symbols')
-const { LOG_VERSION } = require('./lib/meta')
+} = symbols
 const { epochTime, nullTime } = time
 const { pid, exit } = process
 const hostname = os.hostname()
@@ -104,6 +105,7 @@ pino.destination = (dest = process.stdout.fd) => new SonicBoom(dest)
 pino.levels = mappings()
 pino.stdSerializers = Object.assign({}, serializers)
 pino.stdTimeFunctions = Object.assign({}, time)
+pino.symbols = symbols
 pino.LOG_VERSION = LOG_VERSION
 
 module.exports = pino
