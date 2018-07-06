@@ -7,7 +7,8 @@ const base = pino(pino.destination('/dev/null'))
 const child = base.child({})
 const childChild = child.child({})
 const childChildChild = childChild.child({})
-const childSerializers = base.child({serializers: {err: () => {}}})
+const childChildChildChild = childChildChild.child({})
+const child2 = base.child({})
 const baseSerializers = pino({serializers: {err: () => {}}}, pino.destination('/dev/null'))
 const baseSerializersChild = baseSerializers.child({})
 const baseSerializersChildSerializers = baseSerializers.child({serializers: {err: () => {}}})
@@ -39,9 +40,15 @@ const run = bench([
     }
     setImmediate(cb)
   },
-  function benchPinoChildSerilalizers (cb) {
+  function benchPinoChildChildChildChild (cb) {
     for (var i = 0; i < max; i++) {
-      childSerializers.info({ hello: 'world' })
+      childChildChildChild.info({ hello: 'world' })
+    }
+    setImmediate(cb)
+  },
+  function benchPinoChild2 (cb) {
+    for (var i = 0; i < max; i++) {
+      child2.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
