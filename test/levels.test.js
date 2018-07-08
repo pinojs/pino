@@ -91,7 +91,7 @@ test('child returns level integer', async ({is}) => {
   is(child.levelVal, 50)
 })
 
-test('set the level via constructor', async ({is}) => {
+test('set the level via exported pino function', async ({is}) => {
   const expected = [{
     level: 50,
     msg: 'this is an error'
@@ -178,6 +178,18 @@ test('silent is a noop', async ({fail}) => {
   instance['silent']('hello world')
 })
 
+test('set silent via Infinity', async ({fail}) => {
+  const instance = pino({
+    level: Infinity
+  }, sink((result, enc) => {
+    fail('no data should be logged')
+  }))
+
+  Object.keys(pino.levels.values).forEach((level) => {
+    instance[level]('hello world')
+  })
+})
+
 test('silent stays a noop after level changes', async ({is, isNot, fail}) => {
   const noop = require('../lib/tools').noop
   const instance = pino({
@@ -234,4 +246,36 @@ test('setting level in child', async ({is}) => {
   instance.info('hello world')
   instance.error('this is an error')
   instance.fatal('this is fatal')
+})
+
+test('setting level by assigning a number to levelVal', async ({is}) => {
+  const instance = pino()
+  is(instance.levelVal, 30)
+  is(instance.level, 'info')
+  instance.levelVal = 50
+  is(instance.levelVal, 50)
+  is(instance.level, 'error')
+})
+
+test('setting level by assigning a number to level', async ({is}) => {
+  const instance = pino()
+  is(instance.levelVal, 30)
+  is(instance.level, 'info')
+  instance.level = 50
+  is(instance.levelVal, 50)
+  is(instance.level, 'error')
+})
+
+test('setting level by assigning a known label to level', async ({is}) => {
+  const instance = pino()
+  is(instance.levelVal, 30)
+  is(instance.level, 'info')
+  instance.level = 'error'
+  is(instance.levelVal, 50)
+  is(instance.level, 'error')
+})
+
+test('assigning a string to levelVal will throw', async ({throws}) => {
+  const instance = pino()
+  throws(() => { instance.levelVal = 'error' })
 })

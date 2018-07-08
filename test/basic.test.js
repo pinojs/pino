@@ -1,12 +1,15 @@
 'use strict'
 const os = require('os')
+const { join } = require('path')
+const { readFileSync } = require('fs')
+const proxyquire = require('proxyquire')
 const { test } = require('tap')
 const { sink, check, once } = require('./helper')
-const proxyquire = require('proxyquire')
 const pino = require('../')
 const { version } = require('../package.json')
 const { pid } = process
 const hostname = os.hostname()
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
 test('pino version is exposed on export', async ({is}) => {
   is(pino.version, version)
@@ -410,6 +413,25 @@ test('handles objects with null prototype', async ({same}) => {
     hostname: hostname,
     level: 30,
     test: 'test',
+    v: 1
+  })
+})
+
+test('pino.destination', async ({same}) => {
+  const tmp = join(
+    os.tmpdir(),
+    '_' + Math.random().toString(36).substr(2, 9)
+  )
+  const instance = pino(pino.destination(tmp))
+  instance.info('hello')
+  await sleep(250)
+  const result = JSON.parse(readFileSync(tmp).toString())
+  delete result.time
+  same(result, {
+    pid: pid,
+    hostname: hostname,
+    level: 30,
+    msg: 'hello',
     v: 1
   })
 })
