@@ -8,14 +8,18 @@ const { version } = require('../package.json')
 const { pid } = process
 const hostname = os.hostname()
 
-test('pino version is exposed', async ({is}) => {
-  const instance = pino()
-  is(instance.pino, version)
+test('pino version is exposed on export', async ({is}) => {
+  is(pino.version, version)
 })
 
-test('child exposes pino version', async ({is}) => {
+test('pino version is exposed on instance', async ({is}) => {
+  const instance = pino()
+  is(instance.version, version)
+})
+
+test('child instance exposes pino version', async ({is}) => {
   const child = pino().child({foo: 'bar'})
-  is(child.pino, version)
+  is(child.version, version)
 })
 
 function levelTest (name, level) {
