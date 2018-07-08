@@ -10,7 +10,7 @@ const proto = require('./lib/proto')
 const symbols = require('./lib/symbols')
 const { setLevelState, mappings } = require('./lib/levels')
 const { createArgsNormalizer, asChindings } = require('./lib/tools')
-const { LOG_VERSION } = require('./lib/meta')
+const { version, LOG_VERSION } = require('./lib/meta')
 const {
   chindingsSym,
   redactFmtSym,
@@ -106,6 +106,7 @@ pino.levels = mappings()
 pino.stdSerializers = Object.assign({}, serializers)
 pino.stdTimeFunctions = Object.assign({}, time)
 pino.symbols = symbols
+pino.version = version
 pino.LOG_VERSION = LOG_VERSION
 
 module.exports = pino
