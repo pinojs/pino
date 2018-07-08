@@ -33,12 +33,22 @@ test('inserts timestamp by default', async ({ok, is}) => {
   is(result.msg, 'foobar')
 })
 
-test('omits timestamp with option', async ({is}) => {
+test('omits timestamp when timestamp option is false', async ({is}) => {
   const stream = sink()
   const instance = pino({timestamp: false}, stream)
   instance.info('foobar')
   const result = await once(stream, 'data')
   is(result.hasOwnProperty('time'), false)
+  is(result.msg, 'foobar')
+})
+
+test('inserts timestamp when timestamp option is true', async ({ok, is}) => {
+  const stream = sink()
+  const instance = pino({timestamp: true}, stream)
+  instance.info('foobar')
+  const result = await once(stream, 'data')
+  is(result.hasOwnProperty('time'), true)
+  ok(new Date(result.time) <= new Date(), 'time is greater than timestamp')
   is(result.msg, 'foobar')
 })
 
@@ -61,4 +71,19 @@ test('child omits timestamp with option', async ({is}) => {
   const result = await once(stream, 'data')
   is(result.hasOwnProperty('time'), false)
   is(result.msg, 'foobar')
+})
+
+test('pino.stdTimeFunctions.unixTime returns seconds based timestamps', async ({is}) => {
+  const opts = {
+    timestamp: pino.stdTimeFunctions.unixTime
+  }
+  const stream = sink()
+  const instance = pino(opts, stream)
+  const now = Date.now
+  Date.now = () => 1531069919686
+  instance.info('foobar')
+  const result = await once(stream, 'data')
+  is(result.hasOwnProperty('time'), true)
+  is(result.time, 1531069920)
+  Date.now = now
 })

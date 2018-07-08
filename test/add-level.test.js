@@ -4,7 +4,7 @@ const { test } = require('tap')
 const { sink, once } = require('./helper')
 const pino = require('../')
 
-test('can add a custom level via constructor', async ({is}) => {
+test('can add a custom level via exported pino function', async ({is}) => {
   const stream = sink()
   const instance = pino({level: 'foo', levelVal: 35}, stream)
   is(typeof instance.foo, 'function')
@@ -23,7 +23,7 @@ test('can add a custom level to a prior instance', async ({is}) => {
   is(msg, 'bar')
 })
 
-test('custom level via constructor does not affect other instances', async ({is}) => {
+test('custom level via exported pino function does not affect other instances', async ({is}) => {
   const instance = pino({level: 'foo3', levelVal: 36})
   const other = pino()
   is(typeof instance.foo3, 'function')
@@ -93,6 +93,9 @@ test('custom levels exists on children', async ({is}) => {
 test('rejects already known labels', async ({is}) => {
   const instance = pino({level: 'info', levelVal: 900})
   is(instance.levelVal, 30)
+  is(instance.addLevel('error', 200), false)
+  is(instance.levels.values.error, 50)
+  is(200 in instance.levels.labels, false)
 })
 
 test('reject already known values', async ({is}) => {
@@ -101,6 +104,10 @@ test('reject already known values', async ({is}) => {
   } catch (e) {
     is(e.message.indexOf('level value') > -1, true)
   }
+  const instance = pino()
+  is(instance.addLevel('foo', 50), false)
+  is(instance.levels.labels[50], 'error')
+  is('foo' in instance.levels.values, false)
 })
 
 test('reject values of Infinity', async ({throws}) => {
