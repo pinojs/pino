@@ -4,11 +4,11 @@ A "transport" for Pino is some other tool into which the output of Pino is piped
 Consider the following example:
 
 ```js
-var split = require('split2')
-var pump = require('pump')
-var through = require('through2')
+const split = require('split2')
+const pump = require('pump')
+const through = require('through2')
 
-var myTransport = through.obj(function (chunk, enc, cb) {
+const myTransport = through.obj(function (chunk, enc, cb) {
   // do whatever you want here!
   console.log(chunk)
   cb()
@@ -26,6 +26,40 @@ node my-app-which-logs-stuff-to-stdout.js | node my-transport-process.js
 
 Using transports in the same process causes unnecessary load and slows down
 Node's single threaded event loop.
+
+## In-process transports
+
+> **Pino *does not* natively support in-process transports.**
+
+Pino does not support in-process transports because Node processes are
+single threaded processes (ignoring some technical details). Given this
+restriction, one of the methods Pino employs to achieve its speed is to
+purposefully offload the handling of logs, and their ultimate destination, to
+external processes so that the threading capabilities of the OS can be
+used (or other CPUs).
+
+One consequence of this methodology is that "error" logs do not get written to
+`stderr`. However, since Pino logs are in a parseable format, it is possible to
+use tools like [pino-tee][pino-tee] or [jq][jq] to work with the logs. For
+example, to view only logs marked as "error" logs:
+
+```
+$ node an-app.js | jq 'select(.level == 50)'
+```
+
+In short, the way Pino generates logs:
+
+1. Reduces the impact of logging on your application to an extremely minimal amount.
+2. Gives greater flexibility in how logs are processed and stored.
+
+Given all of the above, Pino recommends out-of-process log processing.
+
+However, it is possible to wrap Pino and perform processing in-process.
+For an example of this, see [pino-multi-stream][pinoms].
+
+[pino-tee]: https://npm.im/pino-tee
+[jq]: https://stedolan.github.io/jq/
+[pinoms]: https://npm.im/pino-multi-stream
 
 ## Known Transports
 
