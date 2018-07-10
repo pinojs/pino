@@ -10,7 +10,7 @@ const hostname = os.hostname()
 test('metadata works', async ({ok, same, is}) => {
   const now = Date.now()
   const instance = pino({}, {
-    [Symbol.for('needsMetadata')]: true,
+    [Symbol.for('pino.metadata')]: true,
     write (chunk) {
       is(instance, this.lastLogger)
       is(30, this.lastLevel)
@@ -36,7 +36,7 @@ test('metadata works', async ({ok, same, is}) => {
 
 test('child loggers works', async ({ok, same, is}) => {
   const instance = pino({}, {
-    [Symbol.for('needsMetadata')]: true,
+    [Symbol.for('pino.metadata')]: true,
     write (chunk) {
       is(child, this.lastLogger)
       is(30, this.lastLevel)
@@ -63,7 +63,7 @@ test('child loggers works', async ({ok, same, is}) => {
 
 test('without object', async ({ok, same, is}) => {
   const instance = pino({}, {
-    [Symbol.for('needsMetadata')]: true,
+    [Symbol.for('pino.metadata')]: true,
     write (chunk) {
       is(instance, this.lastLogger)
       is(30, this.lastLevel)
@@ -87,7 +87,7 @@ test('without object', async ({ok, same, is}) => {
 
 test('without msg', async ({ok, same, is}) => {
   const instance = pino({}, {
-    [Symbol.for('needsMetadata')]: true,
+    [Symbol.for('pino.metadata')]: true,
     write (chunk) {
       is(instance, this.lastLogger)
       is(30, this.lastLevel)
