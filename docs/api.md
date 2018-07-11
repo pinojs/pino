@@ -15,7 +15,6 @@
   * [logger.level](#level)
   * [logger.isLevelEnabled()](#isLevelEnabled)
   * [logger.addLevel()](#addLevel)
-  * [logger.levelVal](#levelVal)
   * [logger.levels](#levels)
   * [Event: 'level-change'](#level-change)
   * [logger.version](#version)
@@ -51,11 +50,32 @@ Default: `'info'`
 
 One of `'fatal'`, `'error'`, `'warn'`, `'info`', `'debug'`, `'trace'` or `silent`.
  
-Additional levels can be explicitly added via the `logger.addLevel` method or implicitly
-by setting a custom `level` and `levelVal` together.
+Additional levels can be added to the instance via the `logger.addLevel` method or 
+at instantiation time with the `customLevels` property. 
 
 * See [`logger.addLevel`](#addLevel)
-* See [`levelVal option`](#opt-levelVal)  
+* See [`customLevels` option](#opt-customlevels)
+
+#### `customLevels` (Object)
+
+Default: `undefined`
+
+Use this option to define additional logging levels.
+The keys of the object correspond the namespace of the log level, 
+and the values should be the numerical value of the level. 
+
+```js
+const logger = pino({
+  customLevels: {
+    foo: 35
+  }
+})
+logger.foo('hi')
+```
+
+
+
+
 
 #### `redact` (Array|Object): 
 
@@ -135,13 +155,6 @@ See [stdTimeFunctions](#stdTimeFunctions) for a set of available functions
 for passing in as a value for this option. 
 
 **Caution**: attempting to format time in-process will significantly impact logging performance.
-
-<a id=opt-levelVal></a>    
-#### `levelVal` (Number)
-
-Default: `undefined`
-
-When defining a custom log level via `level`, set to an integer value to define the new level.
 
 <a id=opt-messageKey></a>  
 #### `messageKey` (String)
@@ -500,7 +513,7 @@ therefore where it sits in order of priority among other levels.
 * See [`logger.level`](#level) 
 
 <a id="levelVal"></a>
-### `logger.levelVal` (Number) [Getter]
+### `logger.levelVal` (Number)
 
 Supplies the integer value for the current logging level.
 
