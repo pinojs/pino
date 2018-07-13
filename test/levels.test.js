@@ -1,8 +1,7 @@
 'use strict'
 
 const { test } = require('tap')
-const { sink, once } = require('./helper')
-const { check } = require('./helper')
+const { sink, once, check } = require('./helper')
 const pino = require('../')
 
 test('set the level by string', async ({is}) => {
@@ -42,31 +41,10 @@ test('set the level by number', async ({is}) => {
   const stream = sink()
   const instance = pino(stream)
 
-  instance.levelVal = 50
-  instance.info('hello world')
-  instance.error('this is an error')
-  instance.fatal('this is fatal')
-  const result = await once(stream, 'data')
-  const current = expected.shift()
-  check(is, result, current.level, current.msg)
-})
-
-test('set the level by number via string method', async ({is}) => {
-  const expected = [{
-    level: 50,
-    msg: 'this is an error'
-  }, {
-    level: 60,
-    msg: 'this is fatal'
-  }]
-  const stream = sink()
-  const instance = pino(stream)
-
   instance.level = 50
   instance.info('hello world')
   instance.error('this is an error')
   instance.fatal('this is fatal')
-
   const result = await once(stream, 'data')
   const current = expected.shift()
   check(is, result, current.level, current.msg)
@@ -208,12 +186,12 @@ test('silent stays a noop after level changes', async ({is, isNot, fail}) => {
 
 test('exposed levels', async ({same}) => {
   same(Object.keys(pino.levels.values), [
-    'fatal',
-    'error',
-    'warn',
-    'info',
+    'trace',
     'debug',
-    'trace'
+    'info',
+    'warn',
+    'error',
+    'fatal'
   ])
 })
 
@@ -248,15 +226,6 @@ test('setting level in child', async ({is}) => {
   instance.fatal('this is fatal')
 })
 
-test('setting level by assigning a number to levelVal', async ({is}) => {
-  const instance = pino()
-  is(instance.levelVal, 30)
-  is(instance.level, 'info')
-  instance.levelVal = 50
-  is(instance.levelVal, 50)
-  is(instance.level, 'error')
-})
-
 test('setting level by assigning a number to level', async ({is}) => {
   const instance = pino()
   is(instance.levelVal, 30)
@@ -264,6 +233,11 @@ test('setting level by assigning a number to level', async ({is}) => {
   instance.level = 50
   is(instance.levelVal, 50)
   is(instance.level, 'error')
+})
+
+test('setting level by number to unknown value results in a throw', async ({throws}) => {
+  const instance = pino()
+  throws(() => { instance.level = 973 })
 })
 
 test('setting level by assigning a known label to level', async ({is}) => {
@@ -275,7 +249,7 @@ test('setting level by assigning a known label to level', async ({is}) => {
   is(instance.level, 'error')
 })
 
-test('assigning a string to levelVal will throw', async ({throws}) => {
+test('levelVal is read only', async ({throws}) => {
   const instance = pino()
-  throws(() => { instance.levelVal = 'error' })
+  throws(() => { instance.levelVal = 20 })
 })
