@@ -316,3 +316,14 @@ test('throws when re-specifying pre-configured custom level values via addLevel'
     is(message, 'pre-existing level values cannot be used for new levels')
   }
 })
+
+test('does not share custom level state across siblings', async ({doesNotThrow}) => {
+  const stream = sink()
+  const logger = pino(stream)
+  const child = logger.child({})
+  child.addLevel('foo', 35)
+  doesNotThrow(() => {
+    const child = logger.child({})
+    child.addLevel('foo', 35) // should not throw an error about level override
+  })
+})
