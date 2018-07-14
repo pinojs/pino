@@ -280,6 +280,8 @@ Each logging method has the following signature:
 
 The parameters are explained below using the `logger.info` method but the same applies to all logging methods.
 
+### Logging Method Parameters
+
 <a id=mergingobject></a>
 #### `mergingObject` (Object)
 
@@ -578,7 +580,7 @@ $ node -p "require('pino')().levels"
 * See [`logger.level`](#level)
 
 <a id="level-change"></a>
-## Event: 'level-change'
+### Event: 'level-change'
 
 The logger instance is also an [`EventEmitter ⇗`](https://nodejs.org/dist/latest/docs/api/events.html#events_class_eventemitter)
 
@@ -600,14 +602,14 @@ logger.level = 'trace' // trigger event
 ```
 
 <a id="version"></a>
-## `logger.version` (String)
+### `logger.version` (String)
 
 Exposes the Pino package version. Also available on the exported `pino` function.
 
 * See [`pino.version`](#pino-version)
 
 <a id="log_version"></a>
-## `logger.LOG_VERSION` (Number)
+### `logger.LOG_VERSION` (Number)
 
 Holds the current log format version as output in the `v` property of each log record.
 Also available on the exported `pino` function.

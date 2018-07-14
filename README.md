@@ -118,6 +118,8 @@ See the [Benchmarks](docs/benchmarks.md) document for comparisons.
 
 <https://twitter.com/wa7son>
 
+## Communication
+
 ### Chat on Gitter
 
 <https://gitter.im/pinojs/pino>
