@@ -22,11 +22,15 @@ const fastify = require('fastify')({
   logger: true
 })
 fastify.get('/', async (request, reply) => {
-  reply.type('application/json').code(200)
   reply.log.info('something')
   return { hello: 'world' }
 })
 ```
+
+The `logger` option can also be set to an object, which will be passed through directly
+as the [`pino` options object](api.md#options).
+
+Note: Fastify v1 uses [Pino v4](legacy.md#pino-v4). The upcoming Fastify v2 will use Pino v5.
 
 See the [fastify documentation](https://www.npmjs.com/package/pino-http#pinohttpopts-stream) for more information.
 
@@ -34,7 +38,7 @@ See the [fastify documentation](https://www.npmjs.com/package/pino-http#pinohttp
 ## Pino with Express
 
 ```sh
-npm install  express-pino-logger
+npm install express-pino-logger
 ```
 
 ```js
@@ -57,41 +61,59 @@ See the [express-pino-logger readme](http://npm.im/express-pino-logger) for more
 ## Pino with Hapi
 
 ```sh
-npm install  hapi-pino
+npm install hapi-pino
 ```
 
 ```js
 'use strict'
-
+ 
+require('make-promises-safe')
+ 
 const Hapi = require('hapi')
-
-const server = new Hapi.Server()
-server.connection({ port: 3000 })
-
-server.route({
-  method: 'GET',
-  path: '/',
-  handler: function (request, reply) {
-    request.logger.info('In handler %s', request.path)
-    return reply('hello world')
-  }
-})
-
-server.register(require('hapi-pino'), (err) => {
-  if (err) {
-    console.error(err)
-    process.exit(1)
-  }
-
-  server.logger().info('another way for accessing it')
-
-  // Start the server
-  server.start((err) => {
-    if (err) {
-      console.error(err)
-      process.exit(1)
+ 
+async function start () {
+  // Create a server with a host and port
+  const server = Hapi.server({
+    host: 'localhost',
+    port: 3000
+  })
+ 
+  // Add the route
+  server.route({
+    method: 'GET',
+    path: '/',
+    handler: async function (request, h) {
+      // request.log is HAPI standard way of logging
+      request.log(['a', 'b'], 'Request into hello world')
+ 
+      // you can also use a pino instance, which will be faster
+      request.logger.info('In handler %s', request.path)
+ 
+      return 'hello world'
     }
   })
+ 
+  await server.register({
+    plugin: require('.'),
+    options: {
+      prettyPrint: process.env.NODE_ENV !== 'production'
+    }
+  })
+ 
+  // also as a decorated API
+  server.logger().info('another way for accessing it')
+ 
+  // and through Hapi standard logging system
+  server.log(['subsystem'], 'third way for accessing it')
+ 
+  await server.start()
+ 
+  return server
+}
+ 
+start().catch((err) => {
+  console.log(err)
+  process.exit(1)
 })
 ```
 
@@ -101,7 +123,7 @@ See the [hapi-pino readme](http://npm.im/hapi-pino) for more info.
 ## Pino with Restify
 
 ```sh
-npm install  restify-pino-logger
+npm install restify-pino-logger
 ```
 
 ```js
@@ -126,7 +148,7 @@ See the [restify-pino-logger readme](http://npm.im/restify-pino-logger) for more
 ### Koa
 
 ```sh
-npm install  koa-pino-logger
+npm install koa-pino-logger
 ```
 
 ```js
@@ -150,7 +172,7 @@ See the [koa-pino-logger readme](https://github.com/pinojs/koa-pino-logger) for 
 ## Pino with Node core `http`
 
 ```sh
-npm install  pino-http
+npm install pino-http
 ```
 
 ```js

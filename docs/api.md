@@ -73,10 +73,6 @@ const logger = pino({
 logger.foo('hi')
 ```
 
-
-
-
-
 #### `redact` (Array|Object): 
 
 Default: `undefined`
@@ -187,7 +183,11 @@ configurations. This may be set to a configuration object as outlined in the
 The options object may additionally contain a `prettifier` property to define
 which prettifier module to use. When not present, `prettifier` defaults to
 `'pino-pretty'`. Regardless of the value, the specified prettifier module
-must be installed as a separate dependency. 
+must be installed as a separate dependency:
+
+```sh
+npm install pino-pretty
+```
 
 #### `browser` (Object)
 
@@ -224,6 +224,11 @@ set on the `destination` object:
 * the last logger instance as `destination.lastLogger` (to support child
   loggers)
 
+For a full reference for using `Symbol.for('pino.metadata')`, see the [`pino-multi-stream` ⇗](https://github.com/pinojs/pino-multi-stream)
+module. 
+
+The following is a succinct usage example: 
+
 ```js
 const logger = pino({}, {
   [Symbol.for('pino.metadata')]: true,
@@ -236,6 +241,8 @@ const logger = pino({}, {
   }
 })
 ```
+
+* See [`pino-multi-stream` ⇗](https://github.com/pinojs/pino-multi-stream)
 
 <a id="logger"></a>
 ## Logger Instance
