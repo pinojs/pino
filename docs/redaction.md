@@ -4,11 +4,11 @@ To redact sensitive information, supply paths to keys that hold sensitive data
 using the `redact` option:
 
 ```js
-var pino = require('.')({
+const logger = require('.')({
   redact: ['key', 'path.to.key', 'stuff.thats[*].secret']
 })
 
-pino.info({
+logger.info({
   key: 'will be redacted',
   path: {
     to: {key: 'sensitive', another: 'thing'}
@@ -34,14 +34,14 @@ an object. This allows control over *how* information is redacted.
 For instance, setting the censor: 
 
 ```js
-var pino = require('.')({
+const logger = require('.')({
   redact: {
     paths: ['key', 'path.to.key', 'stuff.thats[*].secret'],
     censor: '**GDPR COMPLIANT**'
   }
 })
 
-pino.info({
+logger.info({
   key: 'will be redacted',
   path: {
     to: {key: 'sensitive', another: 'thing'}
@@ -64,14 +64,14 @@ This will output:
 The `redact.remove` option also allows for the key and value to be removed from output:
 
 ```js
-var pino = require('.')({
+const logger = require('.')({
   redact: {
     paths: ['key', 'path.to.key', 'stuff.thats[*].secret'],
     remove: true
   }
 })
 
-pino.info({
+logger.info({
   key: 'will be redacted',
   path: {
     to: {key: 'sensitive', another: 'thing'}
@@ -98,8 +98,8 @@ See [pino options in API](api.md#pino) for `redact` API details.
 Pino's redaction functionality is built on top of [`fast-redact`](http://github.com/davidmarkclements/fast-redact)
 which adds about 2% overhead to `JSON.stringify` when using paths without wildcards.
 
-When used with pino logger with a single redacted path, any overhead is within noise - we haven't found
-a way to deterministically measure it's effect. This is because its not a bottleneck.
+When used with pino logger with a single redacted path, any overhead is within noise -
+a way to deterministically measure it's effect has not been found. This is because its not a bottleneck.
 
 However, wildcard redaction does carry a non-trivial cost relative to explicitly declaring the keys 
 (50% in a case where four keys are redacted across two objects). See 

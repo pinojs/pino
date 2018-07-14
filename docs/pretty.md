@@ -49,7 +49,7 @@ module.exports = function myPrettifier (options) {
 ```
 
 The reference implementation of such a module is the [`pino-pretty`][pp] module.
-To learn more about creating your own prettifier module, learn from the
+To learn more about creating a custom prettifier module, refer to the
 `pino-pretty` source code.
 
 Note: if the prettifier returns `undefined`, instead of a formatted line, nothing
@@ -58,7 +58,7 @@ will be written to the destination stream.
 ### API Example
 
 > #### NOTE:
-> For general usage, it is highly recommended that you pipe logs into
+> For general usage, it is highly recommended that logs are piped into
 > the prettifier instead. Prettified logs are not easily parsed and cannot
 > be easily investigated at a later date.
 

@@ -1,6 +1,7 @@
 # Transports
 
-A "transport" for Pino is some other tool into which the output of Pino is piped.
+A "transport" for Pino is supplementary tool which consumes Pino logs.
+
 Consider the following example:
 
 ```js
@@ -9,7 +10,7 @@ const pump = require('pump')
 const through = require('through2')
 
 const myTransport = through.obj(function (chunk, enc, cb) {
-  // do whatever you want here!
+  // do the necessary
   console.log(chunk)
   cb()
 })
@@ -18,12 +19,14 @@ pump(process.stdin, split(JSON.parse), myTransport)
 ```
 
 The above defines our "transport" as the file `my-transport-process.js`.
-Now we can get the log data by:
+
+Logs can now be consumed using shell piping:
 
 ```sh
 node my-app-which-logs-stuff-to-stdout.js | node my-transport-process.js
 ```
 
+Ideally, a transport should consume logs in a separate process to the application, 
 Using transports in the same process causes unnecessary load and slows down
 Node's single threaded event loop.
 
@@ -49,7 +52,7 @@ $ node an-app.js | jq 'select(.level == 50)'
 
 In short, the way Pino generates logs:
 
-1. Reduces the impact of logging on your application to an extremely minimal amount.
+1. Reduces the impact of logging on an application to the absolute minimum.
 2. Gives greater flexibility in how logs are processed and stored.
 
 Given all of the above, Pino recommends out-of-process log processing.
@@ -63,7 +66,7 @@ For an example of this, see [pino-multi-stream][pinoms].
 
 ## Known Transports
 
-If you write a transport, let us know and we will add a link here!
+PR's to this document are welcome for any new transports!
 
 + [pino-couch](#pino-couch)
 + [pino-elasticsearch](#pino-elasticsearch)
@@ -79,7 +82,7 @@ If you write a transport, let us know and we will add a link here!
 [pino-couch][pino-couch] uploads each log line as a [CouchDB][CouchDB] document.
 
 ```sh
-$ node yourapp.js | pino-couch -U https://your-server -d mylogs
+$ node app.js | pino-couch -U https://couch-server -d mylogs
 ```
 
 [pino-couch]: https://github.com/IBM/pino-couch
@@ -95,30 +98,29 @@ to [Elasticsearch][elasticsearch], to be displayed in [Kibana][kibana].
 It is extremely simple to use and setup
 
 ```sh
-$ node yourapp.js | pino-elasticsearch
+$ node app.js | pino-elasticsearch
 ```
 
 Assuming Elasticsearch is running on localhost.
 
-If you wish to connect to an external elasticsearch instance (recommended for production):
+To connect to an external elasticsearch instance (recommended for production):
 
-* Check that you defined `network.host` in your `elasticsearch.yml` configuration file. See [elasticsearch Network Settings documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-network.html#common-network-settings) for more details.
+* Check that `network.host` is defined in the `elasticsearch.yml` configuration file. See [elasticsearch Network Settings documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-network.html#common-network-settings) for more details.
 * Launch:
 
 ```sh
-$ node yourapp.js | pino-elasticsearch --host 192.168.1.42
+$ node app.js | pino-elasticsearch --host 192.168.1.42
 ```
 
 Assuming Elasticsearch is running on `192.168.1.42`.
 
-If you wish to connect to AWS Elasticsearch:
+To connect to AWS Elasticsearch:
+
 ```sh
-$ node yourapp.js | pino-elasticsearch  --host https://your-url.us-east-1.es.amazonaws.com --port 443 -c ./aws_config.json
+$ node app.js | pino-elasticsearch  --host https://es-url.us-east-1.es.amazonaws.com --port 443 -c ./aws_config.json
 ```
 
-Then, head to your
-Kibana instance, and [create an index pattern](https://www.elastic.co/guide/en/kibana/current/setup.html) on `'pino'`,
-the default for `pino-elasticsearch`.
+Then [create an index pattern](https://www.elastic.co/guide/en/kibana/current/setup.html) on `'pino'` (the default index key for `pino-elasticsearch`) on the Kibana instance.
 
 [pino-elasticsearch]: https://github.com/pinojs/pino-elasticsearch
 [elasticsearch]: https://www.elastic.co/products/elasticsearch
@@ -126,26 +128,31 @@ the default for `pino-elasticsearch`.
 
 <a id="pino-mq"></a>
 ### pino-mq
-pino-mq will take all messages received on process.stdin and send them over a message bus using JSON serialization; this is more a transform for pino messages because you will need some processing on the other end of the queue(s) to process message and store them in a backend; it is useful for :
-* moving your backpressure from your application to broker
+
+The `pino-mq` transport will take all messages received on `process.stdin` and send them over a message bus using JSON serialization.
+
+This useful for:
+
+* moving backpressure from application to broker
 * transforming messages pressure to another component
 
 ```
 node app.js | pino-mq -u "amqp://guest:guest@localhost/" -q "pino-logs"
 ```
 
-or (recomended)
+Alternatively a configuration file can be used:
 
 ```
 node app.js | pino-mq -c pino-mq.json
 ```
 
-you can get a sample of configuration file by running:
+A base configuration file can be initialized with:
+
 ```
 pino-mq -g
 ```
 
-for full documentation of command line switches and pino-mq.json read [readme](https://github.com/itavy/pino-mq#readme)
+For full documentation of command line switches and configuration see [the `pino-mq` readme](https://github.com/itavy/pino-mq#readme)
 
 <a id="pino-redis"></a>
 ### pino-redis
@@ -153,7 +160,7 @@ for full documentation of command line switches and pino-mq.json read [readme](h
 [pino-redis][pino-redis] loads pino logs into [Redis][Redis].
 
 ```sh
-$ node yourapp.js | pino-redis -U redis://username:password@localhost:6379
+$ node app.js | pino-redis -U redis://username:password@localhost:6379
 ```
 
 [pino-redis]: https://github.com/buianhthang/pino-redis
@@ -171,26 +178,26 @@ As an example, use `socat` to fake a listener:
 $ socat -v udp4-recvfrom:6000,fork exec:'/bin/cat'
 ```
 
-And then run an application that uses `pino` for logging:
+Then run an application that uses `pino` for logging:
 
 ```sh
-$ node yourapp.js | pino-socket -p 6000
+$ node app.js | pino-socket -p 6000
 ```
 
-You should see the logs from your application on both consoles.
+Logs from the application should be observed on both consoles.
 
 [pino-socket]: https://www.npmjs.com/package/pino-socket
 
 #### Logstash
 
-You can also use [pino-socket][pino-socket] to upload logs to
+The [pino-socket][pino-socket] module can also be used to upload logs to
 [Logstash][logstash] via:
 
 ```
-$ node yourapp.js | pino-socket -a 127.0.0.1 -p 5000 -m tcp
+$ node app.js | pino-socket -a 127.0.0.1 -p 5000 -m tcp
 ```
 
-Assuming your logstash is running on the same host and configured as
+Assuming logstash is running on the same host and configured as
 follows:
 
 ```
@@ -213,22 +220,22 @@ output {
 }
 ```
 
-See https://www.elastic.co/guide/en/kibana/current/setup.html to learn
+See <https://www.elastic.co/guide/en/kibana/current/setup.html> to learn
 how to setup [Kibana][kibana].
 
-If you are a Docker fan, you can use
+For Docker users, see
 https://github.com/deviantony/docker-elk to setup an ELK stack.
 
 <a id="pino-syslog"></a>
 ### pino-syslog
 
-[pino-syslog][pino-syslog] is a transport, really a "transform," that converts
-*pino's* logs to [RFC3164][rfc3164] compatible log messages. *pino-syslog* does not
+[pino-syslog][pino-syslog] is a transforming transport that converts
+`pino` NDJSON logs to [RFC3164][rfc3164] compatible log messages. The `pino-syslog` module does not
 forward the logs anywhere, it merely re-writes the messages to `stdout`. But
-in combination with *pino-socket*, you can relay logs to a syslog server:
+when used in combination with `pino-socket` the log messages can be relayed to a syslog server:
 
 ```sh
-$ node yourapp.js | pino-syslog | pino-socket -a syslog.example.com
+$ node app.js | pino-syslog | pino-socket -a syslog.example.com
 ```
 
 Example output for the "hello world" log:

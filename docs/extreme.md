@@ -26,19 +26,19 @@ This has a couple of important caveats:
   + `SIGTERM`
 
   In all of these cases, except `SIGHUP`, the process is in a state that it
-  *must* terminate. Thus, if you do not register an `onTerminated` function when
-  constructing your Pino instance (see [pino#constructor](api.md#constructor)),
+  *must* terminate. Thus, if an `onTerminated` function isn't registered when
+  constructing a Pino instance (see [pino#constructor](api.md#constructor)),
   then Pino will invoke `process.exit(0)` when no error has occurred, or
-  `process.exit(1)` otherwise. If you do supply an `onTerminated` function, it
-  is left up to you to fully terminate the process.
+  `process.exit(1)` otherwise. If an `onTerminated` function is supplied, it 
+  us the responsibility of the `onTerminated` function to manually exit the process.
 
   In the case of `SIGHUP`, we will look to see if any other handlers are
   registered for the event. If not, we will proceed as we do with all other
   signals. If there are more handlers registered than just our own, we will
   simply flush the extreme mode buffer.
 
-So in summary, only use extreme mode if you're doing an extreme amount of
-logging, and you're happy in some scenarios to lose the most recent logs.
+So in summary, only use extreme mode when performing an extreme amount of
+logging and it is acceptable to potentially lose the most recent logs.
 
 ## Usage
 
@@ -67,3 +67,6 @@ buffering.
 In case a synchronous flush is needed, `dest.flushSync()` can be called.
 This method might cause some data loss if a write was already in
 progress, so use it only if truly needed.
+
+* See [`pino.extreme` api](/docs/api.md#pino-extreme)
+* See [`destination` parameter](/docs/api.md#destination)

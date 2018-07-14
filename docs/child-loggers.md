@@ -53,8 +53,8 @@ benchPinoExtremeChildChild*10000: 127.753ms
 It's possible for naming conflicts to arise between child loggers and
 children of child loggers.
 
-This isn't as bad as it sounds, even if you do use the same keys between
-parent and child loggers Pino resolves the conflict in the sanest way.
+This isn't as bad as it sounds, even if the same keys between
+parent and child loggers are used, Pino resolves the conflict in the sanest way.
 
 For example, consider the following:
 

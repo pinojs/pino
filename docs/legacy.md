@@ -100,6 +100,8 @@ $ npm install -g pino-pretty
 $ node app.js | pino-pretty
 ``` 
 
+* See [Pretty Printing documentation](/docs/pretty.md)
+ 
 #### Programmatic Pretty Printing
 
 The [`pino.pretty()`](https://github.com/pinojs/pino/blob/v4.x.x/docs/API.md#prettyoptions)
@@ -130,6 +132,7 @@ npm install --save-dev pino-pretty
 ``` 
 
 * See [prettyPrint option](/docs/api.md#prettyPrint)
+* See [Pretty Printing documentation](/docs/pretty.md)
 
 #### Slowtime
 

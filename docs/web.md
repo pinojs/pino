@@ -86,7 +86,7 @@ async function start () {
       // request.log is HAPI standard way of logging
       request.log(['a', 'b'], 'Request into hello world')
  
-      // you can also use a pino instance, which will be faster
+      // a pino instance can also be used, which will be faster
       request.logger.info('In handler %s', request.path)
  
       return 'hello world'
