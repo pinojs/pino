@@ -62,7 +62,7 @@ will be written to the destination stream.
 > the prettifier instead. Prettified logs are not easily parsed and cannot
 > be easily investigated at a later date.
 
-1. Install a prettifier module as a separate dependency, e.g. `npm install --save pino-pretty`.
+1. Install a prettifier module as a separate dependency, e.g. `npm install pino-pretty`.
 1. Instantiate the logger with pretty printing enabled:
   ```js
   const pino = require('pino')

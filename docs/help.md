@@ -110,7 +110,7 @@ and preload it with the `-r` flag, enabling any `debug` logs with the
 `DEBUG` environment variable:
 
 ```sh
-$ npm i --save pino-debug
+$ npm i pino-debug
 $ DEBUG=* node -r pino-debug app.js
 ```
 

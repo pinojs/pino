@@ -21,7 +21,7 @@
 ## Install
 
 ```
-$ npm install pino --save
+$ npm install pino
 ```
 
 ## Usage

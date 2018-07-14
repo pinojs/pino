@@ -34,7 +34,7 @@ See the [fastify documentation](https://www.npmjs.com/package/pino-http#pinohttp
 ## Pino with Express
 
 ```sh
-npm install --save express-pino-logger
+npm install  express-pino-logger
 ```
 
 ```js
@@ -57,7 +57,7 @@ See the [express-pino-logger readme](http://npm.im/express-pino-logger) for more
 ## Pino with Hapi
 
 ```sh
-npm install --save hapi-pino
+npm install  hapi-pino
 ```
 
 ```js
@@ -101,7 +101,7 @@ See the [hapi-pino readme](http://npm.im/hapi-pino) for more info.
 ## Pino with Restify
 
 ```sh
-npm install --save restify-pino-logger
+npm install  restify-pino-logger
 ```
 
 ```js
@@ -126,7 +126,7 @@ See the [restify-pino-logger readme](http://npm.im/restify-pino-logger) for more
 ### Koa
 
 ```sh
-npm install --save koa-pino-logger
+npm install  koa-pino-logger
 ```
 
 ```js
@@ -150,7 +150,7 @@ See the [koa-pino-logger readme](https://github.com/pinojs/koa-pino-logger) for 
 ## Pino with Node core `http`
 
 ```sh
-npm install --save pino-http
+npm install  pino-http
 ```
 
 ```js
