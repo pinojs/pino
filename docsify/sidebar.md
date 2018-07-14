@@ -9,6 +9,7 @@
 * [Extreme Mode](/docs/extreme.md)
 * [Ecosystem](/docs/ecosystem.md)
 * [Benchmarks](/docs/benchmarks.md)
+* [Legacy](/docs/legacy.md)
 * [Help](/docs/help.md)
   * [Log Rotation](/docs/help.md#rotate)
   * [Multiple Files](/docs/help.md#multiple)

@@ -16,6 +16,7 @@
 * [Pretty Printing ⇗](/docs/pretty.md)
 * [Extreme Mode ⇗](/docs/extreme.md)
 * [Ecosystem ⇗](/docs/ecosystem.md)
+* [Legacy](/docs/legacy.md)
 * [Help ⇗](/docs/help.md)
 
 ## Install

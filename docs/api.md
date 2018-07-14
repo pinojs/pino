@@ -173,6 +173,7 @@ then exit the process.
 
 * See [Extreme mode ⇗](/docs/extreme.md)
 
+<a id=prettyPrint></a>
 #### `prettyPrint` (Boolean|Object)
 
 Default: `false`
@@ -196,7 +197,7 @@ Browser only, may have `asObject` and `write` keys
 * See [Browser API](/docs/browser.md)
 
 <a id="destination"></a>
-### `destination` (WritableStream)
+### `destination` (SonicBoom | WritableStream)
 
 Default: `pino.destination(1)` (STDOUT)
 
@@ -614,7 +615,7 @@ will be `process.stdout.fd`.
 
 The default `stream` is a destination.
 
-`pino.destination()` is implemented on [`sonic-boom`](https://github.com/mcollina/sonic-boom).
+`pino.destination()` is implemented on [`sonic-boom`  ⇗]](https://github.com/mcollina/sonic-boom).
 
 <a id="pino-extreme"></a>
 ### `pino.extreme([dest]) => SonicBoom`
