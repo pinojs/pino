@@ -30,7 +30,7 @@ This has a couple of important caveats:
   constructing a Pino instance (see [pino#constructor](api.md#constructor)),
   then Pino will invoke `process.exit(0)` when no error has occurred, or
   `process.exit(1)` otherwise. If an `onTerminated` function is supplied, it 
-  us the responsibility of the `onTerminated` function to manually exit the process.
+  is the responsibility of the `onTerminated` function to manually exit the process.
 
   In the case of `SIGHUP`, we will look to see if any other handlers are
   registered for the event. If not, we will proceed as we do with all other
