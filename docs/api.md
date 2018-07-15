@@ -14,7 +14,6 @@
   * [logger.flush()](#flush)
   * [logger.level](#level)
   * [logger.isLevelEnabled()](#islevelenabled)
-  * [logger.addLevel()](#addlevel)
   * [logger.levels](#levels)
   * [Event: 'level-change'](#level-change)
   * [logger.version](#version)
@@ -50,10 +49,8 @@ Default: `'info'`
 
 One of `'fatal'`, `'error'`, `'warn'`, `'info`', `'debug'`, `'trace'` or `silent`.
  
-Additional levels can be added to the instance via the `logger.addLevel` method or 
-at instantiation time with the `customLevels` property. 
+Additional levels can be added to the instance via the `customLevels` option. 
 
-* See [`logger.addLevel`](#addLevel)
 * See [`customLevels` option](#opt-customlevels)
 
 <a id=opt-customlevels></a>
@@ -509,24 +506,6 @@ The given level to check against:
 ```js
 if (logger.isLevelEnabled('debug')) logger.debug('conditional log')
 ```
-
-<a id="addlevel"></a>
-### `logger.addLevel(levelLabel, levelValue) => Boolean`
-
-Defines a new level on the logger instance.
-
-If the level name or value already exist the `addLevel` function will throw.
-
-```js
-logger.addLevel('myLevel', 35)
-logger.myLevel('a message')
-// {"level":35,"time":1531261498686,"msg":"a message","pid":67930,"hostname":"x","v":1}
-```
-
-When using this method, the current level of the logger instance does not change.
-To do so, use the [loggerlevel](#level) property after adding the custom level.
-
-* See [`logger.level`](#level)
 
 #### `levelLabel` (String)
 
