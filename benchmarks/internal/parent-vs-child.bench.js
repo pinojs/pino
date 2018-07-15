@@ -9,9 +9,9 @@ const childChild = child.child({})
 const childChildChild = childChild.child({})
 const childChildChildChild = childChildChild.child({})
 const child2 = base.child({})
-const baseSerializers = pino({serializers: {err: () => {}}}, pino.destination('/dev/null'))
+const baseSerializers = pino(pino.destination('/dev/null'))
 const baseSerializersChild = baseSerializers.child({})
-const baseSerializersChildSerializers = baseSerializers.child({serializers: {err: () => {}}})
+const baseSerializersChildSerializers = baseSerializers.child({})
 
 const max = 100
 

@@ -8,7 +8,7 @@ const redaction = require('./lib/redaction')
 const time = require('./lib/time')
 const proto = require('./lib/proto')
 const symbols = require('./lib/symbols')
-const { setLevelState, mappings } = require('./lib/levels')
+const { mappings, genLsCache, assertNoLevelCollisions } = require('./lib/levels')
 const { createArgsNormalizer, asChindings } = require('./lib/tools')
 const { version, LOG_VERSION } = require('./lib/meta')
 const {
@@ -19,6 +19,7 @@ const {
   streamSym,
   stringifySym,
   stringifiersSym,
+  setLevelSym,
   endSym,
   formatOptsSym,
   onTerminatedSym,
@@ -39,8 +40,8 @@ const defaultOptions = {
   timestamp: epochTime,
   onTerminated: (evt, err) => err ? exit(1) : exit(0),
   name: undefined,
-  levelVal: undefined,
-  redact: null
+  redact: null,
+  customLevels: null
 }
 
 const normalize = createArgsNormalizer(defaultOptions)
@@ -58,8 +59,10 @@ function pino (...args) {
     base,
     name,
     level,
-    levelVal
+    customLevels
   } = opts
+
+  assertNoLevelCollisions(pino.levels, customLevels)
 
   const stringify = safe ? stringifySafe : JSON.stringify
   const stringifiers = redact ? redaction(redact, stringify) : {}
@@ -78,7 +81,9 @@ function pino (...args) {
     ? coreChindings(base) : coreChindings(Object.assign({}, base, { name }))
   const time = (timestamp instanceof Function)
     ? timestamp : (timestamp ? epochTime : nullTime)
-  const levels = mappings()
+
+  const levels = mappings(customLevels)
+
   const instance = {
     levels,
     [streamSym]: stream,
@@ -94,8 +99,11 @@ function pino (...args) {
   }
   Object.setPrototypeOf(instance, proto)
 
+  if (customLevels) genLsCache(instance)
+
   events(instance)
-  setLevelState(instance, level, levelVal)
+
+  instance[setLevelSym](level)
 
   return instance
 }

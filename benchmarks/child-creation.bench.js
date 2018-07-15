@@ -5,8 +5,7 @@ const pino = require('../')
 const bunyan = require('bunyan')
 const bole = require('bole')('bench')
 const fs = require('fs')
-const dest = fs.createWriteStream('/dev/null')
-const plog = pino(dest)
+const plog = pino(pino.destination(('/dev/null')))
 delete require.cache[require.resolve('../')]
 const plogExtreme = require('../')(pino.extreme('/dev/null'))
 
@@ -15,13 +14,13 @@ const blog = bunyan.createLogger({
   name: 'myapp',
   streams: [{
     level: 'trace',
-    stream: dest
+    stream: fs.createWriteStream('/dev/null')
   }]
 })
 
 require('bole').output({
   level: 'info',
-  stream: dest
+  stream: fs.createWriteStream('/dev/null')
 }).setFastTime(true)
 
 const run = bench([
