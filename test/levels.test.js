@@ -146,16 +146,6 @@ test('silent level', async ({fail}) => {
   })
 })
 
-test('silent is a noop', async ({fail}) => {
-  const instance = pino({
-    level: 'silent'
-  }, sink((result, enc) => {
-    fail('no data should be logged')
-  }))
-
-  instance['silent']('hello world')
-})
-
 test('set silent via Infinity', async ({fail}) => {
   const instance = pino({
     level: Infinity
@@ -166,22 +156,6 @@ test('set silent via Infinity', async ({fail}) => {
   Object.keys(pino.levels.values).forEach((level) => {
     instance[level]('hello world')
   })
-})
-
-test('silent stays a noop after level changes', async ({is, isNot, fail}) => {
-  const noop = require('../lib/tools').noop
-  const instance = pino({
-    level: 'silent'
-  }, sink((result, enc) => {
-    fail('no data should be logged')
-  }))
-
-  instance.level = 'trace'
-  isNot(instance[instance.level], noop)
-
-  instance.level = 'silent'
-  instance['silent']('hello world')
-  is(instance[instance.level], noop)
 })
 
 test('exposed levels', async ({same}) => {
