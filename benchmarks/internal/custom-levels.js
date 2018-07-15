@@ -61,14 +61,6 @@ const run = bench([
       child.foo({ hello: 'world' })
     }
     setImmediate(cb)
-  },
-  function benchPinoChildCreationAddLevel (cb) {
-    const child = base.child({})
-    child.addLevel('foo', 31)
-    for (var i = 0; i < max; i++) {
-      child.foo({ hello: 'world' })
-    }
-    setImmediate(cb)
   }
 ], 10000)
 

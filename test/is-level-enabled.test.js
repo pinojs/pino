@@ -33,8 +33,10 @@ test('can check if child has current level enabled', async ({is}) => {
 })
 
 test('can check if custom level is enabled', async ({is}) => {
-  const log = pino({level: 'debug'})
-  log.addLevel('foo', 35)
+  const log = pino({
+    customLevels: {foo: 35},
+    level: 'debug'
+  })
   is(true, log.isLevelEnabled('foo'))
   is(true, log.isLevelEnabled('error'))
   is(false, log.isLevelEnabled('trace'))
