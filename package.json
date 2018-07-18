@@ -28,7 +28,8 @@
     "bench-longs-tring": "node benchmarks/utils/runbench long-string",
     "bench-child": "node benchmarks/utils/runbench child",
     "bench-child-child": "node benchmarks/utils/runbench child-child",
-    "bench-child-creation": "node benchmarks/utils/runbench child-creation"
+    "bench-child-creation": "node benchmarks/utils/runbench child-creation",
+    "update-bench-doc": "node benchmarks/utils/generate-benchmark-doc > docs/benchmarks.md"
   },
   "bin": {
     "pino": "./bin.js"
