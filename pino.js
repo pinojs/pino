@@ -82,13 +82,13 @@ function pino (...args) {
   const time = (timestamp instanceof Function)
     ? timestamp : (timestamp ? epochTime : nullTime)
 
-  const extreme = stream.minLength === 4096
+  const isSonic = stream instanceof SonicBoom
   const levels = mappings(customLevels)
 
   const instance = {
     levels,
-    flush: extreme ? flush : noop,
-    flushSync: extreme ? flushSync : noop,
+    flush: isSonic ? flush : noop,
+    flushSync: isSonic ? flushSync : noop,
     [streamSym]: stream,
     [timeSym]: time,
     [stringifySym]: stringify,

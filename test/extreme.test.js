@@ -120,11 +120,6 @@ test('throw an error if extreme is passed', async ({throws}) => {
   })
 })
 
-test('flush is a no-op with non-extreme destinations', async ({is}) => {
-  const instance = require('..')()
-  is(instance.flush.toString(), 'function noop () {}')
-})
-
 test('logger.flush calls dest.flush on extreme destinations', async ({pass, fail}) => {
   const dest = pino.extreme()
   var passed = false
@@ -137,11 +132,6 @@ test('logger.flush calls dest.flush on extreme destinations', async ({pass, fail
   }
   const instance = require('..')(dest)
   instance.flush()
-})
-
-test('flushSync is a no-op with non-extreme destinations', async ({is}) => {
-  const instance = require('..')()
-  is(instance.flushSync.toString(), 'function noop () {}')
 })
 
 test('logger.flushSync calls dest.flushSync on extreme destinations', async ({pass, fail}) => {
