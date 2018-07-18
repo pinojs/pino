@@ -19,11 +19,17 @@ in cases of error.
 Writing to a Node.js stream on exit is not necessarily guaranteed, and naively writing
 to an Extreme Mode logger on exit will definitely lead to lost logs. 
 
-To write logs in an exit handler, create the handler with `pino.final`:
+To write logs in an exit handler, create the handler with [`pino.final`](/docs/api.md#pino-final):
 
 ```js
 process.on('uncaughtException', pino.final(logger, (err, finalLogger) => {
-  finalLogger.error(err)
+  finalLogger.error(err, 'uncaughtException')
+  process.exit(1)
+}))
+
+process.on('unhandledRejection', pino.final(logger, (err, finalLogger) => {
+  finalLogger.error(err, 'unhandledRejection')
+  process.exit(1)
 }))
 ```
 
