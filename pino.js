@@ -9,7 +9,7 @@ const time = require('./lib/time')
 const proto = require('./lib/proto')
 const symbols = require('./lib/symbols')
 const { mappings, genLsCache, assertNoLevelCollisions } = require('./lib/levels')
-const { createArgsNormalizer, asChindings } = require('./lib/tools')
+const { createArgsNormalizer, asChindings, flush, flushSync, noop } = require('./lib/tools')
 const { version, LOG_VERSION } = require('./lib/meta')
 const {
   chindingsSym,
@@ -82,10 +82,13 @@ function pino (...args) {
   const time = (timestamp instanceof Function)
     ? timestamp : (timestamp ? epochTime : nullTime)
 
+  const isSonic = stream instanceof SonicBoom
   const levels = mappings(customLevels)
 
   const instance = {
     levels,
+    flush: isSonic ? flush : noop,
+    flushSync: isSonic ? flushSync : noop,
     [streamSym]: stream,
     [timeSym]: time,
     [stringifySym]: stringify,
@@ -98,7 +101,6 @@ function pino (...args) {
     [chindingsSym]: chindings
   }
   Object.setPrototypeOf(instance, proto)
-
   if (customLevels) genLsCache(instance)
 
   events(instance)
