@@ -1,626 +1,615 @@
-# Table of Contents
+# API 
 
-+ [pino](#constructor)
-+ [Logger Instance](#logger)
-  * [.pino](#version)
-  * [.child](#child)
-  * [.level](#level)
-  * [.fatal](#fatal)
-  * [.error](#error)
-  * [.warn](#warn)
-  * [.info](#info)
-  * [.debug](#debug)
-  * [.trace](#trace)
-  * [.flush](#flush)
-  * [.addLevel](#addLevel)
-  * [.levelVal](#levelVal)
-  * [level-change (event)](#level-change)
-  * [.levels.values](#levelValues)
-  * [.levels.labels](#levelLabels)
-  * [.isLevelEnabled](#isLevelEnabled)
-  * [LOG_VERSION](#log_version)
-  * [.stdSerializers](#stdSerializers)
-    + [.req](#reqSerializer)
-    + [.res](#resSerializer)
-    + [.err](#errSerializer)
-    + [.wrapRequestSerializer](#wrapReq)
-    + [.wrapResponseSerializers](#wrapRes)
-  + [.stdTimeFunctions](#stdTimeFunctions)
-    + [.epochTime](#epochTimeFunction)
-    + [.unixTime](#unixTimeFunction)
-    + [.nullTime](#nullTimeFunction)
-* [.destination](#destination)
-* [.extreme](#extreme)
-+ [Metadata Support](#metadata)
+* [pino() => logger](#export)
+  * [options](#options)
+  * [destination](#destination)
+* [Logger Instance](#logger)
+  * [logger.trace()](#trace)
+  * [logger.debug()](#debug)
+  * [logger.info()](#info)
+  * [logger.warn()](#warn)
+  * [logger.error()](#error)
+  * [logger.fatal()](#fatal)
+  * [logger.child()](#child)
+  * [logger.flush()](#flush)
+  * [logger.level](#level)
+  * [logger.isLevelEnabled()](#islevelenabled)
+  * [logger.levels](#levels)
+  * [Event: 'level-change'](#level-change)
+  * [logger.version](#version)
+  * [logger.LOG_VERSION](#log_version)
+* [Statics](#statics)
+  * [pino.destination()](#pino-destination)
+  * [pino.extreme()](#pino-extreme)
+  * [pino.stdSerializers](#pino-stdserializers)
+  * [pino.stdTimeFunctions](#pino-stdtimefunctions)
+  * [pino.symbols](#pino-symbols)
+  * [pino.version](#pino-version)
+  * [pino.LOG_VERSION](#pino-LOG_VERSION)
 
-# module.exports
+<a id="export"></a>
+## `pino([options], [destination]) => logger`
 
-<a id="constructor"></a>
-## pino([options], [stream])
+The exported `pino` function takes two optional arguments,
+[`options`](#options) and [`destination`](#destination) and
+returns a [logger instance](#logger).
 
-### Parameters:
-+ `options` (object):
-  * `safe` (boolean): avoid error caused by circular references in the object tree.
-    Default: `true`.
-  * `name` (string): the name of the logger. Default: `undefined`.
-  * `serializers` (object): an object containing functions for custom serialization
-    of objects. These functions should return an JSONifiable object and they
-    should never throw. When logging an object, each top-level property matching the exact key of a serializer
-    will be serialized using the defined serializer. Alternatively, it is possible to register a serializer under the key `Symbol.for('pino.*')` which will act upon the complete log object, i.e. every property.
-  * `redact` (array|object): As an array, the `redact` option specifies paths that should 
-     have their values redacted from any log output. Each path must be a string, and the syntax
-     for declaring paths corresponds to JavaScript dot and bracket notation. 
-     See the [redaction](redaction.md) documentation for examples and more information.
-     **WARNING**: Never allow user input to define redacted paths. See [fast-redact#caveat](http://github.com/davidmarkclements/fast-redact#caveat) for details.
-     If an object is supplied, three options can be specified: 
-     * `paths` (array): Required. An array of paths
-     * `censor` (string): Optional. A value to overwrite key which are to be redacted. Default: `'[Redacted]'` 
-     * `remove` (boolean): Optional. Instead of censoring the value, remove both the key and the value. Default: `false`
-  * `timestamp` (boolean|function): Enables or disables the inclusion of a timestamp in the
-    log message. If a function is supplied, it must synchronously return a JSON string
-    representation of the time, e.g. `,"time":1493426328206` (which is the default).
-    If set to `false`, no timestamp will be included in the output.
-    See [stdTimeFunctions](#stdTimeFunctions) for a set of available functions
-    for passing in as a value for this option. Caution: any sort of formatted
-    time will significantly slow down Pino's performance.
-  * `level` (string): one of `'fatal'`, `'error'`, `'warn'`, `'info`', `'debug'`,
-    `'trace'`; also `'silent'` is supported to disable logging. Any other value
-    defines a custom level and requires supplying a level value via `levelVal`.
-    Default: 'info'.
-  * `levelVal` (integer): when defining a custom log level via `level`, set to an
-    integer value to define the new level. Default: `undefined`.
-  * `messageKey` (string): the string key for the 'message' in the JSON object. Default `msg`.
-  * `prettyPrint` (boolean|object): enables pretty printing log logs. This is intended for non-production
-    configurations. This may be set to a configuration object as outlined in the
-    [`pino-pretty` documentation](https://github.com/pinojs/pino-pretty).
-    The options object may additionally contain a `prettifier` property to define
-    which prettifier module to use. When not present, `prettifier` defaults to
-    `'pino-pretty'`. Regardless of the value, the specified prettifier module
-    must be installed as a separate dependency. Default: `false`.
-  * `onTerminated` (function): this function will be invoked during process shutdown when `extreme` is set to `true`.
-    The signature of the function is `onTerminated(eventName, err)`. If you do not specify a function, Pino will
-    invoke `process.exit(0)` when no error has occurred, and `process.exit(1)` otherwise. If you do specify a function,
-    it is up to you to terminate the process; you **must** perform only synchronous operations at this point.
-    See [Extreme mode explained](extreme.md) for more detail.
-  * `enabled` (boolean): enables logging. Default: `true`
-  * `browser` (Object): browser only, may have `asObject` and `write` keys, see [Pino in the Browser](/README.md#browser)
-  * `base` (Object): key-value object added as child logger to each log line. If set to `null` the `base` child logger is not added . Default:
-    * `pid` (process.pid)
-    * `hostname` (os.hostname)
-    * `name` of logger if supplied as option
-  * `crlf` (boolean): logs newline delimited JSON with `\r\n` instead of `\n`. Default: `false`.
-+ `stream` (Writable): a writable stream where the logs will be written.
-  It can also receive some log-line [metadata](#metadata), if the
-  relative protocol is enabled. Default: `process.stdout`
+<a id=options></a>
+### `options` (Object)
 
-### Example:
+#### `name` (String)
+
+Default: `undefined`
+
+The name of the logger. When set adds a `name` field to every JSON line logged.
+
+#### `level` (String)
+
+Default: `'info'`
+
+One of `'fatal'`, `'error'`, `'warn'`, `'info`', `'debug'`, `'trace'` or `silent`.
+ 
+Additional levels can be added to the instance via the `customLevels` option. 
+
+* See [`customLevels` option](#opt-customlevels)
+
+<a id=opt-customlevels></a>
+#### `customLevels` (Object)
+
+Default: `undefined`
+
+Use this option to define additional logging levels.
+The keys of the object correspond the namespace of the log level, 
+and the values should be the numerical value of the level. 
+
 ```js
-'use strict'
-
-var pino = require('pino')
-var logger = pino({
-  name: 'myapp',
-  safe: true,
-  serializers: {
-    req: pino.stdSerializers.req,
-    res: pino.stdSerializers.res
+const logger = pino({
+  customLevels: {
+    foo: 35
   }
 })
+logger.foo('hi')
 ```
-### Discussion:
-Returns a new [logger](#logger) instance.
+
+#### `redact` (Array | Object): 
+
+Default: `undefined`
+
+As an array, the `redact` option specifies paths that should 
+have their values redacted from any log output. 
+
+Each path must be a string using a syntax which corresponds to JavaScript dot and bracket notation.
+
+If an object is supplied, three options can be specified: 
+  * `paths` (array): Required. An array of paths
+  * `censor` (String): Optional. A value to overwrite key which are to be redacted. Default: `'[Redacted]'` 
+  * `remove` (Boolean): Optional. Instead of censoring the value, remove both the key and the value. Default: `false`
+
+**WARNING**: Never allow user input to define redacted paths.
+
+* See the [redaction ⇗](/docs/redaction.md) documentation.
+* See [fast-redact#caveat ⇗](http://github.com/davidmarkclements/fast-redact#caveat)
+
+<a id=opt-serializers></a>
+#### `serializers` (Object)
+
+Default: `{err: pino.stdSerializers.err}`
+
+An object containing functions for custom serialization of objects.
+These functions should return an JSONifiable object and they
+should never throw. When logging an object, each top-level property 
+matching the exact key of a serializer will be serialized using the defined serializer.
+
+* See [pino.stdSerializers](#pino-stdserializers)
+
+##### `serializers[Symbol.for('pino.*')]` (Function)
+
+Default: `undefined`
+
+The `serializers` object may contain a key which is the global symbol: `Symbol.for('pino.*')`. 
+This will act upon the complete log object rather than corresponding to a particular key.
+
+#### `base` (Object)
+
+Default: `{pid: process.pid, hostname: os.hostname}`
+
+Key-value object added as child logger to each log line. 
+
+Set to `null` to avoid adding `pid` and `hostname` properties to each log.
+
+#### `enabled` (Boolean) 
+
+Default: `true`
+
+Set to `false` to disable logging.
+
+#### `safe` (Boolean)
+
+Default: `true`
+
+Avoid throwing caused by circular references in the object tree.
+
+#### `crlf` (Boolean)
+
+Default: `false`
+
+Set to `true` to logs newline delimited JSON with `\r\n` instead of `\n`.
+
+<a id=opt-timestamp></a>
+#### `timestamp` (Boolean | Function)
+
+Default: `true`
+
+Enables or disables the inclusion of a timestamp in the
+log message. If a function is supplied, it must synchronously return a JSON string
+representation of the time, e.g. `,"time":1493426328206` (which is the default).
+
+If set to `false`, no timestamp will be included in the output.
+See [stdTimeFunctions](#pino-stdtimefunctions) for a set of available functions
+for passing in as a value for this option. 
+
+**Caution**: attempting to format time in-process will significantly impact logging performance.
+
+<a id=opt-messagekey></a>  
+#### `messageKey` (String)
+
+Default: `'msg'`
+
+The string key for the 'message' in the JSON object. 
+
+<a id=onterminated></a>
+#### `onTerminated` (Function)
+
+Default: `(evt, err) => err ? process.exit(1) : process.exit(0)`
+
+This function will be invoked during process shutdown when 
+the supplied destination is an instance of [`pino.extreme`](#pino-extreme)
+
+The signature of the function is `onTerminated(eventName, err)`. 
+
+By default, when `pino.extreme` is used, the `onTerminated` function 
+is set to call `process.exit(1)` on error or else `process.exit(0)`. 
+
+If a function is specified it **must** perform only synchronous operations 
+at this point and then exit the process (there are no ticks left for 
+asynchronous activity at this point in the process lifetime).
+
+* See [pino.extreme](#pino-extreme)
+* See [Extreme mode ⇗](/docs/extreme.md)
+
+<a id=prettyPrint></a>
+#### `prettyPrint` (Boolean | Object)
+
+Default: `false`
+
+Enables pretty printing log logs. This is intended for non-production
+configurations. This may be set to a configuration object as outlined in the
+[`pino-pretty` documentation](https://github.com/pinojs/pino-pretty).
+
+The options object may additionally contain a `prettifier` property to define
+which prettifier module to use. When not present, `prettifier` defaults to
+`'pino-pretty'`. Regardless of the value, the specified prettifier module
+must be installed as a separate dependency:
+
+```sh
+npm install pino-pretty
+```
+
+#### `browser` (Object)
+
+Browser only, may have `asObject` and `write` keys. This option is separately 
+documented in the [Browser API ⇗](/docs/browser.md) documentation.
+
+* See [Browser API ⇗](/docs/browser.md)
+
+<a id="destination"></a>
+### `destination` (SonicBoom | WritableStream)
+
+Default: `pino.destination(1)` (STDOUT)
+
+The `destination` parameter, at a minimum must be an object with a `write` method.
+An ordinary Node.js `stream` can be passed as the destination (such as the result
+of `fs.createWriteStream`) but for peak log writing performance it is strongly 
+recommended to use `pino.destination` or `pino.extreme` to create the destination stream.
+
+```js
+// pino.destination(1) by default
+const stdoutLogger = require('pino')()
+
+// destination param may be in first position when no options:
+const fileLogger = require('pino')( pino.destination('/log/path'))
+
+// use the stderr file handle to log to stderr: 
+const opts = {name: 'my-logger'}
+const stderrLogger = require('pino')(opts, pino.destination(2))
+
+```
+
+* See [`pino.destination`](#pino-destination) 
+* See [`pino.extreme`](#pino-extreme) 
+
+#### `destination[Symbol.for('pino.metadata')]`
+
+Default: `false`
+
+Using the global symbol `Symbol.for('pino.metadata')` as a key on the `destination` parameter and 
+setting the key it to `true`, indicates that the following properties should be 
+set on the `destination` object after each log line is written:
+
+* the last logging level as `destination.lastLevel`
+* the last logging message as `destination.lastMsg`
+* the last logging object as `destination.lastObj`
+* the last time as `destination.lastTime`, which will be the partial string returned
+  by the time function.
+* the last logger instance as `destination.lastLogger` (to support child
+  loggers)
+
+For a full reference for using `Symbol.for('pino.metadata')`, see the [`pino-multi-stream` ⇗](https://github.com/pinojs/pino-multi-stream)
+module. 
+
+The following is a succinct usage example: 
+
+```js
+const dest = pino.destination('/dev/null')
+dest[Symbol.for('pino.metadata')] = true
+const logger = pino(dest)
+logger.info({a: 1}, 'hi')
+const { lastMsg, lastLevel, lastObj, lastTime} = dest
+console.log(
+  'Logged message "%s" at level %d with object %o at time %s', 
+  lastMsg, lastLevel, lastObj, lastTime
+) // Logged message "hi" at level 30 with object { a: 1 } at time 1531590545089
+```
+
+* See [`pino-multi-stream` ⇗](https://github.com/pinojs/pino-multi-stream)
 
 <a id="logger"></a>
-# Logger
+## Logger Instance
 
-<a id="version"></a>
-## .pino
+The logger instance is the object returned by the main exported
+[`pino`](#export) function.
 
-Exposes the current version of Pino.
+The primary purpose of the logger instance is to provide logging methods.
 
-### Example:
+The default logging methods are `trace`, `debug`, `info`, `warn`, and `fatal`. 
+
+Each logging method has the following signature: 
+`([mergingObject], [message], [...interpolationValues])`.
+
+The parameters are explained below using the `logger.info` method but the same applies to all logging methods.
+
+### Logging Method Parameters
+
+<a id=mergingobject></a>
+#### `mergingObject` (Object)
+
+An object can optionally be supplied as the first parameter. Each enumerable key and value 
+of the `mergingObject` is copied in to the JSON log line.
+
 ```js
-var log = require('pino')()
-if ('pino' in child) console.log(`pino version: ${log.pino}`)
+logger.info({MIX: {IN: true}})
+// {"level":30,"time":1531254555820,"pid":55956,"hostname":"x","MIX":{"IN":true},"v":1}
 ```
+
+<a id=message></a>
+#### `message` (String)
+
+A `message` string can optionally be supplied as the first parameter, or 
+as the second parameter after supplying a `mergingObject`.
+
+By default, the contents of the `message` parameter will be merged into the 
+JSON log line under the `msg` key:
+
+```js
+logger.info('hello world')
+// {"level":30,"time":1531257112193,"msg":"hello world","pid":55956,"hostname":"x","v":1}
+```
+
+The `message` parameter takes precedence over the `mergedObject`.
+That is, if a `mergedObject` contains a `msg` property, and a `message` parameter 
+is supplied in addition, the `msg` property in the output log will be the value of 
+the `message` parameter not the value of the `msg` property on the `mergedObject`.
+
+The `messageKey` option can be used at instantiation time to change the namespace
+from `msg` to another string as preferred.
+ 
+The `message` string may contain a printf style string with support for 
+the following placeholders: 
+
+* `%s` – string placeholder 
+* `%d` – digit placeholder)
+* `%O`, `%o` and `%j` – object placeholder
+
+Values supplied as additional arguments to the logger method will
+then be interpolated accordingly. 
+
+* See [`messageKey` pino option](#opt-messagekey)
+* See [`...interpolationValues` log method parameter](#interpolationvalues)
+
+<a id=interpolationvalues></a>
+#### `...interpolationValues` (Any)
+
+All arguments supplied after `message` are serialized and interpolated according 
+to any supplied printf-style placeholders (`%s`, `%d`, `%o`|`%O`|`%j`)
+or else concatenated together with the `message` string to form the final
+output `msg` value for the JSON log line.
+
+```js
+logger.info('hello', 'world')
+// {"level":30,"time":1531257618044,"msg":"hello world","pid":55956,"hostname":"x","v":1}
+```
+
+```js
+logger.info('hello', {worldly: 1})
+// {"level":30,"time":1531257797727,"msg":"hello {\"worldly\":1}","pid":55956,"hostname":"x","v":1}
+```
+
+```js
+logger.info('%o hello', {worldly: 1})
+// {"level":30,"time":1531257826880,"msg":"{\"worldly\":1} hello","pid":55956,"hostname":"x","v":1}
+```
+
+* See [`message` log method parameter](#message)
+
+<a id="trace"></a>
+### `logger.trace([mergingObject], [message], [...interpolationValues])`
+
+Write a `'trace'` level log, if the configured [`level`](#level) allows for it.
+
+* See [`mergingObject` log method parameter](#mergingobject)
+* See [`message` log method parameter](#message)
+* See [`...interpolationValues` log method parameter](#interpolationvalues)
+
+<a id="debug"></a>
+### `logger.debug([mergingObject], [message], [...interpolationValues])`
+
+Write a `'debug'` level log, if the configured `level` allows for it.
+
+* See [`mergingObject` log method parameter](#mergingobject)
+* See [`message` log method parameter](#message)
+* See [`...interpolationValues` log method parameter](#interpolationvalues)
+
+<a id="info"></a>
+### `logger.info([mergingObject], [message], [...interpolationValues])`
+
+Write an `'info'` level log, if the configured `level` allows for it.
+
+* See [`mergingObject` log method parameter](#mergingobject)
+* See [`message` log method parameter](#message)
+* See [`...interpolationValues` log method parameter](#interpolationvalues) 
+
+<a id="warn"></a>
+### `logger.warn([mergingObject], [message], [...interpolationValues])`
+
+Write a `'warn'` level log, if the configured `level` allows for it.
+
+* See [`mergingObject` log method parameter](#mergingobject)
+* See [`message` log method parameter](#message)
+* See [`...interpolationValues` log method parameter](#interpolationvalues)
+
+<a id="error"></a>
+### `logger.error([mergingObject], [message], [...interpolationValues])`
+
+Write a `'error'` level log, if the configured `level` allows for it.
+
+* See [`mergingObject` log method parameter](#mergingobject)
+* See [`message` log method parameter](#message)
+* See [`...interpolationValues` log method parameter](#interpolationvalues)
+
+<a id="fatal"></a>
+### `logger.fatal([mergingObject], [message], [...interpolationValues])`
+
+Write a `'fatal'` level log, if the configured `level` allows for it.
+
+* See [`mergingObject` log method parameter](#mergingobject)
+* See [`message` log method parameter](#message)
+* See [`...interpolationValues` log method parameter](#interpolationvalues)
+
 
 <a id="child"></a>
-## .child(bindings)
+### `logger.child(bindings) => logger`
 
-### Parameters:
-+ `bindings` (object): an object of key-value pairs to include in log lines
-  as properties.
-
-### Example:
-```js
-logger.child({ a: 'property' }).info('hello child!')
-// generates
-// {"pid":46497,"hostname":"MacBook-Pro-di-Matteo.local","level":30,"msg":"hello child!","time":1458124707120,"v":0,"a":"property"}
-```
-
-### Discussion:
-Creates a child logger, setting all key-value pairs in `bindings` as properties
-in the log lines. All serializers will be applied to the given pair.
+The `logger.child` method allows for the creation of stateful loggers, 
+where key-value pairs can be pinned to a logger causing them to be output
+on every log line.
 
 Child loggers use the same output stream as the parent and inherit
 the current log level of the parent at the time they are spawned.
 
-From v2.x.x the log level of a child is mutable (whereas in
-v1.x.x it was immutable), and can be set independently of the parent.
-If a `level` property is present in the object passed to `child` it will
-override the child logger level.
+The log level of a child is mutable. It can be set independently 
+of the parent either by setting the [`level`](#level) accessor after creating 
+the child logger or using the reserved [`bindings.level`](#bindingslevel-string) key.
 
-For example:
+#### `bindings` (Object)
 
-```
-var logger = pino()
-logger.level = 'error'
-logger.info('nope') //does not log
-var child = logger.child({foo: 'bar'})
-child.info('nope again') //does not log
-child.level = 'info'
-child.info('hooray') //will log
-logger.info('nope nope nope') //will not log, level is still set to error
-logger.child({ foo: 'bar', level: 'debug' }).debug('debug!')
+An object of key-value pairs to include in every log line output 
+via the returned child logger. 
+
+```js
+const child = logger.child({ MIX: {IN: 'always'} })
+child.info('hello')
+// {"level":30,"time":1531258616689,"msg":"hello","pid":64849,"hostname":"x","MIX":{"IN":"always"},"v":1}
+child.info('child!')
+// {"level":30,"time":1531258617401,"msg":"child!","pid":64849,"hostname":"x","MIX":{"IN":"always"},"v":1}
 ```
 
-Child loggers inherit the serializers from the parent logger but it is
-possible to override them.
+The `bindings` object may contain any key except for reserved configuration keys `level` and `serializers`.
 
-For example:
+##### `bindings.level` (String)
 
-```
-var pino = require('./pino')
+If a `level` property is present in the `bindings` object passed to `logger.child` 
+it will override the child logger level.
 
-var customSerializers = {
-  test: function () {
-    return 'this is my serializer'
-  }
-}
-var child = pino().child({serializers: customSerializers})
-
-child.info({test: 'should not show up'})
+```js
+const logger = pino()
+logger.debug('nope') // will not log, since default level is info
+const child = logger.child({foo: 'bar', level: 'debug'})
+child.debug('debug!') // will log as the `level` property set the level to debug
 ```
 
-Will produce the following output:
+##### `bindings.serializers` (Object)
 
-```
-{"pid":7971,"hostname":"mycomputer.local","level":30,"time":1469488147985,"test":"this is my serializer","v":1}
-```
+Child loggers inherit the [serializers](#opt-serializers) from the parent logger.
 
-Also from version 2.x.x we can spawn child loggers from child loggers, for instance:
+Setting the `serializers` key of the `bindings` object will override 
+any configured parent serializers. 
 
-```
-var logger = pino()
-var child = logger.child({father: true})
-var childChild = child.child({baby: true})
-```
-
-Child logger creation is fast:
-
-```
-benchBunyanCreation*10000: 1291.332ms
-benchBoleCreation*10000: 1630.542ms
-benchPinoCreation*10000: 352.330ms
-benchPinoExtremeCreation*10000: 102.282ms
+```js
+const logger = require('pino')()
+logger.info({test: 'will appear'})
+// {"level":30,"time":1531259759482,"pid":67930,"hostname":"x","test":"will appear","v":1}
+const child = logger.child({serializers: {test: () => `child-only serializer`}})
+child.info({test: 'will be overwritten'})
+// {"level":30,"time":1531259784008,"pid":67930,"hostname":"x","test":"child-only serializer","v":1}
 ```
 
-Logging through a child logger has little performance penalty:
-
-```
-benchBunyanChild*10000: 1343.933ms
-benchBoleChild*10000: 1605.969ms
-benchPinoChild*10000: 334.573ms
-benchPinoExtremeChild*10000: 152.792ms
-```
-
-Spawning children from children has negligible overhead:
-
-```
-benchBunyanChildChild*10000: 1397.202ms
-benchPinoChildChild*10000: 338.930ms
-benchPinoExtremeChildChild*10000: 150.143ms
-```
-
-<a id="level"></a>
-## .level
-
-### Example:
-```
-logger.level = 'info'
-```
-
-### Discussion:
-
-Set this property to the desired logging level. In order of priority, available
-levels are:
-
-  1. <a href="#fatal">`'fatal'`</a>
-  2. <a href="#error">`'error'`</a>
-  3. <a href="#warn">`'warn'`</a>
-  4. <a href="#info">`'info'`</a>
-  5. <a href="#debug">`'debug'`</a>
-  6. <a href="#trace">`'trace'`</a>
-
-The logging level is a *minimum* level. For instance if `logger.level` is
-`'info'` then all `'fatal'`, `'error'`, `'warn'`, and `'info'` logs will be enabled.
-
-You can pass `'silent'` to disable logging.
-
-<a id="fatal"></a>
-## .fatal([obj], msg, [...])
-
-### Parameters:
-+ `obj` (object): object to be serialized
-+ `msg` (string): the log message to write
-+ `...` (*): format string values when `msg` is a format string
-
-### Discussion:
-Log at `'fatal'` level the given `msg`. The `msg` may contain up to 10
-[format string tokens][formatstrs] (given that the method accetps up to 11
-arguments total). The subsequent parameters passed will be used to fill in these
-placeholder tokens with the associated value. Any extra parameters will be
-silently ignored. For example, `log.fatal('%s', 'a', 'b')` will only log the
-string `a` and ignore the `'b'` parameter.
-
-If the first argument is an object, all its properties will be included in the
-JSON line. The number of available format string tokens and associated
-parameters will be reduced accodringly.
-
-[formatstrs]: https://nodejs.org/dist/latest-v8.x/docs/api/util.html#util_util_format_format_args
-
-<a id="error"></a>
-## .error([obj], msg, [...])
-
-### Parameters:
-+ `obj` (object): object to be serialized
-+ `msg` (string): the log message to write
-+ `...` (*): format string values when `msg` is a format string
-
-### Discussion:
-Log at `'error'` level the given `msg`. The `msg` may contain up to 10
-[format string tokens][formatstrs] (given that the method accetps up to 11
-arguments total). The subsequent parameters passed will be used to fill in these
-placeholder tokens with the associated value. Any extra parameters will be
-silently ignored. For example, `log.error('%s', 'a', 'b')` will only log the
-string `a` and ignore the `'b'` parameter.
-
-If the first argument is an object, all its properties will be included in the
-JSON line. The number of available format string tokens and associated
-parameters will be reduced accodringly.
-
-<a id="warn"></a>
-## .warn([obj], msg, [...])
-
-### Parameters:
-+ `obj` (object): object to be serialized
-+ `msg` (string): the log message to write
-+ `...` (*): format string values when `msg` is a format string
-
-### Discussion:
-Log at `'warn'` level the given `msg`. The `msg` may contain up to 10
-[format string tokens][formatstrs] (given that the method accetps up to 11
-arguments total). The subsequent parameters passed will be used to fill in these
-placeholder tokens with the associated value. Any extra parameters will be
-silently ignored. For example, `log.warn('%s', 'a', 'b')` will only log the
-string `a` and ignore the `'b'` parameter.
-
-If the first argument is an object, all its properties will be included in the
-JSON line. The number of available format string tokens and associated
-parameters will be reduced accodringly.
-
-<a id="info"></a>
-## .info([obj], msg, [...])
-
-### Parameters:
-+ `obj` (object): object to be serialized
-+ `msg` (string): the log message to write
-+ `...` (*): format string values when `msg` is a format string
-
-### Discussion:
-Log at `'info'` level the given `msg`. The `msg` may contain up to 10
-[format string tokens][formatstrs] (given that the method accetps up to 11
-arguments total). The subsequent parameters passed will be used to fill in these
-placeholder tokens with the associated value. Any extra parameters will be
-silently ignored. For example, `log.info('%s', 'a', 'b')` will only log the
-string `a` and ignore the `'b'` parameter.
-
-If the first argument is an object, all its properties will be included in the
-JSON line. The number of available format string tokens and associated
-parameters will be reduced accodringly.
-
-<a id="debug"></a>
-## .debug([obj], msg, [...])
-
-### Parameters:
-+ `obj` (object): object to be serialized
-+ `msg` (string): the log message to write
-+ `...` (*): format string values when `msg` is a format string
-
-### Discussion:
-Log at `'debug'` level the given `msg`. The `msg` may contain up to 10
-[format string tokens][formatstrs] (given that the method accetps up to 11
-arguments total). The subsequent parameters passed will be used to fill in these
-placeholder tokens with the associated value. Any extra parameters will be
-silently ignored. For example, `log.debug('%s', 'a', 'b')` will only log the
-string `a` and ignore the `'b'` parameter.
-
-If the first argument is an object, all its properties will be included in the
-JSON line. The number of available format string tokens and associated
-parameters will be reduced accodringly.
-
-<a id="trace"></a>
-## .trace([obj], msg, [...])
-
-### Parameters:
-+ `obj` (object): object to be serialized
-+ `msg` (string): the log message to write
-+ `...` (*): format string values when `msg` is a format string
-
-### Discussion:
-Log at `'trace'` level the given `msg`. The `msg` may contain up to 10
-[format string tokens][formatstrs] (given that the method accetps up to 11
-arguments total). The subsequent parameters passed will be used to fill in these
-placeholder tokens with the associated value. Any extra parameters will be
-silently ignored. For example, `log.trace('%s', 'a', 'b')` will only log the
-string `a` and ignore the `'b'` parameter.
-
-If the first argument is an object, all its properties will be included in the
-JSON line. The number of available format string tokens and associated
-parameters will be reduced accodringly.
+* See [`serializers` option](#opt-serializers)
+* See [pino.stdSerializers](#pino-stdSerializers)
 
 <a id="flush"></a>
-## .flush()
+### `logger.flush()`
 
-### Discussion:
-Flushes the content of the buffer in [extreme mode](extreme.md). It has no effect if
-extreme mode is not enabled.
+Flushes the content of the buffer when using a `pino.extreme` destination.
 
-<a id="addLevel"></a>
-## .addLevel(name, lvl)
+This is an asynchronous, fire and forget, operation.
 
-### Parameters:
-+ `name` (string): defines the method name of the new level
-+ `lvl` (integer): value for the level, e.g. `35` is between `info` and `warn`
+The use case is primarily for Extreme mode logging, which may hold up to 
+4KiB of logs. The `logger.flush` method can be used to flush the logs 
+on an long interval, say ten seconds. Such a strategy can provide an 
+optimium balanace between extremely efficient logging at high demand periods 
+and safer logging at low demand periods. 
 
-### Example:
+* See [`pino.extreme`](#pino-extreme)
+* See [`destination` parameter](#destination)
+* See [Extreme mode ⇗](/docs/extreme.md)
+
+<a id="level"></a>
+### `logger.level` (String) [Getter/Setter]
+
+Set this property to the desired logging level. 
+
+The core levels and their values are as follows: 
+
+|                                                                     |
+|:-------------------------------------------------------------------:|
+| **Level:** | trace | debug | info | warn | error | fatal | silent   |
+| **Value:** | 10    | 20    | 30   | 40   | 50    | 60    | Infinity |
+
+The logging level is a *minimum* level based on the associated value of that level.
+
+For instance if `logger.level` is `info` *(30)* then `info` *(30)*, `warn` *(40)*, `error` *(50)* and `fatal` *(60)* log methods will be enabled but the `trace` *(10)* and `debug` *(20)* methods, being less than 30, will not.
+
+The `silent` logging level is a specialized level which will disable all logging,
+there is no `silent` log method.
+
+<a id="islevelenabled"></a>
+### `logger.islevelenabled(level)`
+
+A utility method for determining if a given log level will write to the destination.
+
+#### `level` (String)
+
+The given level to check against:
+
 ```js
-var pino = require('pino')
-var log = pino()
-log.addLevel('myLevel', 35)
-log.level = 'myLevel'
-log.myLevel('a message')
+if (logger.isLevelEnabled('debug')) logger.debug('conditional log')
 ```
 
-### Discussion:
-Defines a new level on the logger instance.
-Returns `true` on success and `false` if there was a conflict (level name or
-number already exists).
+#### `levelLabel` (String)
 
-When using this method, the current level of the logger instance does not change.
-You must adjust the level with the [level](#level) property after adding your
-custom level.
+Defines the method name of the new level.
 
-If you need a custom level at construction, you can supply the `level` and
-`levelVal` options:
+* See [`logger.level`](#level)
 
-```js
-var pino = require('pino')
-var log = pino({level: 'myLevel', levelVal: 35})
-log.myLevel('a message')
-```
+#### `levelValue` (Number)
 
-The level is set to the custom level on construction, i.e. `log.level` does not
-need to be set.
+Defines the associated minimum threshold value for the level, and 
+therefore where it sits in order of priority among other levels.
+
+* See [`logger.level`](#level) 
 
 <a id="levelVal"></a>
-## .levelVal
+### `logger.levelVal` (Number)
 
-### Example:
+Supplies the integer value for the current logging level.
+
 ```js
 if (logger.levelVal === 30) {
   console.log('logger level is `info`')
 }
 ```
 
-### Discussion:
-Returns the integer value for the logger instance's logging level.
+<a id="levels"></a>
+### `logger.levels` (Object)
+
+Levels are mapped to values to determine the minimum threshold that a
+logging method should be enabled at (see [`logger.level`](#level)).
+
+The `logger.levels` property holds the mappings between levels and values, 
+and vice versa.
+
+```sh 
+$ node -p "require('pino')().levels"
+```
+
+```js
+{ labels:
+   { '10': 'trace',
+     '20': 'debug',
+     '30': 'info',
+     '40': 'warn',
+     '50': 'error',
+     '60': 'fatal' },
+  values:
+   { fatal: 60, error: 50, warn: 40, info: 30, debug: 20, trace: 10 } }
+```
+
+* See [`logger.level`](#level)
 
 <a id="level-change"></a>
-## .on('level-change', fn)
+### Event: 'level-change'
 
-### Example:
+The logger instance is also an [`EventEmitter ⇗`](https://nodejs.org/dist/latest/docs/api/events.html#events_class_eventemitter)
+
+A listener function can be attached to a logger via the `level-change` event 
+
+The listener is passed four arguments: 
+
+* `levelLabel` – the new level string, e.g `trace`
+* `levelValue` – the new level number, e.g `10`
+* `previousLevelLabel` – the prior level string, e.g `info`
+* `previousLevelValue` – the prior level numbebr, e.g `30`
+
 ```js
-var listener = function (lvl, val, prevLvl, prevVal) {
-  console.log(lvl, val, prevLvl, prevVal)
-}
-logger.on('level-change', listener)
-logger.level = 'trace' // trigger console message
-logger.removeListener('level-change', listener)
-logger.level = 'info' // no message, since listener was removed
+const logger = require('pino')()
+logger.on('level-change', (lvl, val, prevLvl, prevVal) => {
+  console.log('%s (%d) was changed to %s (%d)', lvl, val, prevLvl, prevVal)
+})
+logger.level = 'trace' // trigger event
 ```
 
-### Discussion:
-Registers a listener function that is triggered when the level is changed.
+<a id="version"></a>
+### `logger.version` (String)
 
-The listener is passed four arguments: `levelLabel`, `levelValue`,
-`previousLevelLabel`, `previousLevelValue`.
+Exposes the Pino package version. Also available on the exported `pino` function.
 
-**Note:** When browserified, this functionality will only be available if the
-`events` module has been required elsewhere (e.g. if you're using streams
-in the browser). This allows for a trade-off between bundle size and functionality.
-
-<a id="levelValues"></a>
-## .levels.values
-
-### Example:
-```js
-pino.levels.values.error === 50 // true
-```
-
-### Discussion:
-Returns the mappings of level names to their respective internal number
-representation. This property is available as a static property or as an
-instance property.
-
-<a id="levelLabels"></a>
-## .levels.labels
-
-### Example:
-```js
-pino.levels.labels[50] === 'error' // true
-```
-
-### Discussion:
-Returns the mappings of level internal level numbers to their string
-representations. This property is available as a static property or as an
-instance property.
-
-<a id="isLevelEnabled"></a>
-## .isLevelEnabled(logLevel)
-
-### Example:
-```js
-if (logger.isLevelEnabled('debug')) logger.debug('conditional log')
-```
-
-### Discussion:
-A utility method for determining if a given log level will write to the output
-stream.
+* See [`pino.version`](#pino-version)
 
 <a id="log_version"></a>
-## .LOG_VERSION
+### `logger.LOG_VERSION` (Number)
 
-### Discussion:
-Read only. Holds the current log format version (as output in the `v`
-property of each log record). This property is available as a static property
-or as an instance property.
+Holds the current log format version as output in the `v` property of each log record.
+Also available on the exported `pino` function.
 
-<a id="stdSerializers"></a>
-## .stdSerializers
+* See [`pino.LOG_VERSION`](#pino-LOG_VERSION)
 
-Available as a static property, the `stdSerializers` provide functions for
-serializing objects common to many projects. The serializers are directly
-imported from [pino-std-serializers](https://github.com/pinojs/pino-std-serializers).
+## Statics
 
-<a id="reqSerializer"></a>
-### .req
+<a id="pino-destination"></a>
+### `pino.destination([target]) => SonicBoom`
 
-Generates a JSONifiable object from the HTTP `request` object passed to
-the `createServer` callback of Node's HTTP server.
-
-It returns an object in the form:
-
-```js
-{
-  pid: 93535,
-  hostname: 'your host',
-  level: 30,
-  msg: 'my request',
-  time: '2016-03-07T12:21:48.766Z',
-  v: 0,
-  req: {
-    method: 'GET',
-    url: '/',
-    headers: {
-      host: 'localhost:50201',
-      connection: 'close'
-    },
-    remoteAddress: '::ffff:127.0.0.1',
-    remotePort: 50202
-  }
-}
-```
-
-<a id="resSerializer"></a>
-### .res
-
-Generates a JSONifiable object from the HTTP `response` object passed to
-the `createServer` callback of Node's HTTP server.
-
-It returns an object in the form:
-
-```js
-{
-  pid: 93581,
-  hostname: 'myhost',
-  level: 30,
-  msg: 'my response',
-  time: '2016-03-07T12:23:18.041Z',
-  v: 0,
-  res: {
-    statusCode: 200,
-    header: 'HTTP/1.1 200 OK\r\nDate: Mon, 07 Mar 2016 12:23:18 GMT\r\nConnection: close\r\nContent-Length: 5\r\n\r\n'
-  }
-}
-```
-
-<a id="errSerializer"></a>
-### .err
-
-Serializes an `Error` object if passed in as an property.
-
-```js
-{
-  "pid": 40510,
-  "hostname": "MBP-di-Matteo",
-  "level": 50,
-  "msg": "an error",
-  "time": 1459433282301,
-  "v": 1,
-  "type": "Error",
-  "stack": "Error: an error\n    at Object.<anonymous> (/Users/matteo/Repositories/pino/example.js:16:7)\n    at Module._compile (module.js:435:26)\n    at Object.Module._extensions..js (module.js:442:10)\n    at Module.load (module.js:356:32)\n    at Function.Module._load (module.js:313:12)\n    at Function.Module.runMain (module.js:467:10)\n    at startup (node.js:136:18)\n    at node.js:963:3"
-}
-```
-
-<a id="wrapReq"></a>
-## .wrapRequestSerializer
-
-Wraps the standard request serializer such that custom serializers can use
-the newly serilized request. An example of using this function can be found
-in the [pino-http][https://github.com/pinojs/pino-http] module.
-
-<a id="wrapRes"></a>
-## .wrapResponseSerializer
-
-Wraps the standard response serializer such that custom serializers can use
-the newly serilized response. An example of using this function can be found
-in the [pino-http][https://github.com/pinojs/pino-http] module.
-
-<a id="stdTimeFunctions"></a>
-## .stdTimeFunctions
-
-Available as a static property, the `stdTimeFunctions` provide functions for
-generating the timestamp property in the log output. You can set the `timestamp`
-option during initialization to one of these functions to adjust the output
-format. Alternatively, you can specify your own time function.
-
-A time function must synchronously return a string that would be a valid
-component of a JSON string. For example, the default function returns
-a string like `,"time":1493426328206`.
-
-<a id="epochTimeFunction"></a>
-### .epochTime
-
-The default time function for Pino. Returns a string like `,"time":1493426328206`.
-
-<a id="unixTimeFunction"></a>
-### .unixTime
-
-Returns a unix time in seconds, like `,"time":1493426328`.
-
-<a id="nullTimeFunction"></a>
-### .nullTime
-
-Returns an empty string. This function is used when the `timestamp` option
-is set to `false`.
-
-<a id=".destination"></a>
-# .destination(dest?)
-
-Create a pino destination.
-It returns a stream-like object with significantly more throughput than a
-standard Node.js stream.
+Create a Pino Destination instance: a stream-like object with 
+significantly more throughput (over 30%) than a standard Node.js stream.
 
 ```js
 const pino = require('pino')
@@ -628,19 +617,19 @@ const logger = pino(pino.destination('./my-file'))
 const logger2 = pino(pino.destination())
 ```
 
-`dest` could be either a file or a file descriptor. If it is omitted, it
-will be `process.stdout.fd`.
+The `pino.destination` method may be passed a file path or a numerical file descriptor. 
+By default, `pino.destination` will use `process.stdout.fd` (1) as the file descriptor.
 
-The default `stream` is a destination.
+`pino.destination` is implemented on [`sonic-boom` ⇗]](https://github.com/mcollina/sonic-boom).
 
-`pino.destination()` is implemented on [`sonic-boom`](https://github.com/mcollina/sonic-boom).
+* See [`destination` parameter](#destination)
+* See [`sonic-boom` ⇗](https://github.com/mcollina/sonic-boom).
 
-<a id="extreme"></a>
-# .extreme(dest?)
+<a id="pino-extreme"></a>
+### `pino.extreme([target]) => SonicBoom`
 
 Create an extreme mode destination. This yields an additional 60% performance boost.
 There are trade-offs that should be understood before usage.
-See [Extreme mode explained](extreme.md).
 
 ```js
 const pino = require('pino')
@@ -648,37 +637,60 @@ const logger = pino(pino.extreme('./my-file'))
 const logger2 = pino(pino.extreme())
 ```
 
-`dest` can be either a file or a file descriptor. If it is omitted, it
-will be `process.stdout.fd`.
+The `pino.extreme` method may be passed a file path or a numerical file descriptor. 
+By default, `pino.destination` will use `process.stdout.fd` (1) as the file descriptor.
 
-`pino.extreme()` is implemented on [`sonic-boom`](https://github.com/mcollina/sonic-boom).
+`pino.extreme` is implemented with the [`sonic-boom` ⇗](https://github.com/mcollina/sonic-boom)
+module.
 
-<a id="metadata"></a>
-# Metadata
+* See [`destination` parameter](#destination)
+* See [`sonic-boom` ⇗](https://github.com/mcollina/sonic-boom)
+* See [Extreme mode ⇗](/docs/extreme.md)
 
-A destination stream can have a property `stream[Symbol.for('needsMetadata')] = true`
-to indicate that for every log line written, the following properties of the stream
-should be set:
+<a id="pino-stdserializers"></a>
+### `pino.stdSerializers` (Object)
 
-* the last logging level as `stream.lastLevel`
-* the last logging message as `stream.lastMsg`
-* the last logging object as `stream.lastObj`
-* the last time as `stream.lastTime`, which will be the partial string returned
-  by the time function.
-* the last logger instance as `stream.lastLogger` (to support child
-  loggers)
+The `pino.stdSerializers` object provides functions for serializing objects common to many projects. The standard serializers are directly imported from [pino-std-serializers](https://github.com/pinojs/pino-std-serializers).
 
-## Example
+* See [pino-std-serializers ⇗](https://github.com/pinojs/pino-std-serializers)
 
-```js
-var instance = pino({}, {
-  [Symbol.for('needsMetadata')]: true,
-  write: function (chunk) {
-    console.log('lastLevel', this.lastLevel)
-    console.log('lastMsg', this.lastMsg)
-    console.log('lastObj', this.lastObj)
-    console.log('lastLogger', this.lastLogger)
-    console.log('line', chunk)
-  }
-})
-```
+<a id="pino-stdtimefunctions"></a>
+### `pino.stdTimeFunctions` (Object)
+
+The [`timestamp`](#opt-timestamp) option can accept a function which determines the 
+`timestamp` value in a log line.
+
+The `pino.stdTimeFunctions` object provides a very small set of common functions for generating the 
+`timestamp` property. These consist of the following 
+
+* `pino.stdTimeFunctions.epochTime`: Milliseconds since Unix epoch (Default)
+* `pino.stdTimeFunctions.unixTime`: Seconds since Unix epoch
+* `pino.stdTimeFunctions.nullTime`: Clears timestamp property (Used when `timestamp: false`)
+
+* See [`timestamp` option](#opt-timestamp)
+
+<a id="pino-symbols"></a>
+### `pino.symbols` (Object)
+
+For integration purposes with ecosystem and third party libraries `pino.symbols`
+exposes the symbols used to hold non-public state and methods on the logger instance.
+
+Access to the symbols allows logger state to be adjusted, and methods to be overriden or
+proxied for performant integration where necessary.
+
+The `pino.symbols` object is intended for library implementers and shouldn't be utilized 
+for general use.
+
+<a id="pino-version"></a>
+### `pino.version` (String)
+
+Exposes the Pino package version. Also available on the logger instance.
+
+* See [`logger.version`](#version)
+
+<a id="pino-log_version"></a>
+### `pino.LOG_VERSION` (Number)
+
+Holds the current log format version as output in the `v` property of each log record. Also available on the logger instance.
+
+* See [`logger.LOG_VERSION`](#log_version)

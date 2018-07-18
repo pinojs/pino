@@ -1,13 +1,12 @@
 # Pino Ecosystem
 
-Are you looking for a transport to accomplish some sort of log processing?
-Or maybe a transport to make logs easier to read? This list will help you
-with that endeavor. If you cannot find what you are looking for here, write
-it and submit a PR adding it to the list 😃.
+This is a list of ecosystem modules that integrate with `pino`. 
 
 Modules listed under [Core](#core) are maintained by the Pino team. Modules
 listed under [Community](#community) are maintained by independent community
 members.
+
+Please send a PR to add new modules!
 
 <a id="core"></a>
 ## Core

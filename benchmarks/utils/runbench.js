@@ -34,6 +34,8 @@ if (!process.argv[2]) {
   process.exit()
 }
 
+const quiet = process.argv[3] === '-q'
+
 const selectedBenchmark = process.argv[2].toLowerCase()
 const benchmarkDir = resolve(__dirname, '..')
 const benchmarks = {
@@ -66,14 +68,17 @@ function runBenchmark (name, done) {
     cb()
   })
 
-  console.log(`Running ${name.toUpperCase()} benchmark\n`)
+  if (quiet === false) console.log(`Running ${name.toUpperCase()} benchmark\n`)
 
   const benchmark = spawn(
     process.argv[0],
     [join(benchmarkDir, benchmarks[name])]
   )
 
-  benchmark.stdout.pipe(process.stdout)
+  if (quiet === false) {
+    benchmark.stdout.pipe(process.stdout)
+  }
+
   pump(benchmark.stdout, split(), processor)
 
   benchmark.on('exit', () => {
@@ -91,7 +96,7 @@ function sum (arr) {
 }
 
 function displayResults (results) {
-  console.log('==========')
+  if (quiet === false) console.log('==========')
   const benchNames = Object.keys(results)
   for (var i = 0; i < benchNames.length; i += 1) {
     console.log(`${benchNames[i].toUpperCase()} benchmark averages`)
@@ -103,11 +108,13 @@ function displayResults (results) {
       console.log(`${loggers[j]} average: ${average.toFixed(3)}ms`)
     }
   }
-  console.log('==========')
-  console.log(
-    `System: ${type()}/${platform()} ${arch()} ${release()}`,
-    `~ ${cpus()[0].model} (cores/threads: ${cpus().length})`
-  )
+  if (quiet === false) {
+    console.log('==========')
+    console.log(
+      `System: ${type()}/${platform()} ${arch()} ${release()}`,
+      `~ ${cpus()[0].model} (cores/threads: ${cpus().length})`
+    )
+  }
 }
 
 function toBench (done) {
