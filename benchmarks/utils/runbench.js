@@ -78,7 +78,7 @@ function runBenchmark (name, done) {
   if (quiet === false) {
     benchmark.stdout.pipe(process.stdout)
   }
-  
+
   pump(benchmark.stdout, split(), processor)
 
   benchmark.on('exit', () => {

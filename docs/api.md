@@ -157,6 +157,7 @@ Default: `'msg'`
 
 The string key for the 'message' in the JSON object. 
 
+<a id=onterminated></a>
 #### `onTerminated` (Function)
 
 Default: `(evt, err) => err ? process.exit(1) : process.exit(0)`
@@ -470,9 +471,16 @@ child.info({test: 'will be overwritten'})
 
 Flushes the content of the buffer when using a `pino.extreme` destination.
 
-It has no effect if extreme mode is not enabled.
+This is an asynchronous, fire and forget, operation.
+
+The use case is primarily for Extreme mode logging, which may hold up to 
+4KiB of logs. The `logger.flush` method can be used to flush the logs 
+on an long interval, say ten seconds. Such a strategy can provide an 
+optimium balanace between extremely efficient logging at high demand periods 
+and safer logging at low demand periods. 
 
 * See [`pino.extreme`](#pino-extreme)
+* See [`destination` parameter](#destination)
 * See [Extreme mode ⇗](/docs/extreme.md)
 
 <a id="level"></a>
