@@ -1,5 +1,6 @@
 # Help
 
+* [Exit logging](#exit-logging)
 * [Log rotation](#rotate)
 * [Saving to multiple files](#multiple)
 * [Log Filtering](#filter-logs)
@@ -7,6 +8,28 @@
 * [Duplicate keys](#dupe-keys)
 * [Log levels as labels instead of numbers](#level-string)
 * [Pino with `debug`](#debug)
+
+<a id="exit-logging"></a>
+## Exit logging
+
+When a Node process crashes from uncaught exception, exits due to a signal, 
+or exits of it's own accord we may want to write some final logs – particularly
+in cases of error. 
+
+Writing to a Node.js stream on exit is not necessarily guaranteed, and naively writing
+to an Extreme Mode logger on exit will definitely lead to lost logs. 
+
+To write logs in an exit handler, create the handler with `pino.final`:
+
+```js
+process.on('uncaughtException', pino.final(logger, (err, finalLogger) => {
+  finalLogger.error(err)
+}))
+```
+
+The `finalLogger` is a special logger instance that will synchronously and reliably 
+flush every log line. This is important in exit handlers, since no more asynchronous
+activity may be scheduled.
 
 <a id="rotate"></a>
 ## Log rotation

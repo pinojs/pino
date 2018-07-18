@@ -6,6 +6,8 @@ In Pino's standard mode of operation log messages are directly written to the
 output stream as the messages are generated. Extereme mode works by buffering
 log messages and writing them in larger chunks.
 
+## Caveats
+
 This has a couple of important caveats:
 
 * 4KB of spare RAM will be needed for logging
@@ -14,6 +16,10 @@ This has a couple of important caveats:
 * There is a possibility of the most recently buffered log messages being lost
   (up to 4KB of logs)
   * For instance, a power cut will mean up to 4KB of buffered logs will be lost
+
+So in summary, only use extreme mode when performing an extreme amount of
+logging and it is acceptable to potentially lose the most recent logs.
+
 * Pino will register handlers for the following process events/signals so that
   Pino can flush the extreme mode buffer:
 
@@ -37,36 +43,52 @@ This has a couple of important caveats:
   signals. If there are more handlers registered than just our own, we will
   simply flush the extreme mode buffer.
 
-So in summary, only use extreme mode when performing an extreme amount of
-logging and it is acceptable to potentially lose the most recent logs.
-
 ## Usage
 
-Extreme mode is defined by creating an extreme mode destination with
-`pino.extreme()`.
-
-The following creates an extreme destination to stdout:
+The `pino.extreme()` method will provide an Extreme Mode destination.
 
 ```js
-'use strict'
+const pino = require('pino')
+const dest = pino.extreme() // logs to stdout with no args
+const logger = pino(dest)
+```
 
+## Log loss prevention
+
+The following strategy can be used to minimize log loss:
+
+```js
 const pino = require('pino')
 const dest = pino.extreme() // no arguments
 const logger = pino(dest)
 
+// flush every 10 seconds to keep the buffer empty 
+// in periods of low activity
 setInterval(function () {
-  // flush is asynchronous
-  dest.flush()
+  logger.flush()
 }, 10000).unref()
+
+// use pino.final to create a special logger that 
+// guarantees final tick writes 
+const handler = pino.final(logger, (err, finalLogger, evt) => {
+  if (err) finalLogger.error(err, 'error caused exit')
+  finalLogger.info(`${evt} caught`)
+})
+// catch all the ways node might exit
+process.on('beforeExit', () => handler(null, 'beforeExit'))
+process.on('exit', () => handler(null, 'exit'))
+process.on('uncaughtException', (err) => handler(err, 'uncaughtException'))
+process.on('SIGHUP', () => handler(null, 'SIGHUP'))
+process.on('SIGINT', () => handler(null, 'SIGINT'))
+process.on('SIGQUIT', () => handler(null, 'SIGQUIT'))
+process.on('SIGTERM', () => handler(null, 'SIGTERM'))
 ```
 
 An extreme destination is an instance of
 [`SonicBoom`](https://github.com/mcollina/sonic-boom) with `4096`
 buffering.
 
-In case a synchronous flush is needed, `dest.flushSync()` can be called.
-This method might cause some data loss if a write was already in
-progress, so use it only if truly needed.
 
 * See [`pino.extreme` api](/docs/api.md#pino-extreme)
+* See [`pino.final` api](/docs/api.md#pino-final)
 * See [`destination` parameter](/docs/api.md#destination)

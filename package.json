@@ -23,7 +23,7 @@
     "bench": "node benchmarks/utils/runbench all",
     "bench-basic": "node benchmarks/utils/runbench basic",
     "bench-object": "node benchmarks/utils/runbench object",
-    "bench-deepo-bject": "node benchmarks/utils/runbench deep-object",
+    "bench-deep-object": "node benchmarks/utils/runbench deep-object",
     "bench-multi-arg": "node benchmarks/utils/runbench multi-arg",
     "bench-longs-tring": "node benchmarks/utils/runbench long-string",
     "bench-child": "node benchmarks/utils/runbench child",

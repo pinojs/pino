@@ -1,0 +1,149 @@
+'use strict'
+const pino = require('..')
+const fs = require('fs')
+const { test } = require('tap')
+const { sleep } = require('./helper')
+
+test('replaces onTerminated option', async ({throws}) => {
+  throws(() => {
+    pino({
+      onTerminated: () => {}
+    })
+  }, Error('The onTerminated option has been removed, use pino.final instead'))
+})
+
+test('throws if not supplied a logger instance', async ({throws}) => {
+  throws(() => {
+    pino.final()
+  }, Error('expected a pino logger instance'))
+})
+
+test('throws if not supplied a handler', async ({throws}) => {
+  throws(() => {
+    pino.final(pino())
+  }, Error('expected a handler function'))
+})
+
+test('throws if not supplied logger with pino.destination or pino.extreme instance', async ({throws, doesNotThrow}) => {
+  throws(() => {
+    pino.final(pino(fs.createWriteStream('/dev/null')), () => {})
+  }, Error('only compatible with loggers with pino.destination and pino.extreme'))
+
+  doesNotThrow(() => {
+    pino.final(pino(pino.destination()), () => {})
+  })
+
+  doesNotThrow(() => {
+    pino.final(pino(pino.extreme()), () => {})
+  })
+})
+
+test('returns an exit listener function', async ({is}) => {
+  is(typeof pino.final(pino(pino.destination()), () => {}), 'function')
+})
+
+test('listener function immediately sync flushes when fired', async ({pass, fail}) => {
+  const dest = pino.destination('/dev/null')
+  var passed = false
+  dest.flushSync = () => {
+    passed = true
+    pass('flushSync called')
+  }
+  pino.final(pino(dest), () => {})()
+  await sleep(10)
+  if (passed === false) fail('flushSync not called')
+})
+
+test('swallows the non-ready error', async ({doesNotThrow}) => {
+  const dest = pino.destination('/dev/null')
+  doesNotThrow(() => {
+    pino.final(pino(dest), () => {})()
+  })
+})
+
+test('listener function triggers handler function parameter', async ({pass, fail}) => {
+  const dest = pino.destination('/dev/null')
+  var passed = false
+  pino.final(pino(dest), () => {
+    passed = true
+    pass('handler function triggered')
+  })()
+  await sleep(10)
+  if (passed === false) fail('handler function not triggered')
+})
+
+test('passes any error to the handler', async ({is}) => {
+  const dest = pino.destination('/dev/null')
+  pino.final(pino(dest), (err) => {
+    is(err.message, 'test')
+  })(Error('test'))
+})
+
+test('passes a specialized final logger instance', async ({is, isNot, error}) => {
+  const dest = pino.destination('/dev/null')
+  const logger = pino(dest)
+  pino.final(logger, (err, finalLogger) => {
+    error(err)
+
+    is(typeof finalLogger.trace, 'function')
+    is(typeof finalLogger.debug, 'function')
+    is(typeof finalLogger.info, 'function')
+    is(typeof finalLogger.warn, 'function')
+    is(typeof finalLogger.error, 'function')
+    is(typeof finalLogger.fatal, 'function')
+
+    isNot(finalLogger.trace, logger.trace)
+    isNot(finalLogger.debug, logger.debug)
+    isNot(finalLogger.info, logger.info)
+    isNot(finalLogger.warn, logger.warn)
+    isNot(finalLogger.error, logger.error)
+    isNot(finalLogger.fatal, logger.fatal)
+
+    is(finalLogger.child, logger.child)
+    is(finalLogger.levels, logger.levels)
+  })()
+})
+
+test('final logger instances synchronously flush after a log method call', async ({pass, fail, error}) => {
+  const dest = pino.destination('/dev/null')
+  const logger = pino(dest)
+  var passed = false
+  var count = 0
+  dest.flushSync = () => {
+    count++
+    if (count === 2) {
+      passed = true
+      pass('flushSync called')
+    }
+  }
+  pino.final(logger, (err, finalLogger) => {
+    error(err)
+    finalLogger.info('hello')
+  })()
+  await sleep(10)
+  if (passed === false) fail('flushSync not called')
+})
+
+test('also instruments custom log methods', async ({pass, fail, error}) => {
+  const dest = pino.destination('/dev/null')
+  const logger = pino({
+    customLevels: {
+      foo: 35
+    }
+  }, dest)
+  var passed = false
+  var count = 0
+  dest.flushSync = () => {
+    count++
+    if (count === 2) {
+      passed = true
+      pass('flushSync called')
+    }
+  }
+  pino.final(logger, (err, finalLogger) => {
+    error(err)
+    finalLogger.foo('hello')
+  })()
+  await sleep(10)
+  if (passed === false) fail('flushSync not called')
+})

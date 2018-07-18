@@ -33,4 +33,10 @@ function check (is, chunk, level, msg) {
   is(chunk.v, v)
 }
 
-module.exports = { sink, check, once }
+function sleep (ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms)
+  })
+}
+
+module.exports = { sink, check, once, sleep }
