@@ -31,17 +31,13 @@ Node's single threaded event loop.
 
 If you write a transport, let us know and we will add a link here!
 
-- [Transports](#transports)
-  - [Known Transports](#known-transports)
-    - [pino-couch](#pino-couch)
-    - [pino-elasticsearch](#pino-elasticsearch)
-    - [pino-mq](#pino-mq)
-    - [pino-papertrail](#pino-papertrail)
-    - [pino-redis](#pino-redis)
-    - [pino-socket](#pino-socket)
-      - [Logstash](#logstash)
-    - [pino-syslog](#pino-syslog)
-
++ [pino-couch](#pino-couch)
++ [pino-elasticsearch](#pino-elasticsearch)
++ [pino-mq](#pino-mq)
++ [pino-papertrail](#pino-papertrail)
++ [pino-redis](#pino-redis)
++ [pino-socket](#pino-socket)
++ [pino-syslog](#pino-syslog)
 
 <a id="pino-couch"></a>
 ### pino-couch
