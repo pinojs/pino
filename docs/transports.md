@@ -31,12 +31,16 @@ Node's single threaded event loop.
 
 If you write a transport, let us know and we will add a link here!
 
-+ [pino-couch](#pino-couch)
-+ [pino-elasticsearch](#pino-elasticsearch)
-+ [pino-mq](#pino-mq)
-+ [pino-redis](#pino-redis)
-+ [pino-socket](#pino-socket)
-+ [pino-syslog](#pino-syslog)
+- [Transports](#transports)
+  - [Known Transports](#known-transports)
+    - [pino-couch](#pino-couch)
+    - [pino-elasticsearch](#pino-elasticsearch)
+    - [pino-mq](#pino-mq)
+    - [pino-papertrail](#pino-papertrail)
+    - [pino-redis](#pino-redis)
+    - [pino-socket](#pino-socket)
+      - [Logstash](#logstash)
+    - [pino-syslog](#pino-syslog)
 
 
 <a id="pino-couch"></a>
@@ -112,6 +116,20 @@ pino-mq -g
 ```
 
 for full documentation of command line switches and pino-mq.json read [readme](https://github.com/itavy/pino-mq#readme)
+
+<a id="pino-papertrail"></a>
+### pino-papertrail
+pino-papertrail is a transport that will forward logs to the [papertrail](https://papertrailapp.com) log service through an UDPv4 socket.
+
+Given an application `foo` that logs via pino, and a papertrail destination that collects logs on port UDP `12345` on address `bar.papertrailapp.com`, you would use `pino-papertrail`
+like so:
+
+```
+node yourapp.js | pino-papertrail --host bar.papertrailapp.com --port 12345 --appname foo
+```
+
+
+for full documentation of command line switches read [readme](https://github.com/ovhemert/pino-papertrail#readme)
 
 <a id="pino-redis"></a>
 ### pino-redis
