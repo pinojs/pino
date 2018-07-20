@@ -11,6 +11,7 @@
 * [Benchmarks](/docs/benchmarks.md)
 * [Legacy](/docs/legacy.md)
 * [Help](/docs/help.md)
+  * [Exit Logging](/docs/help.md#exit-logging)
   * [Log Rotation](/docs/help.md#rotate)
   * [Multiple Files](/docs/help.md#multiple)
   * [Log Filtering](/docs/help.md#filter-logs)

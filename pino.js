@@ -3,13 +3,12 @@ const os = require('os')
 const stringifySafe = require('fast-safe-stringify')
 const serializers = require('pino-std-serializers')
 const SonicBoom = require('sonic-boom')
-const events = require('./lib/events')
 const redaction = require('./lib/redaction')
 const time = require('./lib/time')
 const proto = require('./lib/proto')
 const symbols = require('./lib/symbols')
 const { mappings, genLsCache, assertNoLevelCollisions } = require('./lib/levels')
-const { createArgsNormalizer, asChindings } = require('./lib/tools')
+const { createArgsNormalizer, asChindings, final } = require('./lib/tools')
 const { version, LOG_VERSION } = require('./lib/meta')
 const {
   chindingsSym,
@@ -22,11 +21,10 @@ const {
   setLevelSym,
   endSym,
   formatOptsSym,
-  onTerminatedSym,
   messageKeyStringSym
 } = symbols
 const { epochTime, nullTime } = time
-const { pid, exit } = process
+const { pid } = process
 const hostname = os.hostname()
 const defaultErrorSerializer = serializers.err
 const defaultOptions = {
@@ -38,7 +36,6 @@ const defaultOptions = {
   base: { pid, hostname },
   serializers: {err: defaultErrorSerializer},
   timestamp: epochTime,
-  onTerminated: (evt, err) => err ? exit(1) : exit(0),
   name: undefined,
   redact: null,
   customLevels: null
@@ -54,7 +51,6 @@ function pino (...args) {
     crlf,
     serializers,
     timestamp,
-    onTerminated,
     messageKey,
     base,
     name,
@@ -92,7 +88,6 @@ function pino (...args) {
     [stringifiersSym]: stringifiers,
     [endSym]: end,
     [formatOptsSym]: formatOpts,
-    [onTerminatedSym]: onTerminated,
     [messageKeyStringSym]: messageKeyString,
     [serializersSym]: serializers,
     [chindingsSym]: chindings
@@ -101,8 +96,6 @@ function pino (...args) {
 
   if (customLevels) genLsCache(instance)
 
-  events(instance)
-
   instance[setLevelSym](level)
 
   return instance
@@ -110,6 +103,7 @@ function pino (...args) {
 
 pino.extreme = (dest = process.stdout.fd) => new SonicBoom(dest, 4096)
 pino.destination = (dest = process.stdout.fd) => new SonicBoom(dest)
+pino.final = final
 pino.levels = mappings()
 pino.stdSerializers = Object.assign({}, serializers)
 pino.stdTimeFunctions = Object.assign({}, time)

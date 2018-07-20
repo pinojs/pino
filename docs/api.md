@@ -21,6 +21,7 @@
 * [Statics](#statics)
   * [pino.destination()](#pino-destination)
   * [pino.extreme()](#pino-extreme)
+  * [pino.final()](#pino-final)
   * [pino.stdSerializers](#pino-stdserializers)
   * [pino.stdTimeFunctions](#pino-stdtimefunctions)
   * [pino.symbols](#pino-symbols)
@@ -156,26 +157,6 @@ for passing in as a value for this option.
 Default: `'msg'`
 
 The string key for the 'message' in the JSON object. 
-
-<a id=onterminated></a>
-#### `onTerminated` (Function)
-
-Default: `(evt, err) => err ? process.exit(1) : process.exit(0)`
-
-This function will be invoked during process shutdown when 
-the supplied destination is an instance of [`pino.extreme`](#pino-extreme)
-
-The signature of the function is `onTerminated(eventName, err)`. 
-
-By default, when `pino.extreme` is used, the `onTerminated` function 
-is set to call `process.exit(1)` on error or else `process.exit(0)`. 
-
-If a function is specified it **must** perform only synchronous operations 
-at this point and then exit the process (there are no ticks left for 
-asynchronous activity at this point in the process lifetime).
-
-* See [pino.extreme](#pino-extreme)
-* See [Extreme mode ⇗](/docs/extreme.md)
 
 <a id=prettyPrint></a>
 #### `prettyPrint` (Boolean | Object)
@@ -646,6 +627,38 @@ module.
 * See [`destination` parameter](#destination)
 * See [`sonic-boom` ⇗](https://github.com/mcollina/sonic-boom)
 * See [Extreme mode ⇗](/docs/extreme.md)
+
+<a id="pino-final"></a>
+### `pino.final(logger, handler) => Function`
+
+The `pino.final` method supplies an exit listener function that can be 
+supplied to process exit events such as `exit`, `uncaughtException`, 
+`SIGHUP` and so on. 
+
+The exit listener function will call the supplied `handler` function 
+with an error object (or else `null`), a `finalLogger` instance followed
+by any additional arguments the `handler` may be called with. 
+The `finalLogger` is a specialist logger that synchronously flushes 
+on every write. This is important to gaurantee final log writes, 
+both when using `pino.destination` or `pino.extreme` targets. 
+
+Since final log writes cannot be gauranteed with normal Node.js streams, 
+if the `destination` parameter of the `logger` supplied to `pino.final`
+is a Node.js stream `pino.final` will throw. It's highly recommended
+for both performance and safety to use `pino.destination`/`pino.extreme`
+destinations.
+
+```js
+process.on('uncaughtException', pino.final(logger, (err, finalLogger) => {
+  finalLogger.error(err, 'uncaughtException')
+  process.exit(1)
+}))
+```
+
+* See [`destination` parameter](#destination)
+* See [Exit logging help](/docs/help.md#exit-logging)
+* See [Extreme mode ⇗](/docs/extreme.md)
+* See [Log loss prevention ⇗](/docs/extreme.md#log-loss-prevention)
 
 <a id="pino-stdserializers"></a>
 ### `pino.stdSerializers` (Object)
