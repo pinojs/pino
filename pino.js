@@ -146,7 +146,8 @@ function asJson (obj, msg, num, time) {
   if (hasObj) {
     var notHasOwnProperty = obj.hasOwnProperty === undefined
     if (objError) {
-      data += ',"type":"Error","stack":' + this.stringify(obj.stack)
+      data += ',"type":"Error"'
+      data += obj.stack ? ',"stack":' + this.stringify(obj.stack) : ''
     }
     // if global serializer is set, call it first
     if (this.serializers[Symbol.for('pino.*')]) {

@@ -128,3 +128,18 @@ test('an error with statusCode property is not confused for a http response', fu
   instance.level = name
   instance[name](err)
 })
+
+test('stack is omitted if it is not set on err', t => {
+  t.plan(2)
+  var err = new Error('myerror')
+  delete err.stack
+  var instance = pino(sink(function (chunk, enc, cb) {
+    t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
+    delete chunk.time
+    t.equal(chunk.hasOwnProperty('stack'), false)
+    cb()
+  }))
+
+  instance.level = name
+  instance[name](err)
+})

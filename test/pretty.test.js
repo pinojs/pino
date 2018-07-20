@@ -105,6 +105,24 @@ test('pino transform prettifies Error', function (t) {
   instance.info(err)
 })
 
+test('pino transform prettifies Error without stack', function (t) {
+  var prettier = pretty()
+  var err = new Error('hello world')
+  delete err.stack
+  var expected = [err.message]
+
+  t.plan(expected.length)
+
+  prettier.pipe(split(function (line) {
+    t.ok(line.indexOf(expected.shift()) >= 0, 'line matches')
+    return line
+  }))
+
+  var instance = pino(prettier)
+
+  instance.info(err)
+})
+
 function getIndentLevel (str) {
   return (/^\s*/.exec(str) || [''])[0].length
 }

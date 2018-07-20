@@ -217,7 +217,9 @@ function pretty (opts) {
     line += eol
 
     if (value.type === 'Error') {
-      line += '    ' + withSpaces(value.stack, eol) + eol
+      line += value.stack
+        ? '    ' + withSpaces(value.stack, eol) + eol
+        : ''
 
       var propsForPrint
       if (errorProps && errorProps.length > 0) {
