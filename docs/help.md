@@ -64,6 +64,11 @@ We would rotate our log files with logrotate, by adding the following to `/etc/l
 }
 ```
 
+The `copytruncate` configuration has a very slight possibility of lost log lines due 
+to a gap between copying and truncating - the truncate may occur after additional lines
+have been written. To perform log rotation without `copytruncate`, see the [Reopening log files](#reopening)
+help.
+
 <a id="reopening"></a>
 ## Reopening log files
 
@@ -71,17 +76,40 @@ In cases where a log rotation tool doesn't offer a copy-truncate capabilities,
 or where using them is deemed inappropriate `pino.destination` and `pino.extreme`
 destinations are able to reopen file paths after a file has been moved away.
 
-One way to use this is to set up a SIGUSR2 or SIGHUP signal handler that 
-reopens the log file destination.
+One way to use this is to set up a `SIGUSR2` or `SIGHUP` signal handler that 
+reopens the log file destination, making sure to write the process PID out 
+somewhere so the log rotation tool knows where to send the signal.
 
 ```js
+// write the process pid to a well known location for later
+const fs = require('fs')
+fs.writeFileSync('/var/run/myapp.pid', process.pid)
+
 const dest = pino.destination('/log/file') // pino.extreme will also work
 const logger = require('pino')(dest)
-process.on('SIGUSR2', () => dest.reopen())
+process.on('SIGHUP', () => dest.reopen())
 ```
 
 The log rotation tool can then be configured to send this signal to the process 
-after a log rotation has occurred.
+after a log rotation event has occurred.
+
+Given a similar scenario as in the [Log rotation](#rotate) section a basic
+`logrotate` config that aligns with this strategy would look similar to the following:
+
+```
+/var/log/myapp.log {
+       su root
+       daily
+       rotate 7
+       delaycompress
+       compress
+       notifempty
+       missingok
+       postrotate
+           kill -HUP `cat /var/run/myapp.pid`
+       endscript
+}
+``` 
 
 <a id="multiple"></a>
 ## Saving to multiple files
