@@ -603,8 +603,12 @@ By default, `pino.destination` will use `process.stdout.fd` (1) as the file desc
 
 `pino.destination` is implemented on [`sonic-boom` ⇗]](https://github.com/mcollina/sonic-boom).
 
+A `pino.destination` instance can also be used to reopen closed files 
+(for example, for some log rotation scenarios), see [Reopening log files](/docs/help.md#reopening).
+
 * See [`destination` parameter](#destination)
-* See [`sonic-boom` ⇗](https://github.com/mcollina/sonic-boom).
+* See [`sonic-boom` ⇗](https://github.com/mcollina/sonic-boom)
+* See [Reopening log files](/docs/help.md#reopening)
 
 <a id="pino-extreme"></a>
 ### `pino.extreme([target]) => SonicBoom`
@@ -624,9 +628,13 @@ By default, `pino.destination` will use `process.stdout.fd` (1) as the file desc
 `pino.extreme` is implemented with the [`sonic-boom` ⇗](https://github.com/mcollina/sonic-boom)
 module.
 
+A `pino.extreme` instance can also be used to reopen closed files 
+(for example, for some log rotation scenarios), see [Reopening log files](/docs/help.md#reopening).
+
 * See [`destination` parameter](#destination)
 * See [`sonic-boom` ⇗](https://github.com/mcollina/sonic-boom)
 * See [Extreme mode ⇗](/docs/extreme.md)
+* See [Reopening log files](/docs/help.md#reopening)
 
 <a id="pino-final"></a>
 ### `pino.final(logger, handler) => Function`
