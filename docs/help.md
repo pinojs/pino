@@ -2,8 +2,9 @@
 
 * [Exit logging](#exit-logging)
 * [Log rotation](#rotate)
+* [Reopening log files](#reopening)
 * [Saving to multiple files](#multiple)
-* [Log Filtering](#filter-logs)
+* [Log filtering](#filter-logs)
 * [Transports and systemd](#transport-systemd)
 * [Duplicate keys](#dupe-keys)
 * [Log levels as labels instead of numbers](#level-string)
@@ -62,6 +63,25 @@ We would rotate our log files with logrotate, by adding the following to `/etc/l
        copytruncate
 }
 ```
+
+<a id="reopening"></a>
+## Reopening log files
+
+In cases where a log rotation tool doesn't offer a copy-truncate capabilities, 
+or where using them is deemed inappropriate `pino.destination` and `pino.extreme`
+destinations are able to reopen file paths after a file has been moved away.
+
+One way to use this is to set up a SIGUSR2 or SIGHUP signal handler that 
+reopens the log file destination.
+
+```js
+const dest = pino.destination('/log/file') // pino.extreme will also work
+const logger = require('pino')(dest)
+process.on('SIGUSR2', () => dest.reopen())
+```
+
+The log rotation tool can then be configured to send this signal to the process 
+after a log rotation has occurred.
 
 <a id="multiple"></a>
 ## Saving to multiple files
