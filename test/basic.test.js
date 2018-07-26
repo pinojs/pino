@@ -446,12 +446,14 @@ test('children with same names render in correct order', async ({is}) => {
 })
 
 // https://github.com/pinojs/pino/pull/251 - use this.stringify
-test('when safe is true it should ONLY use `fast-safe-stringify`', async ({is}) => {
+test('when safe is true it should ONLY use stringifySafe', async ({is}) => {
   var isFastSafeStringifyCalled = false
   const mockedPino = proxyquire('../', {
-    'fast-safe-stringify' () {
-      isFastSafeStringifyCalled = true
-      return '{ "hello": "world" }'
+    './lib/tools.js': {
+      stringifySafe () {
+        isFastSafeStringifyCalled = true
+        return '{ "hello": "world" }'
+      }
     }
   })
   const instance = mockedPino({ safe: true }, sink())

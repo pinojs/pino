@@ -1,6 +1,5 @@
 'use strict'
 const os = require('os')
-const stringifySafe = require('fast-safe-stringify')
 const serializers = require('pino-std-serializers')
 const SonicBoom = require('sonic-boom')
 const redaction = require('./lib/redaction')
@@ -8,11 +7,11 @@ const time = require('./lib/time')
 const proto = require('./lib/proto')
 const symbols = require('./lib/symbols')
 const { mappings, genLsCache, assertNoLevelCollisions } = require('./lib/levels')
-const { createArgsNormalizer, asChindings, final } = require('./lib/tools')
+const { createArgsNormalizer, asChindings, final, stringifySafe } = require('./lib/tools')
 const { version, LOG_VERSION } = require('./lib/meta')
 const {
   chindingsSym,
-  redactFmtSym,
+  redactSym,
   serializersSym,
   timeSym,
   streamSym,
@@ -63,7 +62,7 @@ function pino (...args) {
   const stringify = safe ? stringifySafe : JSON.stringify
   const stringifiers = redact ? redaction(redact, stringify) : {}
   const formatOpts = redact
-    ? {stringify: stringifiers[redactFmtSym]}
+    ? {stringify: stringifiers[redactSym]}
     : { stringify }
   const messageKeyString = `,"${messageKey}":`
   const end = ',"v":' + LOG_VERSION + '}' + (crlf ? '\r\n' : '\n')

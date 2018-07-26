@@ -8,11 +8,11 @@ const winston = require('winston')
 const fs = require('fs')
 const dest = fs.createWriteStream('/dev/null')
 const loglevel = require('./utils/wrap-log-level')(dest)
-const plog = pino(dest)
+const plogNodeStream = pino(dest)
 delete require.cache[require.resolve('../')]
 const plogExtreme = require('../')(pino.extreme('/dev/null'))
 delete require.cache[require.resolve('../')]
-const plogDest = require('../')(pino.destination('/dev/null'))
+const plog = require('../')(pino.destination('/dev/null'))
 
 process.env.DEBUG = 'dlog'
 const debug = require('debug')
@@ -78,15 +78,15 @@ const run = bench([
     }
     setImmediate(cb)
   },
-  function benchPinoDestination (cb) {
-    for (var i = 0; i < max; i++) {
-      plogDest.info('hello world')
-    }
-    setImmediate(cb)
-  },
   function benchPinoExtreme (cb) {
     for (var i = 0; i < max; i++) {
       plogExtreme.info('hello world')
+    }
+    setImmediate(cb)
+  },
+  function benchPinoNodeStream (cb) {
+    for (var i = 0; i < max; i++) {
+      plogNodeStream.info('hello world')
     }
     setImmediate(cb)
   }
