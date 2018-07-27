@@ -8,13 +8,11 @@ const winston = require('winston')
 const fs = require('fs')
 const dest = fs.createWriteStream('/dev/null')
 const loglevel = require('./utils/wrap-log-level')(dest)
-const plog = pino(dest)
+const plog = pino(pino.destination('/dev/null'))
+delete require.cache[require.resolve('../')]
+const plogNodeStream = pino(dest)
 delete require.cache[require.resolve('../')]
 const plogExtreme = require('../')(pino.extreme('/dev/null'))
-delete require.cache[require.resolve('../')]
-const plogUnsafe = require('../')({safe: false}, dest)
-delete require.cache[require.resolve('../')]
-const plogUnsafeExtreme = require('../')({safe: false}, pino.extreme('/dev/null'))
 const blog = bunyan.createLogger({
   name: 'myapp',
   streams: [{
@@ -55,7 +53,7 @@ const run = bench([
     }
     setImmediate(cb)
   },
-  function benchLogLevelObject (cb) {
+  function benchLogLevelObj (cb) {
     for (var i = 0; i < max; i++) {
       loglevel.info({ hello: 'world' })
     }
@@ -67,21 +65,15 @@ const run = bench([
     }
     setImmediate(cb)
   },
-  function benchPinoUnsafeObj (cb) {
-    for (var i = 0; i < max; i++) {
-      plogUnsafe.info({ hello: 'world' })
-    }
-    setImmediate(cb)
-  },
   function benchPinoExtremeObj (cb) {
     for (var i = 0; i < max; i++) {
       plogExtreme.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
-  function benchPinoUnsafeExtremeObj (cb) {
+  function benchPinoNodeStreamObj (cb) {
     for (var i = 0; i < max; i++) {
-      plogUnsafeExtreme.info({ hello: 'world' })
+      plogNodeStream.info({ hello: 'world' })
     }
     setImmediate(cb)
   }
