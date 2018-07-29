@@ -143,3 +143,19 @@ test('stack is omitted if it is not set on err', t => {
   instance.level = name
   instance[name](err)
 })
+
+test('stack is rendered as any other property if it\'s not a string', t => {
+  t.plan(3)
+  var err = new Error('myerror')
+  err.stack = null
+  var instance = pino(sink(function (chunk, enc, cb) {
+    t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
+    delete chunk.time
+    t.equal(chunk.hasOwnProperty('stack'), true)
+    t.equal(chunk.stack, null)
+    cb()
+  }))
+
+  instance.level = name
+  instance[name](err)
+})
