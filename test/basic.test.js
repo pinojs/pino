@@ -2,7 +2,6 @@
 const os = require('os')
 const { join } = require('path')
 const { readFileSync } = require('fs')
-const proxyquire = require('proxyquire')
 const { test } = require('tap')
 const { sink, check, once } = require('./helper')
 const pino = require('../')
@@ -446,15 +445,13 @@ test('children with same names render in correct order', async ({is}) => {
 })
 
 // https://github.com/pinojs/pino/pull/251 - use this.stringify
-test('when safe is true it should ONLY use `fast-safe-stringify`', async ({is}) => {
-  var isFastSafeStringifyCalled = false
-  const mockedPino = proxyquire('../', {
-    'fast-safe-stringify' () {
-      isFastSafeStringifyCalled = true
-      return '{ "hello": "world" }'
-    }
-  })
-  const instance = mockedPino({ safe: true }, sink())
-  instance.info({ hello: 'world' })
-  is(isFastSafeStringifyCalled, true)
+test('when safe is true it should ONLY use `fast-safe-stringify`', async ({deepEqual}) => {
+  const stream = sink()
+  const root = pino({ safe: true }, stream)
+  // circular depth
+  const obj = {}
+  obj.a = obj
+  root.info(obj)
+  const { a } = await once(stream, 'data')
+  deepEqual(a, { a: '[Circular]' })
 })
