@@ -60,7 +60,7 @@ function pino (...args) {
 
   assertNoLevelCollisions(pino.levels, customLevels)
 
-  const stringify = safe ? stringifySafe : JSON.stringify
+  const stringify = safe ? trySafe : JSON.stringify
   const stringifiers = redact ? redaction(redact, stringify) : {}
   const formatOpts = redact
     ? {stringify: stringifiers[redactFmtSym]}
@@ -112,3 +112,11 @@ pino.version = version
 pino.LOG_VERSION = LOG_VERSION
 
 module.exports = pino
+
+function trySafe (obj) {
+  try {
+    return JSON.stringify(obj)
+  } catch (_) {
+    return stringifySafe(obj)
+  }
+}

@@ -18,9 +18,6 @@ const plogUnsafeExtreme = require('../')({safe: false}, pino.extreme('/dev/null'
 const loglevel = require('./utils/wrap-log-level')(dest)
 
 const deep = Object.assign({}, require('../package.json'), { level: 'info' })
-deep.deep = Object.assign({}, JSON.parse(JSON.stringify(deep)))
-deep.deep.deep = Object.assign({}, JSON.parse(JSON.stringify(deep)))
-deep.deep.deep.deep = Object.assign({}, JSON.parse(JSON.stringify(deep)))
 
 const max = 10
 const blog = bunyan.createLogger({
