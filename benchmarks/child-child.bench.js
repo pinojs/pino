@@ -5,7 +5,9 @@ const pino = require('../')
 const bunyan = require('bunyan')
 const fs = require('fs')
 const dest = fs.createWriteStream('/dev/null')
-const plog = pino(dest).child({ a: 'property' }).child({sub: 'child'})
+const plogNodeStream = pino(dest).child({ a: 'property' }).child({sub: 'child'})
+delete require.cache[require.resolve('../')]
+const plogDest = require('../')(pino.destination('/dev/null'))
 delete require.cache[require.resolve('../')]
 const plogExtreme = require('../')(pino.extreme('/dev/null'))
   .child({ a: 'property' })
@@ -29,13 +31,19 @@ const run = bench([
   },
   function benchPinoChildChild (cb) {
     for (var i = 0; i < max; i++) {
-      plog.info({ hello: 'world' })
+      plogDest.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
   function benchPinoExtremeChildChild (cb) {
     for (var i = 0; i < max; i++) {
       plogExtreme.info({ hello: 'world' })
+    }
+    setImmediate(cb)
+  },
+  function benchPinoNodeStreamChildChild (cb) {
+    for (var i = 0; i < max; i++) {
+      plogNodeStream.info({ hello: 'world' })
     }
     setImmediate(cb)
   }

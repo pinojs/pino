@@ -5,7 +5,9 @@ const pino = require('../')
 const bunyan = require('bunyan')
 const bole = require('bole')('bench')
 const fs = require('fs')
-const plog = pino(pino.destination(('/dev/null')))
+const dest = fs.createWriteStream('/dev/null')
+const plogNodeStream = pino(dest)
+const plogDest = pino(pino.destination(('/dev/null')))
 delete require.cache[require.resolve('../')]
 const plogExtreme = require('../')(pino.extreme('/dev/null'))
 
@@ -14,13 +16,13 @@ const blog = bunyan.createLogger({
   name: 'myapp',
   streams: [{
     level: 'trace',
-    stream: fs.createWriteStream('/dev/null')
+    stream: dest
   }]
 })
 
 require('bole').output({
   level: 'info',
-  stream: fs.createWriteStream('/dev/null')
+  stream: dest
 }).setFastTime(true)
 
 const run = bench([
@@ -39,7 +41,7 @@ const run = bench([
     setImmediate(cb)
   },
   function benchPinoCreation (cb) {
-    var child = plog.child({ a: 'property' })
+    var child = plogDest.child({ a: 'property' })
     for (var i = 0; i < max; i++) {
       child.info({ hello: 'world' })
     }
@@ -47,6 +49,13 @@ const run = bench([
   },
   function benchPinoExtremeCreation (cb) {
     var child = plogExtreme.child({ a: 'property' })
+    for (var i = 0; i < max; i++) {
+      child.info({ hello: 'world' })
+    }
+    setImmediate(cb)
+  },
+  function benchPinoNodeStreamCreation (cb) {
+    var child = plogNodeStream.child({ a: 'property' })
     for (var i = 0; i < max; i++) {
       child.info({ hello: 'world' })
     }

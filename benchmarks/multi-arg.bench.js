@@ -8,13 +8,12 @@ const winston = require('winston')
 const fs = require('fs')
 const dest = fs.createWriteStream('/dev/null')
 const loglevel = require('./utils/wrap-log-level')(dest)
-const plog = pino(dest)
+const plogNodeStream = pino(dest)
+delete require.cache[require.resolve('../')]
+const plogDest = require('../')(pino.destination('/dev/null'))
 delete require.cache[require.resolve('../')]
 const plogExtreme = require('../')(pino.extreme('/dev/null'))
 delete require.cache[require.resolve('../')]
-const plogUnsafe = require('../')({safe: false}, dest)
-delete require.cache[require.resolve('../')]
-const plogUnsafeExtreme = require('../')({safe: false}, pino.extreme('/dev/null'))
 
 process.env.DEBUG = 'dlog'
 const debug = require('debug')
@@ -82,13 +81,19 @@ const run = bench([
   },
   function benchPinoMulti (cb) {
     for (var i = 0; i < max; i++) {
-      plog.info('hello', 'world')
+      plogDest.info('hello', 'world')
     }
     setImmediate(cb)
   },
   function benchPinoExtremeMulti (cb) {
     for (var i = 0; i < max; i++) {
       plogExtreme.info('hello', 'world')
+    }
+    setImmediate(cb)
+  },
+  function benchPinoNodeStreamMulti (cb) {
+    for (var i = 0; i < max; i++) {
+      plogNodeStream.info('hello', 'world')
     }
     setImmediate(cb)
   },
@@ -112,13 +117,19 @@ const run = bench([
   },
   function benchPinoInterpolate (cb) {
     for (var i = 0; i < max; i++) {
-      plog.info('hello %s', 'world')
+      plogDest.info('hello %s', 'world')
     }
     setImmediate(cb)
   },
   function benchPinoExtremeInterpolate (cb) {
     for (var i = 0; i < max; i++) {
       plogExtreme.info('hello %s', 'world')
+    }
+    setImmediate(cb)
+  },
+  function benchPinoNodeStreamInterpolate (cb) {
+    for (var i = 0; i < max; i++) {
+      plogNodeStream.info('hello %s', 'world')
     }
     setImmediate(cb)
   },
@@ -143,7 +154,7 @@ const run = bench([
   },
   function benchPinoInterpolateAll (cb) {
     for (var i = 0; i < max; i++) {
-      plog.info('hello %s %j %d', 'world', {obj: true}, 4)
+      plogDest.info('hello %s %j %d', 'world', {obj: true}, 4)
     }
     setImmediate(cb)
   },
@@ -153,15 +164,9 @@ const run = bench([
     }
     setImmediate(cb)
   },
-  function benchPinoUnsafeInterpolateAll (cb) {
+  function benchPinoNodeStreamInterpolateAll (cb) {
     for (var i = 0; i < max; i++) {
-      plogUnsafe.info('hello %s %j %d', 'world', {obj: true}, 4)
-    }
-    setImmediate(cb)
-  },
-  function benchPinoUnsafeExtremeInterpolateAll (cb) {
-    for (var i = 0; i < max; i++) {
-      plogUnsafeExtreme.info('hello %s %j %d', 'world', {obj: true}, 4)
+      plogNodeStream.info('hello %s %j %d', 'world', {obj: true}, 4)
     }
     setImmediate(cb)
   },
@@ -185,13 +190,7 @@ const run = bench([
   },
   function benchPinoInterpolateExtra (cb) {
     for (var i = 0; i < max; i++) {
-      plog.info('hello %s %j %d', 'world', {obj: true}, 4, {another: 'obj'})
-    }
-    setImmediate(cb)
-  },
-  function benchPinoUnsafeInterpolateExtra (cb) {
-    for (var i = 0; i < max; i++) {
-      plogUnsafe.info('hello %s %j %d', 'world', {obj: true}, 4, {another: 'obj'})
+      plogDest.info('hello %s %j %d', 'world', {obj: true}, 4, {another: 'obj'})
     }
     setImmediate(cb)
   },
@@ -201,9 +200,9 @@ const run = bench([
     }
     setImmediate(cb)
   },
-  function benchPinoUnsafeExtremeInterpolateExtra (cb) {
+  function benchPinoNodeStreamInterpolateExtra (cb) {
     for (var i = 0; i < max; i++) {
-      plogUnsafeExtreme.info('hello %s %j %d', 'world', {obj: true}, 4, {another: 'obj'})
+      plogNodeStream.info('hello %s %j %d', 'world', {obj: true}, 4, {another: 'obj'})
     }
     setImmediate(cb)
   },
@@ -227,13 +226,7 @@ const run = bench([
   },
   function benchPinoInterpolateDeep (cb) {
     for (var i = 0; i < max; i++) {
-      plog.info('hello %j', deep)
-    }
-    setImmediate(cb)
-  },
-  function benchPinoUnsafeInterpolateDeep (cb) {
-    for (var i = 0; i < max; i++) {
-      plogUnsafe.info('hello %j', deep)
+      plogDest.info('hello %j', deep)
     }
     setImmediate(cb)
   },
@@ -243,9 +236,9 @@ const run = bench([
     }
     setImmediate(cb)
   },
-  function benchPinoUnsafeExtremeInterpolateDeep (cb) {
+  function benchPinoNodeStreamInterpolateDeep (cb) {
     for (var i = 0; i < max; i++) {
-      plogUnsafeExtreme.info('hello %j', deep)
+      plogNodeStream.info('hello %j', deep)
     }
     setImmediate(cb)
   }

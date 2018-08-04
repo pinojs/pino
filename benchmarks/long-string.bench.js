@@ -7,16 +7,15 @@ const bole = require('bole')('bench')
 const winston = require('winston')
 const fs = require('fs')
 const dest = fs.createWriteStream('/dev/null')
-const plog = pino(dest)
+const plogNodeStream = pino(dest)
+delete require.cache[require.resolve('../')]
+const plogDest = require('../')(pino.destination('/dev/null'))
 delete require.cache[require.resolve('../')]
 const plogExtreme = require('../')(pino.extreme('/dev/null'))
 
-const deep = require('../package.json')
-deep.deep = JSON.parse(JSON.stringify(deep))
-deep.deep.deep = JSON.parse(JSON.stringify(deep))
-deep.deep.deep.deep = JSON.parse(JSON.stringify(deep))
+const crypto = require('crypto')
 
-const longStr = JSON.stringify(deep)
+const longStr = crypto.randomBytes(2000).toString()
 
 const max = 10
 const blog = bunyan.createLogger({
@@ -61,7 +60,7 @@ var run = bench([
   },
   function benchPino (cb) {
     for (var i = 0; i < max; i++) {
-      plog.info(longStr)
+      plogDest.info(longStr)
     }
     setImmediate(cb)
   },
@@ -70,7 +69,13 @@ var run = bench([
       plogExtreme.info(longStr)
     }
     setImmediate(cb)
+  },
+  function benchPinoNodeStream (cb) {
+    for (var i = 0; i < max; i++) {
+      plogNodeStream.info(longStr)
+    }
+    setImmediate(cb)
   }
-], 10000)
+], 1000)
 
 run(run)

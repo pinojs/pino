@@ -7,13 +7,12 @@ const bole = require('bole')('bench')
 const winston = require('winston')
 const fs = require('fs')
 const dest = fs.createWriteStream('/dev/null')
-const plog = pino(dest)
+const plogNodeStream = pino(dest)
+delete require.cache[require.resolve('../')]
+const plogDest = require('../')(pino.destination('/dev/null'))
 delete require.cache[require.resolve('../')]
 const plogExtreme = require('../')(pino.extreme('/dev/null'))
 delete require.cache[require.resolve('../')]
-const plogUnsafe = require('../')({safe: false}, dest)
-delete require.cache[require.resolve('../')]
-const plogUnsafeExtreme = require('../')({safe: false}, pino.extreme('/dev/null'))
 
 const loglevel = require('./utils/wrap-log-level')(dest)
 
@@ -68,13 +67,7 @@ const run = bench([
   },
   function benchPinoDeepObj (cb) {
     for (var i = 0; i < max; i++) {
-      plog.info(deep)
-    }
-    setImmediate(cb)
-  },
-  function benchPinoUnsafeDeepObj (cb) {
-    for (var i = 0; i < max; i++) {
-      plogUnsafe.info(deep)
+      plogDest.info(deep)
     }
     setImmediate(cb)
   },
@@ -84,9 +77,9 @@ const run = bench([
     }
     setImmediate(cb)
   },
-  function benchPinoUnsafeExtremeDeepObj (cb) {
+  function benchPinoNodeStreamDeepObj (cb) {
     for (var i = 0; i < max; i++) {
-      plogUnsafeExtreme.info(deep)
+      plogNodeStream.info(deep)
     }
     setImmediate(cb)
   }
