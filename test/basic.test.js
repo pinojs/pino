@@ -455,3 +455,29 @@ test('when safe is true it should ONLY use `fast-safe-stringify`', async ({deepE
   const { a } = await once(stream, 'data')
   deepEqual(a, { a: '[Circular]' })
 })
+
+test('when safe is true, fast-safe-stringify must be used when interpolating', async (t) => {
+  const stream = sink()
+  const instance = pino({safe: true}, stream)
+
+  const o = { a: { b: {} } }
+  o.a.b.c = o.a.b
+  instance.info('test', o)
+
+  const { msg } = await once(stream, 'data')
+  t.is(msg, 'test {"a":{"b":{"c":"[Circular]"}}}')
+})
+
+test('when safe is false, interpolation should throw', async (t) => {
+  const stream = sink()
+  const instance = pino({safe: false}, stream)
+  var o = { a: { b: {} } }
+  o.a.b.c = o.a.b
+  try {
+    instance.info('test', o)
+  } catch (e) {
+    t.is(e.message, 'Converting circular structure to JSON')
+    return
+  }
+  t.fail('must throw')
+})

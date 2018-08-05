@@ -71,10 +71,10 @@ PR's to this document are welcome for any new transports!
 + [pino-couch](#pino-couch)
 + [pino-elasticsearch](#pino-elasticsearch)
 + [pino-mq](#pino-mq)
++ [pino-papertrail](#pino-papertrail)
 + [pino-redis](#pino-redis)
 + [pino-socket](#pino-socket)
 + [pino-syslog](#pino-syslog)
-
 
 <a id="pino-couch"></a>
 ### pino-couch
@@ -153,6 +153,20 @@ pino-mq -g
 ```
 
 For full documentation of command line switches and configuration see [the `pino-mq` readme](https://github.com/itavy/pino-mq#readme)
+
+<a id="pino-papertrail"></a>
+### pino-papertrail
+pino-papertrail is a transport that will forward logs to the [papertrail](https://papertrailapp.com) log service through an UDPv4 socket.
+
+Given an application `foo` that logs via pino, and a papertrail destination that collects logs on port UDP `12345` on address `bar.papertrailapp.com`, you would use `pino-papertrail`
+like so:
+
+```
+node yourapp.js | pino-papertrail --host bar.papertrailapp.com --port 12345 --appname foo
+```
+
+
+for full documentation of command line switches read [readme](https://github.com/ovhemert/pino-papertrail#readme)
 
 <a id="pino-redis"></a>
 ### pino-redis
