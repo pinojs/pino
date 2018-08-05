@@ -371,3 +371,47 @@ test('redact – supports intermediate wildcard paths', async ({is}) => {
   const { req } = await once(stream, 'data')
   is(req.headers.cookie, '[Redacted]')
 })
+
+test('redacts numbers at the top level', async ({is}) => {
+  const stream = sink()
+  const instance = pino({redact: ['id']}, stream)
+  const obj = {
+    id: 7915
+  }
+  instance.info(obj)
+  const o = await once(stream, 'data')
+  is(o.id, '[Redacted]')
+})
+
+test('redacts booleans at the top level', async ({is}) => {
+  const stream = sink()
+  const instance = pino({redact: ['maybe']}, stream)
+  const obj = {
+    maybe: true
+  }
+  instance.info(obj)
+  const o = await once(stream, 'data')
+  is(o.maybe, '[Redacted]')
+})
+
+test('redacts strings at the top level', async ({is}) => {
+  const stream = sink()
+  const instance = pino({redact: ['s']}, stream)
+  const obj = {
+    s: 's'
+  }
+  instance.info(obj)
+  const o = await once(stream, 'data')
+  is(o.s, '[Redacted]')
+})
+
+test('redacts null at the top level', async ({is}) => {
+  const stream = sink()
+  const instance = pino({redact: ['n']}, stream)
+  const obj = {
+    n: null
+  }
+  instance.info(obj)
+  const o = await once(stream, 'data')
+  is(o.n, '[Redacted]')
+})
