@@ -30,7 +30,6 @@ const defaultErrorSerializer = serializers.err
 const defaultOptions = {
   level: 'info',
   messageKey: 'msg',
-  safe: true,
   enabled: true,
   prettyPrint: false,
   base: { pid, hostname },
@@ -46,7 +45,6 @@ const normalize = createArgsNormalizer(defaultOptions)
 function pino (...args) {
   const { opts, stream } = normalize(...args)
   const {
-    safe,
     redact,
     crlf,
     serializers,
@@ -60,7 +58,6 @@ function pino (...args) {
 
   assertNoLevelCollisions(pino.levels, customLevels)
 
-  const stringify = safe ? trySafe : JSON.stringify
   const stringifiers = redact ? redaction(redact, stringify) : {}
   const formatOpts = redact
     ? {stringify: stringifiers[redactFmtSym]}
@@ -113,7 +110,7 @@ pino.LOG_VERSION = LOG_VERSION
 
 module.exports = pino
 
-function trySafe (obj) {
+function stringify (obj) {
   try {
     return JSON.stringify(obj)
   } catch (_) {
