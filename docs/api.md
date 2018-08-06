@@ -178,7 +178,7 @@ documented in the [Browser API ⇗](/docs/browser.md) documentation.
 * See [Browser API ⇗](/docs/browser.md)
 
 <a id="destination"></a>
-### `destination` (SonicBoom | WritableStream)
+### `destination` (SonicBoom | WritableStream | String)
 
 Default: `pino.destination(1)` (STDOUT)
 
@@ -198,6 +198,8 @@ const fileLogger = require('pino')( pino.destination('/log/path'))
 const opts = {name: 'my-logger'}
 const stderrLogger = require('pino')(opts, pino.destination(2))
 
+// automatic wrapping in pino.destination
+const fileLogger = require('pino')('/log/path')
 ```
 
 * See [`pino.destination`](#pino-destination) 

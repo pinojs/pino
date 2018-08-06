@@ -424,6 +424,44 @@ test('pino.destination', async ({same}) => {
   })
 })
 
+test('auto pino.destination with a string', async ({same}) => {
+  const tmp = join(
+    os.tmpdir(),
+    '_' + Math.random().toString(36).substr(2, 9)
+  )
+  const instance = pino(tmp)
+  instance.info('hello')
+  await sleep(250)
+  const result = JSON.parse(readFileSync(tmp).toString())
+  delete result.time
+  same(result, {
+    pid: pid,
+    hostname: hostname,
+    level: 30,
+    msg: 'hello',
+    v: 1
+  })
+})
+
+test('auto pino.destination with a string as second argument', async ({same}) => {
+  const tmp = join(
+    os.tmpdir(),
+    '_' + Math.random().toString(36).substr(2, 9)
+  )
+  const instance = pino({}, tmp)
+  instance.info('hello')
+  await sleep(250)
+  const result = JSON.parse(readFileSync(tmp).toString())
+  delete result.time
+  same(result, {
+    pid: pid,
+    hostname: hostname,
+    level: 30,
+    msg: 'hello',
+    v: 1
+  })
+})
+
 // https://github.com/pinojs/pino/issues/222
 test('children with same names render in correct order', async ({is}) => {
   const stream = sink()
