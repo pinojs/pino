@@ -124,12 +124,6 @@ Default: `true`
 
 Set to `false` to disable logging.
 
-#### `safe` (Boolean)
-
-Default: `true`
-
-Avoid throwing caused by circular references in the object tree.
-
 #### `crlf` (Boolean)
 
 Default: `false`

@@ -1,6 +1,5 @@
 'use strict'
 const os = require('os')
-const stringifySafe = require('fast-safe-stringify')
 const serializers = require('pino-std-serializers')
 const SonicBoom = require('sonic-boom')
 const redaction = require('./lib/redaction')
@@ -8,7 +7,12 @@ const time = require('./lib/time')
 const proto = require('./lib/proto')
 const symbols = require('./lib/symbols')
 const { mappings, genLsCache, assertNoLevelCollisions } = require('./lib/levels')
-const { createArgsNormalizer, asChindings, final } = require('./lib/tools')
+const {
+  createArgsNormalizer,
+  asChindings,
+  final,
+  stringify
+} = require('./lib/tools')
 const { version, LOG_VERSION } = require('./lib/meta')
 const {
   chindingsSym,
@@ -30,7 +34,6 @@ const defaultErrorSerializer = serializers.err
 const defaultOptions = {
   level: 'info',
   messageKey: 'msg',
-  safe: true,
   enabled: true,
   prettyPrint: false,
   base: { pid, hostname },
@@ -46,7 +49,6 @@ const normalize = createArgsNormalizer(defaultOptions)
 function pino (...args) {
   const { opts, stream } = normalize(...args)
   const {
-    safe,
     redact,
     crlf,
     serializers,
@@ -60,7 +62,6 @@ function pino (...args) {
 
   assertNoLevelCollisions(pino.levels, customLevels)
 
-  const stringify = safe ? trySafe : JSON.stringify
   const stringifiers = redact ? redaction(redact, stringify) : {}
   const formatOpts = redact
     ? {stringify: stringifiers[redactFmtSym]}
@@ -112,11 +113,3 @@ pino.version = version
 pino.LOG_VERSION = LOG_VERSION
 
 module.exports = pino
-
-function trySafe (obj) {
-  try {
-    return JSON.stringify(obj)
-  } catch (_) {
-    return stringifySafe(obj)
-  }
-}

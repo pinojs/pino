@@ -152,17 +152,6 @@ test('does not explode with a circular ref', async ({doesNotThrow}) => {
   doesNotThrow(() => instance.info(a))
 })
 
-test('explode with a circular ref when safe is false', async ({throws}) => {
-  const stream = sink()
-  const instance = pino({ safe: false }, stream)
-  const b = {}
-  const a = {
-    hello: b
-  }
-  b.a = a // circular ref
-  throws(() => instance.info(a))
-})
-
 test('set the name', async ({is, same}) => {
   const stream = sink()
   const instance = pino({
@@ -445,9 +434,9 @@ test('children with same names render in correct order', async ({is}) => {
 })
 
 // https://github.com/pinojs/pino/pull/251 - use this.stringify
-test('when safe is true it should ONLY use `fast-safe-stringify`', async ({deepEqual}) => {
+test('use `fast-safe-stringify` to avoid circular dependencies', async ({deepEqual}) => {
   const stream = sink()
-  const root = pino({ safe: true }, stream)
+  const root = pino(stream)
   // circular depth
   const obj = {}
   obj.a = obj
@@ -456,9 +445,9 @@ test('when safe is true it should ONLY use `fast-safe-stringify`', async ({deepE
   deepEqual(a, { a: '[Circular]' })
 })
 
-test('when safe is true, fast-safe-stringify must be used when interpolating', async (t) => {
+test('fast-safe-stringify must be used when interpolating', async (t) => {
   const stream = sink()
-  const instance = pino({safe: true}, stream)
+  const instance = pino(stream)
 
   const o = { a: { b: {} } }
   o.a.b.c = o.a.b
@@ -466,18 +455,4 @@ test('when safe is true, fast-safe-stringify must be used when interpolating', a
 
   const { msg } = await once(stream, 'data')
   t.is(msg, 'test {"a":{"b":{"c":"[Circular]"}}}')
-})
-
-test('when safe is false, interpolation should throw', async (t) => {
-  const stream = sink()
-  const instance = pino({safe: false}, stream)
-  var o = { a: { b: {} } }
-  o.a.b.c = o.a.b
-  try {
-    instance.info('test', o)
-  } catch (e) {
-    t.is(e.message, 'Converting circular structure to JSON')
-    return
-  }
-  t.fail('must throw')
 })
