@@ -1,6 +1,5 @@
 'use strict'
 const os = require('os')
-const stringifySafe = require('fast-safe-stringify')
 const serializers = require('pino-std-serializers')
 const SonicBoom = require('sonic-boom')
 const redaction = require('./lib/redaction')
@@ -8,7 +7,12 @@ const time = require('./lib/time')
 const proto = require('./lib/proto')
 const symbols = require('./lib/symbols')
 const { mappings, genLsCache, assertNoLevelCollisions } = require('./lib/levels')
-const { createArgsNormalizer, asChindings, final } = require('./lib/tools')
+const {
+  createArgsNormalizer,
+  asChindings,
+  final,
+  stringify
+} = require('./lib/tools')
 const { version, LOG_VERSION } = require('./lib/meta')
 const {
   chindingsSym,
@@ -109,11 +113,3 @@ pino.version = version
 pino.LOG_VERSION = LOG_VERSION
 
 module.exports = pino
-
-function stringify (obj) {
-  try {
-    return JSON.stringify(obj)
-  } catch (_) {
-    return stringifySafe(obj)
-  }
-}
