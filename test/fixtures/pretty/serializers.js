@@ -6,6 +6,10 @@ var log = pino({
   prettyPrint: true,
   serializers: {
     foo (obj) {
+      if (obj.an !== 'object') {
+        throw new Error('kaboom')
+      }
+
       return 'bar'
     }
   }
