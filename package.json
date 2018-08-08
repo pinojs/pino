@@ -67,7 +67,7 @@
     "fresh-require": "^1.0.3",
     "log": "^1.4.0",
     "loglevel": "^1.6.1",
-    "pino-pretty": "^2.0.0",
+    "pino-pretty": "^2.0.1",
     "pre-commit": "^1.2.2",
     "proxyquire": "^2.0.1",
     "qodaa": "^1.0.1",
@@ -85,7 +85,7 @@
     "fast-redact": "^1.1.13",
     "fast-safe-stringify": "^2.0.4",
     "flatstr": "^1.0.5",
-    "pino-std-serializers": "^2.0.0",
+    "pino-std-serializers": "^2.2.0",
     "pump": "^3.0.0",
     "quick-format-unescaped": "^3.0.0",
     "sonic-boom": "^0.6.0"
