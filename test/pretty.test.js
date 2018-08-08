@@ -76,7 +76,8 @@ test('can send pretty print to custom stream', async ({is}) => {
   const log = pino({
     prettifier: require('pino-pretty'),
     prettyPrint: {
-      levelFirst: true
+      levelFirst: true,
+      colorize: false
     }
   }, dest)
   log.info('foo')
@@ -134,4 +135,16 @@ test('applies redaction rules', async ({is, isNot}) => {
   isNot(actual.match(/\(123456 on abcdefghijklmnopqr\): h/), null)
   isNot(actual.match(/\[Redacted\]/), null)
   is(actual.match(/object/), null)
+})
+
+test('dateformat', async ({isNot}) => {
+  var actual = ''
+  const child = fork(join(__dirname, 'fixtures', 'pretty', 'dateformat.js'), {silent: true})
+
+  child.stdout.pipe(writer((s, enc, cb) => {
+    actual += s
+    cb()
+  }))
+  await once(child, 'close')
+  isNot(actual.match(/\(123456 on abcdefghijklmnopqr\): h/), null)
 })
