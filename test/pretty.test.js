@@ -121,3 +121,17 @@ test('applies serializers', async ({is, isNot}) => {
   isNot(actual.match(/\(123456 on abcdefghijklmnopqr\): h/), null)
   isNot(actual.match(/foo: "bar"/), null)
 })
+
+test('applies redaction rules', async ({is, isNot}) => {
+  var actual = ''
+  const child = fork(join(__dirname, 'fixtures', 'pretty', 'redact.js'), {silent: true})
+
+  child.stdout.pipe(writer((s, enc, cb) => {
+    actual += s
+    cb()
+  }))
+  await once(child, 'close')
+  isNot(actual.match(/\(123456 on abcdefghijklmnopqr\): h/), null)
+  isNot(actual.match(/\[Redacted\]/), null)
+  is(actual.match(/object/), null)
+})
