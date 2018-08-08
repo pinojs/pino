@@ -108,3 +108,16 @@ test('parses and outputs chindings', async ({is, isNot}) => {
   isNot(actual.match(/a: 1/), null)
   is(actual.match(/a: 1/g).length, 2)
 })
+
+test('applies serializers', async ({is, isNot}) => {
+  var actual = ''
+  const child = fork(join(__dirname, 'fixtures', 'pretty', 'serializers.js'), {silent: true})
+
+  child.stdout.pipe(writer((s, enc, cb) => {
+    actual += s
+    cb()
+  }))
+  await once(child, 'close')
+  isNot(actual.match(/\(123456 on abcdefghijklmnopqr\): h/), null)
+  isNot(actual.match(/foo: "bar"/), null)
+})
