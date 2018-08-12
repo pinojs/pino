@@ -148,3 +148,27 @@ test('dateformat', async ({isNot}) => {
   await once(child, 'close')
   isNot(actual.match(/\(123456 on abcdefghijklmnopqr\): h/), null)
 })
+
+test('without timestamp', async ({isNot}) => {
+  var actual = ''
+  const child = fork(join(__dirname, 'fixtures', 'pretty', 'no-time.js'), {silent: true})
+
+  child.stdout.pipe(writer((s, enc, cb) => {
+    actual += s
+    cb()
+  }))
+  await once(child, 'close')
+  isNot(actual.slice(2), '[]')
+})
+
+test('with custom timestamp', async ({is}) => {
+  var actual = ''
+  const child = fork(join(__dirname, 'fixtures', 'pretty', 'custom-time.js'), {silent: true})
+
+  child.stdout.pipe(writer((s, enc, cb) => {
+    actual += s
+    cb()
+  }))
+  await once(child, 'close')
+  is(actual.slice(0, 8), '["test"]')
+})
