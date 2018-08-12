@@ -415,3 +415,25 @@ test('redacts null at the top level', async ({is}) => {
   const o = await once(stream, 'data')
   is(o.n, '[Redacted]')
 })
+
+test('supports bracket notation', async ({is}) => {
+  const stream = sink()
+  const instance = pino({redact: ['a["b-b"]']}, stream)
+  const obj = {
+    a: {'b-b': 'c'}
+  }
+  instance.info(obj)
+  const o = await once(stream, 'data')
+  is(o.a['b-b'], '[Redacted]')
+})
+
+test('supports leading bracket notation', async ({is}) => {
+  const stream = sink()
+  const instance = pino({redact: ['["a-a"].b']}, stream)
+  const obj = {
+    'a-a': {b: 'c'}
+  }
+  instance.info(obj)
+  const o = await once(stream, 'data')
+  is(o['a-a'].b, '[Redacted]')
+})

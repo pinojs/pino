@@ -93,6 +93,23 @@ This will output
 
 See [pino options in API](api.md#pino) for `redact` API details.
 
+<a name="paths"></a>
+## Path Syntax
+
+The syntax for paths supplied to the `redact` option conform to the syntax in path lookups
+in standard EcmaScript, with two additions: 
+
+* paths may start with bracket notation
+* paths may contain the asterisk `*` to denote a wildcard
+
+By way of example, the following are all valid paths:
+
+* `a.b.c`
+* `a["b-c"].d`
+* `["a-b"].c`
+* `a.b.*`
+* `a[*].b`
+
 ## Overhead
 
 Pino's redaction functionality is built on top of [`fast-redact`](http://github.com/davidmarkclements/fast-redact)
