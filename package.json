@@ -18,7 +18,7 @@
   "scripts": {
     "browser-test": "airtap --local 8080 test/browser*test.js",
     "test": "standard | snazzy && NODE_OPTIONS='--no-warnings -r qodaa' tap -j 4 --no-cov test/*test.js",
-    "ci": "standard | snazzy && TAP_TIMEOUT=480000 NODE_OPTIONS='--no-warnings -r qodaa' tap -j 4 --cov test/*test.js",
+    "ci": "standard | snazzy && TAP_TIMEOUT=480000 NODE_OPTIONS='--no-warnings -r qodaa' tap -j 4 --100 test/*test.js",
     "cov-ui": "NODE_OPTIONS='--no-warnings -r qodaa' tap -j 4 --coverage-report=html test/*test.js",
     "bench": "node benchmarks/utils/runbench all",
     "bench-basic": "node benchmarks/utils/runbench basic",
