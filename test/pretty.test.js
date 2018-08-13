@@ -107,7 +107,8 @@ test('parses and outputs chindings', async ({is, isNot}) => {
   isNot(actual.match(/\(123456 on abcdefghijklmnopqr\): h/), null)
   isNot(actual.match(/\(123456 on abcdefghijklmnopqr\): h2/), null)
   isNot(actual.match(/a: 1/), null)
-  is(actual.match(/a: 1/g).length, 2)
+  isNot(actual.match(/b: 2/), null)
+  is(actual.match(/a: 1/g).length, 3)
 })
 
 test('applies serializers', async ({is, isNot}) => {
