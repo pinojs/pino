@@ -15,7 +15,7 @@
   * [logger.level](#level)
   * [logger.isLevelEnabled()](#islevelenabled)
   * [logger.levels](#levels)
-  * [Logger\[Symbol.for('pino.serializers')\]](#serializers)
+  * [logger\[Symbol.for('pino.serializers')\]](#serializers)
   * [Event: 'level-change'](#level-change)
   * [logger.version](#version)
   * [logger.LOG_VERSION](#log_version)
