@@ -91,6 +91,29 @@ test('child does not overwrite parent serializers', async ({is}) => {
   is((await o2).test, 'child')
 })
 
+test('Symbol.for(\'pino.serializers\')', async ({is, isNot}) => {
+  const stream = sink()
+  const parent = pino({ serializers: parentSerializers }, stream)
+  const child = parent.child({a: 'property'})
+
+  is(parent[Symbol.for('pino.serializers')], parentSerializers)
+  is(child[Symbol.for('pino.serializers')], parentSerializers)
+
+  const child2 = parent.child({
+    serializers: {
+      a
+    }
+  })
+
+  function a () {
+    return 'hello'
+  }
+
+  isNot(child2[Symbol.for('pino.serializers')], parentSerializers)
+  is(child2[Symbol.for('pino.serializers')].a, a)
+  is(child2[Symbol.for('pino.serializers')].test, parentSerializers.test)
+})
+
 test('children inherit parent serializers', async ({is}) => {
   const stream = sink()
   const parent = pino({ serializers: parentSerializers }, stream)
