@@ -173,3 +173,16 @@ test('with custom timestamp', async ({is}) => {
   await once(child, 'close')
   is(actual.slice(0, 8), '["test"]')
 })
+
+test('errors', async ({isNot}) => {
+  var actual = ''
+  const child = fork(join(__dirname, 'fixtures', 'pretty', 'error.js'), {silent: true})
+
+  child.stdout.pipe(writer((s, enc, cb) => {
+    actual += s
+    cb()
+  }))
+  await once(child, 'close')
+  isNot(actual.match(/\(123456 on abcdefghijklmnopqr\): kaboom/), null)
+  isNot(actual.match(/.*error\.js.*/), null)
+})
