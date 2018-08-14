@@ -547,9 +547,8 @@ $ node -p "require('pino')().levels"
 <a id="serializers"></a>
 ### logger\[Symbol.for('pino.serializers')\]
 
-Returns the serializers for the logger instance, as seen by the logger
-itself. Child loggers might reuse the same instance of their parent, if
-there are no changes.
+Returns the serializers as applied to the current logger instance. If a child logger did not
+register it's own serializer upon instantiation the serializers of the parent will be returned.
 
 <a id="level-change"></a>
 ### Event: 'level-change'
