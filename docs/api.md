@@ -15,6 +15,7 @@
   * [logger.level](#level)
   * [logger.isLevelEnabled()](#islevelenabled)
   * [logger.levels](#levels)
+  * [Logger\[Symbol.for('pino.serializers')\]](#serializers)
   * [Event: 'level-change'](#level-change)
   * [logger.version](#version)
   * [logger.LOG_VERSION](#log_version)
@@ -542,6 +543,13 @@ $ node -p "require('pino')().levels"
 ```
 
 * See [`logger.level`](#level)
+
+<a id="serializers"></a>
+### logger\[Symbol.for('pino.serializers')\]
+
+Returns the serializers for the logger instance, as seen by the logger
+itself. Child loggers might reuse the same instance of their parent, if
+there are no changes.
 
 <a id="level-change"></a>
 ### Event: 'level-change'
