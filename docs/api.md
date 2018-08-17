@@ -203,6 +203,8 @@ const stderrLogger = require('pino')(opts, pino.destination(2))
 const fileLogger = require('pino')('/log/path')
 ```
 
+On AWS Lambda the default destination is `process.stdout` instead.
+
 * See [`pino.destination`](#pino-destination) 
 * See [`pino.extreme`](#pino-extreme) 
 
@@ -609,6 +611,9 @@ By default, `pino.destination` will use `process.stdout.fd` (1) as the file desc
 A `pino.destination` instance can also be used to reopen closed files 
 (for example, for some log rotation scenarios), see [Reopening log files](/docs/help.md#reopening).
 
+On AWS Lambda we recommend to call `destination.flushSync()` at the end
+of each function execution to avoid losing data.
+
 * See [`destination` parameter](#destination)
 * See [`sonic-boom` ⇗](https://github.com/mcollina/sonic-boom)
 * See [Reopening log files](/docs/help.md#reopening)
@@ -633,6 +638,9 @@ module.
 
 A `pino.extreme` instance can also be used to reopen closed files 
 (for example, for some log rotation scenarios), see [Reopening log files](/docs/help.md#reopening).
+
+On AWS Lambda we recommend to call `extreme.flushSync()` at the end
+of each function execution to avoid losing data.
 
 * See [`destination` parameter](#destination)
 * See [`sonic-boom` ⇗](https://github.com/mcollina/sonic-boom)
