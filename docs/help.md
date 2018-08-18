@@ -13,12 +13,12 @@
 <a id="exit-logging"></a>
 ## Exit logging
 
-When a Node process crashes from uncaught exception, exits due to a signal, 
+When a Node process crashes from uncaught exception, exits due to a signal,
 or exits of it's own accord we may want to write some final logs – particularly
-in cases of error. 
+in cases of error.
 
 Writing to a Node.js stream on exit is not necessarily guaranteed, and naively writing
-to an Extreme Mode logger on exit will definitely lead to lost logs. 
+to an Extreme Mode logger on exit will definitely lead to lost logs.
 
 To write logs in an exit handler, create the handler with [`pino.final`](/docs/api.md#pino-final):
 
@@ -34,7 +34,7 @@ process.on('unhandledRejection', pino.final(logger, (err, finalLogger) => {
 }))
 ```
 
-The `finalLogger` is a special logger instance that will synchronously and reliably 
+The `finalLogger` is a special logger instance that will synchronously and reliably
 flush every log line. This is important in exit handlers, since no more asynchronous
 activity may be scheduled.
 
@@ -64,7 +64,7 @@ We would rotate our log files with logrotate, by adding the following to `/etc/l
 }
 ```
 
-The `copytruncate` configuration has a very slight possibility of lost log lines due 
+The `copytruncate` configuration has a very slight possibility of lost log lines due
 to a gap between copying and truncating - the truncate may occur after additional lines
 have been written. To perform log rotation without `copytruncate`, see the [Reopening log files](#reopening)
 help.
@@ -72,12 +72,12 @@ help.
 <a id="reopening"></a>
 ## Reopening log files
 
-In cases where a log rotation tool doesn't offer a copy-truncate capabilities, 
+In cases where a log rotation tool doesn't offer a copy-truncate capabilities,
 or where using them is deemed inappropriate `pino.destination` and `pino.extreme`
 destinations are able to reopen file paths after a file has been moved away.
 
-One way to use this is to set up a `SIGUSR2` or `SIGHUP` signal handler that 
-reopens the log file destination, making sure to write the process PID out 
+One way to use this is to set up a `SIGUSR2` or `SIGHUP` signal handler that
+reopens the log file destination, making sure to write the process PID out
 somewhere so the log rotation tool knows where to send the signal.
 
 ```js
@@ -90,7 +90,7 @@ const logger = require('pino')(dest)
 process.on('SIGHUP', () => dest.reopen())
 ```
 
-The log rotation tool can then be configured to send this signal to the process 
+The log rotation tool can then be configured to send this signal to the process
 after a log rotation event has occurred.
 
 Given a similar scenario as in the [Log rotation](#rotate) section a basic
@@ -109,7 +109,7 @@ Given a similar scenario as in the [Log rotation](#rotate) section a basic
            kill -HUP `cat /var/run/myapp.pid`
        endscript
 }
-``` 
+```
 
 <a id="multiple"></a>
 ## Saving to multiple files
@@ -131,7 +131,7 @@ node app.js | pino-tee warn ./warn-logs > ./all-logs
 
 <a id="filter-logs"></a>
 ## Log Filtering
-The Pino philosophy advocates common, pre-existing, system utilities. 
+The Pino philosophy advocates common, pre-existing, system utilities.
 
 Some recommendations in line with this philosophy are:
 
@@ -159,16 +159,17 @@ ExecStart=/bin/sh -c '/path/to/node app.js | pino-transport'
 ## How Pino handles duplicate keys
 
 Duplicate keys are possibly when a child logger logs an object with a key that
-collides with a key in the child loggers bindings. 
+collides with a key in the child loggers bindings.
 
 See the [child logger duplicate keys caveat](/docs/child-loggers.md#duplicate-keys-caveat)
 for information on this is handled.
 
 <a id="level-string"></a>
 ## Log levels as labels instead of numbers
-Pino log lines are meant to be parseable. Thus, there isn't any built-in option
-to change the level from the integer value to the string name. However, there
-are a couple of options:
+Pino log lines are meant to be parseable. Thus, Pino's default mode of opertaion
+is to print the level value instead of the string name. However, while it is
+possible to set the `useLevelLabels` option, we recommend using one of these
+options instead if you are able:
 
 1. If the only change desired is the name then a transport can be used. One such
 transport is [`pino-text-level-transport`](https://npm.im/pino-text-level-transport).
@@ -178,12 +179,12 @@ the logs human friendly.
 <a id="debug"></a>
 ## Pino with `debug`
 
-The popular [`debug`](http://npm.im/debug) is used in many modules across the ecosystem. 
+The popular [`debug`](http://npm.im/debug) is used in many modules across the ecosystem.
 
 The [`pino-debug`](http://github.com/pinojs/pino-debug) module
 can capture calls to `debug` loggers and run them
 through `pino` instead. This results in a 10x (20x in extreme mode)
-performance improvement - event though `pino-debug` is logging additional 
+performance improvement - event though `pino-debug` is logging additional
 data and wrapping it in JSON.
 
 To quickly enable this install [`pino-debug`](http://github.com/pinojs/pino-debug)
