@@ -242,6 +242,30 @@ test('produces labels when told to', async ({is}) => {
   instance.info('hello world')
 })
 
+test('children produce labels when told to', async ({is}) => {
+  const expected = [
+    {
+      level: 'info',
+      msg: 'child 1'
+    },
+    {
+      level: 'info',
+      msg: 'child 2'
+    }
+  ]
+  const instance = pino({useLevelLabels: true}, sink((result, enc, cb) => {
+    const current = expected.shift()
+    check(is, result, current.level, current.msg)
+    cb()
+  }))
+
+  const child1 = instance.child({name: 'child1'})
+  const child2 = child1.child({name: 'child2'})
+
+  child1.info('child 1')
+  child2.info('child 2')
+})
+
 test('produces labels for custom levels', async ({is}) => {
   const expected = [
     {
