@@ -25,7 +25,8 @@ const {
   setLevelSym,
   endSym,
   formatOptsSym,
-  messageKeyStringSym
+  messageKeyStringSym,
+  useLevelLabelsSym
 } = symbols
 const { epochTime, nullTime } = time
 const { pid } = process
@@ -33,6 +34,7 @@ const hostname = os.hostname()
 const defaultErrorSerializer = serializers.err
 const defaultOptions = {
   level: 'info',
+  useLevelLabels: false,
   messageKey: 'msg',
   enabled: true,
   prettyPrint: false,
@@ -57,7 +59,8 @@ function pino (...args) {
     base,
     name,
     level,
-    customLevels
+    customLevels,
+    useLevelLabels
   } = opts
 
   assertNoLevelCollisions(pino.levels, customLevels)
@@ -83,6 +86,7 @@ function pino (...args) {
 
   const instance = {
     levels,
+    [useLevelLabelsSym]: useLevelLabels,
     [streamSym]: stream,
     [timeSym]: time,
     [stringifySym]: stringify,
@@ -95,7 +99,7 @@ function pino (...args) {
   }
   Object.setPrototypeOf(instance, proto)
 
-  if (customLevels) genLsCache(instance)
+  if (customLevels || useLevelLabels) genLsCache(instance)
 
   instance[setLevelSym](level)
 
