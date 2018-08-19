@@ -211,7 +211,12 @@ const stderrLogger = require('pino')(opts, pino.destination(2))
 const fileLogger = require('pino')('/log/path')
 ```
 
-On AWS Lambda the default destination is `process.stdout` instead.
+However, there are some special instances where `pino.destination` is not used as the default:
+
++ When something, e.g a process manager, has monkey-patched `process.stdout.write`.
++ When running on AWS Lambda.
+
+In these cases `process.stdout` is used instead.
 
 * See [`pino.destination`](#pino-destination)
 * See [`pino.extreme`](#pino-extreme)
