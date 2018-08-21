@@ -661,15 +661,12 @@ of each function execution to avoid losing data.
 * See [Reopening log files](/docs/help.md#reopening)
 
 <a id="pino-final"></a>
-### `pino.final(logger, handler) => Function`
 
-The `pino.final` method supplies an exit listener function that can be
-supplied to process exit events such as `exit`, `uncaughtException`,
-`SIGHUP` and so on.
+### `pino.final(logger, [handler]) => Function | FinalLogger`
 
-The exit listener function will call the supplied `handler` function
-with an error object (or else `null`), a `finalLogger` instance followed
-by any additional arguments the `handler` may be called with.
+The `pino.final` method can be used to acquire a final logger instance 
+or create an exit listener function.
+
 The `finalLogger` is a specialist logger that synchronously flushes
 on every write. This is important to gaurantee final log writes,
 both when using `pino.destination` or `pino.extreme` targets.
@@ -680,11 +677,30 @@ is a Node.js stream `pino.final` will throw. It's highly recommended
 for both performance and safety to use `pino.destination`/`pino.extreme`
 destinations.
 
+#### `pino.final(logger, handler) => Function`
+
+In this case the `pino.final` method supplies an exit listener function that can be
+supplied to process exit events such as `exit`, `uncaughtException`,
+`SIGHUP` and so on.
+
+The exit listener function will call the supplied `handler` function
+with an error object (or else `null`), a `finalLogger` instance followed
+by any additional arguments the `handler` may be called with.
+
 ```js
 process.on('uncaughtException', pino.final(logger, (err, finalLogger) => {
   finalLogger.error(err, 'uncaughtException')
   process.exit(1)
 }))
+```
+
+#### `pino.final(logger) => FinalLogger`
+
+In this case the `pino.final` method returns a finalLogger instance.
+
+```js
+var finalLogger = pino.final(logger)
+finalLogger.info('exiting...')
 ```
 
 * See [`destination` parameter](#destination)
