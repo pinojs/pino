@@ -662,7 +662,7 @@ of each function execution to avoid losing data.
 
 <a id="pino-final"></a>
 
-### `pino.final(logger, [handler]) => Function | Logger`
+### `pino.final(logger, [handler]) => Function | FinalLogger`
 
 The `pino.final` method can be used to acquire a final logger instance 
 or create an exit listener function.

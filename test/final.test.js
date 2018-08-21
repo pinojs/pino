@@ -21,7 +21,7 @@ test('throws if not supplied a logger instance', async ({throws}) => {
 test('throws if the supplied handler is not a function', async ({throws}) => {
   throws(() => {
     pino.final(pino(), 'dummy')
-  }, Error('expected a handler function'))
+  }, Error('if supplied, the handler parameter should be a function'))
 })
 
 test('throws if not supplied logger with pino.destination or pino.extreme instance', async ({throws, doesNotThrow}) => {
@@ -84,7 +84,22 @@ test('passes a specialized final logger instance', async ({is, isNot, error}) =>
   const logger = pino(dest)
   pino.final(logger, (err, finalLogger) => {
     error(err)
-    testLoggers(logger, finalLogger, is, isNot)
+    is(typeof finalLogger.trace, 'function')
+    is(typeof finalLogger.debug, 'function')
+    is(typeof finalLogger.info, 'function')
+    is(typeof finalLogger.warn, 'function')
+    is(typeof finalLogger.error, 'function')
+    is(typeof finalLogger.fatal, 'function')
+
+    isNot(finalLogger.trace, logger.trace)
+    isNot(finalLogger.debug, logger.debug)
+    isNot(finalLogger.info, logger.info)
+    isNot(finalLogger.warn, logger.warn)
+    isNot(finalLogger.error, logger.error)
+    isNot(finalLogger.fatal, logger.fatal)
+
+    is(finalLogger.child, logger.child)
+    is(finalLogger.levels, logger.levels)
   })()
 })
 
@@ -92,7 +107,22 @@ test('returns a specialized final logger instance if no handler is passed', asyn
   const dest = pino.destination('/dev/null')
   const logger = pino(dest)
   const finalLogger = pino.final(logger)
-  testLoggers(logger, finalLogger, is, isNot)
+  is(typeof finalLogger.trace, 'function')
+  is(typeof finalLogger.debug, 'function')
+  is(typeof finalLogger.info, 'function')
+  is(typeof finalLogger.warn, 'function')
+  is(typeof finalLogger.error, 'function')
+  is(typeof finalLogger.fatal, 'function')
+
+  isNot(finalLogger.trace, logger.trace)
+  isNot(finalLogger.debug, logger.debug)
+  isNot(finalLogger.info, logger.info)
+  isNot(finalLogger.warn, logger.warn)
+  isNot(finalLogger.error, logger.error)
+  isNot(finalLogger.fatal, logger.fatal)
+
+  is(finalLogger.child, logger.child)
+  is(finalLogger.levels, logger.levels)
 })
 
 test('final logger instances synchronously flush after a log method call', async ({pass, fail, error}) => {
@@ -138,22 +168,3 @@ test('also instruments custom log methods', async ({pass, fail, error}) => {
   await sleep(10)
   if (passed === false) fail('flushSync not called')
 })
-
-function testLoggers (logger, finalLogger, is, isNot) {
-  is(typeof finalLogger.trace, 'function')
-  is(typeof finalLogger.debug, 'function')
-  is(typeof finalLogger.info, 'function')
-  is(typeof finalLogger.warn, 'function')
-  is(typeof finalLogger.error, 'function')
-  is(typeof finalLogger.fatal, 'function')
-
-  isNot(finalLogger.trace, logger.trace)
-  isNot(finalLogger.debug, logger.debug)
-  isNot(finalLogger.info, logger.info)
-  isNot(finalLogger.warn, logger.warn)
-  isNot(finalLogger.error, logger.error)
-  isNot(finalLogger.fatal, logger.fatal)
-
-  is(finalLogger.child, logger.child)
-  is(finalLogger.levels, logger.levels)
-}
