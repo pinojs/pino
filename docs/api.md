@@ -694,7 +694,7 @@ process.on('uncaughtException', pino.final(logger, (err, finalLogger) => {
 }))
 ```
 
-#### `pino.final(logger) => Logger`
+#### `pino.final(logger) => FinalLogger`
 
 In this case the `pino.final` method returns a finalLogger instance.
 
