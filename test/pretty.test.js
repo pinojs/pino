@@ -184,5 +184,6 @@ test('errors', async ({isNot}) => {
   }))
   await once(child, 'close')
   isNot(actual.match(/\(123456 on abcdefghijklmnopqr\): kaboom/), null)
+  isNot(actual.match(/\(123456 on abcdefghijklmnopqr\): with a message/), null)
   isNot(actual.match(/.*error\.js.*/), null)
 })

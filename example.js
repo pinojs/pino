@@ -31,3 +31,5 @@ pino.trace('this is a trace statement')
 pino.debug('this is a "debug" statement with "')
 
 pino.info(new Error('kaboom'))
+
+pino.info(new Error('kaboom'), 'with', 'a', 'message')
