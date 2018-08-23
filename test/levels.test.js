@@ -242,6 +242,21 @@ test('produces labels when told to', async ({is}) => {
   instance.info('hello world')
 })
 
+test('changes label naming when told to', async ({is}) => {
+  const expected = [{
+    priority: 30,
+    msg: 'hello world'
+  }]
+  const instance = pino({changeLevelName: 'priority'}, sink((result, enc, cb) => {
+    const current = expected.shift()
+    is(result.priority, current.priority)
+    is(result.msg, current.msg)
+    cb()
+  }))
+
+  instance.info('hello world')
+})
+
 test('children produce labels when told to', async ({is}) => {
   const expected = [
     {
@@ -291,4 +306,19 @@ test('produces labels for custom levels', async ({is}) => {
 
   instance.info('hello world')
   instance.foo('foobar')
+})
+
+test('setting changeLevelName does not affect labels when told to', async ({is}) => {
+  const instance = pino(
+    {
+      useLevelLabels: true,
+      changeLevelName: 'priority'
+    },
+    sink((result, enc, cb) => {
+      is(result.priority, 'info')
+      cb()
+    })
+  )
+
+  instance.info('hello world')
 })

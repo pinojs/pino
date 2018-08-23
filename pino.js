@@ -26,7 +26,8 @@ const {
   endSym,
   formatOptsSym,
   messageKeyStringSym,
-  useLevelLabelsSym
+  useLevelLabelsSym,
+  changeLevelNameSym
 } = symbols
 const { epochTime, nullTime } = time
 const { pid } = process
@@ -43,7 +44,8 @@ const defaultOptions = {
   timestamp: epochTime,
   name: undefined,
   redact: null,
-  customLevels: null
+  customLevels: null,
+  changeLevelName: 'level'
 }
 
 const normalize = createArgsNormalizer(defaultOptions)
@@ -60,7 +62,8 @@ function pino (...args) {
     name,
     level,
     customLevels,
-    useLevelLabels
+    useLevelLabels,
+    changeLevelName
   } = opts
 
   assertNoLevelCollisions(pino.levels, customLevels)
@@ -87,6 +90,7 @@ function pino (...args) {
   const instance = {
     levels,
     [useLevelLabelsSym]: useLevelLabels,
+    [changeLevelNameSym]: changeLevelName,
     [streamSym]: stream,
     [timeSym]: time,
     [stringifySym]: stringify,
@@ -99,7 +103,7 @@ function pino (...args) {
   }
   Object.setPrototypeOf(instance, proto)
 
-  if (customLevels || useLevelLabels) genLsCache(instance)
+  if (customLevels || useLevelLabels || changeLevelName !== defaultOptions.changeLevelName) genLsCache(instance)
 
   instance[setLevelSym](level)
 

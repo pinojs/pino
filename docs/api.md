@@ -179,6 +179,20 @@ Default: `false`
 Enables printing of level labels instead of level values in the printed logs.
 Warning: this option may not be supported by downstream transports.
 
+<a id="changeLevelName"></a>
+#### `changeLevelName` (String)
+
+Default: `'level'`
+
+Changes the property `level` to any string value you pass in:
+```js
+const logger = pino({
+  changeLevelName: 'priority'
+})
+logger.info('hello world')
+// {"priority":30,"time":1531257112193,"msg":"hello world","pid":55956,"hostname":"x","v":1}
+```
+
 #### `browser` (Object)
 
 Browser only, may have `asObject` and `write` keys. This option is separately
@@ -664,7 +678,7 @@ of each function execution to avoid losing data.
 
 ### `pino.final(logger, [handler]) => Function | FinalLogger`
 
-The `pino.final` method can be used to acquire a final logger instance 
+The `pino.final` method can be used to acquire a final logger instance
 or create an exit listener function.
 
 The `finalLogger` is a specialist logger that synchronously flushes
