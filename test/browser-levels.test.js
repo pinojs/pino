@@ -2,7 +2,7 @@
 const test = require('tape')
 const pino = require('../browser')
 
-test('set the level by string', ({end, same, is}) => {
+test('set the level by string', ({ end, same, is }) => {
   const expected = [
     {
       level: 50,
@@ -29,7 +29,7 @@ test('set the level by string', ({end, same, is}) => {
   end()
 })
 
-test('set the level by string. init with silent', ({end, same, is}) => {
+test('set the level by string. init with silent', ({ end, same, is }) => {
   const expected = [
     {
       level: 50,
@@ -57,7 +57,7 @@ test('set the level by string. init with silent', ({end, same, is}) => {
   end()
 })
 
-test('set the level by string. init with silent and transmit', ({end, same, is}) => {
+test('set the level by string. init with silent and transmit', ({ end, same, is }) => {
   const expected = [
     {
       level: 50,
@@ -88,7 +88,7 @@ test('set the level by string. init with silent and transmit', ({end, same, is})
   end()
 })
 
-test('set the level via constructor', ({end, same, is}) => {
+test('set the level via constructor', ({ end, same, is }) => {
   const expected = [
     {
       level: 50,
@@ -115,7 +115,7 @@ test('set the level via constructor', ({end, same, is}) => {
   end()
 })
 
-test('the wrong level throws', ({end, throws}) => {
+test('the wrong level throws', ({ end, throws }) => {
   const instance = pino()
   throws(() => {
     instance.level = 'kaboom'
@@ -123,7 +123,7 @@ test('the wrong level throws', ({end, throws}) => {
   end()
 })
 
-test('the wrong level by number throws', ({end, throws}) => {
+test('the wrong level by number throws', ({ end, throws }) => {
   const instance = pino()
   throws(() => {
     instance.levelVal = 55
@@ -131,23 +131,23 @@ test('the wrong level by number throws', ({end, throws}) => {
   end()
 })
 
-test('exposes level string mappings', ({end, is}) => {
+test('exposes level string mappings', ({ end, is }) => {
   is(pino.levels.values.error, 50)
   end()
 })
 
-test('exposes level number mappings', ({end, is}) => {
+test('exposes level number mappings', ({ end, is }) => {
   is(pino.levels.labels[50], 'error')
   end()
 })
 
-test('returns level integer', ({end, is}) => {
-  const instance = pino({level: 'error'})
+test('returns level integer', ({ end, is }) => {
+  const instance = pino({ level: 'error' })
   is(instance.levelVal, 50)
   end()
 })
 
-test('silent level via constructor', ({end, fail}) => {
+test('silent level via constructor', ({ end, fail }) => {
   const instance = pino({
     level: 'silent',
     browser: {
@@ -164,7 +164,7 @@ test('silent level via constructor', ({end, fail}) => {
   end()
 })
 
-test('silent level by string', ({end, fail}) => {
+test('silent level by string', ({ end, fail }) => {
   const instance = pino({
     browser: {
       write () {
@@ -182,7 +182,7 @@ test('silent level by string', ({end, fail}) => {
   end()
 })
 
-test('exposed levels', ({end, same}) => {
+test('exposed levels', ({ end, same }) => {
   same(Object.keys(pino.levels.values), [
     'fatal',
     'error',
@@ -194,7 +194,7 @@ test('exposed levels', ({end, same}) => {
   end()
 })
 
-test('exposed labels', ({end, same}) => {
+test('exposed labels', ({ end, same }) => {
   same(Object.keys(pino.levels.labels), [
     '10',
     '20',

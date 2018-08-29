@@ -8,9 +8,9 @@ const writer = require('flush-write-stream')
 const { once } = require('./helper')
 const pino = require('../')
 
-test('can be enabled via exported pino function', async ({isNot}) => {
+test('can be enabled via exported pino function', async ({ isNot }) => {
   var actual = ''
-  const child = fork(join(__dirname, 'fixtures', 'pretty', 'basic.js'), {silent: true})
+  const child = fork(join(__dirname, 'fixtures', 'pretty', 'basic.js'), { silent: true })
 
   child.stdout.pipe(writer((s, enc, cb) => {
     actual += s
@@ -20,9 +20,9 @@ test('can be enabled via exported pino function', async ({isNot}) => {
   isNot(actual.match(/\(123456 on abcdefghijklmnopqr\): h/), null)
 })
 
-test('can be enabled via exported pino function with pretty configuration', async ({isNot}) => {
+test('can be enabled via exported pino function with pretty configuration', async ({ isNot }) => {
   var actual = ''
-  const child = fork(join(__dirname, 'fixtures', 'pretty', 'level-first.js'), {silent: true})
+  const child = fork(join(__dirname, 'fixtures', 'pretty', 'level-first.js'), { silent: true })
 
   child.stdout.pipe(writer((s, enc, cb) => {
     actual += s
@@ -32,9 +32,9 @@ test('can be enabled via exported pino function with pretty configuration', asyn
   isNot(actual.match(/^INFO.*h/), null)
 })
 
-test('can be enabled via exported pino function with prettifier', async ({isNot}) => {
+test('can be enabled via exported pino function with prettifier', async ({ isNot }) => {
   var actual = ''
-  const child = fork(join(__dirname, 'fixtures', 'pretty', 'pretty-factory.js'), {silent: true})
+  const child = fork(join(__dirname, 'fixtures', 'pretty', 'pretty-factory.js'), { silent: true })
 
   child.stdout.pipe(writer((s, enc, cb) => {
     actual += s
@@ -45,11 +45,11 @@ test('can be enabled via exported pino function with prettifier', async ({isNot}
   isNot(actual.match(/^INFO.*h/), null)
 })
 
-test('does not throw error when enabled with stream specified', async ({doesNotThrow}) => {
-  doesNotThrow(() => pino({prettyPrint: true}, process.stdout))
+test('does not throw error when enabled with stream specified', async ({ doesNotThrow }) => {
+  doesNotThrow(() => pino({ prettyPrint: true }, process.stdout))
 })
 
-test('throws when prettyPrint is true but pino-pretty module is not installed', async ({throws, is}) => {
+test('throws when prettyPrint is true but pino-pretty module is not installed', async ({ throws, is }) => {
   // pino pretty *is* installed, and probably also cached, so rather than
   // messing with the filesystem the simplest way to generate a not found
   // error is to simulate it:
@@ -57,15 +57,15 @@ test('throws when prettyPrint is true but pino-pretty module is not installed', 
   require.cache[require.resolve('pino-pretty')].exports = () => {
     throw Error(`Cannot find module 'pino-pretty'`)
   }
-  throws(() => pino({prettyPrint: true}))
-  try { pino({prettyPrint: true}) } catch ({message}) {
+  throws(() => pino({ prettyPrint: true }))
+  try { pino({ prettyPrint: true }) } catch ({ message }) {
     is(message, 'Missing `pino-pretty` module: `pino-pretty` must be installed separately')
   }
 
   require.cache[require.resolve('pino-pretty')].exports = prettyFactory
 })
 
-test('can send pretty print to custom stream', async ({is}) => {
+test('can send pretty print to custom stream', async ({ is }) => {
   const dest = new Writable({
     objectMode: true,
     write (formatted, enc) {
@@ -83,9 +83,9 @@ test('can send pretty print to custom stream', async ({is}) => {
   log.info('foo')
 })
 
-test('ignores `undefined` from prettifier', async ({is}) => {
+test('ignores `undefined` from prettifier', async ({ is }) => {
   var actual = ''
-  const child = fork(join(__dirname, 'fixtures', 'pretty', 'skipped-output.js'), {silent: true})
+  const child = fork(join(__dirname, 'fixtures', 'pretty', 'skipped-output.js'), { silent: true })
 
   child.stdout.pipe(writer((s, enc) => {
     actual += s
@@ -95,9 +95,9 @@ test('ignores `undefined` from prettifier', async ({is}) => {
   is(actual, '')
 })
 
-test('parses and outputs chindings', async ({is, isNot}) => {
+test('parses and outputs chindings', async ({ is, isNot }) => {
   var actual = ''
-  const child = fork(join(__dirname, 'fixtures', 'pretty', 'child.js'), {silent: true})
+  const child = fork(join(__dirname, 'fixtures', 'pretty', 'child.js'), { silent: true })
 
   child.stdout.pipe(writer((s, enc, cb) => {
     actual += s
@@ -111,9 +111,9 @@ test('parses and outputs chindings', async ({is, isNot}) => {
   is(actual.match(/a: 1/g).length, 3)
 })
 
-test('applies serializers', async ({is, isNot}) => {
+test('applies serializers', async ({ is, isNot }) => {
   var actual = ''
-  const child = fork(join(__dirname, 'fixtures', 'pretty', 'serializers.js'), {silent: true})
+  const child = fork(join(__dirname, 'fixtures', 'pretty', 'serializers.js'), { silent: true })
 
   child.stdout.pipe(writer((s, enc, cb) => {
     actual += s
@@ -124,9 +124,9 @@ test('applies serializers', async ({is, isNot}) => {
   isNot(actual.match(/foo: "bar"/), null)
 })
 
-test('applies redaction rules', async ({is, isNot}) => {
+test('applies redaction rules', async ({ is, isNot }) => {
   var actual = ''
-  const child = fork(join(__dirname, 'fixtures', 'pretty', 'redact.js'), {silent: true})
+  const child = fork(join(__dirname, 'fixtures', 'pretty', 'redact.js'), { silent: true })
 
   child.stdout.pipe(writer((s, enc, cb) => {
     actual += s
@@ -138,9 +138,9 @@ test('applies redaction rules', async ({is, isNot}) => {
   is(actual.match(/object/), null)
 })
 
-test('dateformat', async ({isNot}) => {
+test('dateformat', async ({ isNot }) => {
   var actual = ''
-  const child = fork(join(__dirname, 'fixtures', 'pretty', 'dateformat.js'), {silent: true})
+  const child = fork(join(__dirname, 'fixtures', 'pretty', 'dateformat.js'), { silent: true })
 
   child.stdout.pipe(writer((s, enc, cb) => {
     actual += s
@@ -150,9 +150,9 @@ test('dateformat', async ({isNot}) => {
   isNot(actual.match(/\(123456 on abcdefghijklmnopqr\): h/), null)
 })
 
-test('without timestamp', async ({isNot}) => {
+test('without timestamp', async ({ isNot }) => {
   var actual = ''
-  const child = fork(join(__dirname, 'fixtures', 'pretty', 'no-time.js'), {silent: true})
+  const child = fork(join(__dirname, 'fixtures', 'pretty', 'no-time.js'), { silent: true })
 
   child.stdout.pipe(writer((s, enc, cb) => {
     actual += s
@@ -162,9 +162,9 @@ test('without timestamp', async ({isNot}) => {
   isNot(actual.slice(2), '[]')
 })
 
-test('with custom timestamp', async ({is}) => {
+test('with custom timestamp', async ({ is }) => {
   var actual = ''
-  const child = fork(join(__dirname, 'fixtures', 'pretty', 'custom-time.js'), {silent: true})
+  const child = fork(join(__dirname, 'fixtures', 'pretty', 'custom-time.js'), { silent: true })
 
   child.stdout.pipe(writer((s, enc, cb) => {
     actual += s
@@ -174,9 +174,9 @@ test('with custom timestamp', async ({is}) => {
   is(actual.slice(0, 8), '["test"]')
 })
 
-test('errors', async ({isNot}) => {
+test('errors', async ({ isNot }) => {
   var actual = ''
-  const child = fork(join(__dirname, 'fixtures', 'pretty', 'error.js'), {silent: true})
+  const child = fork(join(__dirname, 'fixtures', 'pretty', 'error.js'), { silent: true })
 
   child.stdout.pipe(writer((s, enc, cb) => {
     actual += s

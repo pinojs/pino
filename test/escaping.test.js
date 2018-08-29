@@ -9,7 +9,7 @@ const { pid } = process
 const hostname = os.hostname()
 
 function testEscape (ch, key) {
-  test('correctly escape ' + ch, async ({same}) => {
+  test('correctly escape ' + ch, async ({ same }) => {
     const stream = sink()
     const instance = pino({
       name: 'hello'
@@ -74,7 +74,7 @@ toEscape.forEach((key) => {
   testEscape(JSON.stringify(key), key)
 })
 
-test('correctly escape `hello \\u001F world \\n \\u0022`', async ({same}) => {
+test('correctly escape `hello \\u001F world \\n \\u0022`', async ({ same }) => {
   const stream = sink()
   const instance = pino({
     name: 'hello'

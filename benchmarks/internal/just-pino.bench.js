@@ -9,12 +9,12 @@ delete require.cache[require.resolve('../../')]
 const plogDest = require('../../')(pino.destination('/dev/null'))
 delete require.cache[require.resolve('../../')]
 const plogExtreme = require('../../')(pino.extreme('/dev/null'))
-const plogChild = plog.child({a: 'property'})
-const plogDestChild = plogDest.child({a: 'property'})
-const plogExtremeChild = plogExtreme.child({a: 'property'})
-const plogChildChild = plog.child({a: 'property'}).child({sub: 'child'})
-const plogDestChildChild = plogDest.child({a: 'property'}).child({sub: 'child'})
-const plogExtremeChildChild = plogExtreme.child({a: 'property'}).child({sub: 'child'})
+const plogChild = plog.child({ a: 'property' })
+const plogDestChild = plogDest.child({ a: 'property' })
+const plogExtremeChild = plogExtreme.child({ a: 'property' })
+const plogChildChild = plog.child({ a: 'property' }).child({ sub: 'child' })
+const plogDestChildChild = plogDest.child({ a: 'property' }).child({ sub: 'child' })
+const plogExtremeChildChild = plogExtreme.child({ a: 'property' }).child({ sub: 'child' })
 
 const max = 10
 
@@ -143,37 +143,37 @@ const run = bench([
   },
   function benchPinoInterpolateAll (cb) {
     for (var i = 0; i < max; i++) {
-      plog.info('hello %s %j %d', 'world', {obj: true}, 4)
+      plog.info('hello %s %j %d', 'world', { obj: true }, 4)
     }
     setImmediate(cb)
   },
   function benchPinoDestInterpolateAll (cb) {
     for (var i = 0; i < max; i++) {
-      plogDest.info('hello %s %j %d', 'world', {obj: true}, 4)
+      plogDest.info('hello %s %j %d', 'world', { obj: true }, 4)
     }
     setImmediate(cb)
   },
   function benchPinoExtremeInterpolateAll (cb) {
     for (var i = 0; i < max; i++) {
-      plogExtreme.info('hello %s %j %d', 'world', {obj: true}, 4)
+      plogExtreme.info('hello %s %j %d', 'world', { obj: true }, 4)
     }
     setImmediate(cb)
   },
   function benchPinoInterpolateExtra (cb) {
     for (var i = 0; i < max; i++) {
-      plog.info('hello %s %j %d', 'world', {obj: true}, 4, {another: 'obj'})
+      plog.info('hello %s %j %d', 'world', { obj: true }, 4, { another: 'obj' })
     }
     setImmediate(cb)
   },
   function benchPinoDestInterpolateExtra (cb) {
     for (var i = 0; i < max; i++) {
-      plogDest.info('hello %s %j %d', 'world', {obj: true}, 4, {another: 'obj'})
+      plogDest.info('hello %s %j %d', 'world', { obj: true }, 4, { another: 'obj' })
     }
     setImmediate(cb)
   },
   function benchPinoExtremeInterpolateExtra (cb) {
     for (var i = 0; i < max; i++) {
-      plogExtreme.info('hello %s %j %d', 'world', {obj: true}, 4, {another: 'obj'})
+      plogExtreme.info('hello %s %j %d', 'world', { obj: true }, 4, { another: 'obj' })
     }
     setImmediate(cb)
   }

@@ -7,7 +7,7 @@ const pino = require('../')
 const { pid } = process
 const hostname = os.hostname()
 
-test('metadata works', async ({ok, same, is}) => {
+test('metadata works', async ({ ok, same, is }) => {
   const now = Date.now()
   const instance = pino({}, {
     [Symbol.for('pino.metadata')]: true,
@@ -34,7 +34,7 @@ test('metadata works', async ({ok, same, is}) => {
   instance.info({ hello: 'world' }, 'a msg')
 })
 
-test('child loggers works', async ({ok, same, is}) => {
+test('child loggers works', async ({ ok, same, is }) => {
   const instance = pino({}, {
     [Symbol.for('pino.metadata')]: true,
     write (chunk) {
@@ -61,7 +61,7 @@ test('child loggers works', async ({ok, same, is}) => {
   child.info({ from: 'child' }, 'a msg')
 })
 
-test('without object', async ({ok, same, is}) => {
+test('without object', async ({ ok, same, is }) => {
   const instance = pino({}, {
     [Symbol.for('pino.metadata')]: true,
     write (chunk) {
@@ -85,7 +85,7 @@ test('without object', async ({ok, same, is}) => {
   instance.info('a msg')
 })
 
-test('without msg', async ({ok, same, is}) => {
+test('without msg', async ({ ok, same, is }) => {
   const instance = pino({}, {
     [Symbol.for('pino.metadata')]: true,
     write (chunk) {

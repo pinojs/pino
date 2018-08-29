@@ -272,7 +272,7 @@ function createLogEventShape () {
     ts: 0,
     messages: [],
     bindings: [],
-    level: {label: '', value: 0}
+    level: { label: '', value: 0 }
   }
 }
 

@@ -4,7 +4,7 @@ const { test } = require('tap')
 const { sink, once, check } = require('./helper')
 const pino = require('../')
 
-test('set the level by string', async ({is}) => {
+test('set the level by string', async ({ is }) => {
   const expected = [{
     level: 50,
     msg: 'this is an error'
@@ -23,14 +23,14 @@ test('set the level by string', async ({is}) => {
   check(is, result, current.level, current.msg)
 })
 
-test('the wrong level throws', async ({throws}) => {
+test('the wrong level throws', async ({ throws }) => {
   const instance = pino()
   throws(() => {
     instance.level = 'kaboom'
   })
 })
 
-test('set the level by number', async ({is}) => {
+test('set the level by number', async ({ is }) => {
   const expected = [{
     level: 50,
     msg: 'this is an error'
@@ -50,26 +50,26 @@ test('set the level by number', async ({is}) => {
   check(is, result, current.level, current.msg)
 })
 
-test('exposes level string mappings', async ({is}) => {
+test('exposes level string mappings', async ({ is }) => {
   is(pino.levels.values.error, 50)
 })
 
-test('exposes level number mappings', async ({is}) => {
+test('exposes level number mappings', async ({ is }) => {
   is(pino.levels.labels[50], 'error')
 })
 
-test('returns level integer', async ({is}) => {
+test('returns level integer', async ({ is }) => {
   const instance = pino({ level: 'error' })
   is(instance.levelVal, 50)
 })
 
-test('child returns level integer', async ({is}) => {
+test('child returns level integer', async ({ is }) => {
   const parent = pino({ level: 'error' })
   const child = parent.child({ foo: 'bar' })
   is(child.levelVal, 50)
 })
 
-test('set the level via exported pino function', async ({is}) => {
+test('set the level via exported pino function', async ({ is }) => {
   const expected = [{
     level: 50,
     msg: 'this is an error'
@@ -88,7 +88,7 @@ test('set the level via exported pino function', async ({is}) => {
   check(is, result, current.level, current.msg)
 })
 
-test('level-change event', async ({is}) => {
+test('level-change event', async ({ is }) => {
   const instance = pino()
   function handle (lvl, val, prevLvl, prevVal) {
     is(lvl, 'trace')
@@ -121,7 +121,7 @@ test('level-change event', async ({is}) => {
   is(count, 6)
 })
 
-test('enable', async ({fail}) => {
+test('enable', async ({ fail }) => {
   const instance = pino({
     level: 'trace',
     enabled: false
@@ -134,7 +134,7 @@ test('enable', async ({fail}) => {
   })
 })
 
-test('silent level', async ({fail}) => {
+test('silent level', async ({ fail }) => {
   const instance = pino({
     level: 'silent'
   }, sink((result, enc) => {
@@ -146,7 +146,7 @@ test('silent level', async ({fail}) => {
   })
 })
 
-test('set silent via Infinity', async ({fail}) => {
+test('set silent via Infinity', async ({ fail }) => {
   const instance = pino({
     level: Infinity
   }, sink((result, enc) => {
@@ -158,7 +158,7 @@ test('set silent via Infinity', async ({fail}) => {
   })
 })
 
-test('exposed levels', async ({same}) => {
+test('exposed levels', async ({ same }) => {
   same(Object.keys(pino.levels.values), [
     'trace',
     'debug',
@@ -169,7 +169,7 @@ test('exposed levels', async ({same}) => {
   ])
 })
 
-test('exposed labels', async ({same}) => {
+test('exposed labels', async ({ same }) => {
   same(Object.keys(pino.levels.labels), [
     '10',
     '20',
@@ -180,7 +180,7 @@ test('exposed labels', async ({same}) => {
   ])
 })
 
-test('setting level in child', async ({is}) => {
+test('setting level in child', async ({ is }) => {
   const expected = [{
     level: 50,
     msg: 'this is an error'
@@ -200,7 +200,7 @@ test('setting level in child', async ({is}) => {
   instance.fatal('this is fatal')
 })
 
-test('setting level by assigning a number to level', async ({is}) => {
+test('setting level by assigning a number to level', async ({ is }) => {
   const instance = pino()
   is(instance.levelVal, 30)
   is(instance.level, 'info')
@@ -209,12 +209,12 @@ test('setting level by assigning a number to level', async ({is}) => {
   is(instance.level, 'error')
 })
 
-test('setting level by number to unknown value results in a throw', async ({throws}) => {
+test('setting level by number to unknown value results in a throw', async ({ throws }) => {
   const instance = pino()
   throws(() => { instance.level = 973 })
 })
 
-test('setting level by assigning a known label to level', async ({is}) => {
+test('setting level by assigning a known label to level', async ({ is }) => {
   const instance = pino()
   is(instance.levelVal, 30)
   is(instance.level, 'info')
@@ -223,17 +223,17 @@ test('setting level by assigning a known label to level', async ({is}) => {
   is(instance.level, 'error')
 })
 
-test('levelVal is read only', async ({throws}) => {
+test('levelVal is read only', async ({ throws }) => {
   const instance = pino()
   throws(() => { instance.levelVal = 20 })
 })
 
-test('produces labels when told to', async ({is}) => {
+test('produces labels when told to', async ({ is }) => {
   const expected = [{
     level: 'info',
     msg: 'hello world'
   }]
-  const instance = pino({useLevelLabels: true}, sink((result, enc, cb) => {
+  const instance = pino({ useLevelLabels: true }, sink((result, enc, cb) => {
     const current = expected.shift()
     check(is, result, current.level, current.msg)
     cb()
@@ -242,12 +242,12 @@ test('produces labels when told to', async ({is}) => {
   instance.info('hello world')
 })
 
-test('changes label naming when told to', async ({is}) => {
+test('changes label naming when told to', async ({ is }) => {
   const expected = [{
     priority: 30,
     msg: 'hello world'
   }]
-  const instance = pino({changeLevelName: 'priority'}, sink((result, enc, cb) => {
+  const instance = pino({ changeLevelName: 'priority' }, sink((result, enc, cb) => {
     const current = expected.shift()
     is(result.priority, current.priority)
     is(result.msg, current.msg)
@@ -257,7 +257,7 @@ test('changes label naming when told to', async ({is}) => {
   instance.info('hello world')
 })
 
-test('children produce labels when told to', async ({is}) => {
+test('children produce labels when told to', async ({ is }) => {
   const expected = [
     {
       level: 'info',
@@ -268,20 +268,20 @@ test('children produce labels when told to', async ({is}) => {
       msg: 'child 2'
     }
   ]
-  const instance = pino({useLevelLabels: true}, sink((result, enc, cb) => {
+  const instance = pino({ useLevelLabels: true }, sink((result, enc, cb) => {
     const current = expected.shift()
     check(is, result, current.level, current.msg)
     cb()
   }))
 
-  const child1 = instance.child({name: 'child1'})
-  const child2 = child1.child({name: 'child2'})
+  const child1 = instance.child({ name: 'child1' })
+  const child2 = child1.child({ name: 'child2' })
 
   child1.info('child 1')
   child2.info('child 2')
 })
 
-test('produces labels for custom levels', async ({is}) => {
+test('produces labels for custom levels', async ({ is }) => {
   const expected = [
     {
       level: 'info',
@@ -308,7 +308,7 @@ test('produces labels for custom levels', async ({is}) => {
   instance.foo('foobar')
 })
 
-test('setting changeLevelName does not affect labels when told to', async ({is}) => {
+test('setting changeLevelName does not affect labels when told to', async ({ is }) => {
   const instance = pino(
     {
       useLevelLabels: true,

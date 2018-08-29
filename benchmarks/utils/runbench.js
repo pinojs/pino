@@ -123,11 +123,11 @@ function toBench (done) {
 
 const benchQueue = []
 if (selectedBenchmark !== 'all') {
-  benchQueue.push(toBench.bind({name: selectedBenchmark}))
+  benchQueue.push(toBench.bind({ name: selectedBenchmark }))
 } else {
   const keys = Object.keys(benchmarks)
   for (var i = 0; i < keys.length; i += 1) {
-    benchQueue.push(toBench.bind({name: keys[i]}))
+    benchQueue.push(toBench.bind({ name: keys[i] }))
   }
 }
 steed.series(benchQueue, function (err, results) {
