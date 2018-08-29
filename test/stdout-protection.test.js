@@ -29,9 +29,9 @@ test('do not use SonicBoom on AWS Lambda', async (t) => {
   t.equal(logger[symbols.streamSym], process.stdout)
 })
 
-test('do not use SonicBoom is someone tampered with process.stdout.write', async ({isNot}) => {
+test('do not use SonicBoom is someone tampered with process.stdout.write', async ({ isNot }) => {
   var actual = ''
-  const child = fork(join(__dirname, 'fixtures', 'stdout-hack-protection.js'), {silent: true})
+  const child = fork(join(__dirname, 'fixtures', 'stdout-hack-protection.js'), { silent: true })
 
   child.stdout.pipe(writer((s, enc, cb) => {
     actual += s

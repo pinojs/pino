@@ -4,14 +4,14 @@ const { test } = require('tap')
 const { sink, once } = require('./helper')
 const pino = require('../')
 
-test('pino exposes standard time functions', async ({ok}) => {
+test('pino exposes standard time functions', async ({ ok }) => {
   ok(pino.stdTimeFunctions)
   ok(pino.stdTimeFunctions.epochTime)
   ok(pino.stdTimeFunctions.unixTime)
   ok(pino.stdTimeFunctions.nullTime)
 })
 
-test('pino accepts external time functions', async ({is}) => {
+test('pino accepts external time functions', async ({ is }) => {
   const opts = {
     timestamp: () => ',"time":"none"'
   }
@@ -23,7 +23,7 @@ test('pino accepts external time functions', async ({is}) => {
   is(result.time, 'none')
 })
 
-test('inserts timestamp by default', async ({ok, is}) => {
+test('inserts timestamp by default', async ({ ok, is }) => {
   const stream = sink()
   const instance = pino(stream)
   instance.info('foobar')
@@ -33,18 +33,18 @@ test('inserts timestamp by default', async ({ok, is}) => {
   is(result.msg, 'foobar')
 })
 
-test('omits timestamp when timestamp option is false', async ({is}) => {
+test('omits timestamp when timestamp option is false', async ({ is }) => {
   const stream = sink()
-  const instance = pino({timestamp: false}, stream)
+  const instance = pino({ timestamp: false }, stream)
   instance.info('foobar')
   const result = await once(stream, 'data')
   is(result.hasOwnProperty('time'), false)
   is(result.msg, 'foobar')
 })
 
-test('inserts timestamp when timestamp option is true', async ({ok, is}) => {
+test('inserts timestamp when timestamp option is true', async ({ ok, is }) => {
   const stream = sink()
-  const instance = pino({timestamp: true}, stream)
+  const instance = pino({ timestamp: true }, stream)
   instance.info('foobar')
   const result = await once(stream, 'data')
   is(result.hasOwnProperty('time'), true)
@@ -52,10 +52,10 @@ test('inserts timestamp when timestamp option is true', async ({ok, is}) => {
   is(result.msg, 'foobar')
 })
 
-test('child inserts timestamp by default', async ({ok, is}) => {
+test('child inserts timestamp by default', async ({ ok, is }) => {
   const stream = sink()
   const logger = pino(stream)
-  const instance = logger.child({component: 'child'})
+  const instance = logger.child({ component: 'child' })
   instance.info('foobar')
   const result = await once(stream, 'data')
   is(result.hasOwnProperty('time'), true)
@@ -63,17 +63,17 @@ test('child inserts timestamp by default', async ({ok, is}) => {
   is(result.msg, 'foobar')
 })
 
-test('child omits timestamp with option', async ({is}) => {
+test('child omits timestamp with option', async ({ is }) => {
   const stream = sink()
-  const logger = pino({timestamp: false}, stream)
-  const instance = logger.child({component: 'child'})
+  const logger = pino({ timestamp: false }, stream)
+  const instance = logger.child({ component: 'child' })
   instance.info('foobar')
   const result = await once(stream, 'data')
   is(result.hasOwnProperty('time'), false)
   is(result.msg, 'foobar')
 })
 
-test('pino.stdTimeFunctions.unixTime returns seconds based timestamps', async ({is}) => {
+test('pino.stdTimeFunctions.unixTime returns seconds based timestamps', async ({ is }) => {
   const opts = {
     timestamp: pino.stdTimeFunctions.unixTime
   }

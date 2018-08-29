@@ -10,22 +10,22 @@ const { pid } = process
 const hostname = os.hostname()
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
-test('pino version is exposed on export', async ({is}) => {
+test('pino version is exposed on export', async ({ is }) => {
   is(pino.version, version)
 })
 
-test('pino version is exposed on instance', async ({is}) => {
+test('pino version is exposed on instance', async ({ is }) => {
   const instance = pino()
   is(instance.version, version)
 })
 
-test('child instance exposes pino version', async ({is}) => {
-  const child = pino().child({foo: 'bar'})
+test('child instance exposes pino version', async ({ is }) => {
+  const child = pino().child({ foo: 'bar' })
   is(child.version, version)
 })
 
 function levelTest (name, level) {
-  test(`${name} logs as ${level}`, async ({is}) => {
+  test(`${name} logs as ${level}`, async ({ is }) => {
     const stream = sink()
     const instance = pino(stream)
     instance.level = name
@@ -33,7 +33,7 @@ function levelTest (name, level) {
     check(is, await once(stream, 'data'), level, 'hello world')
   })
 
-  test(`passing objects at level ${name}`, async ({is}) => {
+  test(`passing objects at level ${name}`, async ({ is }) => {
     const stream = sink()
     const instance = pino(stream)
     instance.level = name
@@ -48,7 +48,7 @@ function levelTest (name, level) {
     is(result.v, 1)
   })
 
-  test(`passing an object and a string at level ${name}`, async ({is, same}) => {
+  test(`passing an object and a string at level ${name}`, async ({ is, same }) => {
     const stream = sink()
     const instance = pino(stream)
     instance.level = name
@@ -66,7 +66,7 @@ function levelTest (name, level) {
     })
   })
 
-  test(`formatting logs as ${name}`, async ({is}) => {
+  test(`formatting logs as ${name}`, async ({ is }) => {
     const stream = sink()
     const instance = pino(stream)
     instance.level = name
@@ -75,7 +75,7 @@ function levelTest (name, level) {
     check(is, result, level, 'hello 42')
   })
 
-  test(`passing error with a serializer at level ${name}`, async ({is, same}) => {
+  test(`passing error with a serializer at level ${name}`, async ({ is, same }) => {
     const stream = sink()
     const err = new Error('myerror')
     const instance = pino({
@@ -101,7 +101,7 @@ function levelTest (name, level) {
     })
   })
 
-  test(`child logger for level ${name}`, async ({is, same}) => {
+  test(`child logger for level ${name}`, async ({ is, same }) => {
     const stream = sink()
     const instance = pino(stream)
     instance.level = name
@@ -128,7 +128,7 @@ levelTest('info', 30)
 levelTest('debug', 20)
 levelTest('trace', 10)
 
-test('serializers can return undefined to strip field', async ({is}) => {
+test('serializers can return undefined to strip field', async ({ is }) => {
   const stream = sink()
   const instance = pino({
     serializers: {
@@ -141,7 +141,7 @@ test('serializers can return undefined to strip field', async ({is}) => {
   is('test' in result, false)
 })
 
-test('does not explode with a circular ref', async ({doesNotThrow}) => {
+test('does not explode with a circular ref', async ({ doesNotThrow }) => {
   const stream = sink()
   const instance = pino(stream)
   const b = {}
@@ -152,7 +152,7 @@ test('does not explode with a circular ref', async ({doesNotThrow}) => {
   doesNotThrow(() => instance.info(a))
 })
 
-test('set the name', async ({is, same}) => {
+test('set the name', async ({ is, same }) => {
   const stream = sink()
   const instance = pino({
     name: 'hello'
@@ -171,7 +171,7 @@ test('set the name', async ({is, same}) => {
   })
 })
 
-test('set the messageKey', async ({is, same}) => {
+test('set the messageKey', async ({ is, same }) => {
   const stream = sink()
   const message = 'hello world'
   const messageKey = 'fooMessage'
@@ -191,7 +191,7 @@ test('set the messageKey', async ({is, same}) => {
   })
 })
 
-test('set undefined properties', async ({is, same}) => {
+test('set undefined properties', async ({ is, same }) => {
   const stream = sink()
   const instance = pino(stream)
   instance.info({ hello: 'world', property: undefined })
@@ -207,15 +207,15 @@ test('set undefined properties', async ({is, same}) => {
   })
 })
 
-test('prototype properties are not logged', async ({is}) => {
+test('prototype properties are not logged', async ({ is }) => {
   const stream = sink()
   const instance = pino(stream)
-  instance.info(Object.create({hello: 'world'}))
+  instance.info(Object.create({ hello: 'world' }))
   const { hello } = await once(stream, 'data')
   is(hello, undefined)
 })
 
-test('set the base', async ({is, same}) => {
+test('set the base', async ({ is, same }) => {
   const stream = sink()
   const instance = pino({
     base: {
@@ -235,7 +235,7 @@ test('set the base', async ({is, same}) => {
   })
 })
 
-test('set the base to null', async ({is, same}) => {
+test('set the base to null', async ({ is, same }) => {
   const stream = sink()
   const instance = pino({
     base: null
@@ -251,13 +251,13 @@ test('set the base to null', async ({is, same}) => {
   })
 })
 
-test('throw if creating child without bindings', async ({throws}) => {
+test('throw if creating child without bindings', async ({ throws }) => {
   const stream = sink()
   const instance = pino(stream)
   throws(() => instance.child())
 })
 
-test('correctly escapes msg strings with stray double quote at end', async ({same}) => {
+test('correctly escapes msg strings with stray double quote at end', async ({ same }) => {
   const stream = sink()
   const instance = pino({
     name: 'hello'
@@ -276,7 +276,7 @@ test('correctly escapes msg strings with stray double quote at end', async ({sam
   })
 })
 
-test('correctly escape msg strings with unclosed double quote', async ({same}) => {
+test('correctly escape msg strings with unclosed double quote', async ({ same }) => {
   const stream = sink()
   const instance = pino({
     name: 'hello'
@@ -295,7 +295,7 @@ test('correctly escape msg strings with unclosed double quote', async ({same}) =
 })
 
 // https://github.com/pinojs/pino/issues/139
-test('object and format string', async ({same}) => {
+test('object and format string', async ({ same }) => {
   const stream = sink()
   const instance = pino(stream)
   instance.info({}, 'foo %s', 'bar')
@@ -311,7 +311,7 @@ test('object and format string', async ({same}) => {
   })
 })
 
-test('object and format string property', async ({same}) => {
+test('object and format string property', async ({ same }) => {
   const stream = sink()
   const instance = pino(stream)
   instance.info({ answer: 42 }, 'foo %s', 'bar')
@@ -327,17 +327,17 @@ test('object and format string property', async ({same}) => {
   })
 })
 
-test('correctly strip undefined when returned from toJSON', async ({is}) => {
+test('correctly strip undefined when returned from toJSON', async ({ is }) => {
   const stream = sink()
   const instance = pino({
     test: 'this'
   }, stream)
-  instance.fatal({test: {toJSON () { return undefined }}})
+  instance.fatal({ test: { toJSON () { return undefined } } })
   const result = await once(stream, 'data')
   is('test' in result, false)
 })
 
-test('correctly supports stderr', async ({same}) => {
+test('correctly supports stderr', async ({ same }) => {
   // stderr inherits from Stream, rather than Writable
   const dest = {
     writable: true,
@@ -357,7 +357,7 @@ test('correctly supports stderr', async ({same}) => {
   instance.fatal('a message')
 })
 
-test('normalize number to string', async ({same}) => {
+test('normalize number to string', async ({ same }) => {
   const stream = sink()
   const instance = pino(stream)
   instance.info(1)
@@ -372,7 +372,7 @@ test('normalize number to string', async ({same}) => {
   })
 })
 
-test('normalize number to string with an object', async ({same}) => {
+test('normalize number to string with an object', async ({ same }) => {
   const stream = sink()
   const instance = pino(stream)
   instance.info({ answer: 42 }, 1)
@@ -388,7 +388,7 @@ test('normalize number to string with an object', async ({same}) => {
   })
 })
 
-test('handles objects with null prototype', async ({same}) => {
+test('handles objects with null prototype', async ({ same }) => {
   const stream = sink()
   const instance = pino(stream)
   const o = Object.create(null)
@@ -405,7 +405,7 @@ test('handles objects with null prototype', async ({same}) => {
   })
 })
 
-test('pino.destination', async ({same}) => {
+test('pino.destination', async ({ same }) => {
   const tmp = join(
     os.tmpdir(),
     '_' + Math.random().toString(36).substr(2, 9)
@@ -424,7 +424,7 @@ test('pino.destination', async ({same}) => {
   })
 })
 
-test('auto pino.destination with a string', async ({same}) => {
+test('auto pino.destination with a string', async ({ same }) => {
   const tmp = join(
     os.tmpdir(),
     '_' + Math.random().toString(36).substr(2, 9)
@@ -443,7 +443,7 @@ test('auto pino.destination with a string', async ({same}) => {
   })
 })
 
-test('auto pino.destination with a string as second argument', async ({same}) => {
+test('auto pino.destination with a string as second argument', async ({ same }) => {
   const tmp = join(
     os.tmpdir(),
     '_' + Math.random().toString(36).substr(2, 9)
@@ -463,16 +463,16 @@ test('auto pino.destination with a string as second argument', async ({same}) =>
 })
 
 // https://github.com/pinojs/pino/issues/222
-test('children with same names render in correct order', async ({is}) => {
+test('children with same names render in correct order', async ({ is }) => {
   const stream = sink()
   const root = pino(stream)
-  root.child({a: 1}).child({a: 2}).info({a: 3})
+  root.child({ a: 1 }).child({ a: 2 }).info({ a: 3 })
   const { a } = await once(stream, 'data')
   is(a, 3, 'last logged object takes precedence')
 })
 
 // https://github.com/pinojs/pino/pull/251 - use this.stringify
-test('use `fast-safe-stringify` to avoid circular dependencies', async ({deepEqual}) => {
+test('use `fast-safe-stringify` to avoid circular dependencies', async ({ deepEqual }) => {
   const stream = sink()
   const root = pino(stream)
   // circular depth

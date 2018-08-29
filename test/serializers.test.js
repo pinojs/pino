@@ -11,11 +11,11 @@ const childSerializers = {
   test: () => 'child'
 }
 
-test('default err namespace error serializer', async ({is}) => {
+test('default err namespace error serializer', async ({ is }) => {
   const stream = sink()
   const parent = pino(stream)
 
-  parent.info({err: ReferenceError('test')})
+  parent.info({ err: ReferenceError('test') })
   const o = await once(stream, 'data')
   is(typeof o.err, 'object')
   is(o.err.type, 'ReferenceError')
@@ -23,7 +23,7 @@ test('default err namespace error serializer', async ({is}) => {
   is(typeof o.err.stack, 'string')
 })
 
-test('custom serializer overrides default err namespace error serializer', async ({is}) => {
+test('custom serializer overrides default err namespace error serializer', async ({ is }) => {
   const stream = sink()
   const parent = pino({
     serializers: {
@@ -35,7 +35,7 @@ test('custom serializer overrides default err namespace error serializer', async
     }
   }, stream)
 
-  parent.info({err: ReferenceError('test')})
+  parent.info({ err: ReferenceError('test') })
   const o = await once(stream, 'data')
   is(typeof o.err, 'object')
   is(o.err.t, 'ReferenceError')
@@ -43,11 +43,11 @@ test('custom serializer overrides default err namespace error serializer', async
   is(typeof o.err.s, 'string')
 })
 
-test('null overrides default err namespace error serializer', async ({is}) => {
+test('null overrides default err namespace error serializer', async ({ is }) => {
   const stream = sink()
-  const parent = pino({serializers: {err: null}}, stream)
+  const parent = pino({ serializers: { err: null } }, stream)
 
-  parent.info({err: ReferenceError('test')})
+  parent.info({ err: ReferenceError('test') })
   const o = await once(stream, 'data')
   is(typeof o.err, 'object')
   is(typeof o.err.type, 'undefined')
@@ -55,11 +55,11 @@ test('null overrides default err namespace error serializer', async ({is}) => {
   is(typeof o.err.stack, 'undefined')
 })
 
-test('undefined overrides default err namespace error serializer', async ({is}) => {
+test('undefined overrides default err namespace error serializer', async ({ is }) => {
   const stream = sink()
-  const parent = pino({serializers: {err: undefined}}, stream)
+  const parent = pino({ serializers: { err: undefined } }, stream)
 
-  parent.info({err: ReferenceError('test')})
+  parent.info({ err: ReferenceError('test') })
   const o = await once(stream, 'data')
   is(typeof o.err, 'object')
   is(typeof o.err.type, 'undefined')
@@ -67,34 +67,34 @@ test('undefined overrides default err namespace error serializer', async ({is}) 
   is(typeof o.err.stack, 'undefined')
 })
 
-test('serializers override values', async ({is}) => {
+test('serializers override values', async ({ is }) => {
   const stream = sink()
   const parent = pino({ serializers: parentSerializers }, stream)
   parent.child({ serializers: childSerializers })
 
-  parent.fatal({test: 'test'})
+  parent.fatal({ test: 'test' })
   const o = await once(stream, 'data')
   is(o.test, 'parent')
 })
 
-test('child does not overwrite parent serializers', async ({is}) => {
+test('child does not overwrite parent serializers', async ({ is }) => {
   const stream = sink()
   const parent = pino({ serializers: parentSerializers }, stream)
   const child = parent.child({ serializers: childSerializers })
 
-  parent.fatal({test: 'test'})
+  parent.fatal({ test: 'test' })
 
   const o = once(stream, 'data')
   is((await o).test, 'parent')
   const o2 = once(stream, 'data')
-  child.fatal({test: 'test'})
+  child.fatal({ test: 'test' })
   is((await o2).test, 'child')
 })
 
-test('Symbol.for(\'pino.serializers\')', async ({is, isNot}) => {
+test('Symbol.for(\'pino.serializers\')', async ({ is, isNot }) => {
   const stream = sink()
   const parent = pino({ serializers: parentSerializers }, stream)
-  const child = parent.child({a: 'property'})
+  const child = parent.child({ a: 'property' })
 
   is(parent[Symbol.for('pino.serializers')], parentSerializers)
   is(child[Symbol.for('pino.serializers')], parentSerializers)
@@ -114,17 +114,17 @@ test('Symbol.for(\'pino.serializers\')', async ({is, isNot}) => {
   is(child2[Symbol.for('pino.serializers')].test, parentSerializers.test)
 })
 
-test('children inherit parent serializers', async ({is}) => {
+test('children inherit parent serializers', async ({ is }) => {
   const stream = sink()
   const parent = pino({ serializers: parentSerializers }, stream)
 
-  const child = parent.child({a: 'property'})
-  child.fatal({test: 'test'})
+  const child = parent.child({ a: 'property' })
+  child.fatal({ test: 'test' })
   const o = await once(stream, 'data')
   is(o.test, 'parent')
 })
 
-test('children serializers get called', async ({is}) => {
+test('children serializers get called', async ({ is }) => {
   const stream = sink()
   const parent = pino({
     test: 'this'
@@ -132,26 +132,26 @@ test('children serializers get called', async ({is}) => {
 
   const child = parent.child({ 'a': 'property', serializers: childSerializers })
 
-  child.fatal({test: 'test'})
+  child.fatal({ test: 'test' })
   const o = await once(stream, 'data')
   is(o.test, 'child')
 })
 
-test('children serializers get called when inherited from parent', async ({is}) => {
+test('children serializers get called when inherited from parent', async ({ is }) => {
   const stream = sink()
   const parent = pino({
     test: 'this',
     serializers: parentSerializers
   }, stream)
 
-  const child = parent.child({serializers: {test: function () { return 'pass' }}})
+  const child = parent.child({ serializers: { test: function () { return 'pass' } } })
 
-  child.fatal({test: 'fail'})
+  child.fatal({ test: 'fail' })
   const o = await once(stream, 'data')
   is(o.test, 'pass')
 })
 
-test('non-overridden serializers are available in the children', async ({is}) => {
+test('non-overridden serializers are available in the children', async ({ is }) => {
   const stream = sink()
   const pSerializers = {
     onlyParent: function () { return 'parent' },
@@ -168,34 +168,34 @@ test('non-overridden serializers are available in the children', async ({is}) =>
   const child = parent.child({ serializers: cSerializers })
 
   const o = once(stream, 'data')
-  child.fatal({shared: 'test'})
+  child.fatal({ shared: 'test' })
   is((await o).shared, 'child')
   const o2 = once(stream, 'data')
-  child.fatal({onlyParent: 'test'})
+  child.fatal({ onlyParent: 'test' })
   is((await o2).onlyParent, 'parent')
   const o3 = once(stream, 'data')
-  child.fatal({onlyChild: 'test'})
+  child.fatal({ onlyChild: 'test' })
   is((await o3).onlyChild, 'child')
   const o4 = once(stream, 'data')
-  parent.fatal({onlyChild: 'test'})
+  parent.fatal({ onlyChild: 'test' })
   is((await o4).onlyChild, 'test')
 })
 
-test('Symbol.for(\'pino.*\') serializer', async ({notSame, is, isNot}) => {
+test('Symbol.for(\'pino.*\') serializer', async ({ notSame, is, isNot }) => {
   const stream = sink()
   const globalSerializer = {
     [Symbol.for('pino.*')]: function (obj) {
       if (obj.lionel === 'richie') {
-        return {hello: 'is', it: 'me', you: 'are', looking: 'for'}
+        return { hello: 'is', it: 'me', you: 'are', looking: 'for' }
       }
-      return {lionel: 'richie'}
+      return { lionel: 'richie' }
     }
   }
 
-  const logger = pino({serializers: globalSerializer}, stream)
+  const logger = pino({ serializers: globalSerializer }, stream)
 
   const o = once(stream, 'data')
-  logger.info({hello: 'is', it: 'me', you: 'are', looking: 'for'})
+  logger.info({ hello: 'is', it: 'me', you: 'are', looking: 'for' })
   is((await o).lionel, 'richie')
   isNot((await o).hello, 'is')
   isNot((await o).it, 'me')
@@ -203,7 +203,7 @@ test('Symbol.for(\'pino.*\') serializer', async ({notSame, is, isNot}) => {
   isNot((await o).looking, 'for')
 
   const o2 = once(stream, 'data')
-  logger.info({lionel: 'richie'})
+  logger.info({ lionel: 'richie' })
   is((await o2).lionel, 'richie')
   is((await o2).hello, 'is')
   is((await o2).it, 'me')

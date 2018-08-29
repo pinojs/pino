@@ -14,7 +14,7 @@ const childSerializers = {
   test: () => 'child'
 }
 
-test('serializers override values', ({end, is}) => {
+test('serializers override values', ({ end, is }) => {
   const parent = pino({
     serializers: parentSerializers,
     browser: {
@@ -26,10 +26,10 @@ test('serializers override values', ({end, is}) => {
     }
   })
 
-  parent.fatal({test: 'test'})
+  parent.fatal({ test: 'test' })
 })
 
-test('without the serialize option, serializers do not override values', ({end, is}) => {
+test('without the serialize option, serializers do not override values', ({ end, is }) => {
   const parent = pino({ serializers: parentSerializers,
     browser: {
       write (o) {
@@ -39,11 +39,11 @@ test('without the serialize option, serializers do not override values', ({end, 
     }
   })
 
-  parent.fatal({test: 'test'})
+  parent.fatal({ test: 'test' })
 })
 
 if (process.title !== 'browser') {
-  test('if serialize option is true, standard error serializer is auto enabled', ({end, same}) => {
+  test('if serialize option is true, standard error serializer is auto enabled', ({ end, same }) => {
     const err = Error('test')
     err.code = 'test'
     err.type = 'Error' // get that cov
@@ -64,7 +64,7 @@ if (process.title !== 'browser') {
     end()
   })
 
-  test('if serialize option is array, standard error serializer is auto enabled', ({end, same}) => {
+  test('if serialize option is array, standard error serializer is auto enabled', ({ end, same }) => {
     const err = Error('test')
     err.code = 'test'
     const expect = pino.stdSerializers.err(err)
@@ -84,7 +84,7 @@ if (process.title !== 'browser') {
     end()
   })
 
-  test('if serialize option is array containing !stdSerializers.err, standard error serializer is disabled', ({end, is}) => {
+  test('if serialize option is array containing !stdSerializers.err, standard error serializer is disabled', ({ end, is }) => {
     const err = Error('test')
     err.code = 'test'
     const expect = err
@@ -104,7 +104,7 @@ if (process.title !== 'browser') {
     end()
   })
 
-  test('in browser, serializers apply to all objects', ({end, is}) => {
+  test('in browser, serializers apply to all objects', ({ end, is }) => {
     const consoleError = console.error
     console.error = function (test, test2, test3, test4, test5) {
       is(test.key, 'serialized')
@@ -123,11 +123,11 @@ if (process.title !== 'browser') {
 
     console.error = consoleError
 
-    logger.fatal({key: 'test'}, {key2: 'test'}, 'str should skip', [{foo: 'array should skip'}], {key3: 'test'})
+    logger.fatal({ key: 'test' }, { key2: 'test' }, 'str should skip', [{ foo: 'array should skip' }], { key3: 'test' })
     end()
   })
 
-  test('serialize can be an array of selected serializers', ({end, is}) => {
+  test('serialize can be an array of selected serializers', ({ end, is }) => {
     const consoleError = console.error
     console.error = function (test, test2, test3, test4, test5) {
       is(test.key, 'test')
@@ -146,11 +146,11 @@ if (process.title !== 'browser') {
 
     console.error = consoleError
 
-    logger.fatal({key: 'test'}, {key2: 'test'}, 'str should skip', [{foo: 'array should skip'}], {key3: 'test'})
+    logger.fatal({ key: 'test' }, { key2: 'test' }, 'str should skip', [{ foo: 'array should skip' }], { key3: 'test' })
     end()
   })
 
-  test('serialize filter applies to child loggers', ({end, is}) => {
+  test('serialize filter applies to child loggers', ({ end, is }) => {
     const consoleError = console.error
     console.error = function (binding, test, test2, test3, test4, test5) {
       is(test.key, 'test')
@@ -164,16 +164,16 @@ if (process.title !== 'browser') {
 
     console.error = consoleError
 
-    logger.child({aBinding: 'test',
+    logger.child({ aBinding: 'test',
       serializers: {
         key: () => 'serialized',
         key2: () => 'serialized2',
         key3: () => 'serialized3'
-      }}).fatal({key: 'test'}, {key2: 'test'}, 'str should skip', [{foo: 'array should skip'}], {key3: 'test'})
+      } }).fatal({ key: 'test' }, { key2: 'test' }, 'str should skip', [{ foo: 'array should skip' }], { key3: 'test' })
     end()
   })
 
-  test('parent serializers apply to child bindings', ({end, is}) => {
+  test('parent serializers apply to child bindings', ({ end, is }) => {
     const consoleError = console.error
     console.error = function (binding) {
       is(binding.key, 'serialized')
@@ -188,11 +188,11 @@ if (process.title !== 'browser') {
 
     console.error = consoleError
 
-    logger.child({key: 'test'}).fatal({test: 'test'})
+    logger.child({ key: 'test' }).fatal({ test: 'test' })
     end()
   })
 
-  test('child serializers apply to child bindings', ({end, is}) => {
+  test('child serializers apply to child bindings', ({ end, is }) => {
     const consoleError = console.error
     console.error = function (binding) {
       is(binding.key, 'serialized')
@@ -204,15 +204,15 @@ if (process.title !== 'browser') {
 
     console.error = consoleError
 
-    logger.child({key: 'test',
+    logger.child({ key: 'test',
       serializers: {
         key: () => 'serialized'
-      }}).fatal({test: 'test'})
+      } }).fatal({ test: 'test' })
     end()
   })
 }
 
-test('child does not overwrite parent serializers', ({end, is}) => {
+test('child does not overwrite parent serializers', ({ end, is }) => {
   var c = 0
   const parent = pino({ serializers: parentSerializers,
     browser: {
@@ -224,14 +224,14 @@ test('child does not overwrite parent serializers', ({end, is}) => {
           is(o.test, 'child')
           end()
         }
-      }}})
+      } } })
   const child = parent.child({ serializers: childSerializers })
 
-  parent.fatal({test: 'test'})
-  child.fatal({test: 'test'})
+  parent.fatal({ test: 'test' })
+  child.fatal({ test: 'test' })
 })
 
-test('children inherit parent serializers', ({end, is}) => {
+test('children inherit parent serializers', ({ end, is }) => {
   const parent = pino({ serializers: parentSerializers,
     browser: {
       serialize: true,
@@ -241,12 +241,12 @@ test('children inherit parent serializers', ({end, is}) => {
     }
   })
 
-  const child = parent.child({a: 'property'})
-  child.fatal({test: 'test'})
+  const child = parent.child({ a: 'property' })
+  child.fatal({ test: 'test' })
   end()
 })
 
-test('children serializers get called', ({end, is}) => {
+test('children serializers get called', ({ end, is }) => {
   const parent = pino({
     test: 'this',
     browser: {
@@ -259,11 +259,11 @@ test('children serializers get called', ({end, is}) => {
 
   const child = parent.child({ 'a': 'property', serializers: childSerializers })
 
-  child.fatal({test: 'test'})
+  child.fatal({ test: 'test' })
   end()
 })
 
-test('children serializers get called when inherited from parent', ({end, is}) => {
+test('children serializers get called when inherited from parent', ({ end, is }) => {
   const parent = pino({
     test: 'this',
     serializers: parentSerializers,
@@ -275,13 +275,13 @@ test('children serializers get called when inherited from parent', ({end, is}) =
     }
   })
 
-  const child = parent.child({serializers: { test: () => 'pass' }})
+  const child = parent.child({ serializers: { test: () => 'pass' } })
 
-  child.fatal({test: 'fail'})
+  child.fatal({ test: 'fail' })
   end()
 })
 
-test('non overriden serializers are available in the children', ({end, is}) => {
+test('non overriden serializers are available in the children', ({ end, is }) => {
   const pSerializers = {
     onlyParent: () => 'parent',
     shared: () => 'parent'
@@ -310,9 +310,9 @@ test('non overriden serializers are available in the children', ({end, is}) => {
 
   const child = parent.child({ serializers: cSerializers })
 
-  child.fatal({shared: 'test'})
-  child.fatal({onlyParent: 'test'})
-  child.fatal({onlyChild: 'test'})
-  parent.fatal({onlyChild: 'test'})
+  child.fatal({ shared: 'test' })
+  child.fatal({ onlyParent: 'test' })
+  child.fatal({ onlyChild: 'test' })
+  parent.fatal({ onlyChild: 'test' })
   end()
 })

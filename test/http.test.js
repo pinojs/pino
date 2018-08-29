@@ -9,7 +9,7 @@ const pino = require('../')
 const { pid } = process
 const hostname = os.hostname()
 
-test('http request support', async ({ok, same, error, teardown}) => {
+test('http request support', async ({ ok, same, error, teardown }) => {
   var originalReq
   const instance = pino(sink((chunk, enc) => {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
@@ -44,7 +44,7 @@ test('http request support', async ({ok, same, error, teardown}) => {
   server.close()
 })
 
-test('http request support via serializer', async ({ok, same, error, teardown}) => {
+test('http request support via serializer', async ({ ok, same, error, teardown }) => {
   var originalReq
   const instance = pino({
     serializers: {
@@ -84,7 +84,7 @@ test('http request support via serializer', async ({ok, same, error, teardown}) 
   server.close()
 })
 
-test('http request support via serializer without request connection', async ({ok, same, error, teardown}) => {
+test('http request support via serializer without request connection', async ({ ok, same, error, teardown }) => {
   var originalReq
   const instance = pino({
     serializers: {
@@ -123,7 +123,7 @@ test('http request support via serializer without request connection', async ({o
   server.close()
 })
 
-test('http response support', async ({ok, same, error, teardown}) => {
+test('http response support', async ({ ok, same, error, teardown }) => {
   var originalRes
   const instance = pino(sink((chunk, enc) => {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
@@ -157,7 +157,7 @@ test('http response support', async ({ok, same, error, teardown}) => {
   server.close()
 })
 
-test('http response support via a serializer', async ({ok, same, error, teardown}) => {
+test('http response support via a serializer', async ({ ok, same, error, teardown }) => {
   var originalRes
   const instance = pino({
     serializers: {
@@ -195,7 +195,7 @@ test('http response support via a serializer', async ({ok, same, error, teardown
   server.close()
 })
 
-test('http request support via serializer in a child', async ({ok, same, error, teardown}) => {
+test('http request support via serializer in a child', async ({ ok, same, error, teardown }) => {
   var originalReq
   const instance = pino({
     serializers: {

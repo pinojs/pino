@@ -5,13 +5,13 @@ const pino = require('../')
 const bunyan = require('bunyan')
 const fs = require('fs')
 const dest = fs.createWriteStream('/dev/null')
-const plogNodeStream = pino(dest).child({ a: 'property' }).child({sub: 'child'})
+const plogNodeStream = pino(dest).child({ a: 'property' }).child({ sub: 'child' })
 delete require.cache[require.resolve('../')]
 const plogDest = require('../')(pino.destination('/dev/null'))
 delete require.cache[require.resolve('../')]
 const plogExtreme = require('../')(pino.extreme('/dev/null'))
   .child({ a: 'property' })
-  .child({sub: 'child'})
+  .child({ sub: 'child' })
 
 const max = 10
 const blog = bunyan.createLogger({
@@ -20,7 +20,7 @@ const blog = bunyan.createLogger({
     level: 'trace',
     stream: dest
   }]
-}).child({ a: 'property' }).child({sub: 'child'})
+}).child({ a: 'property' }).child({ sub: 'child' })
 
 const run = bench([
   function benchBunyanChildChild (cb) {

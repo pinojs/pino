@@ -135,74 +135,74 @@ const run = bench([
   },
   function benchBunyanInterpolateAll (cb) {
     for (var i = 0; i < max; i++) {
-      blog.info('hello %s %j %d', 'world', {obj: true}, 4)
+      blog.info('hello %s %j %d', 'world', { obj: true }, 4)
     }
     setImmediate(cb)
   },
 
   function benchWinstonInterpolateAll (cb) {
     for (var i = 0; i < max; i++) {
-      chill.log('info', 'hello %s %j %d', 'world', {obj: true}, 4)
+      chill.log('info', 'hello %s %j %d', 'world', { obj: true }, 4)
     }
     setImmediate(cb)
   },
   function benchBoleInterpolateAll (cb) {
     for (var i = 0; i < max; i++) {
-      bole.info('hello %s %j %d', 'world', {obj: true}, 4)
+      bole.info('hello %s %j %d', 'world', { obj: true }, 4)
     }
     setImmediate(cb)
   },
   function benchPinoInterpolateAll (cb) {
     for (var i = 0; i < max; i++) {
-      plogDest.info('hello %s %j %d', 'world', {obj: true}, 4)
+      plogDest.info('hello %s %j %d', 'world', { obj: true }, 4)
     }
     setImmediate(cb)
   },
   function benchPinoExtremeInterpolateAll (cb) {
     for (var i = 0; i < max; i++) {
-      plogExtreme.info('hello %s %j %d', 'world', {obj: true}, 4)
+      plogExtreme.info('hello %s %j %d', 'world', { obj: true }, 4)
     }
     setImmediate(cb)
   },
   function benchPinoNodeStreamInterpolateAll (cb) {
     for (var i = 0; i < max; i++) {
-      plogNodeStream.info('hello %s %j %d', 'world', {obj: true}, 4)
+      plogNodeStream.info('hello %s %j %d', 'world', { obj: true }, 4)
     }
     setImmediate(cb)
   },
   function benchBunyanInterpolateExtra (cb) {
     for (var i = 0; i < max; i++) {
-      blog.info('hello %s %j %d', 'world', {obj: true}, 4, {another: 'obj'})
+      blog.info('hello %s %j %d', 'world', { obj: true }, 4, { another: 'obj' })
     }
     setImmediate(cb)
   },
   function benchWinstonInterpolateExtra (cb) {
     for (var i = 0; i < max; i++) {
-      chill.log('info', 'hello %s %j %d', 'world', {obj: true}, 4, {another: 'obj'})
+      chill.log('info', 'hello %s %j %d', 'world', { obj: true }, 4, { another: 'obj' })
     }
     setImmediate(cb)
   },
   function benchBoleInterpolateExtra (cb) {
     for (var i = 0; i < max; i++) {
-      bole.info('hello %s %j %d', 'world', {obj: true}, 4, {another: 'obj'})
+      bole.info('hello %s %j %d', 'world', { obj: true }, 4, { another: 'obj' })
     }
     setImmediate(cb)
   },
   function benchPinoInterpolateExtra (cb) {
     for (var i = 0; i < max; i++) {
-      plogDest.info('hello %s %j %d', 'world', {obj: true}, 4, {another: 'obj'})
+      plogDest.info('hello %s %j %d', 'world', { obj: true }, 4, { another: 'obj' })
     }
     setImmediate(cb)
   },
   function benchPinoExtremeInterpolateExtra (cb) {
     for (var i = 0; i < max; i++) {
-      plogExtreme.info('hello %s %j %d', 'world', {obj: true}, 4, {another: 'obj'})
+      plogExtreme.info('hello %s %j %d', 'world', { obj: true }, 4, { another: 'obj' })
     }
     setImmediate(cb)
   },
   function benchPinoNodeStreamInterpolateExtra (cb) {
     for (var i = 0; i < max; i++) {
-      plogNodeStream.info('hello %s %j %d', 'world', {obj: true}, 4, {another: 'obj'})
+      plogNodeStream.info('hello %s %j %d', 'world', { obj: true }, 4, { another: 'obj' })
     }
     setImmediate(cb)
   },

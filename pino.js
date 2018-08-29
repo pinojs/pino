@@ -40,7 +40,7 @@ const defaultOptions = {
   enabled: true,
   prettyPrint: false,
   base: { pid, hostname },
-  serializers: {err: defaultErrorSerializer},
+  serializers: { err: defaultErrorSerializer },
   timestamp: epochTime,
   name: undefined,
   redact: null,
@@ -70,7 +70,7 @@ function pino (...args) {
 
   const stringifiers = redact ? redaction(redact, stringify) : {}
   const formatOpts = redact
-    ? {stringify: stringifiers[redactFmtSym]}
+    ? { stringify: stringifiers[redactFmtSym] }
     : { stringify }
   const messageKeyString = `,"${messageKey}":`
   const end = ',"v":' + LOG_VERSION + '}' + (crlf ? '\r\n' : '\n')

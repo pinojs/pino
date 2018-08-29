@@ -5,11 +5,11 @@ const pino = require('../../')
 
 const base = pino(pino.destination('/dev/null'))
 const baseCl = pino({
-  customLevels: {foo: 31}
+  customLevels: { foo: 31 }
 }, pino.destination('/dev/null'))
 const child = base.child({})
 const childCl = base.child({
-  customLevels: {foo: 31}
+  customLevels: { foo: 31 }
 })
 const childOfBaseCl = baseCl.child({})
 
@@ -55,7 +55,7 @@ const run = bench([
   },
   function benchPinoChildCreationCustomLevel (cb) {
     const child = base.child({
-      customLevels: {foo: 31}
+      customLevels: { foo: 31 }
     })
     for (var i = 0; i < max; i++) {
       child.foo({ hello: 'world' })

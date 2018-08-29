@@ -9,9 +9,9 @@ const hostname = os.hostname()
 const level = 50
 const name = 'error'
 
-test('err is serialized with additional properties set on the Error object', async ({ok, same}) => {
+test('err is serialized with additional properties set on the Error object', async ({ ok, same }) => {
   const stream = sink()
-  const err = Object.assign(new Error('myerror'), {foo: 'bar'})
+  const err = Object.assign(new Error('myerror'), { foo: 'bar' })
   const instance = pino(stream)
   instance.level = name
   instance[name](err)
@@ -30,9 +30,9 @@ test('err is serialized with additional properties set on the Error object', asy
   })
 })
 
-test('type should be retained, even if type is a property', async ({ok, same}) => {
+test('type should be retained, even if type is a property', async ({ ok, same }) => {
   const stream = sink()
-  const err = Object.assign(new Error('myerror'), {type: 'bar'})
+  const err = Object.assign(new Error('myerror'), { type: 'bar' })
   const instance = pino(stream)
   instance.level = name
   instance[name](err)
@@ -50,7 +50,7 @@ test('type should be retained, even if type is a property', async ({ok, same}) =
   })
 })
 
-test('type, message and stack should be first level properties', async ({ok, same}) => {
+test('type, message and stack should be first level properties', async ({ ok, same }) => {
   const stream = sink()
   const err = Object.assign(new Error('foo'), { foo: 'bar' })
   const instance = pino(stream)
@@ -72,9 +72,9 @@ test('type, message and stack should be first level properties', async ({ok, sam
   })
 })
 
-test('err serializer', async ({ok, same}) => {
+test('err serializer', async ({ ok, same }) => {
   const stream = sink()
-  const err = Object.assign(new Error('myerror'), {foo: 'bar'})
+  const err = Object.assign(new Error('myerror'), { foo: 'bar' })
   const instance = pino({
     serializers: {
       err: pino.stdSerializers.err
@@ -100,7 +100,7 @@ test('err serializer', async ({ok, same}) => {
   })
 })
 
-test('an error with statusCode property is not confused for a http response', async ({ok, same}) => {
+test('an error with statusCode property is not confused for a http response', async ({ ok, same }) => {
   const stream = sink()
   const err = Object.assign(new Error('StatusCodeErr'), { statusCode: 500 })
   const instance = pino(stream)
