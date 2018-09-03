@@ -448,7 +448,7 @@ test('auto pino.destination with a string as second argument', async ({ same }) 
     os.tmpdir(),
     '_' + Math.random().toString(36).substr(2, 9)
   )
-  const instance = pino({}, tmp)
+  const instance = pino(null, tmp)
   instance.info('hello')
   await sleep(250)
   const result = JSON.parse(readFileSync(tmp).toString())
@@ -457,6 +457,27 @@ test('auto pino.destination with a string as second argument', async ({ same }) 
     pid: pid,
     hostname: hostname,
     level: 30,
+    msg: 'hello',
+    v: 1
+  })
+})
+
+test('does not override opts with a string as second argument', async ({ same }) => {
+  const tmp = join(
+    os.tmpdir(),
+    '_' + Math.random().toString(36).substr(2, 9)
+  )
+  const instance = pino({
+    timestamp: () => ',"time":"none"'
+  }, tmp)
+  instance.info('hello')
+  await sleep(250)
+  const result = JSON.parse(readFileSync(tmp).toString())
+  same(result, {
+    pid: pid,
+    hostname: hostname,
+    level: 30,
+    time: 'none',
     msg: 'hello',
     v: 1
   })
