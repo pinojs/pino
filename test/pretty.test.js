@@ -187,3 +187,18 @@ test('errors', async ({ isNot }) => {
   isNot(actual.match(/\(123456 on abcdefghijklmnopqr\): with a message/), null)
   isNot(actual.match(/.*error\.js.*/), null)
 })
+
+test('errors with props', async ({ isNot }) => {
+  var actual = ''
+  const child = fork(join(__dirname, 'fixtures', 'pretty', 'error-props.js'), { silent: true })
+
+  child.stdout.pipe(writer((s, enc, cb) => {
+    actual += s
+    cb()
+  }))
+  await once(child, 'close')
+  isNot(actual.match(/\(123456 on abcdefghijklmnopqr\): kaboom/), null)
+  isNot(actual.match(/code: ENOENT/), null)
+  isNot(actual.match(/errno: 1/), null)
+  isNot(actual.match(/.*error-props\.js.*/), null)
+})
