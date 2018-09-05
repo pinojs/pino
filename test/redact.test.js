@@ -405,6 +405,17 @@ test('redacts strings at the top level', async ({ is }) => {
   is(o.s, '[Redacted]')
 })
 
+test('does not redact primitives if not objects', async ({ is }) => {
+  const stream = sink()
+  const instance = pino({ redact: ['a.b'] }, stream)
+  const obj = {
+    a: 42
+  }
+  instance.info(obj)
+  const o = await once(stream, 'data')
+  is(o.a, 42)
+})
+
 test('redacts null at the top level', async ({ is }) => {
   const stream = sink()
   const instance = pino({ redact: ['n'] }, stream)
