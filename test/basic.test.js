@@ -515,3 +515,18 @@ test('fast-safe-stringify must be used when interpolating', async (t) => {
   const { msg } = await once(stream, 'data')
   t.is(msg, 'test {"a":{"b":{"c":"[Circular]"}}}')
 })
+
+test('throws when setting useOnlyCustomLevels without customLevels', async ({ is, throws }) => {
+  throws(() => {
+    pino({
+      useOnlyCustomLevels: true
+    })
+  })
+  try {
+    pino({
+      useOnlyCustomLevels: true
+    })
+  } catch ({ message }) {
+    is(message, 'customLevels is required if useOnlyCustomLevels is set true')
+  }
+})

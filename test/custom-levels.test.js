@@ -18,42 +18,43 @@ test('adds additional levels', async ({ is }) => {
   is(level, 35)
 })
 
-test('throws when specifying existing levels', async ({ is, throws }) => {
+test('custom levels does not override default levels', async ({ is }) => {
   const stream = sink()
-  throws(() => pino({
+  const logger = pino({
     customLevels: {
-      info: 35
+      foo: 35
     }
   }, stream)
-  )
-  try {
-    pino({
-      customLevels: {
-        info: 35
-      }
-    })
-  } catch ({ message }) {
-    is(message, 'levels cannot be overridden')
-  }
+
+  logger.info('test')
+  const { level } = await once(stream, 'data')
+  is(level, 30)
 })
 
-test('throws when specifying existing values', async ({ is, throws }) => {
+test('custom levels overrides default level label if use useOnlyCustomLevels', async ({ is }) => {
   const stream = sink()
-  throws(() => pino({
+  const logger = pino({
     customLevels: {
-      foo: 30
-    }
+      foo: 35
+    },
+    useOnlyCustomLevels: true,
+    level: 'foo'
   }, stream)
-  )
-  try {
-    pino({
-      customLevels: {
-        foo: 30
-      }
-    })
-  } catch ({ message }) {
-    is(message, 'pre-existing level values cannot be used for new levels')
-  }
+
+  is(logger.hasOwnProperty('info'), false)
+})
+
+test('custom levels overrides default level value if use useOnlyCustomLevels', async ({ is }) => {
+  const stream = sink()
+  const logger = pino({
+    customLevels: {
+      foo: 35
+    },
+    useOnlyCustomLevels: true,
+    level: 35
+  }, stream)
+
+  is(logger.hasOwnProperty('info'), false)
 })
 
 test('custom levels are inherited by children', async ({ is }) => {
@@ -101,45 +102,7 @@ test('customLevels property child bindings does not get logged', async ({ is }) 
   is(customLevels, undefined)
 })
 
-test('throws when specifying core levels via child bindings', async ({ is, throws }) => {
-  const stream = sink()
-  throws(() => pino(stream).child({
-    customLevels: {
-      info: 35
-    }
-  })
-  )
-  try {
-    pino(stream).child({
-      customLevels: {
-        info: 35
-      }
-    })
-  } catch ({ message }) {
-    is(message, 'levels cannot be overridden')
-  }
-})
-
-test('throws when specifying core values via child bindings', async ({ is, throws }) => {
-  const stream = sink()
-  throws(() => pino(stream).child({
-    customLevels: {
-      foo: 30
-    }
-  })
-  )
-  try {
-    pino(stream).child({
-      customLevels: {
-        foo: 30
-      }
-    })
-  } catch ({ message }) {
-    is(message, 'pre-existing level values cannot be used for new levels')
-  }
-})
-
-test('throws when specifying pre-existing parent levels via child bindings', async ({ is, throws }) => {
+test('throws when specifying pre-existing parent labels via child bindings', async ({ is, throws }) => {
   const stream = sink()
   throws(() => pino({
     customLevels: {
@@ -190,6 +153,40 @@ test('throws when specifying pre-existing parent values via child bindings', asy
     })
   } catch ({ message }) {
     is(message, 'pre-existing level values cannot be used for new levels')
+  }
+})
+
+test('throws when specifying core values via child bindings', async ({ is, throws }) => {
+  const stream = sink()
+  throws(() => pino(stream).child({
+    customLevels: {
+      foo: 30
+    }
+  })
+  )
+  try {
+    pino(stream).child({
+      customLevels: {
+        foo: 30
+      }
+    })
+  } catch ({ message }) {
+    is(message, 'pre-existing level values cannot be used for new levels')
+  }
+})
+
+test('throws when useOnlyCustomLevels is set true without customLevels', async ({ is, throws }) => {
+  const stream = sink()
+  throws(() => pino({
+    useOnlyCustomLevels: true
+  }, stream)
+  )
+  try {
+    pino({
+      useOnlyCustomLevels: true
+    }, stream)
+  } catch ({ message }) {
+    is(message, 'customLevels is required if useOnlyCustomLevels is set true')
   }
 })
 

@@ -73,6 +73,27 @@ const logger = pino({
 logger.foo('hi')
 ```
 
+<a id=opt-useOnlyCustomLevels></a>
+#### `useOnlyCustomLevels` (Boolean)
+
+Default: `false`
+
+Use this option to only use defined `customLevels` and omit Pino's levels.
+Logger's default `level` must be changed to a value in `customLevels` in order to use `useOnlyCustomLevels`
+Warning: this option may not be supported by downstream transports.
+
+```js
+const logger = pino({
+  customLevels: {
+    foo: 35
+  },
+  useOnlyCustomLevels: true,
+  level: 'foo'
+})
+logger.foo('hi')
+logger.info('hello') // Will throw an error saying info in not found in logger object
+```
+
 #### `redact` (Array | Object):
 
 Default: `undefined`

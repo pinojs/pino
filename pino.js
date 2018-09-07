@@ -6,7 +6,7 @@ const redaction = require('./lib/redaction')
 const time = require('./lib/time')
 const proto = require('./lib/proto')
 const symbols = require('./lib/symbols')
-const { mappings, genLsCache, assertNoLevelCollisions } = require('./lib/levels')
+const { assertDefaultLevelFound, mappings, genLsCache } = require('./lib/levels')
 const {
   createArgsNormalizer,
   asChindings,
@@ -27,7 +27,8 @@ const {
   formatOptsSym,
   messageKeyStringSym,
   useLevelLabelsSym,
-  changeLevelNameSym
+  changeLevelNameSym,
+  useOnlyCustomLevelsSym
 } = symbols
 const { epochTime, nullTime } = time
 const { pid } = process
@@ -45,7 +46,8 @@ const defaultOptions = {
   name: undefined,
   redact: null,
   customLevels: null,
-  changeLevelName: 'level'
+  changeLevelName: 'level',
+  useOnlyCustomLevels: false
 }
 
 const normalize = createArgsNormalizer(defaultOptions)
@@ -63,10 +65,9 @@ function pino (...args) {
     level,
     customLevels,
     useLevelLabels,
-    changeLevelName
+    changeLevelName,
+    useOnlyCustomLevels
   } = opts
-
-  assertNoLevelCollisions(pino.levels, customLevels)
 
   const stringifiers = redact ? redaction(redact, stringify) : {}
   const formatOpts = redact
@@ -85,12 +86,16 @@ function pino (...args) {
   const time = (timestamp instanceof Function)
     ? timestamp : (timestamp ? epochTime : nullTime)
 
-  const levels = mappings(customLevels)
+  if (useOnlyCustomLevels && !customLevels) throw Error('customLevels is required if useOnlyCustomLevels is set true')
+
+  assertDefaultLevelFound(level, customLevels, useOnlyCustomLevels)
+  const levels = mappings(customLevels, useOnlyCustomLevels)
 
   const instance = {
     levels,
     [useLevelLabelsSym]: useLevelLabels,
     [changeLevelNameSym]: changeLevelName,
+    [useOnlyCustomLevelsSym]: useOnlyCustomLevels,
     [streamSym]: stream,
     [timeSym]: time,
     [stringifySym]: stringify,
