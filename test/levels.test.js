@@ -322,3 +322,62 @@ test('setting changeLevelName does not affect labels when told to', async ({ is 
 
   instance.info('hello world')
 })
+
+test('throws when creating a default label that does not exist in logger levels', async ({ is, throws }) => {
+  const defaultLevel = 'foo'
+  throws(() => {
+    pino({
+      customLevels: {
+        bar: 5
+      },
+      level: defaultLevel
+    })
+  })
+  try {
+    pino({
+      level: defaultLevel
+    })
+  } catch ({ message }) {
+    is(message, `default level:${defaultLevel} must be included in custom levels`)
+  }
+})
+
+test('throws when creating a default value that does not exist in logger levels', async ({ is, throws }) => {
+  const defaultLevel = 15
+  throws(() => {
+    pino({
+      customLevels: {
+        bar: 5
+      },
+      level: defaultLevel
+    })
+  })
+  try {
+    pino({
+      level: defaultLevel
+    })
+  } catch ({ message }) {
+    is(message, `default level:${defaultLevel} must be included in custom levels`)
+  }
+})
+
+test('throws when creating a default value that does not exist in logger levels', async ({ is, throws }) => {
+  throws(() => {
+    pino({
+      customLevels: {
+        foo: 5
+      },
+      useOnlyCustomLevels: true
+    })
+  })
+  try {
+    pino({
+      customLevels: {
+        foo: 5
+      },
+      useOnlyCustomLevels: true
+    })
+  } catch ({ message }) {
+    is(message, `default level:info must be included in custom levels`)
+  }
+})
