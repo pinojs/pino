@@ -381,3 +381,9 @@ test('throws when creating a default value that does not exist in logger levels'
     is(message, `default level:info must be included in custom levels`)
   }
 })
+
+test('passes when creating a default value that exists in logger levels', async ({ is, throws }) => {
+  pino({
+    level: 30
+  })
+})
