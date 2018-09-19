@@ -3,7 +3,7 @@
 In essence, extreme mode enables even faster performance by Pino.
 
 In Pino's standard mode of operation log messages are directly written to the
-output stream as the messages are generated. Extereme mode works by buffering
+output stream as the messages are generated. Extreme mode works by buffering
 log messages and writing them in larger chunks.
 
 ## Caveats
