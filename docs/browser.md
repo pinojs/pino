@@ -96,7 +96,7 @@ const pino = require('pino')({
   }
 })
 // following will apply myCustomSerializer to the custom property,
-// but will not apply anotherSerizlier to another key
+// but will not apply anotherSerializer to another key
 pino.info({custom: 'a', another: 'b'})
 ```
 
