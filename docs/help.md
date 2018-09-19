@@ -166,7 +166,7 @@ for information on this is handled.
 
 <a id="level-string"></a>
 ## Log levels as labels instead of numbers
-Pino log lines are meant to be parseable. Thus, Pino's default mode of opertaion
+Pino log lines are meant to be parseable. Thus, Pino's default mode of operation
 is to print the level value instead of the string name. However, while it is
 possible to set the `useLevelLabels` option, we recommend using one of these
 options instead if you are able:
