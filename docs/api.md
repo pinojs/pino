@@ -703,10 +703,10 @@ The `pino.final` method can be used to acquire a final logger instance
 or create an exit listener function.
 
 The `finalLogger` is a specialist logger that synchronously flushes
-on every write. This is important to gaurantee final log writes,
+on every write. This is important to guarantee final log writes,
 both when using `pino.destination` or `pino.extreme` targets.
 
-Since final log writes cannot be gauranteed with normal Node.js streams,
+Since final log writes cannot be guaranteed with normal Node.js streams,
 if the `destination` parameter of the `logger` supplied to `pino.final`
 is a Node.js stream `pino.final` will throw. It's highly recommended
 for both performance and safety to use `pino.destination`/`pino.extreme`
@@ -771,7 +771,7 @@ The `pino.stdTimeFunctions` object provides a very small set of common functions
 For integration purposes with ecosystem and third party libraries `pino.symbols`
 exposes the symbols used to hold non-public state and methods on the logger instance.
 
-Access to the symbols allows logger state to be adjusted, and methods to be overriden or
+Access to the symbols allows logger state to be adjusted, and methods to be overridden or
 proxied for performant integration where necessary.
 
 The `pino.symbols` object is intended for library implementers and shouldn't be utilized
