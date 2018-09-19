@@ -73,7 +73,7 @@ will be written to the destination stream.
     prettifier: require('pino-pretty')
   })
   ```
-  Note: the default prettifier module is `pino-pretty`, so the preceeding
+  Note: the default prettifier module is `pino-pretty`, so the preceding
   example could be:
   ```js
   const pino = require('pino')
