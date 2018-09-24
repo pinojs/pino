@@ -542,6 +542,17 @@ test('correctly log Infinity', async (t) => {
   t.is(num, null)
 })
 
+test('correctly log -Infinity', async (t) => {
+  const stream = sink()
+  const instance = pino(stream)
+
+  const o = { num: -Infinity }
+  instance.info(o)
+
+  const { num } = await once(stream, 'data')
+  t.is(num, null)
+})
+
 test('correctly log NaN', async (t) => {
   const stream = sink()
   const instance = pino(stream)
