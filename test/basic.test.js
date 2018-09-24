@@ -530,3 +530,25 @@ test('throws when setting useOnlyCustomLevels without customLevels', async ({ is
     is(message, 'customLevels is required if useOnlyCustomLevels is set true')
   }
 })
+
+test('correctly log Infinity', async (t) => {
+  const stream = sink()
+  const instance = pino(stream)
+
+  const o = { num: Infinity }
+  instance.info(o)
+
+  const { num } = await once(stream, 'data')
+  t.is(num, null)
+})
+
+test('correctly log NaN', async (t) => {
+  const stream = sink()
+  const instance = pino(stream)
+
+  const o = { num: NaN }
+  instance.info(o)
+
+  const { num } = await once(stream, 'data')
+  t.is(num, null)
+})
