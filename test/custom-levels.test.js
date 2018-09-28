@@ -31,6 +31,23 @@ test('custom levels does not override default levels', async ({ is }) => {
   is(level, 30)
 })
 
+test('default levels can be redefined using custom levels', async ({ is }) => {
+  const stream = sink()
+  const logger = pino({
+    customLevels: {
+      info: 35,
+      debug: 45
+    },
+    useOnlyCustomLevels: true
+  }, stream)
+
+  is(logger.hasOwnProperty('info'), true)
+
+  logger.info('test')
+  const { level } = await once(stream, 'data')
+  is(level, 35)
+})
+
 test('custom levels overrides default level label if use useOnlyCustomLevels', async ({ is }) => {
   const stream = sink()
   const logger = pino({
