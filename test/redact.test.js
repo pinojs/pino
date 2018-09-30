@@ -448,3 +448,12 @@ test('supports leading bracket notation', async ({ is }) => {
   const o = await once(stream, 'data')
   is(o['a-a'].b, '[Redacted]')
 })
+
+test('issue 521: does not modify original object when redacting nested paths', async ({ ok }) => {
+  const stream = sink()
+  const instance = pino({ redact: { paths: ['foo.bar'] } }, stream)
+  const obj = {}
+  instance.info({ foo: obj })
+  await once(stream, 'data')
+  ok(obj.hasOwnProperty('bar') === false)
+})
