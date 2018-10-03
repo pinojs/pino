@@ -153,3 +153,24 @@ test('stack is rendered as any other property if it\'s not a string', t => {
   instance.level = name
   instance[name](err)
 })
+
+test('correctly ignores toString on errors', async ({ same }) => {
+  const err = new Error('myerror')
+  err.toString = () => undefined
+  const stream = sink()
+  const instance = pino({
+    test: 'this'
+  }, stream)
+  instance.fatal(err)
+  const result = await once(stream, 'data')
+  delete result.time
+  same(result, {
+    pid: pid,
+    hostname: hostname,
+    level: 60,
+    type: 'Error',
+    msg: err.message,
+    stack: err.stack,
+    v: 1
+  })
+})
