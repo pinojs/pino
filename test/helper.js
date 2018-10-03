@@ -18,7 +18,14 @@ function once (emitter, name) {
 }
 
 function sink (func) {
-  const result = split(JSON.parse)
+  const result = split((data) => {
+    try {
+      return JSON.parse(data)
+    } catch (err) {
+      console.log(err)
+      console.log(data)
+    }
+  })
   if (func) result.pipe(writer.obj(func))
   return result
 }

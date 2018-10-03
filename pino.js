@@ -1,6 +1,6 @@
 'use strict'
 const os = require('os')
-const serializers = require('pino-std-serializers')
+const stdSerializers = require('pino-std-serializers')
 const SonicBoom = require('sonic-boom')
 const redaction = require('./lib/redaction')
 const time = require('./lib/time')
@@ -33,7 +33,7 @@ const {
 const { epochTime, nullTime } = time
 const { pid } = process
 const hostname = os.hostname()
-const defaultErrorSerializer = serializers.err
+const defaultErrorSerializer = stdSerializers.err
 const defaultOptions = {
   level: 'info',
   useLevelLabels: false,
@@ -41,7 +41,9 @@ const defaultOptions = {
   enabled: true,
   prettyPrint: false,
   base: { pid, hostname },
-  serializers: { err: defaultErrorSerializer },
+  serializers: Object.assign(Object.create(null), {
+    err: defaultErrorSerializer
+  }),
   timestamp: epochTime,
   name: undefined,
   redact: null,
@@ -51,6 +53,8 @@ const defaultOptions = {
 }
 
 const normalize = createArgsNormalizer(defaultOptions)
+
+const serializers = Object.assign(Object.create(null), stdSerializers)
 
 function pino (...args) {
   const { opts, stream } = normalize(...args)
@@ -119,7 +123,7 @@ pino.extreme = (dest = process.stdout.fd) => new SonicBoom(dest, 4096)
 pino.destination = (dest = process.stdout.fd) => new SonicBoom(dest)
 pino.final = final
 pino.levels = mappings()
-pino.stdSerializers = Object.assign({}, serializers)
+pino.stdSerializers = serializers
 pino.stdTimeFunctions = Object.assign({}, time)
 pino.symbols = symbols
 pino.version = version
