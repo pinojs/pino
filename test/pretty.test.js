@@ -202,3 +202,29 @@ test('errors with props', async ({ isNot }) => {
   isNot(actual.match(/errno: 1/), null)
   isNot(actual.match(/.*error-props\.js.*/), null)
 })
+
+test('final works with pretty', async ({ isNot }) => {
+  var actual = ''
+  const child = fork(join(__dirname, 'fixtures', 'pretty', 'final.js'), { silent: true })
+
+  child.stdout.pipe(writer((s, enc, cb) => {
+    actual += s
+    cb()
+  }))
+  await once(child, 'close')
+  isNot(actual.match(/WARN \(123456 on abcdefghijklmnopqr\): final only works with pino.destination\(\) or pino.extreme\(\)/), null)
+  isNot(actual.match(/INFO \(123456 on abcdefghijklmnopqr\): beforeExit/), null)
+})
+
+test('returning ', async ({ isNot }) => {
+  var actual = ''
+  const child = fork(join(__dirname, 'fixtures', 'pretty', 'final-return.js'), { silent: true })
+
+  child.stdout.pipe(writer((s, enc, cb) => {
+    actual += s
+    cb()
+  }))
+  await once(child, 'close')
+  isNot(actual.match(/WARN \(123456 on abcdefghijklmnopqr\): final only works with pino.destination\(\) or pino.extreme\(\)/), null)
+  isNot(actual.match(/INFO \(123456 on abcdefghijklmnopqr\): after/), null)
+})
