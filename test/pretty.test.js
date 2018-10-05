@@ -202,3 +202,42 @@ test('errors with props', async ({ isNot }) => {
   isNot(actual.match(/errno: 1/), null)
   isNot(actual.match(/.*error-props\.js.*/), null)
 })
+
+test('final works with pretty', async ({ isNot }) => {
+  var actual = ''
+  const child = fork(join(__dirname, 'fixtures', 'pretty', 'final.js'), { silent: true })
+
+  child.stdout.pipe(writer((s, enc, cb) => {
+    actual += s
+    cb()
+  }))
+  await once(child, 'close')
+  isNot(actual.match(/WARN \(123456 on abcdefghijklmnopqr\): pino.final with prettyPrint does not support flushing/), null)
+  isNot(actual.match(/INFO \(123456 on abcdefghijklmnopqr\): beforeExit/), null)
+})
+
+test('final works when returning a logger', async ({ isNot }) => {
+  var actual = ''
+  const child = fork(join(__dirname, 'fixtures', 'pretty', 'final-return.js'), { silent: true })
+
+  child.stdout.pipe(writer((s, enc, cb) => {
+    actual += s
+    cb()
+  }))
+  await once(child, 'close')
+  isNot(actual.match(/WARN \(123456 on abcdefghijklmnopqr\): pino.final with prettyPrint does not support flushing/), null)
+  isNot(actual.match(/INFO \(123456 on abcdefghijklmnopqr\): after/), null)
+})
+
+test('final works without prior logging', async ({ isNot }) => {
+  var actual = ''
+  const child = fork(join(__dirname, 'fixtures', 'pretty', 'final-no-log-before.js'), { silent: true })
+
+  child.stdout.pipe(writer((s, enc, cb) => {
+    actual += s
+    cb()
+  }))
+  await once(child, 'close')
+  isNot(actual.match(/WARN: pino.final with prettyPrint does not support flushing/), null)
+  isNot(actual.match(/INFO \(123456 on abcdefghijklmnopqr\): beforeExit/), null)
+})
