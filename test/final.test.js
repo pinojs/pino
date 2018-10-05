@@ -24,33 +24,18 @@ test('throws if the supplied handler is not a function', async ({ throws }) => {
   }, Error('if supplied, the handler parameter should be a function'))
 })
 
-test('logs as warn if not supplied logger with pino.destination or pino.extreme instance', async ({ plan, is }) => {
-  plan(2)
+test('throws if not supplied logger with pino.destination or pino.extreme instance', async ({ throws, doesNotThrow }) => {
+  throws(() => {
+    pino.final(pino(fs.createWriteStream('/dev/null')), () => {})
+  }, Error('inal requires a stream that has a flushSync method, such as pino.destination and pino.extreme'))
 
-  const logger = pino(fs.createWriteStream('/dev/null'))
-  logger.warn = (msg) => {
-    is(msg, 'final only works with pino.destination() or pino.extreme()')
-  }
+  doesNotThrow(() => {
+    pino.final(pino(pino.destination()), () => {})
+  })
 
-  pino.final(logger, () => {})()
-  pino.final(logger)
-})
-
-test('does not logs as warn if supplied logger with pino.destination or pino.extreme instance', async ({ fail }) => {
-  const logger = pino(pino.destination())
-  logger.warn = () => {
-    fail('warn should not be called')
-  }
-
-  pino.final(logger, () => {})()
-  pino.final(logger)
-
-  const extreme = pino(pino.extreme())
-  extreme.warn = () => {
-    fail('warn should not be called')
-  }
-  pino.final(extreme, () => {})()
-  pino.final(extreme)
+  doesNotThrow(() => {
+    pino.final(pino(pino.extreme()), () => {})
+  })
 })
 
 test('returns an exit listener function', async ({ is }) => {

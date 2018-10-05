@@ -212,7 +212,7 @@ test('final works with pretty', async ({ isNot }) => {
     cb()
   }))
   await once(child, 'close')
-  isNot(actual.match(/WARN \(123456 on abcdefghijklmnopqr\): final only works with pino.destination\(\) or pino.extreme\(\)/), null)
+  isNot(actual.match(/WARN \(123456 on abcdefghijklmnopqr\): pino.final with prettyPrint does not support flushing/), null)
   isNot(actual.match(/INFO \(123456 on abcdefghijklmnopqr\): beforeExit/), null)
 })
 
@@ -225,6 +225,6 @@ test('returning ', async ({ isNot }) => {
     cb()
   }))
   await once(child, 'close')
-  isNot(actual.match(/WARN \(123456 on abcdefghijklmnopqr\): final only works with pino.destination\(\) or pino.extreme\(\)/), null)
+  isNot(actual.match(/WARN \(123456 on abcdefghijklmnopqr\): pino.final with prettyPrint does not support flushing/), null)
   isNot(actual.match(/INFO \(123456 on abcdefghijklmnopqr\): after/), null)
 })
