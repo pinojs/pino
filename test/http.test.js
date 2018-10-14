@@ -158,7 +158,6 @@ test('http response support', async ({ ok, same, error, teardown }) => {
 })
 
 test('http response support via a serializer', async ({ ok, same, error, teardown }) => {
-  var originalRes
   const instance = pino({
     serializers: {
       res: pino.stdSerializers.res
@@ -173,14 +172,18 @@ test('http response support via a serializer', async ({ ok, same, error, teardow
       msg: 'my response',
       v: 1,
       res: {
-        statusCode: originalRes.statusCode,
-        header: originalRes._header
+        statusCode: 200,
+        headers: {
+          'x-single': 'y',
+          'x-multi': [1, 2]
+        }
       }
     })
   }))
 
   const server = http.createServer(function (req, res) {
-    originalRes = res
+    res.setHeader('x-single', 'y')
+    res.setHeader('x-multi', [1, 2])
     res.end('hello')
     instance.info({ res: res }, 'my response')
   })
