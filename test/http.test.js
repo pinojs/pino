@@ -136,7 +136,7 @@ test('http response support', async ({ ok, same, error, teardown }) => {
       v: 1,
       res: {
         statusCode: originalRes.statusCode,
-        header: originalRes._header
+        headers: originalRes._headers
       }
     })
   }))
