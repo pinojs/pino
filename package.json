@@ -1,6 +1,6 @@
 {
   "name": "pino",
-  "version": "5.7.0",
+  "version": "5.8.0",
   "description": "super fast, all natural json logger",
   "main": "pino.js",
   "browser": "./browser.js",
@@ -84,7 +84,7 @@
     "fast-redact": "^1.2.0",
     "fast-safe-stringify": "^2.0.6",
     "flatstr": "^1.0.5",
-    "pino-std-serializers": "^2.2.1",
+    "pino-std-serializers": "^2.3.0",
     "pump": "^3.0.0",
     "quick-format-unescaped": "^3.0.0",
     "sonic-boom": "^0.6.1"
