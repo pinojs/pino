@@ -16,6 +16,7 @@
     "lib"
   ],
   "scripts": {
+    "docs": "docsify serve",
     "browser-test": "airtap --local 8080 test/browser*test.js",
     "test": "standard | snazzy && NODE_OPTIONS='--no-warnings -r qodaa' tap -j 4 --no-cov test/*test.js",
     "ci": "standard | snazzy && TAP_TIMEOUT=480000 NODE_OPTIONS='--no-warnings -r qodaa' tap -j 4 --100 test/*test.js",
@@ -61,6 +62,7 @@
     "benchmark": "^2.1.4",
     "bole": "^3.0.2",
     "bunyan": "^1.8.12",
+    "docsify-cli": "^4.2.1",
     "fastbench": "^1.0.1",
     "flush-write-stream": "^1.0.3",
     "fresh-require": "^1.0.3",
