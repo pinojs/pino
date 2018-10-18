@@ -1,6 +1,6 @@
 # Redaction
 
-To redact sensitive information, supply paths to keys that hold sensitive data 
+To redact sensitive information, supply paths to keys that hold sensitive data
 using the `redact` option:
 
 ```js
@@ -28,10 +28,10 @@ This will output:
 {"level":30,"time":1527777350011,"pid":3186,"hostname":"Davids-MacBook-Pro-3.local","key":"[Redacted]","path":{"to":{"key":"[Redacted]","another":"thing"}},"stuff":{"thats":[{"secret":"[Redacted]","logme":"will be logged"},{"secret":"[Redacted]","logme":"as will this"}]},"v":1}
 ```
 
-The `redact` option can take an array (as shown in the above example) or 
+The `redact` option can take an array (as shown in the above example) or
 an object. This allows control over *how* information is redacted.
 
-For instance, setting the censor: 
+For instance, setting the censor:
 
 ```js
 const logger = require('.')({
@@ -55,7 +55,7 @@ logger.info({
 })
 ```
 
-This will output: 
+This will output:
 
 ```JSON
 {"level":30,"time":1527778563934,"pid":3847,"hostname":"Davids-MacBook-Pro-3.local","key":"**GDPR COMPLIANT**","path":{"to":{"key":"**GDPR COMPLIANT**","another":"thing"}},"stuff":{"thats":[{"secret":"**GDPR COMPLIANT**","logme":"will be logged"},{"secret":"**GDPR COMPLIANT**","logme":"as will this"}]},"v":1}
@@ -97,7 +97,7 @@ See [pino options in API](api.md#pino) for `redact` API details.
 ## Path Syntax
 
 The syntax for paths supplied to the `redact` option conform to the syntax in path lookups
-in standard EcmaScript, with two additions: 
+in standard EcmaScript, with two additions:
 
 * paths may start with bracket notation
 * paths may contain the asterisk `*` to denote a wildcard
@@ -118,16 +118,16 @@ which adds about 2% overhead to `JSON.stringify` when using paths without wildca
 When used with pino logger with a single redacted path, any overhead is within noise -
 a way to deterministically measure it's effect has not been found. This is because its not a bottleneck.
 
-However, wildcard redaction does carry a non-trivial cost relative to explicitly declaring the keys 
-(50% in a case where four keys are redacted across two objects). See 
+However, wildcard redaction does carry a non-trivial cost relative to explicitly declaring the keys
+(50% in a case where four keys are redacted across two objects). See
 the [`fast-redact` benchmarks](https://github.com/davidmarkclements/fast-redact#benchmarks) for details.
 
 ## Safety
 
-The `redact` option is intended as an initialization time configuration option. 
-It's extremely important that path strings do not originate from user input.  
+The `redact` option is intended as an initialization time configuration option.
+It's extremely important that path strings do not originate from user input.
 The `fast-redact` module uses a VM context to syntax check the paths, user input
 should never be combined with such an approach. See the [`fast-redact` Caveat](https://github.com/davidmarkclements/fast-redact#caveat)
-and the [`fast-redact` Approach](https://github.com/davidmarkclements/fast-redact#approach) for in-depth information. 
+and the [`fast-redact` Approach](https://github.com/davidmarkclements/fast-redact#approach) for in-depth information.
 
 

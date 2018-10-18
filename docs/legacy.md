@@ -4,7 +4,7 @@
 
 ### Node v4
 
-Node v4 is supported on the [Pino v4](#pino-v4-documentation) line. 
+Node v4 is supported on the [Pino v4](#pino-v4-documentation) line.
 
 ### Node v0.10-v0.12
 
@@ -30,12 +30,12 @@ Node v0.10 or Node v0.12 is supported on the [Pino v2](#pino-v2-documentation) l
 
 #### Logging Destination
 
-In Pino v4 the destination could be set by passing a stream as the 
-second parameter to the exported `pino` function. This is still the 
+In Pino v4 the destination could be set by passing a stream as the
+second parameter to the exported `pino` function. This is still the
 case in v5. However it's strongly recommended to use `pino.destination`
 which will write logs ~30% faster.
 
-##### v4 
+##### v4
 
 ```js
 const stdoutLogger = require('pino')()
@@ -44,7 +44,7 @@ const fileLogger = require('pino')(fs.createWriteStream('/log/path'))
 ```
 
 ##### v5
- 
+
 ```js
 const stdoutLogger = require('pino')() // pino.destination by default
 const stderrLogger = require('pino')(pino.destination(2))
@@ -52,7 +52,7 @@ const fileLogger = require('pino')(pino.destination('/log/path'))
 ```
 
 Note: This is not a breaking change, `WritableStream` instances are still
-supported, but are slower than `pino.destination` which 
+supported, but are slower than `pino.destination` which
 uses the high speed [`sonic-boom` ⇗](https://github.com/mcollina/sonic-boom) library.
 
 * See [`destination` parameter](/docs/api.md#destination)
@@ -62,7 +62,7 @@ uses the high speed [`sonic-boom` ⇗](https://github.com/mcollina/sonic-boom) l
 The `extreme` setting does not exist as an option in Pino v5, instead use
 a `pino.extreme` destination.
 
-##### v4 
+##### v4
 
 ```js
 const stdoutLogger = require('pino')({extreme: true})
@@ -71,7 +71,7 @@ const fileLogger = require('pino')({extreme: true}, fs.createWriteStream('/log/p
 ```
 
 ##### v5
- 
+
 ```js
 const stdoutLogger = require('pino')(pino.extreme())
 const stderrLogger = require('pino')(pino.extreme(2))
@@ -84,7 +84,7 @@ const fileLogger = require('pino')(pino.extreme('/log/path'))
 
 #### Pino CLI is now pino-pretty CLI
 
-The Pino CLI is provided with Pino v4 for basic log prettification. 
+The Pino CLI is provided with Pino v4 for basic log prettification.
 
 From Pino v5 the CLI is installed separately with `pino-pretty`.
 
@@ -92,16 +92,16 @@ From Pino v5 the CLI is installed separately with `pino-pretty`.
 ```sh
 $ npm install -g pino
 $ node app.js | pino
-``` 
+```
 
 ##### v5
 ```sh
 $ npm install -g pino-pretty
 $ node app.js | pino-pretty
-``` 
+```
 
 * See [Pretty Printing documentation](/docs/pretty.md)
- 
+
 #### Programmatic Pretty Printing
 
 The [`pino.pretty()`](https://github.com/pinojs/pino/blob/v4.x.x/docs/API.md#prettyoptions)
@@ -129,20 +129,20 @@ In v5 the `pretty-print` module must be installed to use the `prettyPrint` optio
 
 ```sh
 npm install --save-dev pino-pretty
-``` 
+```
 
 * See [prettyPrint option](/docs/api.md#prettyPrint)
 * See [Pretty Printing documentation](/docs/pretty.md)
 
 #### Slowtime
 
-In Pino v4 a `slowtime` option was supplied, which allowed for full ISO dates 
-in the timestamps instead of milliseconds since the Epoch. In Pino v5 this 
+In Pino v4 a `slowtime` option was supplied, which allowed for full ISO dates
+in the timestamps instead of milliseconds since the Epoch. In Pino v5 this
 has been completely removed, along with the `pino.stdTimeFunctions.slowTime`
-function. In order to achieve the equivalent in v5, a custom 
-time function should be supplied: 
+function. In order to achieve the equivalent in v5, a custom
+time function should be supplied:
 
-##### v4 
+##### v4
 
 ```js
 const pino = require('pino')

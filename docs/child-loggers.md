@@ -1,14 +1,14 @@
 # Child loggers
 
 Let's assume we want to have `"module":"foo"` added to every log within a
-module `foo.js`. 
+module `foo.js`.
 
 To accomplish this, simply use a child logger:
 
 ```js
 'use strict'
 // imports a pino logger instance of `require('pino')()`
-const parentLogger = require('./lib/logger') 
+const parentLogger = require('./lib/logger')
 const log = parentLogger.child({module: 'foo'})
 
 function doSomething () {
@@ -74,8 +74,8 @@ $ cat my-log
 Notice how there's two key's named `a` in the JSON output. The sub-childs properties
 appear after the parent child properties.
 
-At some point the logs will most likely be processed (for instance with a [transport](transports.md)), 
-and this generally involves parsing. `JSON.parse` will return an object where the conflicting 
+At some point the logs will most likely be processed (for instance with a [transport](transports.md)),
+and this generally involves parsing. `JSON.parse` will return an object where the conflicting
 namespace holds the final value assigned to it:
 
 ```sh
@@ -84,9 +84,9 @@ $ cat my-log | node -e "process.stdin.once('data', (line) => console.log(JSON.st
 ```
 
 Ultimately the conflict is resolved by taking the last value, which aligns with Bunyans child logging
-behavior. 
+behavior.
 
-There may be cases where this edge case becomes problematic if a JSON parser with alternative behavior 
+There may be cases where this edge case becomes problematic if a JSON parser with alternative behavior
 is used to process the logs. It's recommended to be conscious of namespace conflicts with child loggers,
 in light of an expected log processing approach.
 

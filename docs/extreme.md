@@ -35,7 +35,7 @@ logging and it is acceptable to potentially lose the most recent logs.
   *must* terminate. Thus, if an `onTerminated` function isn't registered when
   constructing a Pino instance (see [pino#constructor](api.md#constructor)),
   then Pino will invoke `process.exit(0)` when no error has occurred, or
-  `process.exit(1)` otherwise. If an `onTerminated` function is supplied, it 
+  `process.exit(1)` otherwise. If an `onTerminated` function is supplied, it
   is the responsibility of the `onTerminated` function to manually exit the process.
 
   In the case of `SIGHUP`, we will look to see if any other handlers are
@@ -63,14 +63,14 @@ const pino = require('pino')
 const dest = pino.extreme() // no arguments
 const logger = pino(dest)
 
-// asynchronously flush every 10 seconds to keep the buffer empty 
+// asynchronously flush every 10 seconds to keep the buffer empty
 // in periods of low activity
 setInterval(function () {
   logger.flush()
 }, 10000).unref()
 
-// use pino.final to create a special logger that 
-// guarantees final tick writes 
+// use pino.final to create a special logger that
+// guarantees final tick writes
 const handler = pino.final(logger, (err, finalLogger, evt) => {
   finalLogger.info(`${evt} caught`)
   if (err) finalLogger.error(err, 'error caused exit')
