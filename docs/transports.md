@@ -26,7 +26,7 @@ Logs can now be consumed using shell piping:
 node my-app-which-logs-stuff-to-stdout.js | node my-transport-process.js
 ```
 
-Ideally, a transport should consume logs in a separate process to the application, 
+Ideally, a transport should consume logs in a separate process to the application,
 Using transports in the same process causes unnecessary load and slows down
 Node's single threaded event loop.
 

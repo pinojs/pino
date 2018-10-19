@@ -43,7 +43,7 @@ This produces:
 {"level":30,"time":1531171082399,"msg":"hello child!","pid":657,"hostname":"Davids-MBP-3.fritz.box","a":"property","v":1}
 ```
 
-For using Pino with a web framework see: 
+For using Pino with a web framework see:
 
 * [Pino with Fastify](docs/web.md#fastify)
 * [Pino with Express](docs/web.md#express)
@@ -58,18 +58,18 @@ For using Pino with a web framework see:
 
 ### Development Formatting
 
-The [`pino-pretty`](https://github.com/pinojs/pino-pretty) module can be used to 
+The [`pino-pretty`](https://github.com/pinojs/pino-pretty) module can be used to
 format logs during development:
 
 ![pretty demo](pretty-demo.png)
 
 ### Transports & Log Processing
 
-Due to Node's single-threaded event-loop, it's highly recommended that sending, 
-alert triggering, reformatting and all forms of log processing 
-is conducted in a separate process. In Pino parlance we call all log processors 
+Due to Node's single-threaded event-loop, it's highly recommended that sending,
+alert triggering, reformatting and all forms of log processing
+is conducted in a separate process. In Pino parlance we call all log processors
 "transports", and recommend that the transports be run as separate
-processes, piping the stdout of the application to the stdin of the transport. 
+processes, piping the stdout of the application to the stdin of the transport.
 
 For more details see our [Transports⇗](docs/transports.md) document.
 

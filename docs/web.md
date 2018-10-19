@@ -1,6 +1,6 @@
 # Web Frameworks
 
-Since HTTP logging is a primary use case, Pino has first class support for the Node.js 
+Since HTTP logging is a primary use case, Pino has first class support for the Node.js
 web framework ecosystem.
 
 + [Pino with Fastify](#fastify)
@@ -14,7 +14,7 @@ web framework ecosystem.
 ## Pino with Fastify
 
 The Fastify web framework comes bundled with Pino by default, simply set Fastify's
-`logger` option to `true` and use `reply.log` for log messages that correspond 
+`logger` option to `true` and use `reply.log` for log messages that correspond
 to each individual request:
 
 ```js
@@ -66,18 +66,18 @@ npm install hapi-pino
 
 ```js
 'use strict'
- 
+
 require('make-promises-safe')
- 
+
 const Hapi = require('hapi')
- 
+
 async function start () {
   // Create a server with a host and port
   const server = Hapi.server({
     host: 'localhost',
     port: 3000
   })
- 
+
   // Add the route
   server.route({
     method: 'GET',
@@ -85,32 +85,32 @@ async function start () {
     handler: async function (request, h) {
       // request.log is HAPI standard way of logging
       request.log(['a', 'b'], 'Request into hello world')
- 
+
       // a pino instance can also be used, which will be faster
       request.logger.info('In handler %s', request.path)
- 
+
       return 'hello world'
     }
   })
- 
+
   await server.register({
     plugin: require('.'),
     options: {
       prettyPrint: process.env.NODE_ENV !== 'production'
     }
   })
- 
+
   // also as a decorated API
   server.logger().info('another way for accessing it')
- 
+
   // and through Hapi standard logging system
   server.log(['subsystem'], 'third way for accessing it')
- 
+
   await server.start()
- 
+
   return server
 }
- 
+
 start().catch((err) => {
   console.log(err)
   process.exit(1)
@@ -179,13 +179,13 @@ npm install pino-http
 const http = require('http')
 const server = http.createServer(handle)
 const logger = require('pino-http')()
- 
+
 function handle (req, res) {
   logger(req, res)
   req.log.info('something else')
   res.end('hello world')
 }
- 
+
 server.listen(3000)
 ```
 

@@ -1,6 +1,6 @@
 # Pino Ecosystem
 
-This is a list of ecosystem modules that integrate with `pino`. 
+This is a list of ecosystem modules that integrate with `pino`.
 
 Modules listed under [Core](#core) are maintained by the Pino team. Modules
 listed under [Community](#community) are maintained by independent community
