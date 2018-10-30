@@ -141,7 +141,7 @@ message and a `logEvent` object.
 
 The `logEvent` object is a data structure representing a log message, it represents
 the arguments passed to a logger statement, the level
-at which they were logged and the heirarchy of child bindings.
+at which they were logged and the hierarchy of child bindings.
 
 The `logEvent` format is structured like so:
 
