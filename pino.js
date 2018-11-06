@@ -1,7 +1,6 @@
 'use strict'
 const os = require('os')
 const stdSerializers = require('pino-std-serializers')
-const SonicBoom = require('sonic-boom')
 const redaction = require('./lib/redaction')
 const time = require('./lib/time')
 const proto = require('./lib/proto')
@@ -11,7 +10,8 @@ const {
   createArgsNormalizer,
   asChindings,
   final,
-  stringify
+  stringify,
+  buildSafeSonicBoom
 } = require('./lib/tools')
 const { version, LOG_VERSION } = require('./lib/meta')
 const {
@@ -119,8 +119,9 @@ function pino (...args) {
   return instance
 }
 
-pino.extreme = (dest = process.stdout.fd) => new SonicBoom(dest, 4096)
-pino.destination = (dest = process.stdout.fd) => new SonicBoom(dest)
+pino.extreme = (dest = process.stdout.fd) => buildSafeSonicBoom(dest, 4096)
+pino.destination = (dest = process.stdout.fd) => buildSafeSonicBoom(dest)
+
 pino.final = final
 pino.levels = mappings()
 pino.stdSerializers = serializers
