@@ -9,6 +9,7 @@
 * [Duplicate keys](#dupe-keys)
 * [Log levels as labels instead of numbers](#level-string)
 * [Pino with `debug`](#debug)
+* [Unicode and Windows terminal](#windows)
 
 <a id="exit-logging"></a>
 ## Exit logging
@@ -199,3 +200,16 @@ $ DEBUG=* node -r pino-debug app.js
 [`pino-debug`](http://github.com/pinojs/pino-debug) also offers fine grain control to map specific `debug`
 namespaces to `pino` log levels. See [`pino-debug`](http://github.com/pinojs/pino-debug)
 for more.
+
+<a id="windows"></a>
+## Unicode and Windows terminal
+
+Pino uses [sonic-boom](https://github.com/mcollina/sonic-boom) to speed
+up logging. Internally, it uses [`fs.write`](https://nodejs.org/dist/latest-v10.x/docs/api/fs.html#fs_fs_write_fd_string_position_encoding_callback) to write log lines directly to a file
+descriptor. On Windows, unicode output is not handled properly in the
+terminal (both `cmd.exe` and powershell), and as such the output could
+be visualized incorrectly if the log lines include utf8 characters. It
+is possible to configure the terminal to visualize those characters
+correctly with the use of [`chcp`](https://ss64.com/nt/chcp.html) by
+executing in the terminal `chcp 65001`. This is a known limitation of
+Node.js.
