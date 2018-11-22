@@ -40,12 +40,6 @@ test('redact.paths option – throws if array contains an invalid path', async (
   })
 })
 
-test('redact.censor option – throws if censor is a function', async ({ throws }) => {
-  throws(() => {
-    pino({ redact: { paths: ['req.headers.cookie'], censor: () => {} } })
-  })
-})
-
 test('redact option – top level key', async ({ is }) => {
   const stream = sink()
   const instance = pino({ redact: ['key'] }, stream)
