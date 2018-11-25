@@ -185,7 +185,7 @@ The popular [`debug`](http://npm.im/debug) is used in many modules across the ec
 The [`pino-debug`](http://github.com/pinojs/pino-debug) module
 can capture calls to `debug` loggers and run them
 through `pino` instead. This results in a 10x (20x in extreme mode)
-performance improvement - event though `pino-debug` is logging additional
+performance improvement - even though `pino-debug` is logging additional
 data and wrapping it in JSON.
 
 To quickly enable this install [`pino-debug`](http://github.com/pinojs/pino-debug)
