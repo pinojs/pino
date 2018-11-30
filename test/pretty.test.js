@@ -241,4 +241,3 @@ test('final works without prior logging', async ({ isNot }) => {
   isNot(actual.match('pino.final with prettyPrint does not support flushing'), null)
   isNot(actual.match('beforeExit'), null)
 })
-
