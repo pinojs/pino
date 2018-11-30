@@ -212,8 +212,8 @@ test('final works with pretty', async ({ isNot }) => {
     cb()
   }))
   await once(child, 'close')
-  isNot(actual.match(/WARN \(123456 on abcdefghijklmnopqr\): pino.final with prettyPrint does not support flushing/), null)
-  isNot(actual.match(/INFO \(123456 on abcdefghijklmnopqr\): beforeExit/), null)
+  isNot(actual.match('pino.final with prettyPrint does not support flushing'), null)
+  isNot(actual.match('beforeExit'), null)
 })
 
 test('final works when returning a logger', async ({ isNot }) => {
@@ -225,8 +225,8 @@ test('final works when returning a logger', async ({ isNot }) => {
     cb()
   }))
   await once(child, 'close')
-  isNot(actual.match(/WARN \(123456 on abcdefghijklmnopqr\): pino.final with prettyPrint does not support flushing/), null)
-  isNot(actual.match(/INFO \(123456 on abcdefghijklmnopqr\): after/), null)
+  isNot(actual.match('pino.final with prettyPrint does not support flushing'), null)
+  isNot(actual.match('after'), null)
 })
 
 test('final works without prior logging', async ({ isNot }) => {
@@ -238,6 +238,7 @@ test('final works without prior logging', async ({ isNot }) => {
     cb()
   }))
   await once(child, 'close')
-  isNot(actual.match(/WARN: pino.final with prettyPrint does not support flushing/), null)
-  isNot(actual.match(/INFO \(123456 on abcdefghijklmnopqr\): beforeExit/), null)
+  isNot(actual.match('pino.final with prettyPrint does not support flushing'), null)
+  isNot(actual.match('beforeExit'), null)
 })
+
