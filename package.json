@@ -68,6 +68,7 @@
     "fresh-require": "^1.0.3",
     "log": "^1.4.0",
     "loglevel": "^1.6.1",
+    "pino-multi-stream": "^4.0.0",
     "pino-pretty": "^2.2.4",
     "pre-commit": "^1.2.2",
     "proxyquire": "^2.1.0",

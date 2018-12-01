@@ -83,6 +83,24 @@ test('can send pretty print to custom stream', async ({ is }) => {
   log.info('foo')
 })
 
+test('multi-stream with pretty print', async ({ doesNotThrow }) => {
+  doesNotThrow(() => {
+    const { multistream } = require('pino-multi-stream')
+    const outStream = pino({
+      prettifier: require('pino-pretty'),
+      prettyPrint: {
+        levelFirst: true,
+        colorize: false
+      }
+    })
+    const log = pino({}, multistream([
+      { stream: outStream[pino.symbols.streamSym] }
+    ]))
+
+    log.info('foo')
+  })
+})
+
 test('ignores `undefined` from prettifier', async ({ is }) => {
   var actual = ''
   const child = fork(join(__dirname, 'fixtures', 'pretty', 'skipped-output.js'), { silent: true })
@@ -212,8 +230,8 @@ test('final works with pretty', async ({ isNot }) => {
     cb()
   }))
   await once(child, 'close')
-  isNot(actual.match(/WARN \(123456 on abcdefghijklmnopqr\): pino.final with prettyPrint does not support flushing/), null)
-  isNot(actual.match(/INFO \(123456 on abcdefghijklmnopqr\): beforeExit/), null)
+  isNot(actual.match(/\[\d+\]\s+WARN\s+\(123456 on abcdefghijklmnopqr\): pino.final with prettyPrint does not support flushing/), null)
+  isNot(actual.match(/\[\d+\]\s+INFO\s+\(123456 on abcdefghijklmnopqr\): beforeExit/), null)
 })
 
 test('final works when returning a logger', async ({ isNot }) => {
@@ -225,8 +243,8 @@ test('final works when returning a logger', async ({ isNot }) => {
     cb()
   }))
   await once(child, 'close')
-  isNot(actual.match(/WARN \(123456 on abcdefghijklmnopqr\): pino.final with prettyPrint does not support flushing/), null)
-  isNot(actual.match(/INFO \(123456 on abcdefghijklmnopqr\): after/), null)
+  isNot(actual.match(/\[\d+\]\s+WARN\s+\(123456 on abcdefghijklmnopqr\): pino.final with prettyPrint does not support flushing/), null)
+  isNot(actual.match(/\[\d+\]\s+INFO\s+\(123456 on abcdefghijklmnopqr\): after/), null)
 })
 
 test('final works without prior logging', async ({ isNot }) => {
@@ -238,6 +256,6 @@ test('final works without prior logging', async ({ isNot }) => {
     cb()
   }))
   await once(child, 'close')
-  isNot(actual.match(/WARN: pino.final with prettyPrint does not support flushing/), null)
-  isNot(actual.match(/INFO \(123456 on abcdefghijklmnopqr\): beforeExit/), null)
+  isNot(actual.match(/\[\d+\]\s+WARN\s*: pino.final with prettyPrint does not support flushing/), null)
+  isNot(actual.match(/\[\d+\]\s+INFO\s+\(123456 on abcdefghijklmnopqr\): beforeExit/), null)
 })
