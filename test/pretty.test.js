@@ -3,14 +3,14 @@
 const { Writable } = require('stream')
 const { test } = require('tap')
 const { join } = require('path')
-const { fork } = require('child_process')
+const execa = require('execa')
 const writer = require('flush-write-stream')
 const { once } = require('./helper')
 const pino = require('../')
 
 test('can be enabled via exported pino function', async ({ isNot }) => {
   var actual = ''
-  const child = fork(join(__dirname, 'fixtures', 'pretty', 'basic.js'), { silent: true })
+  const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'basic.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
     actual += s
@@ -22,7 +22,7 @@ test('can be enabled via exported pino function', async ({ isNot }) => {
 
 test('can be enabled via exported pino function with pretty configuration', async ({ isNot }) => {
   var actual = ''
-  const child = fork(join(__dirname, 'fixtures', 'pretty', 'level-first.js'), { silent: true })
+  const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'level-first.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
     actual += s
@@ -34,7 +34,7 @@ test('can be enabled via exported pino function with pretty configuration', asyn
 
 test('can be enabled via exported pino function with prettifier', async ({ isNot }) => {
   var actual = ''
-  const child = fork(join(__dirname, 'fixtures', 'pretty', 'pretty-factory.js'), { silent: true })
+  const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'pretty-factory.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
     actual += s
@@ -85,7 +85,7 @@ test('can send pretty print to custom stream', async ({ is }) => {
 
 test('ignores `undefined` from prettifier', async ({ is }) => {
   var actual = ''
-  const child = fork(join(__dirname, 'fixtures', 'pretty', 'skipped-output.js'), { silent: true })
+  const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'skipped-output.js')])
 
   child.stdout.pipe(writer((s, enc) => {
     actual += s
@@ -97,7 +97,7 @@ test('ignores `undefined` from prettifier', async ({ is }) => {
 
 test('parses and outputs chindings', async ({ is, isNot }) => {
   var actual = ''
-  const child = fork(join(__dirname, 'fixtures', 'pretty', 'child.js'), { silent: true })
+  const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'child.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
     actual += s
@@ -113,7 +113,7 @@ test('parses and outputs chindings', async ({ is, isNot }) => {
 
 test('applies serializers', async ({ is, isNot }) => {
   var actual = ''
-  const child = fork(join(__dirname, 'fixtures', 'pretty', 'serializers.js'), { silent: true })
+  const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'serializers.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
     actual += s
@@ -126,7 +126,7 @@ test('applies serializers', async ({ is, isNot }) => {
 
 test('applies redaction rules', async ({ is, isNot }) => {
   var actual = ''
-  const child = fork(join(__dirname, 'fixtures', 'pretty', 'redact.js'), { silent: true })
+  const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'redact.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
     actual += s
@@ -140,7 +140,7 @@ test('applies redaction rules', async ({ is, isNot }) => {
 
 test('dateformat', async ({ isNot }) => {
   var actual = ''
-  const child = fork(join(__dirname, 'fixtures', 'pretty', 'dateformat.js'), { silent: true })
+  const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'dateformat.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
     actual += s
@@ -152,7 +152,7 @@ test('dateformat', async ({ isNot }) => {
 
 test('without timestamp', async ({ isNot }) => {
   var actual = ''
-  const child = fork(join(__dirname, 'fixtures', 'pretty', 'no-time.js'), { silent: true })
+  const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'no-time.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
     actual += s
@@ -164,7 +164,7 @@ test('without timestamp', async ({ isNot }) => {
 
 test('with custom timestamp', async ({ is }) => {
   var actual = ''
-  const child = fork(join(__dirname, 'fixtures', 'pretty', 'custom-time.js'), { silent: true })
+  const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'custom-time.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
     actual += s
@@ -176,7 +176,7 @@ test('with custom timestamp', async ({ is }) => {
 
 test('errors', async ({ isNot }) => {
   var actual = ''
-  const child = fork(join(__dirname, 'fixtures', 'pretty', 'error.js'), { silent: true })
+  const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'error.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
     actual += s
@@ -190,7 +190,7 @@ test('errors', async ({ isNot }) => {
 
 test('errors with props', async ({ isNot }) => {
   var actual = ''
-  const child = fork(join(__dirname, 'fixtures', 'pretty', 'error-props.js'), { silent: true })
+  const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'error-props.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
     actual += s
@@ -205,39 +205,39 @@ test('errors with props', async ({ isNot }) => {
 
 test('final works with pretty', async ({ isNot }) => {
   var actual = ''
-  const child = fork(join(__dirname, 'fixtures', 'pretty', 'final.js'), { silent: true })
+  const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'final.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
     actual += s
     cb()
   }))
   await once(child, 'close')
-  isNot(actual.match(/WARN \(123456 on abcdefghijklmnopqr\): pino.final with prettyPrint does not support flushing/), null)
-  isNot(actual.match(/INFO \(123456 on abcdefghijklmnopqr\): beforeExit/), null)
+  isNot(actual.match(/WARN\s+\(123456 on abcdefghijklmnopqr\): pino.final with prettyPrint does not support flushing/), null)
+  isNot(actual.match(/INFO\s+\(123456 on abcdefghijklmnopqr\): beforeExit/), null)
 })
 
 test('final works when returning a logger', async ({ isNot }) => {
   var actual = ''
-  const child = fork(join(__dirname, 'fixtures', 'pretty', 'final-return.js'), { silent: true })
+  const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'final-return.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
     actual += s
     cb()
   }))
   await once(child, 'close')
-  isNot(actual.match(/WARN \(123456 on abcdefghijklmnopqr\): pino.final with prettyPrint does not support flushing/), null)
-  isNot(actual.match(/INFO \(123456 on abcdefghijklmnopqr\): after/), null)
+  isNot(actual.match(/WARN\s+\(123456 on abcdefghijklmnopqr\): pino.final with prettyPrint does not support flushing/), null)
+  isNot(actual.match(/INFO\s+\(123456 on abcdefghijklmnopqr\): after/), null)
 })
 
 test('final works without prior logging', async ({ isNot }) => {
   var actual = ''
-  const child = fork(join(__dirname, 'fixtures', 'pretty', 'final-no-log-before.js'), { silent: true })
+  const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'final-no-log-before.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
     actual += s
     cb()
   }))
   await once(child, 'close')
-  isNot(actual.match(/WARN: pino.final with prettyPrint does not support flushing/), null)
-  isNot(actual.match(/INFO \(123456 on abcdefghijklmnopqr\): beforeExit/), null)
+  isNot(actual.match(/WARN\s+: pino.final with prettyPrint does not support flushing/), null)
+  isNot(actual.match(/INFO\s+\(123456 on abcdefghijklmnopqr\): beforeExit/), null)
 })
