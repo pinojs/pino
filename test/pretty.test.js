@@ -83,8 +83,15 @@ test('can send pretty print to custom stream', async ({ is }) => {
   log.info('foo')
 })
 
-test('multi-stream with pretty print', async ({ doesNotThrow }) => {
+test('multi-stream with pretty print', async ({ is, doesNotThrow }) => {
   doesNotThrow(() => {
+    const dest = new Writable({
+      objectMode: true,
+      write (formatted, enc) {
+        is(/^INFO.*foo\n$/.test(formatted), true)
+      }
+    })
+
     const { multistream } = require('pino-multi-stream')
     const outStream = pino({
       prettifier: require('pino-pretty'),
@@ -92,7 +99,7 @@ test('multi-stream with pretty print', async ({ doesNotThrow }) => {
         levelFirst: true,
         colorize: false
       }
-    })
+    }, dest)
     const log = pino({}, multistream([
       { stream: outStream[pino.symbols.streamSym] }
     ]))
