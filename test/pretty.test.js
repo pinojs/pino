@@ -5,7 +5,7 @@ const { test } = require('tap')
 const { join } = require('path')
 const execa = require('execa')
 const writer = require('flush-write-stream')
-const { once } = require('./helper')
+const { expected, once } = require('./helper')
 const pino = require('../')
 
 test('can be enabled via exported pino function', async ({ isNot }) => {
@@ -229,7 +229,7 @@ test('final works when returning a logger', async ({ isNot }) => {
   isNot(actual.match(/INFO\s+\(123456 on abcdefghijklmnopqr\): after/), null)
 })
 
-test('final works without prior logging', async ({ isNot }) => {
+test('final works without prior logging', async ({ is, isNot }) => {
   var actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'final-no-log-before.js')])
 
@@ -238,6 +238,17 @@ test('final works without prior logging', async ({ isNot }) => {
     cb()
   }))
   await once(child, 'close')
+
   isNot(actual.match(/WARN\s+: pino.final with prettyPrint does not support flushing/), null)
   isNot(actual.match(/INFO\s+\(123456 on abcdefghijklmnopqr\): beforeExit/), null)
+  var s$ = [
+    'pino.final',
+    'prettyPrint',
+    'beforeExit',
+    '123456',
+    'abcdefghijklmnopqr',
+    'WARN',
+    'INFO'
+  ]
+  is(expected(actual).output({ has: s$ }), true)
 })
