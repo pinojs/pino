@@ -20,15 +20,12 @@ function expected (str) {
     get: (k) => (valid.object(k)) ? memo.get(k) : void 0,
     has: (k) => (valid.object(k)) ? memo.has(k) : void 0
   }
-
   var shake = ({ s_, ndl_ }) => {
     var delim = ' '
     /* eslint-disable */
     var sane = /([\s()[\[^\]]:*)/mg
     /* eslint-enable */
-
     if (!valid.string(s_) || !valid.array(ndl_)) return void 0
-
     var tree = s_.replace(sane, ' ').split(delim).filter(o => ndl_.indexOf(o) !== -1)
     return tree.length !== 0
   }
