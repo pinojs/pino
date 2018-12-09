@@ -119,8 +119,8 @@ function pino (...args) {
   return instance
 }
 
-pino.extreme = (dest = process.stdout.fd) => buildSafeSonicBoom(dest, 4096)
-pino.destination = (dest = process.stdout.fd) => buildSafeSonicBoom(dest)
+pino.extreme = (dest = process.stdout.fd) => buildSafeSonicBoom(dest, 4096, false)
+pino.destination = (dest = process.stdout.fd) => buildSafeSonicBoom(dest, 0, true)
 
 pino.final = final
 pino.levels = mappings()
