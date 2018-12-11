@@ -24,7 +24,7 @@ test('throws if the supplied handler is not a function', async ({ throws }) => {
   }, Error('if supplied, the handler parameter should be a function'))
 })
 
-test('throws if not supplied logger with pino.extreme or pino.extreme instance', async ({ throws, doesNotThrow }) => {
+test('throws if not supplied logger with pino.extreme instance', async ({ throws, doesNotThrow }) => {
   throws(() => {
     pino.final(pino(fs.createWriteStream('/dev/null')), () => {})
   }, Error('final requires a stream that has a flushSync method, such as pino.destination and pino.extreme'))
