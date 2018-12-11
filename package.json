@@ -69,7 +69,7 @@
     "fresh-require": "^1.0.3",
     "log": "^1.4.0",
     "loglevel": "^1.6.1",
-    "pino-pretty": "^2.2.4",
+    "pino-pretty": "^2.4.0",
     "pre-commit": "^1.2.2",
     "proxyquire": "^2.1.0",
     "qodaa": "^1.0.1",
@@ -79,17 +79,17 @@
     "steed": "^1.1.3",
     "tap": "^12.1.0",
     "tape": "^4.9.0",
-    "through2": "^2.0.5",
+    "through2": "^3.0.0",
     "winston": "^3.1.0"
   },
   "dependencies": {
     "fast-json-parse": "^1.0.3",
-    "fast-redact": "^1.4.0",
+    "fast-redact": "^1.4.2",
     "fast-safe-stringify": "^2.0.6",
-    "flatstr": "^1.0.5",
+    "flatstr": "^1.0.9",
     "pino-std-serializers": "^2.3.0",
     "pump": "^3.0.0",
     "quick-format-unescaped": "^3.0.0",
-    "sonic-boom": "^0.6.3"
+    "sonic-boom": "^0.7.1"
   }
 }
