@@ -54,6 +54,18 @@ test('listener function immediately sync flushes when fired', async ({ pass, fai
   if (passed === false) fail('flushSync not called')
 })
 
+test('listener function immediately sync flushes when fired (pino.destination)', async ({ pass, fail }) => {
+  const dest = pino.destination('/dev/null')
+  var passed = false
+  dest.flushSync = () => {
+    passed = true
+    pass('flushSync called')
+  }
+  pino.final(pino(dest), () => {})()
+  await sleep(10)
+  if (passed === false) fail('flushSync not called')
+})
+
 test('swallows the non-ready error', async ({ doesNotThrow }) => {
   const dest = pino.extreme('/dev/null')
   doesNotThrow(() => {
