@@ -662,9 +662,6 @@ By default, `pino.destination` will use `process.stdout.fd` (1) as the file desc
 A `pino.destination` instance can also be used to reopen closed files
 (for example, for some log rotation scenarios), see [Reopening log files](/docs/help.md#reopening).
 
-On AWS Lambda we recommend to call `destination.flushSync()` at the end
-of each function execution to avoid losing data.
-
 * See [`destination` parameter](#destination)
 * See [`sonic-boom` ⇗](https://github.com/mcollina/sonic-boom)
 * See [Reopening log files](/docs/help.md#reopening)
@@ -707,13 +704,14 @@ or create an exit listener function.
 
 The `finalLogger` is a specialist logger that synchronously flushes
 on every write. This is important to guarantee final log writes,
-both when using `pino.destination` or `pino.extreme` targets.
+both when using `pino.extreme` target.
 
 Since final log writes cannot be guaranteed with normal Node.js streams,
 if the `destination` parameter of the `logger` supplied to `pino.final`
-is a Node.js stream `pino.final` will throw. It's highly recommended
-for both performance and safety to use `pino.destination`/`pino.extreme`
-destinations.
+is a Node.js stream `pino.final` will throw.
+
+The use of `pino.final` with `pino.destination` is not needed, as
+`pino.destination` writes things synchronously.
 
 #### `pino.final(logger, handler) => Function`
 
