@@ -49,7 +49,7 @@ The name of the logger. When set adds a `name` field to every JSON line logged.
 
 Default: `'info'`
 
-One of `'fatal'`, `'error'`, `'warn'`, `'info`', `'debug'`, `'trace'` or `silent`.
+One of `'fatal'`, `'error'`, `'warn'`, `'info`', `'debug'`, `'trace'` or `'silent'`.
 
 Additional levels can be added to the instance via the `customLevels` option.
 
@@ -302,7 +302,7 @@ The logger instance is the object returned by the main exported
 
 The primary purpose of the logger instance is to provide logging methods.
 
-The default logging methods are `trace`, `debug`, `info`, `warn`, and `fatal`.
+The default logging methods are `trace`, `debug`, `info`, `warn`, `error`, and `fatal`.
 
 Each logging method has the following signature:
 `([mergingObject], [message], [...interpolationValues])`.
