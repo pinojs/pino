@@ -74,6 +74,7 @@ PR's to this document are welcome for any new transports!
 + [pino-papertrail](#pino-papertrail)
 + [pino-redis](#pino-redis)
 + [pino-socket](#pino-socket)
++ [pino-stackdriver](#pino-stackdriver)
 + [pino-syslog](#pino-syslog)
 
 <a id="pino-couch"></a>
@@ -239,6 +240,19 @@ how to setup [Kibana][kibana].
 
 For Docker users, see
 https://github.com/deviantony/docker-elk to setup an ELK stack.
+
+<a id="pino-stackdriver"></a>
+### pino-stackdriver
+pino-stackdriver is a transport that will forward logs to the [Google Stackdriver](https://cloud.google.com/logging/) log service through it's API.
+
+Given an application `foo` that logs via pino, a stackdriver log project `bar` and credentials in the file `/credentials.json`, you would use `pino-stackdriver`
+like so:
+
+``` sh
+$ node foo | pino-stackdriver --project bar --credentials /credentials.json
+```
+
+for full documentation of command line switches read [readme](https://github.com/ovhemert/pino-stackdriver#readme)
 
 <a id="pino-syslog"></a>
 ### pino-syslog
