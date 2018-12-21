@@ -252,7 +252,7 @@ like so:
 $ node foo | pino-stackdriver --project bar --credentials /credentials.json
 ```
 
-for full documentation of command line switches read [readme](https://github.com/ovhemert/pino-stackdriver#readme)
+For full documentation of command line switches read [readme](https://github.com/ovhemert/pino-stackdriver#readme)
 
 <a id="pino-syslog"></a>
 ### pino-syslog
