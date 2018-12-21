@@ -230,6 +230,15 @@ test('redact.remove – top level key', async ({ is }) => {
   is('key' in o, false)
 })
 
+test('redact.remove – top level key in child logger', async ({ is }) => {
+  const stream = sink()
+  const opts = { redact: { paths: ['key'], remove: true } }
+  const instance = pino(opts, stream).child({ key: { redact: 'me' } })
+  instance.info('test')
+  const o = await once(stream, 'data')
+  is('key' in o, false)
+})
+
 test('redact.paths preserves original object values after the log write', async ({ is }) => {
   const stream = sink()
   const instance = pino({ redact: ['req.headers.cookie'] }, stream)
