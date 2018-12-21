@@ -243,7 +243,7 @@ https://github.com/deviantony/docker-elk to setup an ELK stack.
 
 <a id="pino-stackdriver"></a>
 ### pino-stackdriver
-pino-stackdriver is a transport that will forward logs to the [Google Stackdriver](https://cloud.google.com/logging/) log service through it's API.
+The [pino-stackdriver](https://www.npmjs.com/package/pino-stackdriver) module is a transport that will forward logs to the [Google Stackdriver](https://cloud.google.com/logging/) log service through it's API.
 
 Given an application `foo` that logs via pino, a stackdriver log project `bar` and credentials in the file `/credentials.json`, you would use `pino-stackdriver`
 like so:
