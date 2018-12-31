@@ -657,7 +657,7 @@ const logger2 = pino(pino.destination())
 The `pino.destination` method may be passed a file path or a numerical file descriptor.
 By default, `pino.destination` will use `process.stdout.fd` (1) as the file descriptor.
 
-`pino.destination` is implemented on [`sonic-boom` ⇗]](https://github.com/mcollina/sonic-boom).
+`pino.destination` is implemented on [`sonic-boom` ⇗](https://github.com/mcollina/sonic-boom).
 
 A `pino.destination` instance can also be used to reopen closed files
 (for example, for some log rotation scenarios), see [Reopening log files](/docs/help.md#reopening).
