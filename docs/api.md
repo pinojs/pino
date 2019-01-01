@@ -679,7 +679,7 @@ const logger2 = pino(pino.extreme())
 ```
 
 The `pino.extreme` method may be passed a file path or a numerical file descriptor.
-By default, `pino.destination` will use `process.stdout.fd` (1) as the file descriptor.
+By default, `pino.extreme` will use `process.stdout.fd` (1) as the file descriptor.
 
 `pino.extreme` is implemented with the [`sonic-boom` ⇗](https://github.com/mcollina/sonic-boom)
 module.
