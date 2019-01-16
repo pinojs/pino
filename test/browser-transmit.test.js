@@ -253,3 +253,40 @@ test('applies all serializers to messages and bindings (serialize:true)', ({ end
     .fatal({ test: 'test' }, Error())
   end()
 })
+
+test('extracts bindings and raw messages', ({ end, same, is }) => {
+  let messages = null
+  let bindings = null
+
+  const logger = pino({
+    browser: {
+      write: noop,
+      transmit: {
+        send (level, logEvent) {
+          messages = logEvent.messages
+          bindings = logEvent.bindings
+        }
+      }
+    }
+  })
+
+  const child = logger.child({ child: true })
+  const grandchild = child.child({ grandchild: true })
+
+  logger.fatal({ test: 'parent:test1' })
+  logger.fatal({ test: 'parent:test2' })
+  same([], bindings)
+  same([{ test: 'parent:test2' }], messages)
+
+  child.fatal({ test: 'child:test1' })
+  child.fatal({ test: 'child:test2' })
+  same([{ child: true }], bindings)
+  same([{ test: 'child:test2' }], messages)
+
+  grandchild.fatal({ test: 'grandchild:test1' })
+  grandchild.fatal({ test: 'grandchild:test2' })
+  same([{ child: true }, { grandchild: true }], bindings)
+  same([{ test: 'grandchild:test2' }], messages)
+
+  end()
+})
