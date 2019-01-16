@@ -123,7 +123,11 @@ function pino (opts) {
         this.serializers = childSerializers
         this._serialize = childSerialize
       }
-      if (transmit) this._logEvent.bindings.push(bindings)
+      if (transmit) {
+        this._logEvent = createLogEventShape(
+          [].concat(parent._logEvent.bindings, bindings)
+        )
+      }
     }
     Child.prototype = this
     return new Child(this)
@@ -246,6 +250,7 @@ function transmit (logger, opts, args) {
   var methodLevel = opts.methodLevel
   var methodValue = opts.methodValue
   var val = opts.val
+  var bindings = logger._logEvent.bindings
 
   applySerializers(
     args,
@@ -256,7 +261,7 @@ function transmit (logger, opts, args) {
   logger._logEvent.ts = ts
   logger._logEvent.messages = args.filter(function (arg) {
     // bindings can only be objects, so reference equality check via indexOf is fine
-    return logger._logEvent.bindings.indexOf(arg) === -1
+    return bindings.indexOf(arg) === -1
   })
 
   logger._logEvent.level.label = methodLevel
@@ -264,14 +269,14 @@ function transmit (logger, opts, args) {
 
   send(methodLevel, logger._logEvent, val)
 
-  logger._logEvent = createLogEventShape()
+  logger._logEvent = createLogEventShape(bindings)
 }
 
-function createLogEventShape () {
+function createLogEventShape (bindings) {
   return {
     ts: 0,
     messages: [],
-    bindings: [],
+    bindings: bindings || [],
     level: { label: '', value: 0 }
   }
 }
