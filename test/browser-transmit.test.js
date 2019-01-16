@@ -256,7 +256,7 @@ test('applies all serializers to messages and bindings (serialize:true)', ({ end
 
 test('extracts correct bindings and raw messages over multiple transmits', ({ end, same, is }) => {
   var messages = null
-  let bindings = null
+  var bindings = null
 
   const logger = pino({
     browser: {
