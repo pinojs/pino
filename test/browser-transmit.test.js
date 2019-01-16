@@ -254,7 +254,7 @@ test('applies all serializers to messages and bindings (serialize:true)', ({ end
   end()
 })
 
-test('extracts bindings and raw messages', ({ end, same, is }) => {
+test('extracts correct bindings and raw messages over multiple transmits', ({ end, same, is }) => {
   let messages = null
   let bindings = null
 
