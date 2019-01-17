@@ -211,5 +211,6 @@ terminal (both `cmd.exe` and powershell), and as such the output could
 be visualized incorrectly if the log lines include utf8 characters. It
 is possible to configure the terminal to visualize those characters
 correctly with the use of [`chcp`](https://ss64.com/nt/chcp.html) by
-executing in the terminal `chcp 65001`. As permanent solution, you can add this line `"terminal.integrated.shellArgs.windows": ["-NoExit", "/c", "chcp 65001"]` in Visual studio code User settings. This is a known limitation of
-Node.js.
+executing in the terminal `chcp 65001`. As permanent solution, 
+you can add this line `"terminal.integrated.shellArgs.windows": ["-NoExit", "/c", "chcp 65001"]` 
+in Visual studio code User settings. This is a known limitation of Node.js.
