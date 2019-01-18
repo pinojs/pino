@@ -216,5 +216,4 @@ executing in the terminal `chcp 65001`. For persistent terminal configuration, t
 to automatically run  `chcp 65001` when a Windows cmd shell or PowerShell is opened.
 See the contents of the `windows-cmd-utf8-fix.reg` for details.
 
-you can open windows regedit, go to `[HKEY_LOCAL_MACHINE\Software\Microsoft\Command Processor]`
 and add a line with name `Autorun` of type `string value` and data `chcp 65001`.
