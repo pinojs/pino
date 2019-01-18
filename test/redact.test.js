@@ -354,6 +354,71 @@ test('redact – supports last position wildcard paths', async ({ is }) => {
   is(req.headers.connection, '[Redacted]')
 })
 
+test('redact – supports first position wildcard paths', async ({ is }) => {
+  const stream = sink()
+  const instance = pino({ redact: ['*.headers'] }, stream)
+  instance.info({
+    req: {
+      id: 7915,
+      method: 'GET',
+      url: '/',
+      headers: {
+        host: 'localhost:3000',
+        connection: 'keep-alive',
+        cookie: 'SESSID=298zf09hf012fh2; csrftoken=u32t4o3tb3gg43; _gat=1;'
+      },
+      remoteAddress: '::ffff:127.0.0.1',
+      remotePort: 58022
+    }
+  })
+  const { req } = await once(stream, 'data')
+  is(req.headers, '[Redacted]')
+})
+
+test('redact – supports first position wildcards before other paths', async ({ is }) => {
+  const stream = sink()
+  const instance = pino({ redact: ['*.headers.cookie', 'req.id'] }, stream)
+  instance.info({
+    req: {
+      id: 7915,
+      method: 'GET',
+      url: '/',
+      headers: {
+        host: 'localhost:3000',
+        connection: 'keep-alive',
+        cookie: 'SESSID=298zf09hf012fh2; csrftoken=u32t4o3tb3gg43; _gat=1;'
+      },
+      remoteAddress: '::ffff:127.0.0.1',
+      remotePort: 58022
+    }
+  })
+  const { req } = await once(stream, 'data')
+  is(req.headers.cookie, '[Redacted]')
+  is(req.id, '[Redacted]')
+})
+
+test('redact – supports first position wildcards after other paths', async ({ is }) => {
+  const stream = sink()
+  const instance = pino({ redact: ['req.id', '*.headers.cookie'] }, stream)
+  instance.info({
+    req: {
+      id: 7915,
+      method: 'GET',
+      url: '/',
+      headers: {
+        host: 'localhost:3000',
+        connection: 'keep-alive',
+        cookie: 'SESSID=298zf09hf012fh2; csrftoken=u32t4o3tb3gg43; _gat=1;'
+      },
+      remoteAddress: '::ffff:127.0.0.1',
+      remotePort: 58022
+    }
+  })
+  const { req } = await once(stream, 'data')
+  is(req.headers.cookie, '[Redacted]')
+  is(req.id, '[Redacted]')
+})
+
 test('redact – supports intermediate wildcard paths', async ({ is }) => {
   const stream = sink()
   const instance = pino({ redact: ['req.*.cookie'] }, stream)
