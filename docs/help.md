@@ -212,5 +212,5 @@ be visualized incorrectly if the log lines include utf8 characters. It
 is possible to configure the terminal to visualize those characters
 correctly with the use of [`chcp`](https://ss64.com/nt/chcp.html) by
 executing in the terminal `chcp 65001`. As a permanent solution, 
-you can add this line `"terminal.integrated.shellArgs.windows": ["-NoExit", "/c", "chcp 65001"]` 
-in Visual studio code User settings. This is a known limitation of Node.js.
+you can open windows regedit, go to `[HKEY_LOCAL_MACHINE\Software\Microsoft\Command Processor]`
+and add a line with name `Autorun` of type `string value` and data `chcp 65001`.
