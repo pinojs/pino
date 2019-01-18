@@ -212,7 +212,7 @@ be visualized incorrectly if the log lines include utf8 characters. It
 is possible to configure the terminal to visualize those characters
 correctly with the use of [`chcp`](https://ss64.com/nt/chcp.html) by
 executing in the terminal `chcp 65001`. For persistent terminal configuration, the supplied
-`windows-cmd-utf8-fix.reg` file can be used to automatically modify the Windows Registry 
+`windows-cmd-utf8-fix.reg` file can be used to modify the Windows Registry 
 to automatically run  `chcp 65001` when a Windows cmd shell or PowerShell is opened.
 See the contents of the `windows-cmd-utf8-fix.reg` for details.
 
