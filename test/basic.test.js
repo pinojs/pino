@@ -24,15 +24,15 @@ test('child instance exposes pino version', async ({ is }) => {
   is(child.version, version)
 })
 
-skip('WIP chindings are exposed on instance', async ({ is }) => {
+skip('WIP childBindings are exposed on instance', async ({ is }) => {
   const instance = pino()
-  is(instance.chindings(), null)
+  is(instance.childBindings(), null)
 })
 
-skip('WIP chindings are exposed on child instance', async ({ isNot }) => {
+skip('WIP childBindings are exposed on child instance', async ({ isNot }) => {
   const instance = pino()
   instance.child({ foo: 'bar' })
-  isNot(instance.chindings(), null)
+  isNot(instance.childBindings(), null)
 })
 
 function levelTest (name, level) {
