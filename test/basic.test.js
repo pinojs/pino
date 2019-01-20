@@ -2,7 +2,7 @@
 const os = require('os')
 const { join } = require('path')
 const { readFileSync } = require('fs')
-const { test } = require('tap')
+const { test, skip } = require('tap')
 const { sink, check, once } = require('./helper')
 const pino = require('../')
 const { version } = require('../package.json')
@@ -22,6 +22,17 @@ test('pino version is exposed on instance', async ({ is }) => {
 test('child instance exposes pino version', async ({ is }) => {
   const child = pino().child({ foo: 'bar' })
   is(child.version, version)
+})
+
+skip('WIP chindings are exposed on instance', async ({ is }) => {
+  const instance = pino()
+  is(instance.chindings(), null)
+})
+
+skip('WIP chindings are exposed on child instance', async ({ isNot }) => {
+  const instance = pino()
+  instance.child({ foo: 'bar' })
+  isNot(instance.chindings(), null)
 })
 
 function levelTest (name, level) {
