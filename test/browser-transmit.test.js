@@ -49,10 +49,8 @@ test('passes send function the logged level', ({ end, is }) => {
   end()
 })
 
-test('passes send function messages in logEvent object', ({ end, same, is }) => {
-  // in order to cover all possible scenarios, need to test messages with/without objects, and with/without the `asObject` option set
-
-  const logger1 = pino({
+test('passes send function message strings in logEvent object when asObject is not set', ({ end, same, is }) => {
+  const logger = pino({
     browser: {
       write: noop,
       transmit: {
@@ -64,9 +62,31 @@ test('passes send function messages in logEvent object', ({ end, same, is }) => 
     }
   })
 
-  logger1.fatal('test', 'another test')
+  logger.fatal('test', 'another test')
 
-  const logger2 = pino({
+  end()
+})
+
+test('passes send function message objects in logEvent object when asObject is not set', ({ end, same, is }) => {
+  const logger = pino({
+    browser: {
+      write: noop,
+      transmit: {
+        send (level, { messages }) {
+          same(messages[0], { test: 'test' })
+          is(messages[1], 'another test')
+        }
+      }
+    }
+  })
+
+  logger.fatal({ test: 'test' }, 'another test')
+
+  end()
+})
+
+test('passes send function message strings in logEvent object when asObject is set', ({ end, same, is }) => {
+  const logger = pino({
     browser: {
       asObject: true,
       write: noop,
@@ -79,23 +99,13 @@ test('passes send function messages in logEvent object', ({ end, same, is }) => 
     }
   })
 
-  logger2.fatal('test', 'another test')
+  logger.fatal('test', 'another test')
 
-  const logger3 = pino({
-    browser: {
-      write: noop,
-      transmit: {
-        send (level, { messages }) {
-          same(messages[0], { test: 'test' })
-          is(messages[1], 'another test')
-        }
-      }
-    }
-  })
+  end()
+})
 
-  logger3.fatal({ test: 'test' }, 'another test')
-
-  const logger4 = pino({
+test('passes send function message objects in logEvent object when asObject is set', ({ end, same, is }) => {
+  const logger = pino({
     browser: {
       asObject: true,
       write: noop,
@@ -108,7 +118,7 @@ test('passes send function messages in logEvent object', ({ end, same, is }) => 
     }
   })
 
-  logger4.fatal({ test: 'test' }, 'another test')
+  logger.fatal({ test: 'test' }, 'another test')
 
   end()
 })
