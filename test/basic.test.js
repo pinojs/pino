@@ -25,7 +25,7 @@ test('child instance exposes pino version', async ({ is }) => {
 })
 
 test('childBindings are exposed on every instance', async ({ same }) => {
-  const instance = pino({ level: 'info' })
+  const instance = pino()
   same(instance.childBindings(), {})
 })
 
