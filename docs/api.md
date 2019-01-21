@@ -501,7 +501,7 @@ child.info({test: 'will be overwritten'})
 <a id="childBindings"></a>
 ### `logger.childBindings()`
 
-Returns an object containing all the current bindings.
+Returns an object containing all the current bindings, cloned from the ones passed in via `logger.child()`.
 ```js
 const child = logger.child({ foo: 'bar' })
 console.log(child.childBindings())
