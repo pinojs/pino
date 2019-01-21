@@ -50,7 +50,38 @@ test('passes send function the logged level', ({ end, is }) => {
 })
 
 test('passes send function messages in logEvent object', ({ end, same, is }) => {
-  const logger = pino({
+  // in order to cover all possible scenarios, need to test messages with/without objects, and with/without the `asObject` option set
+
+  const logger1 = pino({
+    browser: {
+      write: noop,
+      transmit: {
+        send (level, { messages }) {
+          is(messages[0], 'test')
+          is(messages[1], 'another test')
+        }
+      }
+    }
+  })
+
+  logger1.fatal('test', 'another test')
+
+  const logger2 = pino({
+    browser: {
+      asObject: true,
+      write: noop,
+      transmit: {
+        send (level, { messages }) {
+          is(messages[0], 'test')
+          is(messages[1], 'another test')
+        }
+      }
+    }
+  })
+
+  logger2.fatal('test', 'another test')
+
+  const logger3 = pino({
     browser: {
       write: noop,
       transmit: {
@@ -62,7 +93,23 @@ test('passes send function messages in logEvent object', ({ end, same, is }) => 
     }
   })
 
-  logger.fatal({ test: 'test' }, 'another test')
+  logger3.fatal({ test: 'test' }, 'another test')
+
+  const logger4 = pino({
+    browser: {
+      asObject: true,
+      write: noop,
+      transmit: {
+        send (level, { messages }) {
+          same(messages[0], { test: 'test' })
+          is(messages[1], 'another test')
+        }
+      }
+    }
+  })
+
+  logger4.fatal({ test: 'test' }, 'another test')
+
   end()
 })
 
