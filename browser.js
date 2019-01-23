@@ -203,18 +203,18 @@ function wrap (opts, logger, level) {
 
 function asObject (logger, level, args, ts) {
   if (logger._serialize) applySerializers(args, logger._serialize, logger.serializers, logger._stdErrSerialize)
-  var msg = args[0]
+  var argsCloned = args.slice()
+  var msg = argsCloned[0]
   var o = { time: ts, level: pino.levels.values[level] }
   var lvl = (logger._childLevel | 0) + 1
   if (lvl < 1) lvl = 1
   // deliberate, catching objects, arrays
   if (msg !== null && typeof msg === 'object') {
-    args = args.slice()
-    while (lvl-- && typeof args[0] === 'object') {
-      Object.assign(o, args.shift())
+    while (lvl-- && typeof argsCloned[0] === 'object') {
+      Object.assign(o, argsCloned.shift())
     }
-    msg = args.length ? format(args.shift(), args) : undefined
-  } else if (typeof msg === 'string') msg = format(args.shift(), args)
+    msg = argsCloned.length ? format(argsCloned.shift(), argsCloned) : undefined
+  } else if (typeof msg === 'string') msg = format(argsCloned.shift(), argsCloned)
   if (msg !== undefined) o.msg = msg
   return o
 }
