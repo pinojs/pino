@@ -11,7 +11,7 @@
   * [logger.error()](#error)
   * [logger.fatal()](#fatal)
   * [logger.child()](#child)
-  * [logger.childBindings()](#childBindings)
+  * [logger.bindings()](#bindings)
   * [logger.flush()](#flush)
   * [logger.level](#level)
   * [logger.isLevelEnabled()](#islevelenabled)
@@ -498,16 +498,16 @@ child.info({test: 'will be overwritten'})
 * See [`serializers` option](#opt-serializers)
 * See [pino.stdSerializers](#pino-stdSerializers)
 
-<a id="childBindings"></a>
-### `logger.childBindings()`
+<a id="bindings"></a>
+### `logger.bindings()`
 
 Returns an object containing all the current bindings, cloned from the ones passed in via `logger.child()`.
 ```js
 const child = logger.child({ foo: 'bar' })
-console.log(child.childBindings())
+console.log(child.bindings())
 // { foo: 'bar' }
 const anotherChild = child.child({ MIX: { IN: 'always' } })
-console.log(child.childBindings())
+console.log(child.bindings())
 // { foo: 'bar', MIX: { IN: 'always' } }
 ```
 

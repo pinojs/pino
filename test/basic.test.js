@@ -24,14 +24,14 @@ test('child instance exposes pino version', async ({ is }) => {
   is(child.version, version)
 })
 
-test('childBindings are exposed on every instance', async ({ same }) => {
+test('bindings are exposed on every instance', async ({ same }) => {
   const instance = pino()
-  same(instance.childBindings(), {})
+  same(instance.bindings(), {})
 })
 
-test('childBindings contain the name and the child bindings', async ({ same }) => {
+test('bindings contain the name and the child bindings', async ({ same }) => {
   const instance = pino({ name: 'basicTest', level: 'info' }).child({ foo: 'bar' }).child({ a: 2 })
-  same(instance.childBindings(), { name: 'basicTest', foo: 'bar', a: 2 })
+  same(instance.bindings(), { name: 'basicTest', foo: 'bar', a: 2 })
 })
 
 function levelTest (name, level) {
