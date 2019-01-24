@@ -24,6 +24,16 @@ test('child instance exposes pino version', async ({ is }) => {
   is(child.version, version)
 })
 
+test('bindings are exposed on every instance', async ({ same }) => {
+  const instance = pino()
+  same(instance.bindings(), {})
+})
+
+test('bindings contain the name and the child bindings', async ({ same }) => {
+  const instance = pino({ name: 'basicTest', level: 'info' }).child({ foo: 'bar' }).child({ a: 2 })
+  same(instance.bindings(), { name: 'basicTest', foo: 'bar', a: 2 })
+})
+
 function levelTest (name, level) {
   test(`${name} logs as ${level}`, async ({ is }) => {
     const stream = sink()
