@@ -63,6 +63,8 @@ the logger for the [Rill framework](https://rill.site/).
 ## Community
 
 + [`pino-colada`](https://github.com/lrlna/pino-colada): cute ndjson formatter for pino.
++ [`pino-fluentd`](https://github.com/davidedantonio/pino-fluentd): send
+Pino logs to a Fluentd instance.
 + [`pino-pretty-min`](https://github.com/unjello/pino-pretty-min): a minimal
 prettifier inspired by the [logrus](https://github.com/sirupsen/logrus) logger.
 
