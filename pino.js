@@ -77,7 +77,6 @@ function pino (...args) {
   const formatOpts = redact
     ? { stringify: stringifiers[redactFmtSym] }
     : { stringify }
-  const messageKeyString = `,"${messageKey}":`
   const end = ',"v":' + LOG_VERSION + '}' + (crlf ? '\r\n' : '\n')
   const coreChindings = asChindings.bind(null, {
     [chindingsSym]: '',
