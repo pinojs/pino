@@ -25,7 +25,7 @@ const {
   setLevelSym,
   endSym,
   formatOptsSym,
-  messageKeyStringSym,
+  messageKeySym,
   useLevelLabelsSym,
   changeLevelNameSym,
   useOnlyCustomLevelsSym
@@ -106,7 +106,7 @@ function pino (...args) {
     [stringifiersSym]: stringifiers,
     [endSym]: end,
     [formatOptsSym]: formatOpts,
-    [messageKeyStringSym]: messageKeyString,
+    [messageKeySym]: messageKey,
     [serializersSym]: serializers,
     [chindingsSym]: chindings
   }

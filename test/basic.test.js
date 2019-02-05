@@ -248,7 +248,12 @@ test('set the base', async ({ is, same }) => {
 test('set the base to null', async ({ is, same }) => {
   const stream = sink()
   const instance = pino({
-    base: null
+    base: null,
+    serializers: {
+      [Symbol.for('pino.*')]: (input) => {
+        return Object.assign({}, input, { additionalMessage: 'using pino' })
+      }
+    }
   }, stream)
   instance.fatal('this is fatal')
   const result = await once(stream, 'data')
@@ -257,6 +262,7 @@ test('set the base to null', async ({ is, same }) => {
   same(result, {
     level: 60,
     msg: 'this is fatal',
+    additionalMessage: 'using pino',
     v: 1
   })
 })
