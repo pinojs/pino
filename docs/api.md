@@ -521,7 +521,7 @@ This is an asynchronous, fire and forget, operation.
 The use case is primarily for Extreme mode logging, which may hold up to
 4KiB of logs. The `logger.flush` method can be used to flush the logs
 on an long interval, say ten seconds. Such a strategy can provide an
-optimium balanace between extremely efficient logging at high demand periods
+optimium balance between extremely efficient logging at high demand periods
 and safer logging at low demand periods.
 
 * See [`pino.extreme`](#pino-extreme)
