@@ -349,7 +349,7 @@ The `message` string may contain a printf style string with support for
 the following placeholders:
 
 * `%s` – string placeholder
-* `%d` – digit placeholder)
+* `%d` – digit placeholder
 * `%O`, `%o` and `%j` – object placeholder
 
 Values supplied as additional arguments to the logger method will
