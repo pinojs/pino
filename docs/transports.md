@@ -76,6 +76,7 @@ PR's to this document are welcome for any new transports!
 + [pino-socket](#pino-socket)
 + [pino-stackdriver](#pino-stackdriver)
 + [pino-syslog](#pino-syslog)
++ [pino-websocket](#pino-websocket)
 
 <a id="pino-couch"></a>
 ### pino-couch
@@ -275,3 +276,15 @@ Example output for the "hello world" log:
 [pino-syslog]: https://www.npmjs.com/package/pino-syslog
 [rfc3164]: https://tools.ietf.org/html/rfc3164
 [logstash]: https://www.elastic.co/products/logstash
+
+
+<a id="pino-websocket"></a>
+### pino-websocket
+
+[pino-websocket](https://www.npmjs.com/package/@abeai/pino-websocket) is a transport that will forward each log line to a websocket server.
+
+```sh
+$ node app.js | pino-websocket -a my-websocket-server.example.com -p 3004
+```
+
+For full documentation of command line switches read [readme](https://github.com/abeai/pino-webscoket#README)
