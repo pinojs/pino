@@ -6,6 +6,8 @@ module.exports = pino
 
 var _console = global.console || {}
 var stdSerializers = {
+  wrapRequestSerializer: passthrough,
+  wrapResponseSerializer: passthrough,
   req: mock,
   res: mock,
   err: asErrValue
@@ -157,6 +159,7 @@ pino.levels = {
 }
 
 pino.stdSerializers = stdSerializers
+pino.symbols = require('./lib/symbols')
 
 function set (opts, logger, level, fallback) {
   var proto = Object.getPrototypeOf(logger)
@@ -296,4 +299,5 @@ function asErrValue (err) {
 }
 
 function mock () { return {} }
+function passthrough (a) { return a }
 function noop () {}
