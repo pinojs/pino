@@ -6,6 +6,8 @@ module.exports = pino
 
 var _console = global.console || {}
 var stdSerializers = {
+  mapHttpRequest: mock,
+  mapHttpResponse: mock,
   wrapRequestSerializer: passthrough,
   wrapResponseSerializer: passthrough,
   req: mock,

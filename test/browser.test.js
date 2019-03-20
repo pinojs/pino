@@ -1,6 +1,8 @@
 'use strict'
 const test = require('tape')
 const fresh = require('fresh-require')
+const pinoStdSerializers = require('pino-std-serializers')
+const pinoSymbols = require('../lib/symbols')
 const pino = require('../browser')
 
 levelTest('fatal')
@@ -101,22 +103,36 @@ test('exposes LOG_VERSION', ({ end, is }) => {
 
 test('exposes faux stdSerializers', ({ end, ok, same }) => {
   ok(pino.stdSerializers)
-  ok(pino.stdSerializers.req)
-  ok(pino.stdSerializers.res)
-  ok(pino.stdSerializers.err)
+  // make sure faux stdSerializers match pino-std-serializers
+  for (let serializer in pinoStdSerializers) {
+    ok(pino.stdSerializers[serializer], `pino.stdSerializers.${serializer}`)
+  }
+  // confirm faux methods return empty objects
   same(pino.stdSerializers.req(), {})
+  same(pino.stdSerializers.mapHttpRequest(), {})
+  same(pino.stdSerializers.mapHttpResponse(), {})
   same(pino.stdSerializers.res(), {})
-
+  // confirm wrapping function is a passthrough
+  const noChange = { foo: 'bar', fuz: 42 }
+  same(pino.stdSerializers.wrapRequestSerializer(noChange), noChange)
+  same(pino.stdSerializers.wrapResponseSerializer(noChange), noChange)
   end()
 })
 
 test('exposes err stdSerializer', ({ end, ok }) => {
-  ok(pino.stdSerializers)
-  ok(pino.stdSerializers.req)
-  ok(pino.stdSerializers.res)
   ok(pino.stdSerializers.err)
   ok(pino.stdSerializers.err(Error()))
+  end()
+})
 
+test('exposes real symbols', ({ end, ok, same }) => {
+  ok(pino.symbols)
+  // confirm every symbol is present
+  for (let symbol in pinoSymbols) {
+    ok(pino.symbols[symbol], `pino.symbols.${symbol}`)
+  }
+  // confirm real symbols are used
+  same(pino.symbols, pinoSymbols)
   end()
 })
 
