@@ -4,6 +4,7 @@ const stdSerializers = require('pino-std-serializers')
 const redaction = require('./lib/redaction')
 const time = require('./lib/time')
 const proto = require('./lib/proto')
+const transport = require('./lib/transport')
 const symbols = require('./lib/symbols')
 const { assertDefaultLevelFound, mappings, genLsCache } = require('./lib/levels')
 const {
@@ -121,7 +122,7 @@ function pino (...args) {
 
 pino.extreme = (dest = process.stdout.fd) => buildSafeSonicBoom(dest, 4096, false)
 pino.destination = (dest = process.stdout.fd) => buildSafeSonicBoom(dest, 0, true)
-
+pino.transport = transport
 pino.final = final
 pino.levels = mappings()
 pino.stdSerializers = serializers
