@@ -76,6 +76,24 @@ function levelTest (name, level) {
     })
   })
 
+  test(`overriding object key by string at level ${name}`, async ({ is, same }) => {
+    const stream = sink()
+    const instance = pino(stream)
+    instance.level = name
+    instance[name]({ hello: 'world', msg: 'object' }, 'string')
+    const result = await once(stream, 'data')
+    is(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
+    delete result.time
+    same(result, {
+      pid: pid,
+      hostname: hostname,
+      level: level,
+      msg: 'string',
+      hello: 'world',
+      v: 1
+    })
+  })
+
   test(`formatting logs as ${name}`, async ({ is }) => {
     const stream = sink()
     const instance = pino(stream)
