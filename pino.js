@@ -25,7 +25,7 @@ const {
   setLevelSym,
   endSym,
   formatOptsSym,
-  messageKeyStringSym,
+  messageKeySym,
   useLevelLabelsSym,
   changeLevelNameSym,
   useOnlyCustomLevelsSym
@@ -77,7 +77,6 @@ function pino (...args) {
   const formatOpts = redact
     ? { stringify: stringifiers[redactFmtSym] }
     : { stringify }
-  const messageKeyString = `,"${messageKey}":`
   const end = ',"v":' + LOG_VERSION + '}' + (crlf ? '\r\n' : '\n')
   const coreChindings = asChindings.bind(null, {
     [chindingsSym]: '',
@@ -106,7 +105,7 @@ function pino (...args) {
     [stringifiersSym]: stringifiers,
     [endSym]: end,
     [formatOptsSym]: formatOpts,
-    [messageKeyStringSym]: messageKeyString,
+    [messageKeySym]: messageKey,
     [serializersSym]: serializers,
     [chindingsSym]: chindings
   }

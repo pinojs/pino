@@ -279,6 +279,28 @@ test('set the base to null', async ({ is, same }) => {
   })
 })
 
+test('set the base to null and use a serializer', async ({ is, same }) => {
+  const stream = sink()
+  const instance = pino({
+    base: null,
+    serializers: {
+      [Symbol.for('pino.*')]: (input) => {
+        return Object.assign({}, input, { additionalMessage: 'using pino' })
+      }
+    }
+  }, stream)
+  instance.fatal('this is fatal too')
+  const result = await once(stream, 'data')
+  is(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
+  delete result.time
+  same(result, {
+    level: 60,
+    msg: 'this is fatal too',
+    additionalMessage: 'using pino',
+    v: 1
+  })
+})
+
 test('throw if creating child without bindings', async ({ throws }) => {
   const stream = sink()
   const instance = pino(stream)
