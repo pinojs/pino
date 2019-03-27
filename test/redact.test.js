@@ -481,6 +481,32 @@ test('redact – supports top level wildcard', async ({ is }) => {
   is(req, '[Redacted]')
 })
 
+test('redact – supports top level wildcard with a censor function', async ({ is }) => {
+  const stream = sink()
+  const instance = pino({
+    redact: {
+      paths: ['*'],
+      censor: () => '[Redacted]'
+    }
+  }, stream)
+  instance.info({
+    req: {
+      id: 7915,
+      method: 'GET',
+      url: '/',
+      headers: {
+        host: 'localhost:3000',
+        connection: 'keep-alive',
+        cookie: 'SESSID=298zf09hf012fh2; csrftoken=u32t4o3tb3gg43; _gat=1;'
+      },
+      remoteAddress: '::ffff:127.0.0.1',
+      remotePort: 58022
+    }
+  })
+  const { req } = await once(stream, 'data')
+  is(req, '[Redacted]')
+})
+
 test('redact – supports top level wildcard and leading wildcard', async ({ is }) => {
   const stream = sink()
   const instance = pino({ redact: ['*', '*.req'] }, stream)
