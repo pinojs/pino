@@ -95,12 +95,6 @@ test('exposes levels object', ({ end, same }) => {
   end()
 })
 
-test('exposes LOG_VERSION', ({ end, is }) => {
-  is(pino.LOG_VERSION, 1)
-
-  end()
-})
-
 test('exposes faux stdSerializers', ({ end, ok, same }) => {
   ok(pino.stdSerializers)
   // make sure faux stdSerializers match pino-std-serializers

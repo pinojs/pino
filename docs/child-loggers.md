@@ -68,7 +68,7 @@ pino(pino.destination('./my-log'))
 
 ```sh
 $ cat my-log
-{"pid":95469,"hostname":"MacBook-Pro-3.home","level":30,"msg":"howdy","time":1459534114473,"a":"property","a":"prop","v":1}
+{"pid":95469,"hostname":"MacBook-Pro-3.home","level":30,"msg":"howdy","time":1459534114473,"a":"property","a":"prop"}
 ```
 
 Notice how there's two key's named `a` in the JSON output. The sub-childs properties
@@ -80,7 +80,7 @@ namespace holds the final value assigned to it:
 
 ```sh
 $ cat my-log | node -e "process.stdin.once('data', (line) => console.log(JSON.stringify(JSON.parse(line))))"
-{"pid":95469,"hostname":"MacBook-Pro-3.home","level":30,"msg":"howdy","time":"2016-04-01T18:08:34.473Z","a":"prop","v":1}
+{"pid":95469,"hostname":"MacBook-Pro-3.home","level":30,"msg":"howdy","time":"2016-04-01T18:08:34.473Z","a":"prop"}
 ```
 
 Ultimately the conflict is resolved by taking the last value, which aligns with Bunyans child logging

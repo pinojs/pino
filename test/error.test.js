@@ -25,8 +25,7 @@ test('err is serialized with additional properties set on the Error object', asy
     type: 'Error',
     msg: err.message,
     stack: err.stack,
-    foo: err.foo,
-    v: 1
+    foo: err.foo
   })
 })
 
@@ -45,8 +44,7 @@ test('type should be retained, even if type is a property', async ({ ok, same })
     level: level,
     type: 'bar',
     msg: err.message,
-    stack: err.stack,
-    v: 1
+    stack: err.stack
   })
 })
 
@@ -67,8 +65,7 @@ test('type, message and stack should be first level properties', async ({ ok, sa
     type: 'Error',
     msg: err.message,
     stack: err.stack,
-    foo: err.foo,
-    v: 1
+    foo: err.foo
   })
 })
 
@@ -95,8 +92,7 @@ test('err serializer', async ({ ok, same }) => {
       message: err.message,
       stack: err.stack,
       foo: err.foo
-    },
-    v: 1
+    }
   })
 })
 
@@ -118,8 +114,7 @@ test('an error with statusCode property is not confused for a http response', as
     type: 'Error',
     msg: err.message,
     stack: err.stack,
-    statusCode: err.statusCode,
-    v: 1
+    statusCode: err.statusCode
   })
 })
 
@@ -170,7 +165,6 @@ test('correctly ignores toString on errors', async ({ same }) => {
     level: 60,
     type: 'Error',
     msg: err.message,
-    stack: err.stack,
-    v: 1
+    stack: err.stack
   })
 })

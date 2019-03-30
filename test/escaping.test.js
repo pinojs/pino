@@ -22,8 +22,7 @@ function testEscape (ch, key) {
       hostname: hostname,
       level: 60,
       name: 'hello',
-      msg: 'this contains ' + key,
-      v: 1
+      msg: 'this contains ' + key
     })
   })
 }
@@ -87,7 +86,6 @@ test('correctly escape `hello \\u001F world \\n \\u0022`', async ({ same }) => {
     hostname: hostname,
     level: 60,
     name: 'hello',
-    msg: 'hello \u001F world \n \u0022',
-    v: 1
+    msg: 'hello \u001F world \n \u0022'
   })
 })

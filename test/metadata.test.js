@@ -25,8 +25,7 @@ test('metadata works', async ({ ok, same, is }) => {
         hostname: hostname,
         level: 30,
         hello: 'world',
-        msg: 'a msg',
-        v: 1
+        msg: 'a msg'
       })
     }
   })
@@ -51,8 +50,7 @@ test('child loggers works', async ({ ok, same, is }) => {
         level: 30,
         hello: 'world',
         from: 'child',
-        msg: 'a msg',
-        v: 1
+        msg: 'a msg'
       })
     }
   })
@@ -76,8 +74,7 @@ test('without object', async ({ ok, same, is }) => {
         pid: pid,
         hostname: hostname,
         level: 30,
-        msg: 'a msg',
-        v: 1
+        msg: 'a msg'
       })
     }
   })
@@ -100,8 +97,7 @@ test('without msg', async ({ ok, same, is }) => {
         pid: pid,
         hostname: hostname,
         level: 30,
-        hello: 'world',
-        v: 1
+        hello: 'world'
       })
     }
   })

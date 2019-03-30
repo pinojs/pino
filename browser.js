@@ -139,8 +139,6 @@ function pino (opts) {
   return logger
 }
 
-pino.LOG_VERSION = 1
-
 pino.levels = {
   values: {
     fatal: 60,
