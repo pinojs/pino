@@ -68,6 +68,7 @@ For an example of this, see [pino-multi-stream][pinoms].
 
 PR's to this document are welcome for any new transports!
 
++ [pino-applicationinsights](#pino-applicationinsights)
 + [pino-azuretable](#pino-azuretable)
 + [pino-couch](#pino-couch)
 + [pino-datadog](#pino-datadog)
@@ -78,6 +79,18 @@ PR's to this document are welcome for any new transports!
 + [pino-socket](#pino-socket)
 + [pino-stackdriver](#pino-stackdriver)
 + [pino-syslog](#pino-syslog)
+
+<a id="pino-applicationinsights"></a>
+### pino-applicationinsights
+The [pino-applicationinsights](https://www.npmjs.com/package/pino-applicationinsights) module is a transport that will forward logs to [Azure Application Insights](https://docs.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview).
+
+Given an application `foo` that logs via pino, you would use `pino-applicationinsights` like so:
+
+``` sh
+$ node foo | pino-applicationinsights --key blablabla
+```
+
+For full documentation of command line switches read [readme](https://github.com/ovhemert/pino-applicationinsights#readme)
 
 <a id="pino-azuretable"></a>
 ### pino-azuretable
