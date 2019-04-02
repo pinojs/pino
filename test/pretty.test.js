@@ -7,10 +7,11 @@ const execa = require('execa')
 const writer = require('flush-write-stream')
 const { once } = require('./helper')
 const pino = require('../')
+const tap = require('tap')
 
 const isWin = process.platform === 'win32'
-// skip tests on Windows as colour codes are different and tests fail
 if (isWin) {
+  tap.comment('Skipping pretty printing tests on Windows as colour codes are different and tests fail')
   process.exit(0)
 }
 
