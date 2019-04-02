@@ -69,6 +69,7 @@ For an example of this, see [pino-multi-stream][pinoms].
 PR's to this document are welcome for any new transports!
 
 + [pino-couch](#pino-couch)
++ [pino-datadog](#pino-datadog)
 + [pino-elasticsearch](#pino-elasticsearch)
 + [pino-mq](#pino-mq)
 + [pino-papertrail](#pino-papertrail)
@@ -89,6 +90,17 @@ $ node app.js | pino-couch -U https://couch-server -d mylogs
 [pino-couch]: https://github.com/IBM/pino-couch
 [CouchDB]: https://couchdb.apache.org
 
+<a id="pino-datadog"></a>
+### pino-datadog
+The [pino-datadog](https://www.npmjs.com/package/pino-datadog) module is a transport that will forward logs to [DataDog](https://www.datadoghq.com/) through it's API.
+
+Given an application `foo` that logs via pino, you would use `pino-datadog` like so:
+
+``` sh
+$ node foo | pino-datadog --key blablabla
+```
+
+For full documentation of command line switches read [readme](https://github.com/ovhemert/pino-datadog#readme)
 
 <a id="pino-elasticsearch"></a>
 ### pino-elasticsearch
