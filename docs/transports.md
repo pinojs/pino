@@ -68,6 +68,7 @@ For an example of this, see [pino-multi-stream][pinoms].
 
 PR's to this document are welcome for any new transports!
 
++ [pino-azuretable](#pino-azuretable)
 + [pino-couch](#pino-couch)
 + [pino-datadog](#pino-datadog)
 + [pino-elasticsearch](#pino-elasticsearch)
@@ -77,6 +78,18 @@ PR's to this document are welcome for any new transports!
 + [pino-socket](#pino-socket)
 + [pino-stackdriver](#pino-stackdriver)
 + [pino-syslog](#pino-syslog)
+
+<a id="pino-azuretable"></a>
+### pino-azuretable
+The [pino-azuretable](https://www.npmjs.com/package/pino-azuretable) module is a transport that will forward logs to the [Azure Table Storage](https://azure.microsoft.com/en-us/services/storage/tables/).
+
+Given an application `foo` that logs via pino, you would use `pino-azuretable` like so:
+
+``` sh
+$ node foo | pino-azuretable --account storageaccount --key blablabla
+```
+
+For full documentation of command line switches read [readme](https://github.com/ovhemert/pino-azuretable#readme)
 
 <a id="pino-couch"></a>
 ### pino-couch
