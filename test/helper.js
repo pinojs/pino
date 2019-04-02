@@ -7,6 +7,12 @@ const pid = process.pid
 const hostname = os.hostname()
 const v = 1
 
+const isWin = process.platform === 'win32'
+
+function getPathToNull () {
+  return isWin ? '\\\\.\\NUL' : '/dev/null'
+}
+
 function once (emitter, name) {
   return new Promise((resolve, reject) => {
     if (name !== 'error') emitter.once('error', reject)
@@ -46,4 +52,4 @@ function sleep (ms) {
   })
 }
 
-module.exports = { sink, check, once, sleep }
+module.exports = { getPathToNull, sink, check, once, sleep }

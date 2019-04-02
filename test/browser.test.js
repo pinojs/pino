@@ -1,6 +1,6 @@
 'use strict'
 const test = require('tape')
-const fresh = require('fresh-require')
+const fresh = require('import-fresh')
 const pinoStdSerializers = require('pino-std-serializers')
 const pinoSymbols = require('../lib/symbols')
 const pino = require('../browser')
@@ -153,7 +153,7 @@ if (process.title !== 'browser') {
   test('in absence of console, log methods become noops', ({ end, ok }) => {
     var console = global.console
     delete global.console
-    const instance = fresh('../browser', require)()
+    const instance = fresh('../browser')()
     global.console = console
     ok(fnName(instance.log).match(/noop/))
     ok(fnName(instance.fatal).match(/noop/))
