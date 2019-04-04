@@ -43,11 +43,12 @@ function levelTest (name, level) {
     check(is, await once(stream, 'data'), level, 'hello world')
   })
 
-  test(`passing objects at level ${name}`, async ({ is }) => {
+  test(`passing objects at level ${name}`, async ({ is, same }) => {
     const stream = sink()
     const instance = pino(stream)
     instance.level = name
-    instance[name]({ hello: 'world' })
+    const obj = { hello: 'world' }
+    instance[name](obj)
 
     const result = await once(stream, 'data')
     is(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
@@ -56,13 +57,15 @@ function levelTest (name, level) {
     is(result.level, level)
     is(result.hello, 'world')
     is(result.v, 1)
+    same(Object.keys(obj), [ 'hello' ])
   })
 
   test(`passing an object and a string at level ${name}`, async ({ is, same }) => {
     const stream = sink()
     const instance = pino(stream)
     instance.level = name
-    instance[name]({ hello: 'world' }, 'a string')
+    const obj = { hello: 'world' }
+    instance[name](obj, 'a string')
     const result = await once(stream, 'data')
     is(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
     delete result.time
@@ -74,6 +77,7 @@ function levelTest (name, level) {
       hello: 'world',
       v: 1
     })
+    same(Object.keys(obj), [ 'hello' ])
   })
 
   test(`overriding object key by string at level ${name}`, async ({ is, same }) => {
