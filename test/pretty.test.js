@@ -248,3 +248,15 @@ test('final works without prior logging', async ({ isNot }) => {
   isNot(actual.match(/WARN\s+: pino.final with prettyPrint does not support flushing/), null)
   isNot(actual.match(/INFO\s+\(123456 on abcdefghijklmnopqr\): beforeExit/), null)
 })
+
+test('works as expected with an object with the msg prop', async ({ isNot }) => {
+  var actual = ''
+  const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'obj-msg-prop.js')])
+
+  child.stdout.pipe(writer((s, enc, cb) => {
+    actual += s
+    cb()
+  }))
+  await once(child, 'close')
+  isNot(actual.match(/\(123456 on abcdefghijklmnopqr\): hello/), null)
+})
