@@ -67,5 +67,6 @@ the logger for the [Rill framework](https://rill.site/).
 MongoDB and many [others](https://www.fluentd.org/dataoutputs) via Fluentd.
 + [`pino-pretty-min`](https://github.com/unjello/pino-pretty-min): a minimal
 prettifier inspired by the [logrus](https://github.com/sirupsen/logrus) logger.
++ [`pino-rotating-file`](https://github.com/homeaway/pino-rotating-file): a hapi-pino log transport for splitting logs into separate, automatically rotating files.
 + [`cls-proxify`](https://github.com/keenondrums/cls-proxify): integration of pino and [CLS](https://github.com/jeff-lewis/cls-hooked). Useful for creating dynamically configured child loggers (e.g. with added trace ID) for each request. 
 
