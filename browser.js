@@ -10,6 +10,7 @@ var stdSerializers = {
   mapHttpResponse: mock,
   wrapRequestSerializer: passthrough,
   wrapResponseSerializer: passthrough,
+  wrapErrorSerializer: passthrough,
   req: mock,
   res: mock,
   err: asErrValue
