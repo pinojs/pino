@@ -535,8 +535,8 @@ Set this property to the desired logging level.
 
 The core levels and their values are as follows:
 
-|                                                                     |
-|:-------------------------------------------------------------------:|
+|            |       |       |      |      |       |       |          |
+|:-----------|-------|-------|------|------|-------|-------|---------:|
 | **Level:** | trace | debug | info | warn | error | fatal | silent   |
 | **Value:** | 10    | 20    | 30   | 40   | 50    | 60    | Infinity |
 
