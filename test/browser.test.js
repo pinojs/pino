@@ -2,7 +2,6 @@
 const test = require('tape')
 const fresh = require('import-fresh')
 const pinoStdSerializers = require('pino-std-serializers')
-const pinoSymbols = require('../lib/symbols')
 const pino = require('../browser')
 
 levelTest('fatal')
@@ -122,17 +121,6 @@ test('exposes faux stdSerializers', ({ end, ok, same }) => {
 test('exposes err stdSerializer', ({ end, ok }) => {
   ok(pino.stdSerializers.err)
   ok(pino.stdSerializers.err(Error()))
-  end()
-})
-
-test('exposes real symbols', ({ end, ok, same }) => {
-  ok(pino.symbols)
-  // confirm every symbol is present
-  for (let symbol in pinoSymbols) {
-    ok(pino.symbols[symbol], `pino.symbols.${symbol}`)
-  }
-  // confirm real symbols are used
-  same(pino.symbols, pinoSymbols)
   end()
 })
 

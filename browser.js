@@ -162,7 +162,6 @@ pino.levels = {
 }
 
 pino.stdSerializers = stdSerializers
-pino.symbols = require('./lib/symbols')
 
 function set (opts, logger, level, fallback) {
   var proto = Object.getPrototypeOf(logger)
