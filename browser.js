@@ -4,7 +4,7 @@ var format = require('quick-format-unescaped')
 
 module.exports = pino
 
-var _console = global.console || {}
+var _console = polyfillGlobalThis().console || {}
 var stdSerializers = {
   mapHttpRequest: mock,
   mapHttpResponse: mock,
@@ -162,7 +162,6 @@ pino.levels = {
 }
 
 pino.stdSerializers = stdSerializers
-pino.symbols = require('./lib/symbols')
 
 function set (opts, logger, level, fallback) {
   var proto = Object.getPrototypeOf(logger)
@@ -304,3 +303,18 @@ function asErrValue (err) {
 function mock () { return {} }
 function passthrough (a) { return a }
 function noop () {}
+
+/* eslint-disable */
+/* istanbul ignore next */
+function polyfillGlobalThis () {
+  if (typeof globalThis !== 'undefined') return globalThis
+  Object.defineProperty(Object.prototype, 'globalThis', {
+    get: function () {
+      delete Object.prototype.globalThis
+      return (this.globalThis = this)
+    },
+    configurable: true
+  })
+  return globalThis
+}
+/* eslint-enable */
