@@ -4,7 +4,7 @@ var format = require('quick-format-unescaped')
 
 module.exports = pino
 
-var _console = polyfillGlobalThis().console || {}
+var _console = pfGlobalThisOrFallback().console || {}
 var stdSerializers = {
   mapHttpRequest: mock,
   mapHttpResponse: mock,
@@ -306,15 +306,20 @@ function noop () {}
 
 /* eslint-disable */
 /* istanbul ignore next */
-function polyfillGlobalThis () {
-  if (typeof globalThis !== 'undefined') return globalThis
-  Object.defineProperty(Object.prototype, 'globalThis', {
-    get: function () {
-      delete Object.prototype.globalThis
-      return (this.globalThis = this)
-    },
-    configurable: true
-  })
-  return globalThis
+function pfGlobalThisOrFallback () {
+  const defd = (o) => typeof o !== 'undefined' && o
+  try { 
+    if (typeof globalThis !== 'undefined') return globalThis
+    Object.defineProperty(Object.prototype, 'globalThis', {
+      get: function () {
+        delete Object.prototype.globalThis
+        return (this.globalThis = this)
+      },
+      configurable: true
+    })
+    return globalThis
+  } catch (e) { 
+    return defd(self) || defd(window) || defd(this) || {}
+  }
 }
 /* eslint-enable */
