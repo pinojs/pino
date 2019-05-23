@@ -7,20 +7,9 @@ commands:
           name: Versions
           command: npm version
       - checkout
-      - restore_cache:
-          keys:
-            - v{{ .Environment.CIRCLE_CACHE_VERSION }}-{{ arch }}-npm-cache-{{ .Branch }}-{{ .Environment.CIRCLE_JOB }}
-            - v{{ .Environment.CIRCLE_CACHE_VERSION }}-{{ arch }}-npm-cache-master-{{ .Environment.CIRCLE_JOB }}
       - run:
           name: Run tests
           command: npm run ci
-      - save-npm-cache
-  save-npm-cache:
-    steps:
-      - save_cache:
-          key: v{{ .Environment.CIRCLE_CACHE_VERSION }}-{{ arch }}-npm-cache-{{ .Branch }}-{{ .Environment.CIRCLE_JOB }}-{{ checksum "package-lock.json" }}
-          paths:
-            - ~/.npm/_cacache
 jobs:
   node-v6:
     docker:
