@@ -1,0 +1,61 @@
+version: 2.1
+
+commands:
+  test-nodejs:
+    steps:
+      - run:
+          name: Versions
+          command: npm version
+      - checkout
+      - restore_cache:
+          keys:
+            - v{{ .Environment.CIRCLE_CACHE_VERSION }}-{{ arch }}-npm-cache-{{ .Branch }}-{{ .Environment.CIRCLE_JOB }}
+            - v{{ .Environment.CIRCLE_CACHE_VERSION }}-{{ arch }}-npm-cache-master-{{ .Environment.CIRCLE_JOB }}
+      - run:
+          name: Run tests
+          command: npm run ci
+      - save-npm-cache
+  save-npm-cache:
+    steps:
+      - save_cache:
+          key: v{{ .Environment.CIRCLE_CACHE_VERSION }}-{{ arch }}-npm-cache-{{ .Branch }}-{{ .Environment.CIRCLE_JOB }}-{{ checksum "package-lock.json" }}
+          paths:
+            - ~/.npm/_cacache
+jobs:
+  node-v6:
+    docker:
+      - image: node:6
+        environment:
+          secure: WeX/nE4FbSZkldDQHyHQruDRbJGbCDmerFqVC1Lbx7RYz5pU5pLraFRUWPUcSguq7Pt7iem7iOADtEqoIuurb0tttc91ilVIOTvtICixATFpRsiuilMqEo5YKNKwmsTiJzOnaoMEnxWOZ8WK+mVBN5h1qTGzg1gEIXBU8wjy1eSQ2+GEGC/NvtKjMwn3ew5XXqr5w7sU7AvoVBBJkUBucG09DVxIW9iB+Pz+k1kCcaCWunZ3r1tSOaIZoKCIW6SZCy2XD0ns0GKdBw+AygxVqDN5LpSj9EJ27wQpkpMcdFnpOyUoijHuqa8d8mnofWrkd3UQyIi1bz/Dq2wmSfLHfxb9+U/iWSi9q3ed2YfeX4+Q3of80onucqD1gTzjwZU+KZi9XSlVEgKEv+WwmTPE+okURGsaONCB3QLzgTo27cv/ACe8GU4UhomkrmDES8y6P1Zj49Np9GOOkYMzerUyV++qaTF6ugi8Z1k93/Put7EaESVmZJxxrtuhm70Dq96Eftrag9ypByYEgRYVKRqL7840bBb+I8J5pC8+uS5xBcusI9amYv01qdqP43F3f3XvRI4KHEG/OO4TfTSmt1htiDKKnciC2/6K6766y3wCOzxEeD2XPie4VkGsSTMJegxkPH37imogXJ/p4Ket7pprZXDnkEsiMn1b+CgTSaNb8ms=
+    steps:
+      - test-nodejs
+  node-v8:
+    docker:
+      - image: node:8
+        environment:
+          secure: WeX/nE4FbSZkldDQHyHQruDRbJGbCDmerFqVC1Lbx7RYz5pU5pLraFRUWPUcSguq7Pt7iem7iOADtEqoIuurb0tttc91ilVIOTvtICixATFpRsiuilMqEo5YKNKwmsTiJzOnaoMEnxWOZ8WK+mVBN5h1qTGzg1gEIXBU8wjy1eSQ2+GEGC/NvtKjMwn3ew5XXqr5w7sU7AvoVBBJkUBucG09DVxIW9iB+Pz+k1kCcaCWunZ3r1tSOaIZoKCIW6SZCy2XD0ns0GKdBw+AygxVqDN5LpSj9EJ27wQpkpMcdFnpOyUoijHuqa8d8mnofWrkd3UQyIi1bz/Dq2wmSfLHfxb9+U/iWSi9q3ed2YfeX4+Q3of80onucqD1gTzjwZU+KZi9XSlVEgKEv+WwmTPE+okURGsaONCB3QLzgTo27cv/ACe8GU4UhomkrmDES8y6P1Zj49Np9GOOkYMzerUyV++qaTF6ugi8Z1k93/Put7EaESVmZJxxrtuhm70Dq96Eftrag9ypByYEgRYVKRqL7840bBb+I8J5pC8+uS5xBcusI9amYv01qdqP43F3f3XvRI4KHEG/OO4TfTSmt1htiDKKnciC2/6K6766y3wCOzxEeD2XPie4VkGsSTMJegxkPH37imogXJ/p4Ket7pprZXDnkEsiMn1b+CgTSaNb8ms=
+    steps:
+      - test-nodejs
+  node-v10:
+    docker:
+      - image: node:10
+        environment:
+          secure: WeX/nE4FbSZkldDQHyHQruDRbJGbCDmerFqVC1Lbx7RYz5pU5pLraFRUWPUcSguq7Pt7iem7iOADtEqoIuurb0tttc91ilVIOTvtICixATFpRsiuilMqEo5YKNKwmsTiJzOnaoMEnxWOZ8WK+mVBN5h1qTGzg1gEIXBU8wjy1eSQ2+GEGC/NvtKjMwn3ew5XXqr5w7sU7AvoVBBJkUBucG09DVxIW9iB+Pz+k1kCcaCWunZ3r1tSOaIZoKCIW6SZCy2XD0ns0GKdBw+AygxVqDN5LpSj9EJ27wQpkpMcdFnpOyUoijHuqa8d8mnofWrkd3UQyIi1bz/Dq2wmSfLHfxb9+U/iWSi9q3ed2YfeX4+Q3of80onucqD1gTzjwZU+KZi9XSlVEgKEv+WwmTPE+okURGsaONCB3QLzgTo27cv/ACe8GU4UhomkrmDES8y6P1Zj49Np9GOOkYMzerUyV++qaTF6ugi8Z1k93/Put7EaESVmZJxxrtuhm70Dq96Eftrag9ypByYEgRYVKRqL7840bBb+I8J5pC8+uS5xBcusI9amYv01qdqP43F3f3XvRI4KHEG/OO4TfTSmt1htiDKKnciC2/6K6766y3wCOzxEeD2XPie4VkGsSTMJegxkPH37imogXJ/p4Ket7pprZXDnkEsiMn1b+CgTSaNb8ms=
+    steps:
+      - test-nodejs
+  node-v12:
+    docker:
+      - image: node:12
+        environment:
+          secure: WeX/nE4FbSZkldDQHyHQruDRbJGbCDmerFqVC1Lbx7RYz5pU5pLraFRUWPUcSguq7Pt7iem7iOADtEqoIuurb0tttc91ilVIOTvtICixATFpRsiuilMqEo5YKNKwmsTiJzOnaoMEnxWOZ8WK+mVBN5h1qTGzg1gEIXBU8wjy1eSQ2+GEGC/NvtKjMwn3ew5XXqr5w7sU7AvoVBBJkUBucG09DVxIW9iB+Pz+k1kCcaCWunZ3r1tSOaIZoKCIW6SZCy2XD0ns0GKdBw+AygxVqDN5LpSj9EJ27wQpkpMcdFnpOyUoijHuqa8d8mnofWrkd3UQyIi1bz/Dq2wmSfLHfxb9+U/iWSi9q3ed2YfeX4+Q3of80onucqD1gTzjwZU+KZi9XSlVEgKEv+WwmTPE+okURGsaONCB3QLzgTo27cv/ACe8GU4UhomkrmDES8y6P1Zj49Np9GOOkYMzerUyV++qaTF6ugi8Z1k93/Put7EaESVmZJxxrtuhm70Dq96Eftrag9ypByYEgRYVKRqL7840bBb+I8J5pC8+uS5xBcusI9amYv01qdqP43F3f3XvRI4KHEG/OO4TfTSmt1htiDKKnciC2/6K6766y3wCOzxEeD2XPie4VkGsSTMJegxkPH37imogXJ/p4Ket7pprZXDnkEsiMn1b+CgTSaNb8ms=
+    steps:
+      - test-nodejs
+
+workflows:
+  version: 2
+  node-multi-build:
+    jobs:
+      - node-v6
+      - node-v8
+      - node-v10
+      - node-v12
