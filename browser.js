@@ -307,9 +307,11 @@ function noop () {}
 /* eslint-disable */
 /* istanbul ignore next */
 function pfGlobalThisOrFallback () {
-  const defd = (o) => typeof o !== 'undefined' && o
+  var defd = function (o) {
+    return typeof o !== 'undefined' && o;
+  }
   try { 
-    if (typeof globalThis !== 'undefined') return globalThis
+    if (typeof globalThis !== 'undefined') return globalThis;
     Object.defineProperty(Object.prototype, 'globalThis', {
       get: function () {
         delete Object.prototype.globalThis
