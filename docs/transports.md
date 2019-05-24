@@ -68,13 +68,42 @@ For an example of this, see [pino-multi-stream][pinoms].
 
 PR's to this document are welcome for any new transports!
 
++ [pino-applicationinsights](#pino-applicationinsights)
++ [pino-azuretable](#pino-azuretable)
 + [pino-couch](#pino-couch)
++ [pino-datadog](#pino-datadog)
 + [pino-elasticsearch](#pino-elasticsearch)
 + [pino-mq](#pino-mq)
 + [pino-papertrail](#pino-papertrail)
 + [pino-redis](#pino-redis)
 + [pino-socket](#pino-socket)
++ [pino-stackdriver](#pino-stackdriver)
 + [pino-syslog](#pino-syslog)
++ [pino-websocket](#pino-websocket)
+
+<a id="pino-applicationinsights"></a>
+### pino-applicationinsights
+The [pino-applicationinsights](https://www.npmjs.com/package/pino-applicationinsights) module is a transport that will forward logs to [Azure Application Insights](https://docs.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview).
+
+Given an application `foo` that logs via pino, you would use `pino-applicationinsights` like so:
+
+``` sh
+$ node foo | pino-applicationinsights --key blablabla
+```
+
+For full documentation of command line switches read [readme](https://github.com/ovhemert/pino-applicationinsights#readme)
+
+<a id="pino-azuretable"></a>
+### pino-azuretable
+The [pino-azuretable](https://www.npmjs.com/package/pino-azuretable) module is a transport that will forward logs to the [Azure Table Storage](https://azure.microsoft.com/en-us/services/storage/tables/).
+
+Given an application `foo` that logs via pino, you would use `pino-azuretable` like so:
+
+``` sh
+$ node foo | pino-azuretable --account storageaccount --key blablabla
+```
+
+For full documentation of command line switches read [readme](https://github.com/ovhemert/pino-azuretable#readme)
 
 <a id="pino-couch"></a>
 ### pino-couch
@@ -88,6 +117,17 @@ $ node app.js | pino-couch -U https://couch-server -d mylogs
 [pino-couch]: https://github.com/IBM/pino-couch
 [CouchDB]: https://couchdb.apache.org
 
+<a id="pino-datadog"></a>
+### pino-datadog
+The [pino-datadog](https://www.npmjs.com/package/pino-datadog) module is a transport that will forward logs to [DataDog](https://www.datadoghq.com/) through it's API.
+
+Given an application `foo` that logs via pino, you would use `pino-datadog` like so:
+
+``` sh
+$ node foo | pino-datadog --key blablabla
+```
+
+For full documentation of command line switches read [readme](https://github.com/ovhemert/pino-datadog#readme)
 
 <a id="pino-elasticsearch"></a>
 ### pino-elasticsearch
@@ -240,6 +280,19 @@ how to setup [Kibana][kibana].
 For Docker users, see
 https://github.com/deviantony/docker-elk to setup an ELK stack.
 
+<a id="pino-stackdriver"></a>
+### pino-stackdriver
+The [pino-stackdriver](https://www.npmjs.com/package/pino-stackdriver) module is a transport that will forward logs to the [Google Stackdriver](https://cloud.google.com/logging/) log service through it's API.
+
+Given an application `foo` that logs via pino, a stackdriver log project `bar` and credentials in the file `/credentials.json`, you would use `pino-stackdriver`
+like so:
+
+``` sh
+$ node foo | pino-stackdriver --project bar --credentials /credentials.json
+```
+
+For full documentation of command line switches read [readme](https://github.com/ovhemert/pino-stackdriver#readme)
+
 <a id="pino-syslog"></a>
 ### pino-syslog
 
@@ -261,3 +314,15 @@ Example output for the "hello world" log:
 [pino-syslog]: https://www.npmjs.com/package/pino-syslog
 [rfc3164]: https://tools.ietf.org/html/rfc3164
 [logstash]: https://www.elastic.co/products/logstash
+
+
+<a id="pino-websocket"></a>
+### pino-websocket
+
+[pino-websocket](https://www.npmjs.com/package/@abeai/pino-websocket) is a transport that will forward each log line to a websocket server.
+
+```sh
+$ node app.js | pino-websocket -a my-websocket-server.example.com -p 3004
+```
+
+For full documentation of command line switches read [readme](https://github.com/abeai/pino-webscoket#README)

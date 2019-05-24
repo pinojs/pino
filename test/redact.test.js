@@ -50,6 +50,26 @@ test('redact option – top level key', async ({ is }) => {
   is(key, '[Redacted]')
 })
 
+test('redact option – top level key next level key', async ({ is }) => {
+  const stream = sink()
+  const instance = pino({ redact: ['key', 'key.foo'] }, stream)
+  instance.info({
+    key: { redact: 'me' }
+  })
+  const { key } = await once(stream, 'data')
+  is(key, '[Redacted]')
+})
+
+test('redact option – next level key then top level key', async ({ is }) => {
+  const stream = sink()
+  const instance = pino({ redact: ['key.foo', 'key'] }, stream)
+  instance.info({
+    key: { redact: 'me' }
+  })
+  const { key } = await once(stream, 'data')
+  is(key, '[Redacted]')
+})
+
 test('redact option – object', async ({ is }) => {
   const stream = sink()
   const instance = pino({ redact: ['req.headers.cookie'] }, stream)
@@ -230,6 +250,15 @@ test('redact.remove – top level key', async ({ is }) => {
   is('key' in o, false)
 })
 
+test('redact.remove – top level key in child logger', async ({ is }) => {
+  const stream = sink()
+  const opts = { redact: { paths: ['key'], remove: true } }
+  const instance = pino(opts, stream).child({ key: { redact: 'me' } })
+  instance.info('test')
+  const o = await once(stream, 'data')
+  is('key' in o, false)
+})
+
 test('redact.paths preserves original object values after the log write', async ({ is }) => {
   const stream = sink()
   const instance = pino({ redact: ['req.headers.cookie'] }, stream)
@@ -343,6 +372,160 @@ test('redact – supports last position wildcard paths', async ({ is }) => {
   is(req.headers.cookie, '[Redacted]')
   is(req.headers.host, '[Redacted]')
   is(req.headers.connection, '[Redacted]')
+})
+
+test('redact – supports first position wildcard paths', async ({ is }) => {
+  const stream = sink()
+  const instance = pino({ redact: ['*.headers'] }, stream)
+  instance.info({
+    req: {
+      id: 7915,
+      method: 'GET',
+      url: '/',
+      headers: {
+        host: 'localhost:3000',
+        connection: 'keep-alive',
+        cookie: 'SESSID=298zf09hf012fh2; csrftoken=u32t4o3tb3gg43; _gat=1;'
+      },
+      remoteAddress: '::ffff:127.0.0.1',
+      remotePort: 58022
+    }
+  })
+  const { req } = await once(stream, 'data')
+  is(req.headers, '[Redacted]')
+})
+
+test('redact – supports first position wildcards before other paths', async ({ is }) => {
+  const stream = sink()
+  const instance = pino({ redact: ['*.headers.cookie', 'req.id'] }, stream)
+  instance.info({
+    req: {
+      id: 7915,
+      method: 'GET',
+      url: '/',
+      headers: {
+        host: 'localhost:3000',
+        connection: 'keep-alive',
+        cookie: 'SESSID=298zf09hf012fh2; csrftoken=u32t4o3tb3gg43; _gat=1;'
+      },
+      remoteAddress: '::ffff:127.0.0.1',
+      remotePort: 58022
+    }
+  })
+  const { req } = await once(stream, 'data')
+  is(req.headers.cookie, '[Redacted]')
+  is(req.id, '[Redacted]')
+})
+
+test('redact – supports first position wildcards after other paths', async ({ is }) => {
+  const stream = sink()
+  const instance = pino({ redact: ['req.id', '*.headers.cookie'] }, stream)
+  instance.info({
+    req: {
+      id: 7915,
+      method: 'GET',
+      url: '/',
+      headers: {
+        host: 'localhost:3000',
+        connection: 'keep-alive',
+        cookie: 'SESSID=298zf09hf012fh2; csrftoken=u32t4o3tb3gg43; _gat=1;'
+      },
+      remoteAddress: '::ffff:127.0.0.1',
+      remotePort: 58022
+    }
+  })
+  const { req } = await once(stream, 'data')
+  is(req.headers.cookie, '[Redacted]')
+  is(req.id, '[Redacted]')
+})
+
+test('redact – supports first position wildcards after top level keys', async ({ is }) => {
+  const stream = sink()
+  const instance = pino({ redact: ['key', '*.headers.cookie'] }, stream)
+  instance.info({
+    req: {
+      id: 7915,
+      method: 'GET',
+      url: '/',
+      headers: {
+        host: 'localhost:3000',
+        connection: 'keep-alive',
+        cookie: 'SESSID=298zf09hf012fh2; csrftoken=u32t4o3tb3gg43; _gat=1;'
+      },
+      remoteAddress: '::ffff:127.0.0.1',
+      remotePort: 58022
+    }
+  })
+  const { req } = await once(stream, 'data')
+  is(req.headers.cookie, '[Redacted]')
+})
+
+test('redact – supports top level wildcard', async ({ is }) => {
+  const stream = sink()
+  const instance = pino({ redact: ['*'] }, stream)
+  instance.info({
+    req: {
+      id: 7915,
+      method: 'GET',
+      url: '/',
+      headers: {
+        host: 'localhost:3000',
+        connection: 'keep-alive',
+        cookie: 'SESSID=298zf09hf012fh2; csrftoken=u32t4o3tb3gg43; _gat=1;'
+      },
+      remoteAddress: '::ffff:127.0.0.1',
+      remotePort: 58022
+    }
+  })
+  const { req } = await once(stream, 'data')
+  is(req, '[Redacted]')
+})
+
+test('redact – supports top level wildcard with a censor function', async ({ is }) => {
+  const stream = sink()
+  const instance = pino({
+    redact: {
+      paths: ['*'],
+      censor: () => '[Redacted]'
+    }
+  }, stream)
+  instance.info({
+    req: {
+      id: 7915,
+      method: 'GET',
+      url: '/',
+      headers: {
+        host: 'localhost:3000',
+        connection: 'keep-alive',
+        cookie: 'SESSID=298zf09hf012fh2; csrftoken=u32t4o3tb3gg43; _gat=1;'
+      },
+      remoteAddress: '::ffff:127.0.0.1',
+      remotePort: 58022
+    }
+  })
+  const { req } = await once(stream, 'data')
+  is(req, '[Redacted]')
+})
+
+test('redact – supports top level wildcard and leading wildcard', async ({ is }) => {
+  const stream = sink()
+  const instance = pino({ redact: ['*', '*.req'] }, stream)
+  instance.info({
+    req: {
+      id: 7915,
+      method: 'GET',
+      url: '/',
+      headers: {
+        host: 'localhost:3000',
+        connection: 'keep-alive',
+        cookie: 'SESSID=298zf09hf012fh2; csrftoken=u32t4o3tb3gg43; _gat=1;'
+      },
+      remoteAddress: '::ffff:127.0.0.1',
+      remotePort: 58022
+    }
+  })
+  const { req } = await once(stream, 'data')
+  is(req, '[Redacted]')
 })
 
 test('redact – supports intermediate wildcard paths', async ({ is }) => {

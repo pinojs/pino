@@ -2,7 +2,7 @@
 const pino = require('..')
 const fs = require('fs')
 const { test } = require('tap')
-const { sleep } = require('./helper')
+const { sleep, getPathToNull } = require('./helper')
 
 test('replaces onTerminated option', async ({ throws }) => {
   throws(() => {
@@ -24,13 +24,13 @@ test('throws if the supplied handler is not a function', async ({ throws }) => {
   }, Error('if supplied, the handler parameter should be a function'))
 })
 
-test('throws if not supplied logger with pino.destination or pino.extreme instance', async ({ throws, doesNotThrow }) => {
+test('throws if not supplied logger with pino.extreme instance', async ({ throws, doesNotThrow }) => {
   throws(() => {
-    pino.final(pino(fs.createWriteStream('/dev/null')), () => {})
+    pino.final(pino(fs.createWriteStream(getPathToNull())), () => {})
   }, Error('final requires a stream that has a flushSync method, such as pino.destination and pino.extreme'))
 
   doesNotThrow(() => {
-    pino.final(pino(pino.destination()), () => {})
+    pino.final(pino(pino.extreme()), () => {})
   })
 
   doesNotThrow(() => {
@@ -39,11 +39,23 @@ test('throws if not supplied logger with pino.destination or pino.extreme instan
 })
 
 test('returns an exit listener function', async ({ is }) => {
-  is(typeof pino.final(pino(pino.destination()), () => {}), 'function')
+  is(typeof pino.final(pino(pino.extreme()), () => {}), 'function')
 })
 
 test('listener function immediately sync flushes when fired', async ({ pass, fail }) => {
-  const dest = pino.destination('/dev/null')
+  const dest = pino.extreme(getPathToNull())
+  var passed = false
+  dest.flushSync = () => {
+    passed = true
+    pass('flushSync called')
+  }
+  pino.final(pino(dest), () => {})()
+  await sleep(10)
+  if (passed === false) fail('flushSync not called')
+})
+
+test('listener function immediately sync flushes when fired (pino.destination)', async ({ pass, fail }) => {
+  const dest = pino.destination(getPathToNull())
   var passed = false
   dest.flushSync = () => {
     passed = true
@@ -55,14 +67,14 @@ test('listener function immediately sync flushes when fired', async ({ pass, fai
 })
 
 test('swallows the non-ready error', async ({ doesNotThrow }) => {
-  const dest = pino.destination('/dev/null')
+  const dest = pino.extreme(getPathToNull())
   doesNotThrow(() => {
     pino.final(pino(dest), () => {})()
   })
 })
 
 test('listener function triggers handler function parameter', async ({ pass, fail }) => {
-  const dest = pino.destination('/dev/null')
+  const dest = pino.extreme(getPathToNull())
   var passed = false
   pino.final(pino(dest), () => {
     passed = true
@@ -73,14 +85,14 @@ test('listener function triggers handler function parameter', async ({ pass, fai
 })
 
 test('passes any error to the handler', async ({ is }) => {
-  const dest = pino.destination('/dev/null')
+  const dest = pino.extreme(getPathToNull())
   pino.final(pino(dest), (err) => {
     is(err.message, 'test')
   })(Error('test'))
 })
 
 test('passes a specialized final logger instance', async ({ is, isNot, error }) => {
-  const dest = pino.destination('/dev/null')
+  const dest = pino.extreme(getPathToNull())
   const logger = pino(dest)
   pino.final(logger, (err, finalLogger) => {
     error(err)
@@ -104,7 +116,7 @@ test('passes a specialized final logger instance', async ({ is, isNot, error }) 
 })
 
 test('returns a specialized final logger instance if no handler is passed', async ({ is, isNot }) => {
-  const dest = pino.destination('/dev/null')
+  const dest = pino.extreme(getPathToNull())
   const logger = pino(dest)
   const finalLogger = pino.final(logger)
   is(typeof finalLogger.trace, 'function')
@@ -126,7 +138,7 @@ test('returns a specialized final logger instance if no handler is passed', asyn
 })
 
 test('final logger instances synchronously flush after a log method call', async ({ pass, fail, error }) => {
-  const dest = pino.destination('/dev/null')
+  const dest = pino.extreme(getPathToNull())
   const logger = pino(dest)
   var passed = false
   var count = 0
@@ -146,7 +158,7 @@ test('final logger instances synchronously flush after a log method call', async
 })
 
 test('also instruments custom log methods', async ({ pass, fail, error }) => {
-  const dest = pino.destination('/dev/null')
+  const dest = pino.extreme(getPathToNull())
   const logger = pino({
     customLevels: {
       foo: 35

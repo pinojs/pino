@@ -49,7 +49,25 @@ test('passes send function the logged level', ({ end, is }) => {
   end()
 })
 
-test('passes send function messages in logEvent object', ({ end, same, is }) => {
+test('passes send function message strings in logEvent object when asObject is not set', ({ end, same, is }) => {
+  const logger = pino({
+    browser: {
+      write: noop,
+      transmit: {
+        send (level, { messages }) {
+          is(messages[0], 'test')
+          is(messages[1], 'another test')
+        }
+      }
+    }
+  })
+
+  logger.fatal('test', 'another test')
+
+  end()
+})
+
+test('passes send function message objects in logEvent object when asObject is not set', ({ end, same, is }) => {
   const logger = pino({
     browser: {
       write: noop,
@@ -63,6 +81,45 @@ test('passes send function messages in logEvent object', ({ end, same, is }) => 
   })
 
   logger.fatal({ test: 'test' }, 'another test')
+
+  end()
+})
+
+test('passes send function message strings in logEvent object when asObject is set', ({ end, same, is }) => {
+  const logger = pino({
+    browser: {
+      asObject: true,
+      write: noop,
+      transmit: {
+        send (level, { messages }) {
+          is(messages[0], 'test')
+          is(messages[1], 'another test')
+        }
+      }
+    }
+  })
+
+  logger.fatal('test', 'another test')
+
+  end()
+})
+
+test('passes send function message objects in logEvent object when asObject is set', ({ end, same, is }) => {
+  const logger = pino({
+    browser: {
+      asObject: true,
+      write: noop,
+      transmit: {
+        send (level, { messages }) {
+          same(messages[0], { test: 'test' })
+          is(messages[1], 'another test')
+        }
+      }
+    }
+  })
+
+  logger.fatal({ test: 'test' }, 'another test')
+
   end()
 })
 
@@ -251,5 +308,42 @@ test('applies all serializers to messages and bindings (serialize:true)', ({ end
     .child({ first: 'binding' })
     .child({ second: 'binding2' })
     .fatal({ test: 'test' }, Error())
+  end()
+})
+
+test('extracts correct bindings and raw messages over multiple transmits', ({ end, same, is }) => {
+  var messages = null
+  var bindings = null
+
+  const logger = pino({
+    browser: {
+      write: noop,
+      transmit: {
+        send (level, logEvent) {
+          messages = logEvent.messages
+          bindings = logEvent.bindings
+        }
+      }
+    }
+  })
+
+  const child = logger.child({ child: true })
+  const grandchild = child.child({ grandchild: true })
+
+  logger.fatal({ test: 'parent:test1' })
+  logger.fatal({ test: 'parent:test2' })
+  same([], bindings)
+  same([{ test: 'parent:test2' }], messages)
+
+  child.fatal({ test: 'child:test1' })
+  child.fatal({ test: 'child:test2' })
+  same([{ child: true }], bindings)
+  same([{ test: 'child:test2' }], messages)
+
+  grandchild.fatal({ test: 'grandchild:test1' })
+  grandchild.fatal({ test: 'grandchild:test2' })
+  same([{ child: true }, { grandchild: true }], bindings)
+  same([{ test: 'grandchild:test2' }], messages)
+
   end()
 })

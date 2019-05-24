@@ -1,6 +1,7 @@
 'use strict'
 const test = require('tape')
-const fresh = require('fresh-require')
+const fresh = require('import-fresh')
+const pinoStdSerializers = require('pino-std-serializers')
 const pino = require('../browser')
 
 levelTest('fatal')
@@ -101,22 +102,25 @@ test('exposes LOG_VERSION', ({ end, is }) => {
 
 test('exposes faux stdSerializers', ({ end, ok, same }) => {
   ok(pino.stdSerializers)
-  ok(pino.stdSerializers.req)
-  ok(pino.stdSerializers.res)
-  ok(pino.stdSerializers.err)
+  // make sure faux stdSerializers match pino-std-serializers
+  for (let serializer in pinoStdSerializers) {
+    ok(pino.stdSerializers[serializer], `pino.stdSerializers.${serializer}`)
+  }
+  // confirm faux methods return empty objects
   same(pino.stdSerializers.req(), {})
+  same(pino.stdSerializers.mapHttpRequest(), {})
+  same(pino.stdSerializers.mapHttpResponse(), {})
   same(pino.stdSerializers.res(), {})
-
+  // confirm wrapping function is a passthrough
+  const noChange = { foo: 'bar', fuz: 42 }
+  same(pino.stdSerializers.wrapRequestSerializer(noChange), noChange)
+  same(pino.stdSerializers.wrapResponseSerializer(noChange), noChange)
   end()
 })
 
 test('exposes err stdSerializer', ({ end, ok }) => {
-  ok(pino.stdSerializers)
-  ok(pino.stdSerializers.req)
-  ok(pino.stdSerializers.res)
   ok(pino.stdSerializers.err)
   ok(pino.stdSerializers.err(Error()))
-
   end()
 })
 
@@ -137,7 +141,7 @@ if (process.title !== 'browser') {
   test('in absence of console, log methods become noops', ({ end, ok }) => {
     var console = global.console
     delete global.console
-    const instance = fresh('../browser', require)()
+    const instance = fresh('../browser')()
     global.console = console
     ok(fnName(instance.log).match(/noop/))
     ok(fnName(instance.fatal).match(/noop/))
@@ -198,9 +202,57 @@ test('opts.browser.write func string joining', ({ end, ok, is }) => {
   end()
 })
 
+test('opts.browser.write func string joining when asObject is true', ({ end, ok, is }) => {
+  const instance = pino({
+    browser: {
+      asObject: true,
+      write: function (o) {
+        is(o.level, 30)
+        is(o.msg, 'test test2 test3')
+        ok(o.time)
+      }
+    }
+  })
+  instance.info('test', 'test2', 'test3')
+
+  end()
+})
+
+test('opts.browser.write func string joining when asObject is true', ({ end, ok, is }) => {
+  const instance = pino({
+    browser: {
+      asObject: true,
+      write: function (o) {
+        is(o.level, 30)
+        is(o.msg, 'test test2 test3')
+        ok(o.time)
+      }
+    }
+  })
+  instance.info('test', 'test2', 'test3')
+
+  end()
+})
+
 test('opts.browser.write func string object joining', ({ end, ok, is }) => {
   const instance = pino({
     browser: {
+      write: function (o) {
+        is(o.level, 30)
+        is(o.msg, 'test {"test":"test2"} {"test":"test3"}')
+        ok(o.time)
+      }
+    }
+  })
+  instance.info('test', { test: 'test2' }, { test: 'test3' })
+
+  end()
+})
+
+test('opts.browser.write func string object joining when asObject is true', ({ end, ok, is }) => {
+  const instance = pino({
+    browser: {
+      asObject: true,
       write: function (o) {
         is(o.level, 30)
         is(o.msg, 'test {"test":"test2"} {"test":"test3"}')

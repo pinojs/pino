@@ -24,6 +24,16 @@ test('child instance exposes pino version', async ({ is }) => {
   is(child.version, version)
 })
 
+test('bindings are exposed on every instance', async ({ same }) => {
+  const instance = pino()
+  same(instance.bindings(), {})
+})
+
+test('bindings contain the name and the child bindings', async ({ same }) => {
+  const instance = pino({ name: 'basicTest', level: 'info' }).child({ foo: 'bar' }).child({ a: 2 })
+  same(instance.bindings(), { name: 'basicTest', foo: 'bar', a: 2 })
+})
+
 function levelTest (name, level) {
   test(`${name} logs as ${level}`, async ({ is }) => {
     const stream = sink()
@@ -33,11 +43,12 @@ function levelTest (name, level) {
     check(is, await once(stream, 'data'), level, 'hello world')
   })
 
-  test(`passing objects at level ${name}`, async ({ is }) => {
+  test(`passing objects at level ${name}`, async ({ is, same }) => {
     const stream = sink()
     const instance = pino(stream)
     instance.level = name
-    instance[name]({ hello: 'world' })
+    const obj = { hello: 'world' }
+    instance[name](obj)
 
     const result = await once(stream, 'data')
     is(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
@@ -46,13 +57,15 @@ function levelTest (name, level) {
     is(result.level, level)
     is(result.hello, 'world')
     is(result.v, 1)
+    same(Object.keys(obj), [ 'hello' ])
   })
 
   test(`passing an object and a string at level ${name}`, async ({ is, same }) => {
     const stream = sink()
     const instance = pino(stream)
     instance.level = name
-    instance[name]({ hello: 'world' }, 'a string')
+    const obj = { hello: 'world' }
+    instance[name](obj, 'a string')
     const result = await once(stream, 'data')
     is(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
     delete result.time
@@ -61,6 +74,25 @@ function levelTest (name, level) {
       hostname: hostname,
       level: level,
       msg: 'a string',
+      hello: 'world',
+      v: 1
+    })
+    same(Object.keys(obj), [ 'hello' ])
+  })
+
+  test(`overriding object key by string at level ${name}`, async ({ is, same }) => {
+    const stream = sink()
+    const instance = pino(stream)
+    instance.level = name
+    instance[name]({ hello: 'world', msg: 'object' }, 'string')
+    const result = await once(stream, 'data')
+    is(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
+    delete result.time
+    same(result, {
+      pid: pid,
+      hostname: hostname,
+      level: level,
+      msg: 'string',
       hello: 'world',
       v: 1
     })
@@ -247,6 +279,28 @@ test('set the base to null', async ({ is, same }) => {
   same(result, {
     level: 60,
     msg: 'this is fatal',
+    v: 1
+  })
+})
+
+test('set the base to null and use a serializer', async ({ is, same }) => {
+  const stream = sink()
+  const instance = pino({
+    base: null,
+    serializers: {
+      [Symbol.for('pino.*')]: (input) => {
+        return Object.assign({}, input, { additionalMessage: 'using pino' })
+      }
+    }
+  }, stream)
+  instance.fatal('this is fatal too')
+  const result = await once(stream, 'data')
+  is(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
+  delete result.time
+  same(result, {
+    level: 60,
+    msg: 'this is fatal too',
+    additionalMessage: 'using pino',
     v: 1
   })
 })

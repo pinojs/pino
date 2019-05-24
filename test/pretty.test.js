@@ -7,6 +7,13 @@ const execa = require('execa')
 const writer = require('flush-write-stream')
 const { once } = require('./helper')
 const pino = require('../')
+const tap = require('tap')
+
+const isWin = process.platform === 'win32'
+if (isWin) {
+  tap.comment('Skipping pretty printing tests on Windows as colour codes are different and tests fail')
+  process.exit(0)
+}
 
 test('can be enabled via exported pino function', async ({ isNot }) => {
   var actual = ''
@@ -240,4 +247,16 @@ test('final works without prior logging', async ({ isNot }) => {
   await once(child, 'close')
   isNot(actual.match(/WARN\s+: pino.final with prettyPrint does not support flushing/), null)
   isNot(actual.match(/INFO\s+\(123456 on abcdefghijklmnopqr\): beforeExit/), null)
+})
+
+test('works as expected with an object with the msg prop', async ({ isNot }) => {
+  var actual = ''
+  const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'obj-msg-prop.js')])
+
+  child.stdout.pipe(writer((s, enc, cb) => {
+    actual += s
+    cb()
+  }))
+  await once(child, 'close')
+  isNot(actual.match(/\(123456 on abcdefghijklmnopqr\): hello/), null)
 })

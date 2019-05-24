@@ -11,6 +11,7 @@
   * [logger.error()](#error)
   * [logger.fatal()](#fatal)
   * [logger.child()](#child)
+  * [logger.bindings()](#bindings)
   * [logger.flush()](#flush)
   * [logger.level](#level)
   * [logger.isLevelEnabled()](#islevelenabled)
@@ -49,7 +50,7 @@ The name of the logger. When set adds a `name` field to every JSON line logged.
 
 Default: `'info'`
 
-One of `'fatal'`, `'error'`, `'warn'`, `'info`', `'debug'`, `'trace'` or `silent`.
+One of `'fatal'`, `'error'`, `'warn'`, `'info`', `'debug'`, `'trace'` or `'silent'`.
 
 Additional levels can be added to the instance via the `customLevels` option.
 
@@ -302,7 +303,7 @@ The logger instance is the object returned by the main exported
 
 The primary purpose of the logger instance is to provide logging methods.
 
-The default logging methods are `trace`, `debug`, `info`, `warn`, and `fatal`.
+The default logging methods are `trace`, `debug`, `info`, `warn`, `error`, and `fatal`.
 
 Each logging method has the following signature:
 `([mergingObject], [message], [...interpolationValues])`.
@@ -348,7 +349,7 @@ The `message` string may contain a printf style string with support for
 the following placeholders:
 
 * `%s` – string placeholder
-* `%d` – digit placeholder)
+* `%d` – digit placeholder
 * `%O`, `%o` and `%j` – object placeholder
 
 Values supplied as additional arguments to the logger method will
@@ -497,6 +498,19 @@ child.info({test: 'will be overwritten'})
 * See [`serializers` option](#opt-serializers)
 * See [pino.stdSerializers](#pino-stdSerializers)
 
+<a id="bindings"></a>
+### `logger.bindings()`
+
+Returns an object containing all the current bindings, cloned from the ones passed in via `logger.child()`.
+```js
+const child = logger.child({ foo: 'bar' })
+console.log(child.bindings())
+// { foo: 'bar' }
+const anotherChild = child.child({ MIX: { IN: 'always' } })
+console.log(child.bindings())
+// { foo: 'bar', MIX: { IN: 'always' } }
+```
+
 <a id="flush"></a>
 ### `logger.flush()`
 
@@ -507,7 +521,7 @@ This is an asynchronous, fire and forget, operation.
 The use case is primarily for Extreme mode logging, which may hold up to
 4KiB of logs. The `logger.flush` method can be used to flush the logs
 on an long interval, say ten seconds. Such a strategy can provide an
-optimium balanace between extremely efficient logging at high demand periods
+optimium balance between extremely efficient logging at high demand periods
 and safer logging at low demand periods.
 
 * See [`pino.extreme`](#pino-extreme)
@@ -521,8 +535,8 @@ Set this property to the desired logging level.
 
 The core levels and their values are as follows:
 
-|                                                                     |
-|:-------------------------------------------------------------------:|
+|            |       |       |      |      |       |       |          |
+|:-----------|-------|-------|------|------|-------|-------|---------:|
 | **Level:** | trace | debug | info | warn | error | fatal | silent   |
 | **Value:** | 10    | 20    | 30   | 40   | 50    | 60    | Infinity |
 
@@ -657,13 +671,10 @@ const logger2 = pino(pino.destination())
 The `pino.destination` method may be passed a file path or a numerical file descriptor.
 By default, `pino.destination` will use `process.stdout.fd` (1) as the file descriptor.
 
-`pino.destination` is implemented on [`sonic-boom` ⇗]](https://github.com/mcollina/sonic-boom).
+`pino.destination` is implemented on [`sonic-boom` ⇗](https://github.com/mcollina/sonic-boom).
 
 A `pino.destination` instance can also be used to reopen closed files
 (for example, for some log rotation scenarios), see [Reopening log files](/docs/help.md#reopening).
-
-On AWS Lambda we recommend to call `destination.flushSync()` at the end
-of each function execution to avoid losing data.
 
 * See [`destination` parameter](#destination)
 * See [`sonic-boom` ⇗](https://github.com/mcollina/sonic-boom)
@@ -682,7 +693,7 @@ const logger2 = pino(pino.extreme())
 ```
 
 The `pino.extreme` method may be passed a file path or a numerical file descriptor.
-By default, `pino.destination` will use `process.stdout.fd` (1) as the file descriptor.
+By default, `pino.extreme` will use `process.stdout.fd` (1) as the file descriptor.
 
 `pino.extreme` is implemented with the [`sonic-boom` ⇗](https://github.com/mcollina/sonic-boom)
 module.
@@ -707,13 +718,14 @@ or create an exit listener function.
 
 The `finalLogger` is a specialist logger that synchronously flushes
 on every write. This is important to guarantee final log writes,
-both when using `pino.destination` or `pino.extreme` targets.
+both when using `pino.extreme` target.
 
 Since final log writes cannot be guaranteed with normal Node.js streams,
 if the `destination` parameter of the `logger` supplied to `pino.final`
-is a Node.js stream `pino.final` will throw. It's highly recommended
-for both performance and safety to use `pino.destination`/`pino.extreme`
-destinations.
+is a Node.js stream `pino.final` will throw.
+
+The use of `pino.final` with `pino.destination` is not needed, as
+`pino.destination` writes things synchronously.
 
 #### `pino.final(logger, handler) => Function`
 

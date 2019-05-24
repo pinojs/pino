@@ -4,8 +4,13 @@ var format = require('quick-format-unescaped')
 
 module.exports = pino
 
-var _console = global.console || {}
+var _console = pfGlobalThisOrFallback().console || {}
 var stdSerializers = {
+  mapHttpRequest: mock,
+  mapHttpResponse: mock,
+  wrapRequestSerializer: passthrough,
+  wrapResponseSerializer: passthrough,
+  wrapErrorSerializer: passthrough,
   req: mock,
   res: mock,
   err: asErrValue
@@ -123,7 +128,11 @@ function pino (opts) {
         this.serializers = childSerializers
         this._serialize = childSerialize
       }
-      if (transmit) this._logEvent.bindings.push(bindings)
+      if (transmit) {
+        this._logEvent = createLogEventShape(
+          [].concat(parent._logEvent.bindings, bindings)
+        )
+      }
     }
     Child.prototype = this
     return new Child(this)
@@ -199,18 +208,18 @@ function wrap (opts, logger, level) {
 
 function asObject (logger, level, args, ts) {
   if (logger._serialize) applySerializers(args, logger._serialize, logger.serializers, logger._stdErrSerialize)
-  var msg = args[0]
+  var argsCloned = args.slice()
+  var msg = argsCloned[0]
   var o = { time: ts, level: pino.levels.values[level] }
   var lvl = (logger._childLevel | 0) + 1
   if (lvl < 1) lvl = 1
   // deliberate, catching objects, arrays
   if (msg !== null && typeof msg === 'object') {
-    args = args.slice()
-    while (lvl-- && typeof args[0] === 'object') {
-      Object.assign(o, args.shift())
+    while (lvl-- && typeof argsCloned[0] === 'object') {
+      Object.assign(o, argsCloned.shift())
     }
-    msg = args.length ? format(args.shift(), args) : undefined
-  } else if (typeof msg === 'string') msg = format(args.shift(), args)
+    msg = argsCloned.length ? format(argsCloned.shift(), argsCloned) : undefined
+  } else if (typeof msg === 'string') msg = format(argsCloned.shift(), argsCloned)
   if (msg !== undefined) o.msg = msg
   return o
 }
@@ -246,6 +255,7 @@ function transmit (logger, opts, args) {
   var methodLevel = opts.methodLevel
   var methodValue = opts.methodValue
   var val = opts.val
+  var bindings = logger._logEvent.bindings
 
   applySerializers(
     args,
@@ -256,7 +266,7 @@ function transmit (logger, opts, args) {
   logger._logEvent.ts = ts
   logger._logEvent.messages = args.filter(function (arg) {
     // bindings can only be objects, so reference equality check via indexOf is fine
-    return logger._logEvent.bindings.indexOf(arg) === -1
+    return bindings.indexOf(arg) === -1
   })
 
   logger._logEvent.level.label = methodLevel
@@ -264,14 +274,14 @@ function transmit (logger, opts, args) {
 
   send(methodLevel, logger._logEvent, val)
 
-  logger._logEvent = createLogEventShape()
+  logger._logEvent = createLogEventShape(bindings)
 }
 
-function createLogEventShape () {
+function createLogEventShape (bindings) {
   return {
     ts: 0,
     messages: [],
-    bindings: [],
+    bindings: bindings || [],
     level: { label: '', value: 0 }
   }
 }
@@ -291,4 +301,25 @@ function asErrValue (err) {
 }
 
 function mock () { return {} }
+function passthrough (a) { return a }
 function noop () {}
+
+/* eslint-disable */
+/* istanbul ignore next */
+function pfGlobalThisOrFallback () {
+  const defd = (o) => typeof o !== 'undefined' && o
+  try { 
+    if (typeof globalThis !== 'undefined') return globalThis
+    Object.defineProperty(Object.prototype, 'globalThis', {
+      get: function () {
+        delete Object.prototype.globalThis
+        return (this.globalThis = this)
+      },
+      configurable: true
+    })
+    return globalThis
+  } catch (e) { 
+    return defd(self) || defd(window) || defd(this) || {}
+  }
+}
+/* eslint-enable */

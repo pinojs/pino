@@ -6,7 +6,7 @@ const { join } = require('path')
 const { test } = require('tap')
 const { fork } = require('child_process')
 const writer = require('flush-write-stream')
-const { once } = require('./helper')
+const { once, getPathToNull } = require('./helper')
 
 test('extreme mode', async ({ is, teardown }) => {
   const now = Date.now
@@ -27,7 +27,7 @@ test('extreme mode', async ({ is, teardown }) => {
     cb()
   }))
 
-  const dest = createWriteStream('/dev/null')
+  const dest = createWriteStream(getPathToNull())
   dest.write = (s) => {
     actual += s
   }
@@ -81,7 +81,7 @@ test('extreme mode with child', async ({ is, teardown }) => {
     cb()
   })).child({ hello: 'world' })
 
-  const dest = createWriteStream('/dev/null')
+  const dest = createWriteStream(getPathToNull())
   dest.write = function (s) { actual += s }
   const extreme = pino(dest).child({ hello: 'world' })
 

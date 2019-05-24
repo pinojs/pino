@@ -3,7 +3,7 @@
 if (typeof $1 !== 'undefined') $1 = arguments.callee.caller.arguments[0]
 
 const test = require('tape')
-const fresh = require('fresh-require')
+const fresh = require('import-fresh')
 const pino = require('../browser')
 
 const parentSerializers = {
@@ -54,7 +54,7 @@ if (process.title !== 'browser') {
       same(err, expect)
     }
 
-    const logger = fresh('../browser', require)({
+    const logger = fresh('../browser')({
       browser: { serialize: true }
     })
 
