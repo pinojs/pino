@@ -22,7 +22,7 @@ const fastify = require('fastify')({
   logger: true
 })
 fastify.get('/', async (request, reply) => {
-  reply.log.info('something')
+  request.log.info('something')
   return { hello: 'world' }
 })
 ```
