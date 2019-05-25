@@ -20,7 +20,6 @@
   * [logger\[Symbol.for('pino.serializers')\]](#serializers)
   * [Event: 'level-change'](#level-change)
   * [logger.version](#version)
-  * [logger.LOG_VERSION](#log_version)
 * [Statics](#statics)
   * [pino.destination()](#pino-destination)
   * [pino.extreme()](#pino-extreme)
@@ -29,7 +28,6 @@
   * [pino.stdTimeFunctions](#pino-stdtimefunctions)
   * [pino.symbols](#pino-symbols)
   * [pino.version](#pino-version)
-  * [pino.LOG_VERSION](#pino-LOG_VERSION)
 
 <a id="export"></a>
 ## `pino([options], [destination]) => logger`
@@ -264,7 +262,7 @@ const logger = pino({
   changeLevelName: 'priority'
 })
 logger.info('hello world')
-// {"priority":30,"time":1531257112193,"msg":"hello world","pid":55956,"hostname":"x","v":1}
+// {"priority":30,"time":1531257112193,"msg":"hello world","pid":55956,"hostname":"x"}
 ```
 
 #### `browser` (Object)
@@ -369,7 +367,7 @@ of the `mergingObject` is copied in to the JSON log line.
 
 ```js
 logger.info({MIX: {IN: true}})
-// {"level":30,"time":1531254555820,"pid":55956,"hostname":"x","MIX":{"IN":true},"v":1}
+// {"level":30,"time":1531254555820,"pid":55956,"hostname":"x","MIX":{"IN":true}}
 ```
 
 <a id=message></a>
@@ -383,7 +381,7 @@ JSON log line under the `msg` key:
 
 ```js
 logger.info('hello world')
-// {"level":30,"time":1531257112193,"msg":"hello world","pid":55956,"hostname":"x","v":1}
+// {"level":30,"time":1531257112193,"msg":"hello world","pid":55956,"hostname":"x"}
 ```
 
 The `message` parameter takes precedence over the `mergedObject`.
@@ -417,17 +415,17 @@ output `msg` value for the JSON log line.
 
 ```js
 logger.info('hello', 'world')
-// {"level":30,"time":1531257618044,"msg":"hello world","pid":55956,"hostname":"x","v":1}
+// {"level":30,"time":1531257618044,"msg":"hello world","pid":55956,"hostname":"x"}
 ```
 
 ```js
 logger.info('hello', {worldly: 1})
-// {"level":30,"time":1531257797727,"msg":"hello {\"worldly\":1}","pid":55956,"hostname":"x","v":1}
+// {"level":30,"time":1531257797727,"msg":"hello {\"worldly\":1}","pid":55956,"hostname":"x"}
 ```
 
 ```js
 logger.info('%o hello', {worldly: 1})
-// {"level":30,"time":1531257826880,"msg":"{\"worldly\":1} hello","pid":55956,"hostname":"x","v":1}
+// {"level":30,"time":1531257826880,"msg":"{\"worldly\":1} hello","pid":55956,"hostname":"x"}
 ```
 
 * See [`message` log method parameter](#message)
@@ -516,9 +514,9 @@ via the returned child logger.
 ```js
 const child = logger.child({ MIX: {IN: 'always'} })
 child.info('hello')
-// {"level":30,"time":1531258616689,"msg":"hello","pid":64849,"hostname":"x","MIX":{"IN":"always"},"v":1}
+// {"level":30,"time":1531258616689,"msg":"hello","pid":64849,"hostname":"x","MIX":{"IN":"always"}}
 child.info('child!')
-// {"level":30,"time":1531258617401,"msg":"child!","pid":64849,"hostname":"x","MIX":{"IN":"always"},"v":1}
+// {"level":30,"time":1531258617401,"msg":"child!","pid":64849,"hostname":"x","MIX":{"IN":"always"}}
 ```
 
 The `bindings` object may contain any key except for reserved configuration keys `level` and `serializers`.
@@ -545,10 +543,10 @@ any configured parent serializers.
 ```js
 const logger = require('pino')()
 logger.info({test: 'will appear'})
-// {"level":30,"time":1531259759482,"pid":67930,"hostname":"x","test":"will appear","v":1}
+// {"level":30,"time":1531259759482,"pid":67930,"hostname":"x","test":"will appear"}
 const child = logger.child({serializers: {test: () => `child-only serializer`}})
 child.info({test: 'will be overwritten'})
-// {"level":30,"time":1531259784008,"pid":67930,"hostname":"x","test":"child-only serializer","v":1}
+// {"level":30,"time":1531259784008,"pid":67930,"hostname":"x","test":"child-only serializer"}
 ```
 
 * See [`serializers` option](#opt-serializers)
@@ -702,14 +700,6 @@ Exposes the Pino package version. Also available on the exported `pino` function
 
 * See [`pino.version`](#pino-version)
 
-<a id="log_version"></a>
-### `logger.LOG_VERSION` (Number)
-
-Holds the current log format version as output in the `v` property of each log record.
-Also available on the exported `pino` function.
-
-* See [`pino.LOG_VERSION`](#pino-LOG_VERSION)
-
 ## Statics
 
 <a id="pino-destination"></a>
@@ -855,10 +845,3 @@ for general use.
 Exposes the Pino package version. Also available on the logger instance.
 
 * See [`logger.version`](#version)
-
-<a id="pino-log_version"></a>
-### `pino.LOG_VERSION` (Number)
-
-Holds the current log format version as output in the `v` property of each log record. Also available on the logger instance.
-
-* See [`logger.LOG_VERSION`](#log_version)

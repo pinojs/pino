@@ -13,7 +13,7 @@ const {
   stringify,
   buildSafeSonicBoom
 } = require('./lib/tools')
-const { version, LOG_VERSION } = require('./lib/meta')
+const { version } = require('./lib/meta')
 const {
   chindingsSym,
   redactFmtSym,
@@ -83,7 +83,7 @@ function pino (...args) {
   const formatOpts = redact
     ? { stringify: stringifiers[redactFmtSym] }
     : { stringify }
-  const end = ',"v":' + LOG_VERSION + '}' + (crlf ? '\r\n' : '\n')
+  const end = '}' + (crlf ? '\r\n' : '\n')
   const coreChindings = asChindings.bind(null, {
     [chindingsSym]: '',
     [serializersSym]: serializers,
@@ -138,6 +138,5 @@ pino.stdSerializers = serializers
 pino.stdTimeFunctions = Object.assign({}, time)
 pino.symbols = symbols
 pino.version = version
-pino.LOG_VERSION = LOG_VERSION
 
 module.exports = pino

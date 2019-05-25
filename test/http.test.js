@@ -20,7 +20,6 @@ test('http request support', async ({ ok, same, error, teardown }) => {
       hostname: hostname,
       level: 30,
       msg: 'my request',
-      v: 1,
       req: {
         method: originalReq.method,
         url: originalReq.url,
@@ -59,7 +58,6 @@ test('http request support via serializer', async ({ ok, same, error, teardown }
       hostname: hostname,
       level: 30,
       msg: 'my request',
-      v: 1,
       req: {
         method: originalReq.method,
         url: originalReq.url,
@@ -99,7 +97,6 @@ test('http request support via serializer without request connection', async ({ 
       hostname: hostname,
       level: 30,
       msg: 'my request',
-      v: 1,
       req: {
         method: originalReq.method,
         url: originalReq.url,
@@ -139,7 +136,6 @@ test('http response support', async ({ ok, same, error, teardown }) => {
       hostname: hostname,
       level: 30,
       msg: 'my response',
-      v: 1,
       res: {
         statusCode: originalRes.statusCode,
         headers: originalRes._headers
@@ -176,7 +172,6 @@ test('http response support via a serializer', async ({ ok, same, error, teardow
       hostname: hostname,
       level: 30,
       msg: 'my response',
-      v: 1,
       res: {
         statusCode: 200,
         headers: {
@@ -218,7 +213,6 @@ test('http request support via serializer in a child', async ({ ok, same, error,
       hostname: hostname,
       level: 30,
       msg: 'my request',
-      v: 1,
       req: {
         method: originalReq.method,
         url: originalReq.url,

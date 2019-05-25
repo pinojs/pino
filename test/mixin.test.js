@@ -28,8 +28,7 @@ test('mixin object is included', async ({ ok, same }) => {
     hostname,
     level,
     msg: 'test',
-    hello: 1,
-    v: 1
+    hello: 1
   })
 })
 
@@ -58,8 +57,7 @@ test('mixin object is new every time', async ({ plan, ok, same }) => {
       hostname,
       level,
       msg,
-      hello: n,
-      v: 1
+      hello: n
     })
   }
 })
@@ -93,8 +91,7 @@ test('mixin object + logged object', async ({ ok, same }) => {
     level,
     foo: 1,
     bar: 3,
-    baz: 4,
-    v: 1
+    baz: 4
   })
 })
 

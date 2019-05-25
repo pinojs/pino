@@ -27,7 +27,7 @@ logger.info({
 This will output:
 
 ```JSON
-{"level":30,"time":1527777350011,"pid":3186,"hostname":"Davids-MacBook-Pro-3.local","key":"[Redacted]","path":{"to":{"key":"[Redacted]","another":"thing"}},"stuff":{"thats":[{"secret":"[Redacted]","logme":"will be logged"},{"secret":"[Redacted]","logme":"as will this"}]},"v":1}
+{"level":30,"time":1527777350011,"pid":3186,"hostname":"Davids-MacBook-Pro-3.local","key":"[Redacted]","path":{"to":{"key":"[Redacted]","another":"thing"}},"stuff":{"thats":[{"secret":"[Redacted]","logme":"will be logged"},{"secret":"[Redacted]","logme":"as will this"}]}}
 ```
 
 The `redact` option can take an array (as shown in the above example) or
@@ -60,7 +60,7 @@ logger.info({
 This will output:
 
 ```JSON
-{"level":30,"time":1527778563934,"pid":3847,"hostname":"Davids-MacBook-Pro-3.local","key":"**GDPR COMPLIANT**","path":{"to":{"key":"**GDPR COMPLIANT**","another":"thing"}},"stuff":{"thats":[{"secret":"**GDPR COMPLIANT**","logme":"will be logged"},{"secret":"**GDPR COMPLIANT**","logme":"as will this"}]},"v":1}
+{"level":30,"time":1527778563934,"pid":3847,"hostname":"Davids-MacBook-Pro-3.local","key":"**GDPR COMPLIANT**","path":{"to":{"key":"**GDPR COMPLIANT**","another":"thing"}},"stuff":{"thats":[{"secret":"**GDPR COMPLIANT**","logme":"will be logged"},{"secret":"**GDPR COMPLIANT**","logme":"as will this"}]}}
 ```
 
 The `redact.remove` option also allows for the key and value to be removed from output:
@@ -90,7 +90,7 @@ logger.info({
 This will output
 
 ```JSON
-{"level":30,"time":1527782356751,"pid":5758,"hostname":"Davids-MacBook-Pro-3.local","path":{"to":{"another":"thing"}},"stuff":{"thats":[{"logme":"will be logged"},{"logme":"as will this"}]},"v":1}
+{"level":30,"time":1527782356751,"pid":5758,"hostname":"Davids-MacBook-Pro-3.local","path":{"to":{"another":"thing"}},"stuff":{"thats":[{"logme":"will be logged"},{"logme":"as will this"}]}}
 ```
 
 See [pino options in API](/docs/api.md#redact-array-object) for `redact` API details.
