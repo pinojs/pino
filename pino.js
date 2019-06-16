@@ -11,7 +11,8 @@ const {
   asChindings,
   final,
   stringify,
-  buildSafeSonicBoom
+  buildSafeSonicBoom,
+  getPrettyStream
 } = require('./lib/tools')
 const { version, LOG_VERSION } = require('./lib/meta')
 const {
@@ -120,6 +121,10 @@ function pino (...args) {
 
 pino.extreme = (dest = process.stdout.fd) => buildSafeSonicBoom(dest, 4096, false)
 pino.destination = (dest = process.stdout.fd) => buildSafeSonicBoom(dest, 0, true)
+pino.createPrettyWriteStream = (...args) => {
+  const { prettifier, dest = process.stdout } = args
+  return getPrettyStream({}, prettifier, dest)
+}
 
 pino.final = final
 pino.levels = mappings()
