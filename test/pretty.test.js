@@ -260,3 +260,37 @@ test('works as expected with an object with the msg prop', async ({ isNot }) => 
   await once(child, 'close')
   isNot(actual.match(/\(123456 on abcdefghijklmnopqr\): hello/), null)
 })
+
+test('creates pretty write stream', async ({ is }) => {
+  const prettyStream = pino.createPrettyWriteStream()
+  is(typeof prettyStream.write, 'function')
+})
+
+test('creates pretty write stream with default pino-pretty', async ({ is }) => {
+  const dest = new Writable({
+    objectMode: true,
+    write (formatted, enc) {
+      is(/^.*INFO.*foo\n$/.test(formatted), true)
+    }
+  })
+  const prettyStream = pino.createPrettyWriteStream({ dest })
+  const log = pino({}, prettyStream)
+  log.info('foo')
+})
+
+test('creates pretty write stream with custom prettifier', async ({ is }) => {
+  const prettifier = function () {
+    return function () {
+      return 'FOO bar'
+    }
+  }
+  const dest = new Writable({
+    objectMode: true,
+    write (formatted, enc) {
+      is(formatted, 'FOO bar')
+    }
+  })
+  const prettyStream = pino.createPrettyWriteStream({ prettifier, dest })
+  const log = pino({}, prettyStream)
+  log.info('foo')
+})
