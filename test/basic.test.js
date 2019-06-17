@@ -516,6 +516,11 @@ test('auto pino.destination with a string as second argument', async ({ same }) 
   })
 })
 
+test('creates pretty write stream', async ({ is }) => {
+  const prettyStream = pino.createPrettyWriteStream()
+  is(typeof prettyStream.write, 'function')
+})
+
 test('does not override opts with a string as second argument', async ({ same }) => {
   const tmp = join(
     os.tmpdir(),
