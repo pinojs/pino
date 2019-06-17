@@ -121,7 +121,7 @@ function pino (...args) {
 
 pino.extreme = (dest = process.stdout.fd) => buildSafeSonicBoom(dest, 4096, false)
 pino.destination = (dest = process.stdout.fd) => buildSafeSonicBoom(dest, 0, true)
-pino.createPrettyWriteStream = (...args) => {
+pino.createPrettyWriteStream = (args = {}) => {
   const { prettifier, dest = process.stdout } = args
   return getPrettyStream({}, prettifier, dest)
 }
