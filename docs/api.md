@@ -21,6 +21,7 @@
   * [logger.version](#version)
   * [logger.LOG_VERSION](#log_version)
 * [Statics](#statics)
+  * [pino.createPrettyWriteStream()](#pino-createprettywritestream)
   * [pino.destination()](#pino-destination)
   * [pino.extreme()](#pino-extreme)
   * [pino.final()](#pino-final)
@@ -655,6 +656,21 @@ Also available on the exported `pino` function.
 * See [`pino.LOG_VERSION`](#pino-LOG_VERSION)
 
 ## Statics
+
+<a id="pino-createprettywritestream"></a>
+### `pino.createPrettyWriteStream({ [prettifier], [dest] }) => WriteStream`
+
+Create a writestream with a prettifier applied to it. This can then be used with  [`pino-multi-stream` ⇗](https://github.com/pinojs/pino-multi-stream)
+module.
+
+```js
+const pino = require('pino')
+const stream = pino.createPrettyWriteStream()
+```
+
+The options object may additionally contain a `prettifier` property to define which prettifier module to use. When not present, `prettifier` defaults to [`pino-pretty` ⇗](https://github.com/pinojs/pino-pretty) (must be installed as a separate dependency).
+
+The method may be passed a write destination, which defaults to `process.stdout`.
 
 <a id="pino-destination"></a>
 ### `pino.destination([target]) => SonicBoom`
