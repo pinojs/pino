@@ -181,6 +181,18 @@ test('with custom timestamp', async ({ is }) => {
   is(actual.slice(0, 8), '["test"]')
 })
 
+test('with custom timestamp label', async ({ is }) => {
+  var actual = ''
+  const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'custom-time-label.js')])
+
+  child.stdout.pipe(writer((s, enc, cb) => {
+    actual += s
+    cb()
+  }))
+  await once(child, 'close')
+  is(actual.slice(0, 8), '["test"]')
+})
+
 test('errors', async ({ isNot }) => {
   var actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'error.js')])

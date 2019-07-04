@@ -19,6 +19,7 @@ const {
   redactFmtSym,
   serializersSym,
   timeSym,
+  timeSliceIndexSym,
   streamSym,
   stringifySym,
   stringifiersSym,
@@ -88,6 +89,7 @@ function pino (...args) {
     ? coreChindings(base) : coreChindings(Object.assign({}, base, { name }))
   const time = (timestamp instanceof Function)
     ? timestamp : (timestamp ? epochTime : nullTime)
+  const timeSliceIndex = time().indexOf(':') + 1
 
   if (useOnlyCustomLevels && !customLevels) throw Error('customLevels is required if useOnlyCustomLevels is set true')
 
@@ -101,6 +103,7 @@ function pino (...args) {
     [useOnlyCustomLevelsSym]: useOnlyCustomLevels,
     [streamSym]: stream,
     [timeSym]: time,
+    [timeSliceIndexSym]: timeSliceIndex,
     [stringifySym]: stringify,
     [stringifiersSym]: stringifiers,
     [endSym]: end,
