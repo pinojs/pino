@@ -3,6 +3,7 @@
 * [pino() => logger](#export)
   * [options](#options)
   * [destination](#destination)
+  * [destination\[Symbol.for('pino.metadata')\]](#metadata)
 * [Logger Instance](#logger)
   * [logger.trace()](#trace)
   * [logger.debug()](#debug)
@@ -260,6 +261,7 @@ In these cases `process.stdout` is used instead.
 * See [`pino.destination`](#pino-destination)
 * See [`pino.extreme`](#pino-extreme)
 
+<a id="metadata"></a>
 #### `destination[Symbol.for('pino.metadata')]`
 
 Default: `false`
