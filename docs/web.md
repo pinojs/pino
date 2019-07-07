@@ -30,9 +30,7 @@ fastify.get('/', async (request, reply) => {
 The `logger` option can also be set to an object, which will be passed through directly
 as the [`pino` options object](api.md#options).
 
-Note: Fastify v1 uses [Pino v4](legacy.md#pino-v4-documentation). The upcoming Fastify v2 will use Pino v5.
-
-See the [fastify documentation](https://www.npmjs.com/package/pino-http#pinohttpopts-stream) for more information.
+See the [fastify documentation](https://www.fastify.io/docs/latest/Logging/) for more information.
 
 <a id="express"></a>
 ## Pino with Express
