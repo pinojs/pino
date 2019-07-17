@@ -130,7 +130,7 @@ test('children serializers get called', async ({ is }) => {
     test: 'this'
   }, stream)
 
-  const child = parent.child({ 'a': 'property', serializers: childSerializers })
+  const child = parent.child({ a: 'property', serializers: childSerializers })
 
   child.fatal({ test: 'test' })
   const o = await once(stream, 'data')

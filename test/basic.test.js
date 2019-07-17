@@ -57,7 +57,7 @@ function levelTest (name, level) {
     is(result.level, level)
     is(result.hello, 'world')
     is(result.v, 1)
-    same(Object.keys(obj), [ 'hello' ])
+    same(Object.keys(obj), ['hello'])
   })
 
   test(`passing an object and a string at level ${name}`, async ({ is, same }) => {
@@ -77,7 +77,7 @@ function levelTest (name, level) {
       hello: 'world',
       v: 1
     })
-    same(Object.keys(obj), [ 'hello' ])
+    same(Object.keys(obj), ['hello'])
   })
 
   test(`overriding object key by string at level ${name}`, async ({ is, same }) => {

@@ -54,8 +54,8 @@ function runBenchmark (name, done) {
   benchmarkResults[name] = {}
 
   const processor = through(function (line, enc, cb) {
-    const [ label, time ] = ('' + line).split(': ')
-    const [ target, iterations ] = label.split('*')
+    const [label, time] = ('' + line).split(': ')
+    const [target, iterations] = label.split('*')
     const logger = target.replace('bench', '')
 
     if (!benchmarkResults[name][logger]) benchmarkResults[name][logger] = []
