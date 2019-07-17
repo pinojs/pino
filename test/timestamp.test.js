@@ -23,6 +23,18 @@ test('pino accepts external time functions', async ({ is }) => {
   is(result.time, 'none')
 })
 
+test('pino accepts external time functions with custom label', async ({ is }) => {
+  const opts = {
+    timestamp: () => ',"custom-time-label":"none"'
+  }
+  const stream = sink()
+  const instance = pino(opts, stream)
+  instance.info('foobar')
+  const result = await once(stream, 'data')
+  is(result.hasOwnProperty('custom-time-label'), true)
+  is(result['custom-time-label'], 'none')
+})
+
 test('inserts timestamp by default', async ({ ok, is }) => {
   const stream = sink()
   const instance = pino(stream)
