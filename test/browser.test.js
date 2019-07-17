@@ -82,12 +82,12 @@ test('exposes levels object', ({ end, same }) => {
       trace: 10
     },
     labels: {
-      '10': 'trace',
-      '20': 'debug',
-      '30': 'info',
-      '40': 'warn',
-      '50': 'error',
-      '60': 'fatal'
+      10: 'trace',
+      20: 'debug',
+      30: 'info',
+      40: 'warn',
+      50: 'error',
+      60: 'fatal'
     }
   })
 
@@ -103,7 +103,7 @@ test('exposes LOG_VERSION', ({ end, is }) => {
 test('exposes faux stdSerializers', ({ end, ok, same }) => {
   ok(pino.stdSerializers)
   // make sure faux stdSerializers match pino-std-serializers
-  for (let serializer in pinoStdSerializers) {
+  for (const serializer in pinoStdSerializers) {
     ok(pino.stdSerializers[serializer], `pino.stdSerializers.${serializer}`)
   }
   // confirm faux methods return empty objects

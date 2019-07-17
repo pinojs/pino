@@ -257,7 +257,7 @@ test('children serializers get called', ({ end, is }) => {
     }
   })
 
-  const child = parent.child({ 'a': 'property', serializers: childSerializers })
+  const child = parent.child({ a: 'property', serializers: childSerializers })
 
   child.fatal({ test: 'test' })
   end()

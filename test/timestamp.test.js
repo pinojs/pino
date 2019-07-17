@@ -1,5 +1,7 @@
 'use strict'
 
+/* eslint no-prototype-builtins: 0 */
+
 const { test } = require('tap')
 const { sink, once } = require('./helper')
 const pino = require('../')
