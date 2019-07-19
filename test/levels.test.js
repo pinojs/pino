@@ -242,6 +242,21 @@ test('produces labels when told to', async ({ is }) => {
   instance.info('hello world')
 })
 
+test('resets levels from labels to numbers', async ({ is }) => {
+  const expected = [{
+    level: 30,
+    msg: 'hello world'
+  }]
+  pino({ useLevelLabels: true })
+  const instance = pino({ useLevelLabels: false }, sink((result, enc, cb) => {
+    const current = expected.shift()
+    check(is, result, current.level, current.msg)
+    cb()
+  }))
+
+  instance.info('hello world')
+})
+
 test('changes label naming when told to', async ({ is }) => {
   const expected = [{
     priority: 30,
