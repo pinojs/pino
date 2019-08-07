@@ -230,7 +230,7 @@ $ node app.js | pino-redis -U redis://username:password@localhost:6379
 $ node app.js | pino-sentry --dsn=https://******@sentry.io/12345
 ```
 
-For full documentation of command line switches read [readme](https://github.com/aandrewww/pino-sentry/blob/master/README.md)
+For full documentation of command line switches see the [pino-sentry readme](https://github.com/aandrewww/pino-sentry/blob/master/README.md)
 
 [pino-sentry]: https://www.npmjs.com/package/pino-sentry
 [Sentry]: https://sentry.io/
