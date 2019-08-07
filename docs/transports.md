@@ -76,6 +76,7 @@ PR's to this document are welcome for any new transports!
 + [pino-mq](#pino-mq)
 + [pino-papertrail](#pino-papertrail)
 + [pino-redis](#pino-redis)
++ [pino-sentry](#pino-sentry)
 + [pino-socket](#pino-socket)
 + [pino-stackdriver](#pino-stackdriver)
 + [pino-syslog](#pino-syslog)
@@ -219,6 +220,20 @@ $ node app.js | pino-redis -U redis://username:password@localhost:6379
 
 [pino-redis]: https://github.com/buianhthang/pino-redis
 [Redis]: https://redis.io/
+
+<a id="pino-sentry"></a>
+### pino-sentry
+
+[pino-sentry][pino-sentry] loads pino logs into [Sentry][Sentry].
+
+```sh
+$ node app.js | pino-sentry --dsn=https://******@sentry.io/12345
+```
+
+For full documentation of command line switches read [readme](https://github.com/aandrewww/pino-sentry/blob/master/README.md)
+
+[pino-sentry]: https://www.npmjs.com/package/pino-sentry
+[Sentry]: https://sentry.io/
 
 <a id="pino-socket"></a>
 ### pino-socket
