@@ -101,3 +101,15 @@ test('pino.stdTimeFunctions.unixTime returns seconds based timestamps', async ({
   is(result.time, 1531069920)
   Date.now = now
 })
+
+test('set the timestampKey', async ({ is }) => {
+  const opts = {
+    timestampKey: 'fooTimestamp'
+  }
+  const stream = sink()
+  const instance = pino(opts, stream)
+  instance.info('foobar')
+  const result = await once(stream, 'data')
+  is(result.hasOwnProperty('time'), false)
+  is(result.hasOwnProperty('fooTimestamp'), true)
+})

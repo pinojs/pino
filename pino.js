@@ -19,6 +19,7 @@ const {
   redactFmtSym,
   serializersSym,
   timeSym,
+  timestampKeySym,
   timeSliceIndexSym,
   streamSym,
   stringifySym,
@@ -46,6 +47,7 @@ const defaultOptions = {
     err: defaultErrorSerializer
   }),
   timestamp: epochTime,
+  timestampKey: 'time',
   name: undefined,
   redact: null,
   customLevels: null,
@@ -64,6 +66,7 @@ function pino (...args) {
     crlf,
     serializers,
     timestamp,
+    timestampKey,
     messageKey,
     base,
     name,
@@ -89,7 +92,7 @@ function pino (...args) {
     ? coreChindings(base) : coreChindings(Object.assign({}, base, { name }))
   const time = (timestamp instanceof Function)
     ? timestamp : (timestamp ? epochTime : nullTime)
-  const timeSliceIndex = time().indexOf(':') + 1
+  const timeSliceIndex = time(timestampKey).indexOf(':') + 1
 
   if (useOnlyCustomLevels && !customLevels) throw Error('customLevels is required if useOnlyCustomLevels is set true')
 
@@ -103,6 +106,7 @@ function pino (...args) {
     [useOnlyCustomLevelsSym]: useOnlyCustomLevels,
     [streamSym]: stream,
     [timeSym]: time,
+    [timestampKeySym]: timestampKey,
     [timeSliceIndexSym]: timeSliceIndex,
     [stringifySym]: stringify,
     [stringifiersSym]: stringifiers,

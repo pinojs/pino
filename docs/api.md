@@ -172,6 +172,13 @@ for passing in as a value for this option.
 
 **Caution**: attempting to format time in-process will significantly impact logging performance.
 
+<a id=opt-timestampkey></a>
+#### `timestampKey` (String)
+
+Default: `'time'`
+
+The string key for the 'time' in the JSON object.
+
 <a id=opt-messagekey></a>
 #### `messageKey` (String)
 
