@@ -70,6 +70,7 @@ PR's to this document are welcome for any new transports!
 
 + [pino-applicationinsights](#pino-applicationinsights)
 + [pino-azuretable](#pino-azuretable)
++ [pino-cloudwatch](#pino-cloudwatch)
 + [pino-couch](#pino-couch)
 + [pino-datadog](#pino-datadog)
 + [pino-elasticsearch](#pino-elasticsearch)
@@ -105,6 +106,18 @@ $ node foo | pino-azuretable --account storageaccount --key blablabla
 ```
 
 For full documentation of command line switches read [readme](https://github.com/ovhemert/pino-azuretable#readme)
+
+<a id="pino-cloudwatch"></a>
+### pino-cloudwatch
+
+[pino-cloudwatch][pino-cloudwatch] is a transport that buffers and forwards logs to [Amazon CloudWatch][].
+
+```sh
+$ node app.js | pino-cloudwatch --group my-log-group
+```
+
+[pino-cloudwatch]: https://github.com/dbhowell/pino-cloudwatch
+[Amazon CloudWatch]: https://aws.amazon.com/cloudwatch/
 
 <a id="pino-couch"></a>
 ### pino-couch
