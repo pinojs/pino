@@ -254,7 +254,6 @@ const fileLogger = require('pino')('/log/path')
 However, there are some special instances where `pino.destination` is not used as the default:
 
 + When something, e.g a process manager, has monkey-patched `process.stdout.write`.
-+ When running on AWS Lambda.
 
 In these cases `process.stdout` is used instead.
 
