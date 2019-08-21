@@ -91,5 +91,13 @@
     "pino-std-serializers": "^2.3.0",
     "quick-format-unescaped": "^3.0.2",
     "sonic-boom": "^0.7.5"
+  },
+  "peerDependencies": {
+    "pino-pretty": "^2.4.0"
+  },
+  "peerDependenciesMeta": {
+    "pino-pretty": {
+      "optional": true
+    }
   }
 }
