@@ -508,7 +508,7 @@ const child = logger.child({ foo: 'bar' })
 console.log(child.bindings())
 // { foo: 'bar' }
 const anotherChild = child.child({ MIX: { IN: 'always' } })
-console.log(child.bindings())
+console.log(anotherChild.bindings())
 // { foo: 'bar', MIX: { IN: 'always' } }
 ```
 
