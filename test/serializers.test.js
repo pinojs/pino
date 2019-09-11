@@ -124,6 +124,30 @@ test('children inherit parent serializers', async ({ is }) => {
   is(o.test, 'parent')
 })
 
+test('children inherit parent Symbol serializers', async ({ is, isNot }) => {
+  const stream = sink()
+  const symbolSerializers = {
+    [Symbol.for('pino.*')]: parentSerializers.test
+  }
+  const parent = pino({ serializers: symbolSerializers }, stream)
+
+  is(parent[Symbol.for('pino.serializers')], symbolSerializers)
+
+  const child = parent.child({
+    serializers: {
+      a
+    }
+  })
+
+  function a () {
+    return 'hello'
+  }
+
+  isNot(child[Symbol.for('pino.serializers')], symbolSerializers)
+  is(child[Symbol.for('pino.serializers')].a, a)
+  is(child[Symbol.for('pino.serializers')][Symbol.for('pino.*')], parentSerializers.test)
+})
+
 test('children serializers get called', async ({ is }) => {
   const stream = sink()
   const parent = pino({
