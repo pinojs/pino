@@ -135,6 +135,7 @@ test('children inherit parent Symbol serializers', async ({ is, isNot }) => {
 
   const child = parent.child({
     serializers: {
+      [Symbol.for('a')]: a,
       a
     }
   })
@@ -145,6 +146,7 @@ test('children inherit parent Symbol serializers', async ({ is, isNot }) => {
 
   isNot(child[Symbol.for('pino.serializers')], symbolSerializers)
   is(child[Symbol.for('pino.serializers')].a, a)
+  is(child[Symbol.for('pino.serializers')][Symbol.for('a')], a)
   is(child[Symbol.for('pino.serializers')][Symbol.for('pino.*')], parentSerializers.test)
 })
 
