@@ -233,7 +233,7 @@ $ node app.js | pino-mysql -c db-configuration.json
 ```
 
 `pino-mysql` can extract and save log fields into corresponding database field
-and/or save the entire log stream as a [JSON Data Type][JSONDT]. It is dead
+and/or save the entire log stream as a [JSON Data Type][JSONDT]. 
 simple to setup and use.
 
 For full documentation and command line switches read the [readme][pino-mysql].
