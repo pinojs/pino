@@ -210,9 +210,11 @@ test('throws when useOnlyCustomLevels is set true without customLevels', async (
 })
 
 test('custom level on one instance does not affect other instances', async ({ is }) => {
-  pino({ customLevels: {
-    foo: 37
-  } })
+  pino({
+    customLevels: {
+      foo: 37
+    }
+  })
   is(typeof pino().foo, 'undefined')
 })
 
