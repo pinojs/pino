@@ -163,7 +163,7 @@ To connect to an external elasticsearch instance (recommended for production):
 * Launch:
 
 ```sh
-$ node app.js | pino-elasticsearch --host 192.168.1.42
+$ node app.js | pino-elasticsearch --node http://192.168.1.42:9200
 ```
 
 Assuming Elasticsearch is running on `192.168.1.42`.
@@ -171,7 +171,7 @@ Assuming Elasticsearch is running on `192.168.1.42`.
 To connect to AWS Elasticsearch:
 
 ```sh
-$ node app.js | pino-elasticsearch  --host https://es-url.us-east-1.es.amazonaws.com --port 443 -c ./aws_config.json
+$ node app.js | pino-elasticsearch --node https://es-url.us-east-1.es.amazonaws.com --es-version 6
 ```
 
 Then [create an index pattern](https://www.elastic.co/guide/en/kibana/current/setup.html) on `'pino'` (the default index key for `pino-elasticsearch`) on the Kibana instance.
