@@ -30,7 +30,8 @@ test('serializers override values', ({ end, is }) => {
 })
 
 test('without the serialize option, serializers do not override values', ({ end, is }) => {
-  const parent = pino({ serializers: parentSerializers,
+  const parent = pino({
+    serializers: parentSerializers,
     browser: {
       write (o) {
         is(o.test, 'test')
@@ -164,12 +165,14 @@ if (process.title !== 'browser') {
 
     console.error = consoleError
 
-    logger.child({ aBinding: 'test',
+    logger.child({
+      aBinding: 'test',
       serializers: {
         key: () => 'serialized',
         key2: () => 'serialized2',
         key3: () => 'serialized3'
-      } }).fatal({ key: 'test' }, { key2: 'test' }, 'str should skip', [{ foo: 'array should skip' }], { key3: 'test' })
+      }
+    }).fatal({ key: 'test' }, { key2: 'test' }, 'str should skip', [{ foo: 'array should skip' }], { key3: 'test' })
     end()
   })
 
@@ -204,17 +207,20 @@ if (process.title !== 'browser') {
 
     console.error = consoleError
 
-    logger.child({ key: 'test',
+    logger.child({
+      key: 'test',
       serializers: {
         key: () => 'serialized'
-      } }).fatal({ test: 'test' })
+      }
+    }).fatal({ test: 'test' })
     end()
   })
 }
 
 test('child does not overwrite parent serializers', ({ end, is }) => {
   var c = 0
-  const parent = pino({ serializers: parentSerializers,
+  const parent = pino({
+    serializers: parentSerializers,
     browser: {
       serialize: true,
       write (o) {
@@ -224,7 +230,9 @@ test('child does not overwrite parent serializers', ({ end, is }) => {
           is(o.test, 'child')
           end()
         }
-      } } })
+      }
+    }
+  })
   const child = parent.child({ serializers: childSerializers })
 
   parent.fatal({ test: 'test' })
@@ -232,7 +240,8 @@ test('child does not overwrite parent serializers', ({ end, is }) => {
 })
 
 test('children inherit parent serializers', ({ end, is }) => {
-  const parent = pino({ serializers: parentSerializers,
+  const parent = pino({
+    serializers: parentSerializers,
     browser: {
       serialize: true,
       write (o) {

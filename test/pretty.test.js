@@ -62,7 +62,7 @@ test('throws when prettyPrint is true but pino-pretty module is not installed', 
   // error is to simulate it:
   const prettyFactory = require('pino-pretty')
   require.cache[require.resolve('pino-pretty')].exports = () => {
-    throw Error(`Cannot find module 'pino-pretty'`)
+    throw Error('Cannot find module \'pino-pretty\'')
   }
   throws(() => pino({ prettyPrint: true }))
   try { pino({ prettyPrint: true }) } catch ({ message }) {

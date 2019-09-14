@@ -393,7 +393,7 @@ test('throws when creating a default value that does not exist in logger levels'
       useOnlyCustomLevels: true
     })
   } catch ({ message }) {
-    is(message, `default level:info must be included in custom levels`)
+    is(message, 'default level:info must be included in custom levels')
   }
 })
 
