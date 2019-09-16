@@ -430,3 +430,19 @@ test('fatal method should call async when sync-flushing fails', ({ equal, fail, 
   const instance = pino(stream)
   doesNotThrow(() => instance.fatal(messages[0]))
 })
+
+test('log null value when message is null', async ({ is }) => {
+  const expected = {
+    msg: null,
+    level: 30
+  }
+
+  const stream = sink()
+  const instance = pino(stream)
+  instance.level = 'info'
+  instance.info(null)
+
+  const result = await once(stream, 'data')
+
+  check(is, result, expected.level, expected.msg)
+})
