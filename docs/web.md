@@ -9,6 +9,7 @@ web framework ecosystem.
 + [Pino with Restify](#restify)
 + [Pino with Koa](#koa)
 + [Pino with Node core `http`](#http)
++ [Pino with Nest](#nest)
 
 <a id="fastify"></a>
 ## Pino with Fastify
@@ -188,3 +189,43 @@ server.listen(3000)
 ```
 
 See the [pino-http readme](http://npm.im/pino-http) for more info.
+
+
+<a id="nest"></a>
+## Pino with Nest
+
+```sh
+npm install nestjs-pino
+```
+
+```ts
+import { NestFactory } from "@nestjs/core"
+import { Controller, Get, Module } from "@nestjs/common";
+import { createLoggerMiddlewares, Logger } from 'nestjs-pino';
+
+@Controller()
+export class AppController {
+  constructor(private readonly logger: Logger) {}
+
+  @Get()
+  getHello(): string {
+    this.logger.log("calling AppController.getHello");
+    return `Hello world`;
+  }
+}
+
+@Module({
+  controllers: [AppController],
+  providers: [Logger]
+})
+class MyModule {}
+
+async function bootstrap() {
+  const app = await NestFactory.create(MyModule);
+  app.use(...createLoggerMiddlewares());
+  await app.listen(3000);
+}
+bootstrap();
+```
+
+See the [nestjs-pino readme](http://npm.im/nestjs-pino) for more info.
