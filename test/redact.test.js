@@ -606,22 +606,55 @@ test('redacts null at the top level', async ({ is }) => {
 
 test('supports bracket notation', async ({ is }) => {
   const stream = sink()
-  const instance = pino({ redact: ['a["b-b"]'] }, stream)
+  const instance = pino({ redact: ['a["b.b"]'] }, stream)
   const obj = {
-    a: { 'b-b': 'c' }
+    a: { 'b.b': 'c' }
   }
   instance.info(obj)
   const o = await once(stream, 'data')
-  is(o.a['b-b'], '[Redacted]')
+  is(o.a['b.b'], '[Redacted]')
 })
 
-test('supports leading bracket notation', async ({ is }) => {
+test('supports bracket notation with further nesting', async ({ is }) => {
   const stream = sink()
-  const instance = pino({ redact: ['["a-a"].b'] }, stream)
+  const instance = pino({ redact: ['a["b.b"].c'] }, stream)
   const obj = {
-    'a-a': { b: 'c' }
+    a: { 'b.b': { c: 'd' } }
   }
   instance.info(obj)
   const o = await once(stream, 'data')
-  is(o['a-a'].b, '[Redacted]')
+  is(o.a['b.b'].c, '[Redacted]')
+})
+
+test('supports leading bracket notation (single quote)', async ({ is }) => {
+  const stream = sink()
+  const instance = pino({ redact: ['[\'a.a\'].b'] }, stream)
+  const obj = {
+    'a.a': { b: 'c' }
+  }
+  instance.info(obj)
+  const o = await once(stream, 'data')
+  is(o['a.a'].b, '[Redacted]')
+})
+
+test('supports leading bracket notation (double quote)', async ({ is }) => {
+  const stream = sink()
+  const instance = pino({ redact: ['["a.a"].b'] }, stream)
+  const obj = {
+    'a.a': { b: 'c' }
+  }
+  instance.info(obj)
+  const o = await once(stream, 'data')
+  is(o['a.a'].b, '[Redacted]')
+})
+
+test('supports leading bracket notation (backtick quote)', async ({ is }) => {
+  const stream = sink()
+  const instance = pino({ redact: ['[`a.a`].b'] }, stream)
+  const obj = {
+    'a.a': { b: 'c' }
+  }
+  instance.info(obj)
+  const o = await once(stream, 'data')
+  is(o['a.a'].b, '[Redacted]')
 })
