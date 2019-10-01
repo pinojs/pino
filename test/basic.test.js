@@ -107,6 +107,19 @@ function levelTest (name, level) {
     check(is, result, level, 'hello 42')
   })
 
+  test(`formatting a symbol at level ${name}`, async ({ is }) => {
+    const stream = sink()
+    const instance = pino(stream)
+    instance.level = name
+
+    const sym = Symbol('foo')
+    instance[name]('hello', sym)
+
+    const result = await once(stream, 'data')
+
+    check(is, result, level, 'hello Symbol(foo)')
+  })
+
   test(`passing error with a serializer at level ${name}`, async ({ is, same }) => {
     const stream = sink()
     const err = new Error('myerror')
