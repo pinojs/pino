@@ -58,8 +58,8 @@ const normalize = createArgsNormalizer(defaultOptions)
 const serializers = Object.assign(Object.create(null), stdSerializers)
 
 function pino (...args) {
-  const instance = {};
-  const { opts, stream } = normalize.apply(instance, args);
+  const instance = {}
+  const { opts, stream } = normalize.apply(instance, args)
   const {
     redact,
     crlf,
