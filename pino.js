@@ -58,7 +58,8 @@ const normalize = createArgsNormalizer(defaultOptions)
 const serializers = Object.assign(Object.create(null), stdSerializers)
 
 function pino (...args) {
-  const { opts, stream } = normalize(...args)
+  const instance = {};
+  const { opts, stream } = normalize.apply(instance, args);
   const {
     redact,
     crlf,
@@ -96,7 +97,7 @@ function pino (...args) {
   assertDefaultLevelFound(level, customLevels, useOnlyCustomLevels)
   const levels = mappings(customLevels, useOnlyCustomLevels)
 
-  const instance = {
+  Object.assign(instance, {
     levels,
     [useLevelLabelsSym]: useLevelLabels,
     [changeLevelNameSym]: changeLevelName,
@@ -111,7 +112,7 @@ function pino (...args) {
     [messageKeySym]: messageKey,
     [serializersSym]: serializers,
     [chindingsSym]: chindings
-  }
+  })
   Object.setPrototypeOf(instance, proto)
 
   if (customLevels || useLevelLabels || changeLevelName !== defaultOptions.changeLevelName) genLsCache(instance)
