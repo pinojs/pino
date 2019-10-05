@@ -23,13 +23,12 @@ The API requires modules provide a factory function which returns a prettifier
 function. This prettifier function must accept either a string of NDJSON or
 a Pino log object. A psuedo-example of such a prettifier is:
 
-Pino instance is passed as `this` into prettifier factory function. But it 
-not initialized yet, so if you need it you may pass it via closure to `prettifier`
-function.
+The uninitialized Pino instance is passed as `this` into prettifier factory function,
+so it can be accessed via closure by the returned prettifier function.
 
 ```js
 module.exports = function myPrettifier (options) {
-  // `this` is bind to pino instance (but not yet initialized).
+  // `this` is bound to the pino instance
   // Deal with whatever options are supplied.
   return function prettifier (inputData) {
     let logObject
