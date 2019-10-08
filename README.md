@@ -51,6 +51,7 @@ For using Pino with a web framework see:
 * [Pino with Restify](docs/web.md#restify)
 * [Pino with Koa](docs/web.md#koa)
 * [Pino with Node core `http`](docs/web.md#http)
+* [Pino with Nest](docs/web.md#nest)
 
 
 <a name="essentials"></a>
