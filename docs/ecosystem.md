@@ -69,4 +69,4 @@ MongoDB and many [others](https://www.fluentd.org/dataoutputs) via Fluentd.
 prettifier inspired by the [logrus](https://github.com/sirupsen/logrus) logger.
 + [`pino-rotating-file`](https://github.com/homeaway/pino-rotating-file): a hapi-pino log transport for splitting logs into separate, automatically rotating files.
 + [`cls-proxify`](https://github.com/keenondrums/cls-proxify): integration of pino and [CLS](https://github.com/jeff-lewis/cls-hooked). Useful for creating dynamically configured child loggers (e.g. with added trace ID) for each request. 
-
++ [`pino-express`](https://github.com/benrei/pino-express): select your own fields to log, and use Pino to log requests within [express](https://expressjs.com/).
