@@ -201,7 +201,7 @@ npm install nestjs-pino
 ```ts
 import { NestFactory } from '@nestjs/core'
 import { Controller, Get, Module } from '@nestjs/common'
-import { createLoggerMiddlewares, Logger } from 'nestjs-pino'
+import { LoggerModule, Logger } from 'nestjs-pino'
 
 @Controller()
 export class AppController {
@@ -216,13 +216,12 @@ export class AppController {
 
 @Module({
   controllers: [AppController],
-  providers: [Logger]
+  imports: [LoggerModule.forRoot()]
 })
 class MyModule {}
 
 async function bootstrap() {
   const app = await NestFactory.create(MyModule)
-  app.use(...createLoggerMiddlewares())
   await app.listen(3000)
 }
 bootstrap()
