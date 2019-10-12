@@ -15,7 +15,7 @@ web framework ecosystem.
 ## Pino with Fastify
 
 The Fastify web framework comes bundled with Pino by default, simply set Fastify's
-`logger` option to `true` and use `reply.log` for log messages that correspond
+`logger` option to `true` and use `request.log` or `reply.log` for log messages that correspond
 to each individual request:
 
 ```js
