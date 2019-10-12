@@ -53,7 +53,7 @@ Default: `'info'`
 
 One of `'fatal'`, `'error'`, `'warn'`, `'info`', `'debug'`, `'trace'` or `'silent'`.
 
-Additional levels can be added to the instance via the `customLevels` option. 
+Additional levels can be added to the instance via the `customLevels` option.
 
 * See [`customLevels` option](#opt-customlevels)
 
