@@ -53,7 +53,7 @@ Default: `'info'`
 
 One of `'fatal'`, `'error'`, `'warn'`, `'info`', `'debug'`, `'trace'` or `'silent'`.
 
-Additional levels can be added to the instance via the `customLevels` option.
+Additional levels can be added to the instance via the `customLevels` option. 
 
 * See [`customLevels` option](#opt-customlevels)
 
@@ -433,6 +433,13 @@ Write a `'error'` level log, if the configured `level` allows for it.
 ### `logger.fatal([mergingObject], [message], [...interpolationValues])`
 
 Write a `'fatal'` level log, if the configured `level` allows for it.
+
+Since `'fatal'` level messages are intended to be logged just prior to the process exiting the `fatal`
+method will always sync flush the destination.
+Therefore it's important not to misuse `fatal` since
+it will cause performance overhead if used for any
+other purpose than writing final log messages before
+the process crashes or exits.
 
 * See [`mergingObject` log method parameter](#mergingobject)
 * See [`message` log method parameter](#message)
