@@ -402,3 +402,18 @@ test('passes when creating a default value that exists in logger levels', async 
     level: 30
   })
 })
+
+test('fatal method sync-flushes the destination if sync flushing is available', async ({ pass, doesNotThrow, plan }) => {
+  plan(2)
+  const stream = sink()
+  stream.flushSync = () => {
+    pass('destination flushed')
+  }
+  const instance = pino(stream)
+  instance.fatal('this is fatal')
+  await once(stream, 'data')
+  doesNotThrow(() => {
+    stream.flushSync = undefined
+    instance.fatal('this is fatal')
+  })
+})

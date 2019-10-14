@@ -434,6 +434,13 @@ Write a `'error'` level log, if the configured `level` allows for it.
 
 Write a `'fatal'` level log, if the configured `level` allows for it.
 
+Since `'fatal'` level messages are intended to be logged just prior to the process exiting the `fatal`
+method will always sync flush the destination.
+Therefore it's important not to misuse `fatal` since
+it will cause performance overhead if used for any
+other purpose than writing final log messages before
+the process crashes or exits.
+
 * See [`mergingObject` log method parameter](#mergingobject)
 * See [`message` log method parameter](#message)
 * See [`...interpolationValues` log method parameter](#interpolationvalues)
