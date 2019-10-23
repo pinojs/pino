@@ -626,6 +626,17 @@ test('supports bracket notation with further nesting', async ({ is }) => {
   is(o.a['b.b'].c, '[Redacted]')
 })
 
+test('supports bracket notation with empty string as path segment', async ({ is }) => {
+  const stream = sink()
+  const instance = pino({ redact: ['a[""].c'] }, stream)
+  const obj = {
+    a: { '': { c: 'd' } }
+  }
+  instance.info(obj)
+  const o = await once(stream, 'data')
+  is(o.a[''].c, '[Redacted]')
+})
+
 test('supports leading bracket notation (single quote)', async ({ is }) => {
   const stream = sink()
   const instance = pino({ redact: ['[\'a.a\'].b'] }, stream)
@@ -657,4 +668,26 @@ test('supports leading bracket notation (backtick quote)', async ({ is }) => {
   instance.info(obj)
   const o = await once(stream, 'data')
   is(o['a.a'].b, '[Redacted]')
+})
+
+test('supports leading bracket notation (single-segment path)', async ({ is }) => {
+  const stream = sink()
+  const instance = pino({ redact: ['[`a.a`]'] }, stream)
+  const obj = {
+    'a.a': { b: 'c' }
+  }
+  instance.info(obj)
+  const o = await once(stream, 'data')
+  is(o['a.a'], '[Redacted]')
+})
+
+test('supports leading bracket notation (single-segment path, wilcard)', async ({ is }) => {
+  const stream = sink()
+  const instance = pino({ redact: ['[*]'] }, stream)
+  const obj = {
+    'a.a': { b: 'c' }
+  }
+  instance.info(obj)
+  const o = await once(stream, 'data')
+  is(o['a.a'], '[Redacted]')
 })
