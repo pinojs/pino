@@ -75,6 +75,7 @@ PR's to this document are welcome for any new transports!
 + [pino-datadog](#pino-datadog)
 + [pino-elasticsearch](#pino-elasticsearch)
 + [pino-mq](#pino-mq)
++ [pino-mysql](#pino-mysql)
 + [pino-papertrail](#pino-papertrail)
 + [pino-redis](#pino-redis)
 + [pino-sentry](#pino-sentry)
@@ -221,6 +222,25 @@ node yourapp.js | pino-papertrail --host bar.papertrailapp.com --port 12345 --ap
 
 
 for full documentation of command line switches read [readme](https://github.com/ovhemert/pino-papertrail#readme)
+
+<a id="pino-mysql"></a>
+### pino-mysql
+
+[pino-mysql][pino-mysql] loads pino logs into [MySQL][MySQL] and [MariaDB][MariaDB].
+
+```sh
+$ node app.js | pino-mysql -c db-configuration.json
+```
+
+`pino-mysql` can extract and save log fields into corresponding database field
+and/or save the entire log stream as a [JSON Data Type][JSONDT]. 
+
+For full documentation and command line switches read the [readme][pino-mysql].
+
+[pino-mysql]: https://www.npmjs.com/package/pino-mysql
+[MySQL]: https://www.mysql.com/
+[MariaDB]: https://mariadb.org/
+[JSONDT]: https://dev.mysql.com/doc/refman/8.0/en/json.html
 
 <a id="pino-redis"></a>
 ### pino-redis
