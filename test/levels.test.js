@@ -409,7 +409,23 @@ test('fatal method sync-flushes the destination if sync flushing is available', 
   stream.flushSync = () => {
     pass('destination flushed')
   }
-  const instance = pino(stream)
+  const instance = pino({ forceFlushOnFatal: true }, stream)
+  instance.fatal('this is fatal')
+  await once(stream, 'data')
+  doesNotThrow(() => {
+    stream.flushSync = undefined
+    instance.fatal('this is fatal')
+  })
+})
+
+test('fatal method should not sync-flushes the destination if sync flushing is disavailable', async ({ pass, fail, doesNotThrow, plan }) => {
+  plan(1)
+  const stream = sink()
+  stream.flushSync = () => fail('flushSync should not be called')
+  stream.flush = () => {
+    pass('destination flushed')
+  }
+  const instance = pino({ forceFlushOnFatal: false }, stream)
   instance.fatal('this is fatal')
   await once(stream, 'data')
   doesNotThrow(() => {
