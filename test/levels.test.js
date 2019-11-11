@@ -429,7 +429,6 @@ test('fatal method should not sync-flushes the destination if sync flushing is d
   instance.fatal('this is fatal')
   await once(stream, 'data')
   doesNotThrow(() => {
-    stream.flushSync = undefined
     instance.fatal('this is fatal')
   })
 })
