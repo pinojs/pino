@@ -29,8 +29,7 @@ const {
   messageKeySym,
   useLevelLabelsSym,
   changeLevelNameSym,
-  useOnlyCustomLevelsSym,
-  forceFlushOnFatalSym
+  useOnlyCustomLevelsSym
 } = symbols
 const { epochTime, nullTime } = time
 const { pid } = process
@@ -51,8 +50,7 @@ const defaultOptions = {
   redact: null,
   customLevels: null,
   changeLevelName: 'level',
-  useOnlyCustomLevels: false,
-  forceFlushOnFatal: false
+  useOnlyCustomLevels: false
 }
 
 const normalize = createArgsNormalizer(defaultOptions)
@@ -73,8 +71,7 @@ function pino (...args) {
     customLevels,
     useLevelLabels,
     changeLevelName,
-    useOnlyCustomLevels,
-    forceFlushOnFatal
+    useOnlyCustomLevels
   } = opts
 
   const stringifiers = redact ? redaction(redact, stringify) : {}
@@ -113,8 +110,7 @@ function pino (...args) {
     [formatOptsSym]: formatOpts,
     [messageKeySym]: messageKey,
     [serializersSym]: serializers,
-    [chindingsSym]: chindings,
-    [forceFlushOnFatalSym]: forceFlushOnFatal
+    [chindingsSym]: chindings
   }
   Object.setPrototypeOf(instance, proto)
 
