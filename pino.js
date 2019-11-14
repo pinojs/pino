@@ -29,6 +29,7 @@ const {
   messageKeySym,
   useLevelLabelsSym,
   changeLevelNameSym,
+  mixinSym,
   useOnlyCustomLevelsSym
 } = symbols
 const { epochTime, nullTime } = time
@@ -71,6 +72,7 @@ function pino (...args) {
     customLevels,
     useLevelLabels,
     changeLevelName,
+    mixin,
     useOnlyCustomLevels
   } = opts
 
@@ -110,6 +112,7 @@ function pino (...args) {
     [formatOptsSym]: formatOpts,
     [messageKeySym]: messageKey,
     [serializersSym]: serializers,
+    [mixinSym]: mixin,
     [chindingsSym]: chindings
   }
   Object.setPrototypeOf(instance, proto)
