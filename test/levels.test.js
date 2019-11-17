@@ -429,5 +429,4 @@ test('fatal method should call async when sync-flushing fails', ({ equal, fail, 
 
   const instance = pino(stream)
   doesNotThrow(() => instance.fatal(messages[0]))
-  once(stream, 'data')
 })
