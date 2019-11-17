@@ -1,0 +1,19 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  build:
+    name: ${{ matrix.node-version }} ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-16.04]
+        node-version: [6,8,10,11]
+    steps:
+      - uses: actions/checkout@v1
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: run
+        run: npm run ci
