@@ -18,4 +18,10 @@ jobs:
       - name: Install
         run: npm i
       - name: run
+        if: !startsWith(matrix.os, 'windows')
         run: npm run ci
+      # Windows just pass the test without checking the Coverage
+      # Due to skipped tests
+      - name: run
+        if: startsWith(matrix.os, 'windows')
+        run: npm run test
