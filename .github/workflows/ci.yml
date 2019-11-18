@@ -17,11 +17,22 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: Install
         run: npm i
-      - name: run with coverage
-        if: (!startsWith(matrix.os, 'windows'))
-        run: npm run ci
-      # Windows just pass the test without checking the Coverage
-      # Due to skipped tests
-      - name: run without coverage
-        if: startsWith(matrix.os, 'windows')
+      - name: Tests
         run: npm run test
+  coverage:
+    name: coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Use Node.js 12
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - name: Install
+        run: npm i
+      - name: run with coverage
+        run: npm run cov-ci
+      - name: Coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
