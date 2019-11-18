@@ -1,0 +1,27 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  build:
+    name: ${{ matrix.node-version }} ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macOS-latest, windows-latest, ubuntu-latest]
+        node-version: [6, 8, 10, 11, 12, 13]
+    steps:
+      - uses: actions/checkout@v1
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install
+        run: npm i
+      - name: run with coverage
+        if: (!startsWith(matrix.os, 'windows'))
+        run: npm run ci
+      # Windows just pass the test without checking the Coverage
+      # Due to skipped tests
+      - name: run without coverage
+        if: startsWith(matrix.os, 'windows')
+        run: npm run test

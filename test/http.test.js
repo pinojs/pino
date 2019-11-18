@@ -84,7 +84,7 @@ test('http request support via serializer', async ({ ok, same, error, teardown }
   server.close()
 })
 
-test('http request support via serializer without request connection', async ({ ok, same, error, teardown }) => {
+test('http request support via serializer without request connection', async ({ ok, isLike, error, teardown }) => {
   var originalReq
   const instance = pino({
     serializers: {
@@ -93,7 +93,7 @@ test('http request support via serializer without request connection', async ({ 
   }, sink((chunk, enc) => {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
-    same(chunk, {
+    isLike(chunk, {
       pid: pid,
       hostname: hostname,
       level: 30,
