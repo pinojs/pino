@@ -17,11 +17,11 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: Install
         run: npm i
-      - name: run
-        if: !startsWith(matrix.os, 'windows')
+      - name: run with coverage
+        if: (!startsWith(matrix.os, 'windows'))
         run: npm run ci
       # Windows just pass the test without checking the Coverage
       # Due to skipped tests
-      - name: run
+      - name: run without coverage
         if: startsWith(matrix.os, 'windows')
         run: npm run test
