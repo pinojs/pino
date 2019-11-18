@@ -36,7 +36,7 @@ jobs:
       - name: Install
         run: npm i
       - name: run with coverage
-        run: npm run ci
+        run: npm run cov-ci
       - name: Coveralls Parallel
         uses: coverallsapp/github-action@master
         with:
