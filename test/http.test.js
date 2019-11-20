@@ -2,6 +2,7 @@
 
 const http = require('http')
 const os = require('os')
+const semver = require('semver')
 const { test } = require('tap')
 const { sink, once } = require('./helper')
 const pino = require('../')
@@ -84,7 +85,7 @@ test('http request support via serializer', async ({ ok, same, error, teardown }
   server.close()
 })
 
-test('http request support via serializer without request connection', async ({ ok, isLike, error, teardown }) => {
+test('http request support via serializer without request connection', async ({ ok, same, error, teardown }) => {
   var originalReq
   const instance = pino({
     serializers: {
@@ -93,7 +94,7 @@ test('http request support via serializer without request connection', async ({ 
   }, sink((chunk, enc) => {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
-    isLike(chunk, {
+    const expected = {
       pid: pid,
       hostname: hostname,
       level: 30,
@@ -104,7 +105,12 @@ test('http request support via serializer without request connection', async ({ 
         url: originalReq.url,
         headers: originalReq.headers
       }
-    })
+    }
+    if (semver.gte(process.version, '13.0.0')) {
+      expected.req.remoteAddress = originalReq.connection.remoteAddress
+      expected.req.remotePort = originalReq.connection.remotePort
+    }
+    same(chunk, expected)
   }))
 
   const server = http.createServer(function (req, res) {
