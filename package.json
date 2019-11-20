@@ -75,6 +75,7 @@
     "proxyquire": "^2.1.3",
     "pump": "^3.0.0",
     "qodaa": "^1.0.1",
+    "semver": "^6.3.0",
     "snazzy": "^8.0.0",
     "split2": "^3.1.1",
     "standard": "^14.2.0",
