@@ -101,8 +101,9 @@ logger.info('hello') // Will throw an error saying info in not found in logger o
 Default: `undefined`
 
 If provided, the `mixin` function is called each time one of the active
-logging methods is called. The function must return an object. The
-properties of the returned object will be added to the logged JSON.
+logging methods is called. The function must synchronously return an
+object. The properties of the returned object will be added to the
+logged JSON.
 
 ```js
 let n = 0
