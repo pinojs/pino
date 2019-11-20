@@ -97,3 +97,10 @@ test('mixin object + logged object', async ({ ok, same }) => {
     v: 1
   })
 })
+
+test('mixin not a function', async ({ throws }) => {
+  const stream = sink()
+  throws(function () {
+    pino({ mixin: 'not a function' }, stream)
+  })
+})
