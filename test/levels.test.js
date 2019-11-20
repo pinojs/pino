@@ -417,3 +417,16 @@ test('fatal method sync-flushes the destination if sync flushing is available', 
     instance.fatal('this is fatal')
   })
 })
+
+test('fatal method should call async when sync-flushing fails', ({ equal, fail, doesNotThrow, plan }) => {
+  plan(2)
+  const messages = [
+    'this is fatal 1'
+  ]
+  const stream = sink((result) => equal(result.msg, messages.shift()))
+  stream.flushSync = () => { throw new Error('Error') }
+  stream.flush = () => fail('flush should be called')
+
+  const instance = pino(stream)
+  doesNotThrow(() => instance.fatal(messages[0]))
+})

@@ -20,6 +20,7 @@
     "browser-test": "airtap --local 8080 test/browser*test.js",
     "test": "standard | snazzy && cross-env NODE_OPTIONS=\"--no-warnings -r qodaa\" tap --no-esm -j 4 --no-cov test/*test.js",
     "ci": "standard | snazzy && cross-env TAP_TIMEOUT=480000 NODE_OPTIONS=\"--no-warnings -r qodaa\" tap --no-esm -j 4 --100 test/*test.js",
+    "cov-ci": "cross-env TAP_TIMEOUT=480000 NODE_OPTIONS=\"--no-warnings -r qodaa\" tap --no-esm -j 4 --100 --coverage-report=lcov test/*test.js",
     "cov-ui": "cross-env NODE_OPTIONS=\"--no-warnings -r qodaa\" tap --no-esm -j 4 --coverage-report=html test/*test.js",
     "bench": "node benchmarks/utils/runbench all",
     "bench-basic": "node benchmarks/utils/runbench basic",

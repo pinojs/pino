@@ -479,7 +479,7 @@ test('pino.destination', async ({ same }) => {
   )
   const instance = pino(pino.destination(tmp))
   instance.info('hello')
-  await sleep(250)
+  await sleep(300)
   const result = JSON.parse(readFileSync(tmp).toString())
   delete result.time
   same(result, {
@@ -498,7 +498,7 @@ test('auto pino.destination with a string', async ({ same }) => {
   )
   const instance = pino(tmp)
   instance.info('hello')
-  await sleep(250)
+  await sleep(300)
   const result = JSON.parse(readFileSync(tmp).toString())
   delete result.time
   same(result, {
@@ -517,7 +517,7 @@ test('auto pino.destination with a string as second argument', async ({ same }) 
   )
   const instance = pino(null, tmp)
   instance.info('hello')
-  await sleep(250)
+  await sleep(300)
   const result = JSON.parse(readFileSync(tmp).toString())
   delete result.time
   same(result, {
@@ -538,7 +538,7 @@ test('does not override opts with a string as second argument', async ({ same })
     timestamp: () => ',"time":"none"'
   }, tmp)
   instance.info('hello')
-  await sleep(250)
+  await sleep(300)
   const result = JSON.parse(readFileSync(tmp).toString())
   same(result, {
     pid: pid,
