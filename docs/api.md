@@ -115,7 +115,7 @@ const logger = pino({
 logger.info('hello')
 // {"level":30,"time":1573664685466,"pid":78742,"hostname":"x","line":1,"msg":"hello","v":1}
 logger.info('world')
-// {"level":30,"time":1573664685469,"pid":78742,"hostname":"x","line":2,"msg":"hello","v":1}
+// {"level":30,"time":1573664685469,"pid":78742,"hostname":"x","line":2,"msg":"world","v":1}
 ```
 
 #### `redact` (Array | Object):
