@@ -76,15 +76,14 @@ test('mixin object is not called if below log level', async ({ ok }) => {
 })
 
 test('mixin object + logged object', async ({ ok, same }) => {
-  let n = 0
   const stream = sink()
   const instance = pino({
     mixin () {
-      return { hello: ++n }
+      return { foo: 1, bar: 2 }
     }
   }, stream)
   instance.level = name
-  instance[name]({ foo: 42 })
+  instance[name]({ bar: 3, baz: 4 })
   const result = await once(stream, 'data')
   ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
   delete result.time
@@ -92,8 +91,9 @@ test('mixin object + logged object', async ({ ok, same }) => {
     pid,
     hostname,
     level,
-    foo: 42,
-    hello: 1,
+    foo: 1,
+    bar: 3,
+    baz: 4,
     v: 1
   })
 })
