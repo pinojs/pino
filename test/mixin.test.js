@@ -1,0 +1,106 @@
+'use strict'
+
+const os = require('os')
+const { test } = require('tap')
+const { sink, once } = require('./helper')
+const pino = require('../')
+
+const { pid } = process
+const hostname = os.hostname()
+const level = 50
+const name = 'error'
+
+test('mixin object is included', async ({ ok, same }) => {
+  let n = 0
+  const stream = sink()
+  const instance = pino({
+    mixin () {
+      return { hello: ++n }
+    }
+  }, stream)
+  instance.level = name
+  instance[name]('test')
+  const result = await once(stream, 'data')
+  ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
+  delete result.time
+  same(result, {
+    pid,
+    hostname,
+    level,
+    msg: 'test',
+    hello: 1,
+    v: 1
+  })
+})
+
+test('mixin object is new every time', async ({ plan, ok, same }) => {
+  plan(6)
+
+  let n = 0
+  const stream = sink()
+  const instance = pino({
+    mixin () {
+      return { hello: n }
+    }
+  }, stream)
+  instance.level = name
+
+  while (++n < 4) {
+    const msg = `test #${n}`
+    stream.pause()
+    instance[name](msg)
+    stream.resume()
+    const result = await once(stream, 'data')
+    ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
+    delete result.time
+    same(result, {
+      pid,
+      hostname,
+      level,
+      msg,
+      hello: n,
+      v: 1
+    })
+  }
+})
+
+test('mixin object is not called if below log level', async ({ ok }) => {
+  const stream = sink()
+  const instance = pino({
+    mixin () {
+      ok(false, 'should not call mixin function')
+    }
+  }, stream)
+  instance.level = 'error'
+  instance.info('test')
+})
+
+test('mixin object + logged object', async ({ ok, same }) => {
+  let n = 0
+  const stream = sink()
+  const instance = pino({
+    mixin () {
+      return { hello: ++n }
+    }
+  }, stream)
+  instance.level = name
+  instance[name]({ foo: 42 })
+  const result = await once(stream, 'data')
+  ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
+  delete result.time
+  same(result, {
+    pid,
+    hostname,
+    level,
+    foo: 42,
+    hello: 1,
+    v: 1
+  })
+})
+
+test('mixin not a function', async ({ throws }) => {
+  const stream = sink()
+  throws(function () {
+    pino({ mixin: 'not a function' }, stream)
+  })
+})

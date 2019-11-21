@@ -96,6 +96,28 @@ logger.foo('hi')
 logger.info('hello') // Will throw an error saying info in not found in logger object
 ```
 
+#### `mixin` (Function):
+
+Default: `undefined`
+
+If provided, the `mixin` function is called each time one of the active
+logging methods is called. The function must synchronously return an
+object. The properties of the returned object will be added to the
+logged JSON.
+
+```js
+let n = 0
+const logger = pino({
+  mixin () {
+    return { line: ++n }
+  }
+})
+logger.info('hello')
+// {"level":30,"time":1573664685466,"pid":78742,"hostname":"x","line":1,"msg":"hello","v":1}
+logger.info('world')
+// {"level":30,"time":1573664685469,"pid":78742,"hostname":"x","line":2,"msg":"world","v":1}
+```
+
 #### `redact` (Array | Object):
 
 Default: `undefined`
