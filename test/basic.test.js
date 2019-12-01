@@ -1,14 +1,29 @@
 'use strict'
 const os = require('os')
 const { join } = require('path')
-const { readFileSync } = require('fs')
+const { readFileSync, existsSync } = require('fs')
 const { test } = require('tap')
 const { sink, check, once } = require('./helper')
 const pino = require('../')
 const { version } = require('../package.json')
 const { pid } = process
 const hostname = os.hostname()
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+const watchFileCreated = (filename, timeout) => new Promise((resolve, reject) => {
+  const interval = setInterval(() => {
+    if (existsSync(filename)) {
+      clearTimeout(timer)
+      clearInterval(interval)
+      resolve()
+    }
+  }, 100)
+  const timer = setTimeout(() => {
+    clearTimeout(timer)
+    clearInterval(interval)
+    reject(new Error(`${filename} was not created with a Timeout:${timeout}`))
+  },
+  timeout
+  )
+})
 
 test('pino version is exposed on export', async ({ is }) => {
   is(pino.version, version)
@@ -479,7 +494,7 @@ test('pino.destination', async ({ same }) => {
   )
   const instance = pino(pino.destination(tmp))
   instance.info('hello')
-  await sleep(500)
+  await watchFileCreated(tmp, 800)
   const result = JSON.parse(readFileSync(tmp).toString())
   delete result.time
   same(result, {
@@ -498,7 +513,7 @@ test('auto pino.destination with a string', async ({ same }) => {
   )
   const instance = pino(tmp)
   instance.info('hello')
-  await sleep(500)
+  await watchFileCreated(tmp, 800)
   const result = JSON.parse(readFileSync(tmp).toString())
   delete result.time
   same(result, {
@@ -517,7 +532,7 @@ test('auto pino.destination with a string as second argument', async ({ same }) 
   )
   const instance = pino(null, tmp)
   instance.info('hello')
-  await sleep(500)
+  await watchFileCreated(tmp, 800)
   const result = JSON.parse(readFileSync(tmp).toString())
   delete result.time
   same(result, {
@@ -538,7 +553,7 @@ test('does not override opts with a string as second argument', async ({ same })
     timestamp: () => ',"time":"none"'
   }, tmp)
   instance.info('hello')
-  await sleep(500)
+  await watchFileCreated(tmp, 800)
   const result = JSON.parse(readFileSync(tmp).toString())
   same(result, {
     pid: pid,
