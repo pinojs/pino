@@ -1,7 +1,7 @@
 'use strict'
 const os = require('os')
 const { join } = require('path')
-const { readFileSync, existsSync } = require('fs')
+const { readFileSync, existsSync, statSync } = require('fs')
 const { test } = require('tap')
 const { sink, check, once } = require('./helper')
 const pino = require('../')
@@ -11,12 +11,14 @@ const hostname = os.hostname()
 const watchFileCreated = (filename) => new Promise((resolve, reject) => {
   const TIMEOUT = 800
   const INTERVAL = 100
+  const threshold = TIMEOUT / INTERVAL
   let counter = 0
   const interval = setInterval(() => {
-    if (existsSync(filename)) {
+    // On some CI runs file is created but not filled
+    if (existsSync(filename) && statSync(filename).size !== 0) {
       clearInterval(interval)
       resolve()
-    } else if (counter <= TIMEOUT / INTERVAL) {
+    } else if (counter <= threshold) {
       counter++
     } else {
       clearInterval(interval)
