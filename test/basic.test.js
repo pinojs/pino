@@ -1,14 +1,31 @@
 'use strict'
 const os = require('os')
 const { join } = require('path')
-const { readFileSync } = require('fs')
+const { readFileSync, existsSync, statSync } = require('fs')
 const { test } = require('tap')
 const { sink, check, once } = require('./helper')
 const pino = require('../')
 const { version } = require('../package.json')
 const { pid } = process
 const hostname = os.hostname()
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+const watchFileCreated = (filename) => new Promise((resolve, reject) => {
+  const TIMEOUT = 800
+  const INTERVAL = 100
+  const threshold = TIMEOUT / INTERVAL
+  let counter = 0
+  const interval = setInterval(() => {
+    // On some CI runs file is created but not filled
+    if (existsSync(filename) && statSync(filename).size !== 0) {
+      clearInterval(interval)
+      resolve()
+    } else if (counter <= threshold) {
+      counter++
+    } else {
+      clearInterval(interval)
+      reject(new Error(`${filename} was not created.`))
+    }
+  }, INTERVAL)
+})
 
 test('pino version is exposed on export', async ({ is }) => {
   is(pino.version, version)
@@ -479,7 +496,7 @@ test('pino.destination', async ({ same }) => {
   )
   const instance = pino(pino.destination(tmp))
   instance.info('hello')
-  await sleep(300)
+  await watchFileCreated(tmp)
   const result = JSON.parse(readFileSync(tmp).toString())
   delete result.time
   same(result, {
@@ -498,7 +515,7 @@ test('auto pino.destination with a string', async ({ same }) => {
   )
   const instance = pino(tmp)
   instance.info('hello')
-  await sleep(300)
+  await watchFileCreated(tmp)
   const result = JSON.parse(readFileSync(tmp).toString())
   delete result.time
   same(result, {
@@ -517,7 +534,7 @@ test('auto pino.destination with a string as second argument', async ({ same }) 
   )
   const instance = pino(null, tmp)
   instance.info('hello')
-  await sleep(300)
+  await watchFileCreated(tmp)
   const result = JSON.parse(readFileSync(tmp).toString())
   delete result.time
   same(result, {
@@ -538,7 +555,7 @@ test('does not override opts with a string as second argument', async ({ same })
     timestamp: () => ',"time":"none"'
   }, tmp)
   instance.info('hello')
-  await sleep(300)
+  await watchFileCreated(tmp)
   const result = JSON.parse(readFileSync(tmp).toString())
   same(result, {
     pid: pid,
