@@ -8,21 +8,21 @@ const pino = require('../')
 const { version } = require('../package.json')
 const { pid } = process
 const hostname = os.hostname()
-const watchFileCreated = (filename, timeout) => new Promise((resolve, reject) => {
+const watchFileCreated = (filename) => new Promise((resolve, reject) => {
+  const TIMEOUT = 800
+  const INTERVAL = 100
+  let counter = 0
   const interval = setInterval(() => {
     if (existsSync(filename)) {
-      clearTimeout(timer)
       clearInterval(interval)
       resolve()
+    } else if (counter <= TIMEOUT / INTERVAL) {
+      counter++
+    } else {
+      clearInterval(interval)
+      reject(new Error(`${filename} was not created.`))
     }
-  }, 100)
-  const timer = setTimeout(() => {
-    clearTimeout(timer)
-    clearInterval(interval)
-    reject(new Error(`${filename} was not created with a Timeout:${timeout}`))
-  },
-  timeout
-  )
+  }, INTERVAL)
 })
 
 test('pino version is exposed on export', async ({ is }) => {
@@ -494,7 +494,7 @@ test('pino.destination', async ({ same }) => {
   )
   const instance = pino(pino.destination(tmp))
   instance.info('hello')
-  await watchFileCreated(tmp, 800)
+  await watchFileCreated(tmp)
   const result = JSON.parse(readFileSync(tmp).toString())
   delete result.time
   same(result, {
@@ -513,7 +513,7 @@ test('auto pino.destination with a string', async ({ same }) => {
   )
   const instance = pino(tmp)
   instance.info('hello')
-  await watchFileCreated(tmp, 800)
+  await watchFileCreated(tmp)
   const result = JSON.parse(readFileSync(tmp).toString())
   delete result.time
   same(result, {
@@ -532,7 +532,7 @@ test('auto pino.destination with a string as second argument', async ({ same }) 
   )
   const instance = pino(null, tmp)
   instance.info('hello')
-  await watchFileCreated(tmp, 800)
+  await watchFileCreated(tmp)
   const result = JSON.parse(readFileSync(tmp).toString())
   delete result.time
   same(result, {
@@ -553,7 +553,7 @@ test('does not override opts with a string as second argument', async ({ same })
     timestamp: () => ',"time":"none"'
   }, tmp)
   instance.info('hello')
-  await watchFileCreated(tmp, 800)
+  await watchFileCreated(tmp)
   const result = JSON.parse(readFileSync(tmp).toString())
   same(result, {
     pid: pid,
