@@ -51,6 +51,39 @@ test('bindings contain the name and the child bindings', async ({ same }) => {
   same(instance.bindings(), { name: 'basicTest', foo: 'bar', a: 2 })
 })
 
+test('set bindings on instance', async ({ same }) => {
+  const instance = pino({ name: 'basicTest', level: 'info' })
+  instance.setBindings({ foo: 'bar' })
+  same(instance.bindings(), { name: 'basicTest', foo: 'bar' })
+})
+
+test('newly set bindings overwrite old bindings', async ({ same }) => {
+  const instance = pino({ name: 'basicTest', level: 'info', base: { foo: 'bar' } })
+  instance.setBindings({ foo: 'baz' })
+  same(instance.bindings(), { name: 'basicTest', foo: 'baz' })
+})
+
+test('set bindings on child instance', async ({ same }) => {
+  const child = pino({ name: 'basicTest', level: 'info' }).child({})
+  child.setBindings({ foo: 'bar' })
+  same(child.bindings(), { name: 'basicTest', foo: 'bar' })
+})
+
+test('child should have bindings set by parent', async ({ same }) => {
+  const instance = pino({ name: 'basicTest', level: 'info' })
+  instance.setBindings({ foo: 'bar' })
+  const child = instance.child({})
+  same(child.bindings(), { name: 'basicTest', foo: 'bar' })
+})
+
+test('child should not share bindings of parent set after child creation', async ({ same }) => {
+  const instance = pino({ name: 'basicTest', level: 'info' })
+  const child = instance.child({})
+  instance.setBindings({ foo: 'bar' })
+  same(instance.bindings(), { name: 'basicTest', foo: 'bar' })
+  same(child.bindings(), { name: 'basicTest' })
+})
+
 function levelTest (name, level) {
   test(`${name} logs as ${level}`, async ({ is }) => {
     const stream = sink()
