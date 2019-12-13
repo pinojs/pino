@@ -80,6 +80,7 @@ test('child should not share bindings of parent set after child creation', async
   const instance = pino({ name: 'basicTest', level: 'info' })
   const child = instance.child({})
   instance.setBindings({ foo: 'bar' })
+  same(instance.bindings(), { name: 'basicTest', foo: 'bar' })
   same(child.bindings(), { name: 'basicTest' })
 })
 
