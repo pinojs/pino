@@ -335,18 +335,9 @@ The parameters are explained below using the `logger.info` method but the same a
 
 ### Logging Method Parameters
 
-<a id=mergingobject></a>
-#### `mergingObject` (Object)
+<a id=loggingmethodreturns></a>
 
-An object can optionally be supplied as the first parameter. Each enumerable key and value
-of the `mergingObject` is copied in to the JSON log line.
-
-```js
-logger.info({MIX: {IN: true}})
-// {"level":30,"time":1531254555820,"pid":55956,"hostname":"x","MIX":{"IN":true},"v":1}
-```
-
-If the `mergingObject` is a non-null object and is not a formatting string, it is returned, allowing for more succinct inline logging:
+The logging level methods return reasonable values, allowing for more succinct logging:
 ```js
 const s = logger.info('some string')
 // {"level":30,"time":1531254555820,"pid":55956,"hostname":"x","msg":"some string","v":1}
@@ -367,6 +358,17 @@ const foobar = logger.info('foo', 'bar')
 throw new logger.error(new Error('BOOM'))
 // {"level":50,"time":1578350985467,"pid":83246,"hostname":"x","msg":"BOOM","stack":"...","type":"Error","v":1}
 // and the error is thrown
+```
+
+<a id=mergingobject></a>
+#### `mergingObject` (Object)
+
+An object can optionally be supplied as the first parameter. Each enumerable key and value
+of the `mergingObject` is copied in to the JSON log line.
+
+```js
+logger.info({MIX: {IN: true}})
+// {"level":30,"time":1531254555820,"pid":55956,"hostname":"x","MIX":{"IN":true},"v":1}
 ```
 
 <a id=message></a>

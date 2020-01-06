@@ -43,6 +43,17 @@ This produces:
 {"level":30,"time":1531171082399,"msg":"hello child!","pid":657,"hostname":"Davids-MBP-3.fritz.box","a":"property","v":1}
 ```
 
+Also, the log level methods [return reasonable values](/docs/api.md#loggingmethodreturns):
+```js
+const logger = require('pino')()
+
+const hw = logger.info('hello world')
+// logs as above and hw is now 'hello world'
+
+if (hw === 'hello world') throw logger.error(new Error('BOOM'))
+// logs error then throws it
+```
+
 For using Pino with a web framework see:
 
 * [Pino with Fastify](docs/web.md#fastify)
