@@ -2,7 +2,7 @@
 const os = require('os')
 const { join } = require('path')
 const { readFileSync, existsSync, statSync } = require('fs')
-const { test } = require('tap')
+const { test, equal, only } = require('tap')
 const { sink, check, once } = require('./helper')
 const pino = require('../')
 const { version } = require('../package.json')
@@ -89,8 +89,27 @@ function levelTest (name, level) {
     const stream = sink()
     const instance = pino(stream)
     instance.level = name
-    instance[name]('hello world')
-    check(is, await once(stream, 'data'), level, 'hello world')
+    const m = 'hello world'
+    equal(instance[name](m), m)
+    check(is, await once(stream, 'data'), level, m)
+  })
+
+  test(`${name} logs null as ${level}`, async ({ is }) => {
+    const stream = sink()
+    const instance = pino(stream)
+    instance.level = name
+    const m = null
+    const result = instance[name](m) === m
+    equal(result, true)
+  })
+
+  test(`${name} logs undefined as ${level}`, async ({ is }) => {
+    const stream = sink()
+    const instance = pino(stream)
+    instance.level = name
+    const m = undefined
+    const result = instance[name](m) === m
+    equal(result, true)
   })
 
   test(`passing objects at level ${name}`, async ({ is, same }) => {
@@ -98,7 +117,7 @@ function levelTest (name, level) {
     const instance = pino(stream)
     instance.level = name
     const obj = { hello: 'world' }
-    instance[name](obj)
+    equal(instance[name](obj), obj)
 
     const result = await once(stream, 'data')
     is(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
@@ -115,7 +134,7 @@ function levelTest (name, level) {
     const instance = pino(stream)
     instance.level = name
     const obj = { hello: 'world' }
-    instance[name](obj, 'a string')
+    equal(instance[name](obj, 'a string'), obj)
     const result = await once(stream, 'data')
     is(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
     delete result.time
@@ -134,7 +153,8 @@ function levelTest (name, level) {
     const stream = sink()
     const instance = pino(stream)
     instance.level = name
-    instance[name]({ hello: 'world', msg: 'object' }, 'string')
+    const obj = { hello: 'world', msg: 'object' }
+    equal(instance[name](obj, 'string'), obj)
     const result = await once(stream, 'data')
     is(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
     delete result.time
@@ -152,9 +172,22 @@ function levelTest (name, level) {
     const stream = sink()
     const instance = pino(stream)
     instance.level = name
-    instance[name]('hello %d', 42)
+    const msg = 'hello 42'
+    equal(instance[name]('hello %d', 42), msg)
     const result = await once(stream, 'data')
-    check(is, result, level, 'hello 42')
+    check(is, result, level, msg)
+  })
+
+  test(`formatting two strings as ${name}`, async ({ is }) => {
+    const stream = sink()
+    const instance = pino(stream)
+    instance.level = name
+    const hello = 'hello'
+    const world = 'world'
+    const helloWorld = `${hello} ${world}`
+    equal(instance[name](hello, world), helloWorld)
+    const result = await once(stream, 'data')
+    check(is, result, level, helloWorld)
   })
 
   test(`formatting a symbol at level ${name}`, async ({ is }) => {
@@ -163,11 +196,13 @@ function levelTest (name, level) {
     instance.level = name
 
     const sym = Symbol('foo')
-    instance[name]('hello', sym)
+    const msg = 'hello'
+    const expected = `${msg} ${sym.toString()}`
+    equal(instance[name](msg, sym), expected)
 
     const result = await once(stream, 'data')
 
-    check(is, result, level, 'hello Symbol(foo)')
+    check(is, result, level, expected)
   })
 
   test(`passing error with a serializer at level ${name}`, async ({ is, same }) => {
@@ -179,7 +214,8 @@ function levelTest (name, level) {
       }
     }, stream)
     instance.level = name
-    instance[name]({ err })
+    const obj = { err }
+    equal(instance[name](obj), obj)
     const result = await once(stream, 'data')
     is(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
     delete result.time
@@ -196,12 +232,15 @@ function levelTest (name, level) {
     })
   })
 
-  test(`child logger for level ${name}`, async ({ is, same }) => {
+  only(`child logger for level ${name}`, async ({ is, same }) => {
     const stream = sink()
     const instance = pino(stream)
     instance.level = name
-    const child = instance.child({ hello: 'world' })
-    child[name]('hello world')
+    const world = 'world'
+    const obj = { hello: world }
+    const child = instance.child(obj)
+    const helloWorld = 'hello world'
+    equal(child[name](helloWorld), helloWorld)
     const result = await once(stream, 'data')
     is(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
     delete result.time
@@ -209,8 +248,8 @@ function levelTest (name, level) {
       pid: pid,
       hostname: hostname,
       level: level,
-      msg: 'hello world',
-      hello: 'world',
+      msg: helloWorld,
+      hello: world,
       v: 1
     })
   })

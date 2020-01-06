@@ -346,6 +346,29 @@ logger.info({MIX: {IN: true}})
 // {"level":30,"time":1531254555820,"pid":55956,"hostname":"x","MIX":{"IN":true},"v":1}
 ```
 
+If the `mergingObject` is a non-null object and is not a formatting string, it is returned, allowing for more succinct inline logging:
+```js
+const s = logger.info('some string')
+// {"level":30,"time":1531254555820,"pid":55956,"hostname":"x","msg":"some string","v":1}
+// and s === 'some string'
+
+const obj = logger.info({my: 'object'}, 'not returned')
+// {"level":30,"time":1578352370038,"pid":84486,"hostname":"x","my":"object","msg":"not returned","v":1}
+// and obj === {my: 'object'}
+
+const foobar42 = logger.info('foobar %d', 42)
+// {"level":30,"time":1578351238980,"pid":83246,"hostname":"x","msg":"foobar {\"foo\":\"bar\"}","v":1}
+// and foobar42 === 'foobar 42'
+
+const foobar = logger.info('foo', 'bar')
+// {"level":30,"time":1578351238980,"pid":83246,"hostname":"x","msg":"foobar {\"foo\":\"bar\"}","v":1}
+// and foobar === 'foo bar'
+
+throw new logger.error(new Error('BOOM'))
+// {"level":50,"time":1578350985467,"pid":83246,"hostname":"x","msg":"BOOM","stack":"...","type":"Error","v":1}
+// and the error is thrown
+```
+
 <a id=message></a>
 #### `message` (String)
 
