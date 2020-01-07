@@ -730,3 +730,25 @@ test('return a value when called level less than configured level', async ({ sam
   const value = instance.debug(obj)
   same(value, obj)
 })
+
+test('return interpolated value when called level less than configured level', async ({ is }) => {
+  const stream = sink()
+  const instance = pino({
+    level: 'warn'
+  }, stream)
+
+  const fmt = 'hello %s'
+  const world = 'world'
+  const value = instance.debug(fmt, world)
+  is(value, 'hello world')
+})
+
+test('return null value when called level less than configured level', async ({ is }) => {
+  const stream = sink()
+  const instance = pino({
+    level: 'warn'
+  }, stream)
+
+  const value = instance.debug(null)
+  is(value, null)
+})
