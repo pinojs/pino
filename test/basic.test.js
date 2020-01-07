@@ -286,6 +286,26 @@ test('set the messageKey', async ({ is, same }) => {
   })
 })
 
+test('set the objectKey', async ({ is, same }) => {
+  const stream = sink()
+  const object = { hello: 'world' }
+  const objectKey = 'stuff'
+  const instance = pino({
+    objectKey
+  }, stream)
+  instance.info(object)
+  const result = await once(stream, 'data')
+  is(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
+  delete result.time
+  same(result, {
+    pid: pid,
+    hostname: hostname,
+    level: 30,
+    stuff: object,
+    v: 1
+  })
+})
+
 test('set undefined properties', async ({ is, same }) => {
   const stream = sink()
   const instance = pino(stream)
