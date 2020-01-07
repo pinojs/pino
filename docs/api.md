@@ -807,6 +807,7 @@ The `pino.stdTimeFunctions` object provides a very small set of common functions
 * `pino.stdTimeFunctions.epochTime`: Milliseconds since Unix epoch (Default)
 * `pino.stdTimeFunctions.unixTime`: Seconds since Unix epoch
 * `pino.stdTimeFunctions.nullTime`: Clears timestamp property (Used when `timestamp: false`)
+* `pino.stdTimeFunctions.isoTime`: ISO 8601-formatted time in UTC
 
 * See [`timestamp` option](#opt-timestamp)
 
