@@ -286,12 +286,12 @@ test('set the messageKey', async ({ is, same }) => {
   })
 })
 
-test('set the objectKey', async ({ is, same }) => {
+test('set the nestedKey', async ({ is, same }) => {
   const stream = sink()
   const object = { hello: 'world' }
-  const objectKey = 'stuff'
+  const nestedKey = 'stuff'
   const instance = pino({
-    objectKey
+    nestedKey
   }, stream)
   instance.info(object)
   const result = await once(stream, 'data')
