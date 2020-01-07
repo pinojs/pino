@@ -2,7 +2,7 @@
 const os = require('os')
 const { join } = require('path')
 const { readFileSync, existsSync, statSync } = require('fs')
-const { test, equal, only } = require('tap')
+const { test, equal } = require('tap')
 const { sink, check, once } = require('./helper')
 const pino = require('../')
 const { version } = require('../package.json')
@@ -232,7 +232,7 @@ function levelTest (name, level) {
     })
   })
 
-  only(`child logger for level ${name}`, async ({ is, same }) => {
+  test(`child logger for level ${name}`, async ({ is, same }) => {
     const stream = sink()
     const instance = pino(stream)
     instance.level = name
