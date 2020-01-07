@@ -11,6 +11,7 @@ test('pino exposes standard time functions', async ({ ok }) => {
   ok(pino.stdTimeFunctions.epochTime)
   ok(pino.stdTimeFunctions.unixTime)
   ok(pino.stdTimeFunctions.nullTime)
+  ok(pino.stdTimeFunctions.isoTime)
 })
 
 test('pino accepts external time functions', async ({ is }) => {
@@ -99,5 +100,22 @@ test('pino.stdTimeFunctions.unixTime returns seconds based timestamps', async ({
   const result = await once(stream, 'data')
   is(result.hasOwnProperty('time'), true)
   is(result.time, 1531069920)
+  Date.now = now
+})
+
+test('pino.stdTimeFunctions.isoTime returns ISO 8601 timestamps', async ({ is }) => {
+  const opts = {
+    timestamp: pino.stdTimeFunctions.isoTime
+  }
+  const stream = sink()
+  const instance = pino(opts, stream)
+  const ms = 1531069919686
+  const now = Date.now
+  Date.now = () => ms
+  const iso = new Date(ms).toISOString()
+  instance.info('foobar')
+  const result = await once(stream, 'data')
+  is(result.hasOwnProperty('time'), true)
+  is(result.time, iso)
   Date.now = now
 })
