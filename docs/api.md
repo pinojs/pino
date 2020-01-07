@@ -332,12 +332,15 @@ Each logging method has the following signature:
 `([mergingObject], [message], [...interpolationValues])`.
 
 The parameters are explained below using the `logger.info` method but the same applies to all logging methods.
-
+  
 ### Logging Method Parameters
 
 <a id=loggingmethodreturns></a>
 
-The logging level methods return reasonable values, allowing for more succinct logging:
+The logging level methods return reasonable values, allowing for more succinct logging.
+More precisely, if `typeof` the first argument is `object` and it's non-`null`,
+it returns that object, else it returns the first string argument,
+unless there are multiple arguments, in which case it returns the interpolated string:
 ```js
 const s = logger.info('some string')
 // {"level":30,"time":1531254555820,"pid":55956,"hostname":"x","msg":"some string","v":1}
