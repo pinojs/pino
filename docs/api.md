@@ -207,7 +207,7 @@ The string key for the 'message' in the JSON object.
 Default: `null`
 
 If there's a chance that objects being logged have properties that conflict with those from pino itself (`level`, `timestamp`, `v`, `pid`, etc)
-and duplicate keys in your log records are undesirable, pino can be configured with an `nestedKey` option that causes any `object`s that are logged
+and duplicate keys in your log records are undesirable, pino can be configured with a `nestedKey` option that causes any `object`s that are logged
 to be placed under a key whose name is the value of `nestedKey`.
 
 This way, when searching something like Kibana for values, one can consistently search under the configured `nestedKey` value instead of the root log record keys.
@@ -218,11 +218,11 @@ const logger = require('pino')({
   nestedKey: 'payload'
 })
 
-const thing = { level: 'hi', timestamp: 'never', foo: 'bar'} // has pino-conflicting properties!
+const thing = { level: 'hi', time: 'never', foo: 'bar'} // has pino-conflicting properties!
 logger.info(thing)
 
 // logs the following:
-// {"level":30,"time":1578357790020,"pid":91736,"hostname":"x","payload":{"level":"hi","timestamp":"never","foo":"bar"},"v":1}
+// {"level":30,"time":1578357790020,"pid":91736,"hostname":"x","payload":{"level":"hi","time":"never","foo":"bar"},"v":1}
 ```
 In this way, logged objects' properties don't conflict with pino's standard logging properties,
 and searching for logged objects can start from a consistent path.
