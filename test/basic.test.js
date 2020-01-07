@@ -719,3 +719,14 @@ test('correctly log NaN', async (t) => {
   const { num } = await once(stream, 'data')
   t.is(num, null)
 })
+
+test('return a value when called level less than configured level', async ({ same }) => {
+  const stream = sink()
+  const instance = pino({
+    level: 'warn'
+  }, stream)
+
+  const obj = { hello: 'world' }
+  const value = instance.debug(obj)
+  same(value, obj)
+})
