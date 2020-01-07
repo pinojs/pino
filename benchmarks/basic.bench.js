@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 'use strict'
 
 const bench = require('fastbench')
@@ -44,49 +45,55 @@ const chill = winston.createLogger({
 const run = bench([
   function benchBunyan (cb) {
     for (var i = 0; i < max; i++) {
-      blog.info('hello world')
+      const msg = 'hello world'
+      blog.info(msg)
     }
     setImmediate(cb)
   },
   function benchWinston (cb) {
     for (var i = 0; i < max; i++) {
-      chill.log('info', 'hello world')
+      const msg = 'hello world'
+      chill.log('info', msg)
     }
     setImmediate(cb)
   },
   function benchBole (cb) {
     for (var i = 0; i < max; i++) {
-      bole.info('hello world')
+      const msg = 'hello world'
+      bole.info(msg)
     }
     setImmediate(cb)
   },
   function benchDebug (cb) {
     for (var i = 0; i < max; i++) {
-      dlog('hello world')
+      const msg = 'hello world'
+      dlog(msg)
     }
     setImmediate(cb)
   },
   function benchLogLevel (cb) {
     for (var i = 0; i < max; i++) {
-      loglevel.info('hello world')
+      const msg = 'hello world'
+      loglevel.info(msg)
     }
     setImmediate(cb)
   },
   function benchPino (cb) {
     for (var i = 0; i < max; i++) {
-      plogDest.info('hello world')
+      const msg = 'hello world'
+      plogDest.info(msg)
     }
     setImmediate(cb)
   },
   function benchPinoExtreme (cb) {
     for (var i = 0; i < max; i++) {
-      plogExtreme.info('hello world')
+      const msg = plogExtreme.info('hello world')
     }
     setImmediate(cb)
   },
   function benchPinoNodeStream (cb) {
     for (var i = 0; i < max; i++) {
-      plogNodeStream.info('hello world')
+      const msg = plogNodeStream.info('hello world')
     }
     setImmediate(cb)
   }

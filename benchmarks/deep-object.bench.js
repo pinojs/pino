@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 'use strict'
 
 const bench = require('fastbench')
@@ -67,19 +68,19 @@ const run = bench([
   },
   function benchPinoDeepObj (cb) {
     for (var i = 0; i < max; i++) {
-      plogDest.info(deep)
+      const obj = plogDest.info(deep)
     }
     setImmediate(cb)
   },
   function benchPinoExtremeDeepObj (cb) {
     for (var i = 0; i < max; i++) {
-      plogExtreme.info(deep)
+      const obj = plogExtreme.info(deep)
     }
     setImmediate(cb)
   },
   function benchPinoNodeStreamDeepObj (cb) {
     for (var i = 0; i < max; i++) {
-      plogNodeStream.info(deep)
+      const obj = plogNodeStream.info(deep)
     }
     setImmediate(cb)
   }

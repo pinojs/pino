@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 'use strict'
 
 const bench = require('fastbench')
@@ -21,159 +22,159 @@ const max = 10
 const run = bench([
   function benchPino (cb) {
     for (var i = 0; i < max; i++) {
-      plog.info('hello world')
+      const s = plog.info('hello world')
     }
     setImmediate(cb)
   },
   function benchPinoDest (cb) {
     for (var i = 0; i < max; i++) {
-      plogDest.info('hello world')
+      const s = plogDest.info('hello world')
     }
     setImmediate(cb)
   },
   function benchPinoExtreme (cb) {
     for (var i = 0; i < max; i++) {
-      plogExtreme.info('hello world')
+      const s = plogExtreme.info('hello world')
     }
     setImmediate(cb)
   },
   function benchPinoObj (cb) {
     for (var i = 0; i < max; i++) {
-      plog.info({ hello: 'world' })
+      const obj = plog.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
   function benchPinoDestObj (cb) {
     for (var i = 0; i < max; i++) {
-      plogDest.info({ hello: 'world' })
+      const obj = plogDest.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
   function benchPinoExtremeObj (cb) {
     for (var i = 0; i < max; i++) {
-      plogExtreme.info({ hello: 'world' })
+      const obj = plogExtreme.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
   function benchPinoChild (cb) {
     for (var i = 0; i < max; i++) {
-      plogChild.info({ hello: 'world' })
+      const obj = plogChild.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
   function benchPinoDestChild (cb) {
     for (var i = 0; i < max; i++) {
-      plogDestChild.info({ hello: 'world' })
+      const obj = plogDestChild.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
   function benchPinoExtremeChild (cb) {
     for (var i = 0; i < max; i++) {
-      plogExtremeChild.info({ hello: 'world' })
+      const obj = plogExtremeChild.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
   function benchPinoChildChild (cb) {
     for (var i = 0; i < max; i++) {
-      plogChildChild.info({ hello: 'world' })
+      const obj = plogChildChild.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
   function benchPinoDestChildChild (cb) {
     for (var i = 0; i < max; i++) {
-      plogDestChildChild.info({ hello: 'world' })
+      const obj = plogDestChildChild.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
   function benchPinoExtremeChildChild (cb) {
     for (var i = 0; i < max; i++) {
-      plogExtremeChildChild.info({ hello: 'world' })
+      const obj = plogExtremeChildChild.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
   function benchPinoChildCreation (cb) {
     var child = plog.child({ a: 'property' })
     for (var i = 0; i < max; i++) {
-      child.info({ hello: 'world' })
+      const obj = child.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
   function benchPinoDestChildCreation (cb) {
     var child = plogDest.child({ a: 'property' })
     for (var i = 0; i < max; i++) {
-      child.info({ hello: 'world' })
+      const obj = child.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
   function benchPinoMulti (cb) {
     for (var i = 0; i < max; i++) {
-      plog.info('hello', 'world')
+      const s = plog.info('hello', 'world')
     }
     setImmediate(cb)
   },
   function benchPinoDestMulti (cb) {
     for (var i = 0; i < max; i++) {
-      plogDest.info('hello', 'world')
+      const s = plogDest.info('hello', 'world')
     }
     setImmediate(cb)
   },
   function benchPinoExtremeMulti (cb) {
     for (var i = 0; i < max; i++) {
-      plogExtreme.info('hello', 'world')
+      const s = plogExtreme.info('hello', 'world')
     }
     setImmediate(cb)
   },
   function benchPinoInterpolate (cb) {
     for (var i = 0; i < max; i++) {
-      plog.info('hello %s', 'world')
+      const s = plog.info('hello %s', 'world')
     }
     setImmediate(cb)
   },
   function benchPinoDestInterpolate (cb) {
     for (var i = 0; i < max; i++) {
-      plogDest.info('hello %s', 'world')
+      const s = plogDest.info('hello %s', 'world')
     }
     setImmediate(cb)
   },
   function benchPinoDestInterpolate (cb) {
     for (var i = 0; i < max; i++) {
-      plogDest.info('hello %s', 'world')
+      const s = plogDest.info('hello %s', 'world')
     }
     setImmediate(cb)
   },
   function benchPinoInterpolateAll (cb) {
     for (var i = 0; i < max; i++) {
-      plog.info('hello %s %j %d', 'world', { obj: true }, 4)
+      const s = plog.info('hello %s %j %d', 'world', { obj: true }, 4)
     }
     setImmediate(cb)
   },
   function benchPinoDestInterpolateAll (cb) {
     for (var i = 0; i < max; i++) {
-      plogDest.info('hello %s %j %d', 'world', { obj: true }, 4)
+      const s = plogDest.info('hello %s %j %d', 'world', { obj: true }, 4)
     }
     setImmediate(cb)
   },
   function benchPinoExtremeInterpolateAll (cb) {
     for (var i = 0; i < max; i++) {
-      plogExtreme.info('hello %s %j %d', 'world', { obj: true }, 4)
+      const s = plogExtreme.info('hello %s %j %d', 'world', { obj: true }, 4)
     }
     setImmediate(cb)
   },
   function benchPinoInterpolateExtra (cb) {
     for (var i = 0; i < max; i++) {
-      plog.info('hello %s %j %d', 'world', { obj: true }, 4, { another: 'obj' })
+      const s = plog.info('hello %s %j %d', 'world', { obj: true }, 4, { another: 'obj' })
     }
     setImmediate(cb)
   },
   function benchPinoDestInterpolateExtra (cb) {
     for (var i = 0; i < max; i++) {
-      plogDest.info('hello %s %j %d', 'world', { obj: true }, 4, { another: 'obj' })
+      const s = plogDest.info('hello %s %j %d', 'world', { obj: true }, 4, { another: 'obj' })
     }
     setImmediate(cb)
   },
   function benchPinoExtremeInterpolateExtra (cb) {
     for (var i = 0; i < max; i++) {
-      plogExtreme.info('hello %s %j %d', 'world', { obj: true }, 4, { another: 'obj' })
+      const s = plogExtreme.info('hello %s %j %d', 'world', { obj: true }, 4, { another: 'obj' })
     }
     setImmediate(cb)
   }

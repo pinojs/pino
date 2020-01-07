@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 'use strict'
 
 const bench = require('fastbench')
@@ -19,55 +20,55 @@ const max = 10
 const run = bench([
   function benchPinoLongString (cb) {
     for (var i = 0; i < max; i++) {
-      plog.info(longStr)
+      const s = plog.info(longStr)
     }
     setImmediate(cb)
   },
   function benchPinoDestLongString (cb) {
     for (var i = 0; i < max; i++) {
-      plogDest.info(longStr)
+      const s = plogDest.info(longStr)
     }
     setImmediate(cb)
   },
   function benchPinoExtremeLongString (cb) {
     for (var i = 0; i < max; i++) {
-      plogExtreme.info(longStr)
+      const s = plogExtreme.info(longStr)
     }
     setImmediate(cb)
   },
   function benchPinoDeepObj (cb) {
     for (var i = 0; i < max; i++) {
-      plog.info(deep)
+      const s = plog.info(deep)
     }
     setImmediate(cb)
   },
   function benchPinoDestDeepObj (cb) {
     for (var i = 0; i < max; i++) {
-      plogDest.info(deep)
+      const s = plogDest.info(deep)
     }
     setImmediate(cb)
   },
   function benchPinoExtremeDeepObj (cb) {
     for (var i = 0; i < max; i++) {
-      plogExtreme.info(deep)
+      const s = plogExtreme.info(deep)
     }
     setImmediate(cb)
   },
   function benchPinoInterpolateDeep (cb) {
     for (var i = 0; i < max; i++) {
-      plog.info('hello %j', deep)
+      const s = plog.info('hello %j', deep)
     }
     setImmediate(cb)
   },
   function benchPinoDestInterpolateDeep (cb) {
     for (var i = 0; i < max; i++) {
-      plogDest.info('hello %j', deep)
+      const s = plogDest.info('hello %j', deep)
     }
     setImmediate(cb)
   },
   function benchPinoExtremeInterpolateDeep (cb) {
     for (var i = 0; i < max; i++) {
-      plogExtreme.info('hello %j', deep)
+      const s = plogExtreme.info('hello %j', deep)
     }
     setImmediate(cb)
   }

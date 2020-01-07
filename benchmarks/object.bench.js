@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 'use strict'
 
 const bench = require('fastbench')
@@ -37,43 +38,47 @@ const max = 10
 const run = bench([
   function benchBunyanObj (cb) {
     for (var i = 0; i < max; i++) {
-      blog.info({ hello: 'world' })
+      const obj = { hello: 'world' }
+      blog.info(obj)
     }
     setImmediate(cb)
   },
   function benchWinstonObj (cb) {
     for (var i = 0; i < max; i++) {
-      chill.info({ hello: 'world' })
+      const obj = { hello: 'world' }
+      chill.info(obj)
     }
     setImmediate(cb)
   },
   function benchBoleObj (cb) {
     for (var i = 0; i < max; i++) {
-      bole.info({ hello: 'world' })
+      const obj = { hello: 'world' }
+      bole.info(obj)
     }
     setImmediate(cb)
   },
   function benchLogLevelObject (cb) {
     for (var i = 0; i < max; i++) {
-      loglevel.info({ hello: 'world' })
+      const obj = { hello: 'world' }
+      loglevel.info(obj)
     }
     setImmediate(cb)
   },
   function benchPinoObj (cb) {
     for (var i = 0; i < max; i++) {
-      plogDest.info({ hello: 'world' })
+      const obj = plogDest.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
   function benchPinoExtremeObj (cb) {
     for (var i = 0; i < max; i++) {
-      plogExtreme.info({ hello: 'world' })
+      const obj = plogExtreme.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
   function benchPinoNodeStreamObj (cb) {
     for (var i = 0; i < max; i++) {
-      plogNodeStream.info({ hello: 'world' })
+      const obj = plogNodeStream.info({ hello: 'world' })
     }
     setImmediate(cb)
   }

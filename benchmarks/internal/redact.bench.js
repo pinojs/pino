@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 'use strict'
 
 const bench = require('fastbench')
@@ -35,49 +36,49 @@ const max = 10
 const run = bench([
   function benchPinoNoRedact (cb) {
     for (var i = 0; i < max; i++) {
-      plog.info({ a: { b: { c: 'redact me.', d: 'leave me' } } })
+      const obj = plog.info({ a: { b: { c: 'redact me.', d: 'leave me' } } })
     }
     setImmediate(cb)
   },
   function benchPinoRedact (cb) {
     for (var i = 0; i < max; i++) {
-      plogRedact.info({ a: { b: { c: 'redact me.', d: 'leave me' } } })
+      const obj = plogRedact.info({ a: { b: { c: 'redact me.', d: 'leave me' } } })
     }
     setImmediate(cb)
   },
   function benchPinoUnsafeNoRedact (cb) {
     for (var i = 0; i < max; i++) {
-      plogUnsafe.info({ a: { b: { c: 'redact me.', d: 'leave me' } } })
+      const obj = plogUnsafe.info({ a: { b: { c: 'redact me.', d: 'leave me' } } })
     }
     setImmediate(cb)
   },
   function benchPinoUnsafeRedact (cb) {
     for (var i = 0; i < max; i++) {
-      plogUnsafeRedact.info({ a: { b: { c: 'redact me.', d: 'leave me' } } })
+      const obj = plogUnsafeRedact.info({ a: { b: { c: 'redact me.', d: 'leave me' } } })
     }
     setImmediate(cb)
   },
   function benchPinoExtremeNoRedact (cb) {
     for (var i = 0; i < max; i++) {
-      plogExtreme.info({ a: { b: { c: 'redact me.', d: 'leave me' } } })
+      const obj = plogExtreme.info({ a: { b: { c: 'redact me.', d: 'leave me' } } })
     }
     setImmediate(cb)
   },
   function benchPinoExtremeRedact (cb) {
     for (var i = 0; i < max; i++) {
-      plogExtremeRedact.info({ a: { b: { c: 'redact me.', d: 'leave me' } } })
+      const obj = plogExtremeRedact.info({ a: { b: { c: 'redact me.', d: 'leave me' } } })
     }
     setImmediate(cb)
   },
   function benchPinoUnsafeExtremeNoRedact (cb) {
     for (var i = 0; i < max; i++) {
-      plogUnsafeExtreme.info({ a: { b: { c: 'redact me.', d: 'leave me' } } })
+      const obj = plogUnsafeExtreme.info({ a: { b: { c: 'redact me.', d: 'leave me' } } })
     }
     setImmediate(cb)
   },
   function benchPinoUnsafeExtremeRedact (cb) {
     for (var i = 0; i < max; i++) {
-      plogUnsafeExtremeRedact.info({ a: { b: { c: 'redact me.', d: 'leave me' } } })
+      const obj = plogUnsafeExtremeRedact.info({ a: { b: { c: 'redact me.', d: 'leave me' } } })
     }
     setImmediate(cb)
   }

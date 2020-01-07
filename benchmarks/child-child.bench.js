@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 'use strict'
 
 const bench = require('fastbench')
@@ -25,25 +26,26 @@ const blog = bunyan.createLogger({
 const run = bench([
   function benchBunyanChildChild (cb) {
     for (var i = 0; i < max; i++) {
-      blog.info({ hello: 'world' })
+      const obj = { hello: 'world' }
+      blog.info(obj)
     }
     setImmediate(cb)
   },
   function benchPinoChildChild (cb) {
     for (var i = 0; i < max; i++) {
-      plogDest.info({ hello: 'world' })
+      const obj = plogDest.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
   function benchPinoExtremeChildChild (cb) {
     for (var i = 0; i < max; i++) {
-      plogExtreme.info({ hello: 'world' })
+      const obj = plogExtreme.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
   function benchPinoNodeStreamChildChild (cb) {
     for (var i = 0; i < max; i++) {
-      plogNodeStream.info({ hello: 'world' })
+      const obj = plogNodeStream.info({ hello: 'world' })
     }
     setImmediate(cb)
   }

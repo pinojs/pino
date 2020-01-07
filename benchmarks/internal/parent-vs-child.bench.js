@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 'use strict'
 
 const bench = require('fastbench')
@@ -18,55 +19,55 @@ const max = 100
 const run = bench([
   function benchPinoBase (cb) {
     for (var i = 0; i < max; i++) {
-      base.info({ hello: 'world' })
+      const obj = base.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
   function benchPinoChild (cb) {
     for (var i = 0; i < max; i++) {
-      child.info({ hello: 'world' })
+      const obj = child.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
   function benchPinoChildChild (cb) {
     for (var i = 0; i < max; i++) {
-      childChild.info({ hello: 'world' })
+      const obj = childChild.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
   function benchPinoChildChildChild (cb) {
     for (var i = 0; i < max; i++) {
-      childChildChild.info({ hello: 'world' })
+      const obj = childChildChild.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
   function benchPinoChildChildChildChild (cb) {
     for (var i = 0; i < max; i++) {
-      childChildChildChild.info({ hello: 'world' })
+      const obj = childChildChildChild.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
   function benchPinoChild2 (cb) {
     for (var i = 0; i < max; i++) {
-      child2.info({ hello: 'world' })
+      const obj = child2.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
   function benchPinoBaseSerilalizers (cb) {
     for (var i = 0; i < max; i++) {
-      baseSerializers.info({ hello: 'world' })
+      const obj = baseSerializers.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
   function benchPinoBaseSerilalizersChild (cb) {
     for (var i = 0; i < max; i++) {
-      baseSerializersChild.info({ hello: 'world' })
+      const obj = baseSerializersChild.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
   function benchPinoBaseSerilalizersChildSeriazliers (cb) {
     for (var i = 0; i < max; i++) {
-      baseSerializersChildSerializers.info({ hello: 'world' })
+      const obj = baseSerializersChildSerializers.info({ hello: 'world' })
     }
     setImmediate(cb)
   }

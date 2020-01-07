@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 'use strict'
 
 const bench = require('fastbench')
@@ -29,35 +30,37 @@ const run = bench([
   function benchBunyanCreation (cb) {
     var child = blog.child({ a: 'property' })
     for (var i = 0; i < max; i++) {
-      child.info({ hello: 'world' })
+      const obj = { hello: 'world' }
+      child.info(obj)
     }
     setImmediate(cb)
   },
   function benchBoleCreation (cb) {
     var child = bole('child')
     for (var i = 0; i < max; i++) {
-      child.info({ hello: 'world' })
+      const obj = { hello: 'world' }
+      child.info(obj)
     }
     setImmediate(cb)
   },
   function benchPinoCreation (cb) {
     var child = plogDest.child({ a: 'property' })
     for (var i = 0; i < max; i++) {
-      child.info({ hello: 'world' })
+      const obj = child.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
   function benchPinoExtremeCreation (cb) {
     var child = plogExtreme.child({ a: 'property' })
     for (var i = 0; i < max; i++) {
-      child.info({ hello: 'world' })
+      const obj = child.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
   function benchPinoNodeStreamCreation (cb) {
     var child = plogNodeStream.child({ a: 'property' })
     for (var i = 0; i < max; i++) {
-      child.info({ hello: 'world' })
+      const obj = child.info({ hello: 'world' })
     }
     setImmediate(cb)
   }
