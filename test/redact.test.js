@@ -240,11 +240,31 @@ test('redact.remove option – removes both key and value', async ({ is }) => {
   is('cookie' in req.headers, false)
 })
 
-test('redact.remove – top level key', async ({ is }) => {
+test('redact.remove – top level key - object value', async ({ is }) => {
   const stream = sink()
   const instance = pino({ redact: { paths: ['key'], remove: true } }, stream)
   instance.info({
     key: { redact: 'me' }
+  })
+  const o = await once(stream, 'data')
+  is('key' in o, false)
+})
+
+test('redact.remove – top level key - number value', async ({ is }) => {
+  const stream = sink()
+  const instance = pino({ redact: { paths: ['key'], remove: true } }, stream)
+  instance.info({
+    key: 1
+  })
+  const o = await once(stream, 'data')
+  is('key' in o, false)
+})
+
+test('redact.remove – top level key - boolean value', async ({ is }) => {
+  const stream = sink()
+  const instance = pino({ redact: { paths: ['key'], remove: true } }, stream)
+  instance.info({
+    key: false
   })
   const o = await once(stream, 'data')
   is('key' in o, false)
