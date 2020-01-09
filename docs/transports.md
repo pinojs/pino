@@ -83,6 +83,7 @@ PR's to this document are welcome for any new transports!
 + [pino-stackdriver](#pino-stackdriver)
 + [pino-syslog](#pino-syslog)
 + [pino-websocket](#pino-websocket)
++ [pino-http-send](#pino-http-send)
 
 <a id="pino-applicationinsights"></a>
 ### pino-applicationinsights
@@ -233,7 +234,7 @@ $ node app.js | pino-mysql -c db-configuration.json
 ```
 
 `pino-mysql` can extract and save log fields into corresponding database field
-and/or save the entire log stream as a [JSON Data Type][JSONDT]. 
+and/or save the entire log stream as a [JSON Data Type][JSONDT].
 
 For full documentation and command line switches read the [readme][pino-mysql].
 
@@ -374,3 +375,13 @@ $ node app.js | pino-websocket -a my-websocket-server.example.com -p 3004
 ```
 
 For full documentation of command line switches read [readme](https://github.com/abeai/pino-webscoket#README)
+
+<a id="pino-http-send"></a>
+### pino-http-send
+
+[pino-http-send](https://npmjs.com/package/pino-http-send) is a configurable and low overhead
+transport that will batch logs and send to a specified URL.
+
+```console
+$ node app.js | pino-http-send -u http://localhost:8080/logs
+```
