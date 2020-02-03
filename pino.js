@@ -31,7 +31,8 @@ const {
   useLevelLabelsSym,
   changeLevelNameSym,
   mixinSym,
-  useOnlyCustomLevelsSym
+  useOnlyCustomLevelsSym,
+  rootLevelSym
 } = symbols
 const { epochTime, nullTime } = time
 const { pid } = process
@@ -102,7 +103,8 @@ function pino (...args) {
   assertDefaultLevelFound(level, customLevels, useOnlyCustomLevels)
   const levels = mappings(customLevels, useOnlyCustomLevels)
 
-  const instance = {
+
+  const rootInstance = {
     levels,
     [useLevelLabelsSym]: useLevelLabels,
     [changeLevelNameSym]: changeLevelName,
@@ -118,15 +120,19 @@ function pino (...args) {
     [nestedKeySym]: nestedKey,
     [serializersSym]: serializers,
     [mixinSym]: mixin,
-    [chindingsSym]: chindings
+    [chindingsSym]: chindings,
+    [rootLevelSym]: level,
+    get rootLevel() { return rootInstance[rootLevelSym];},
+    set rootLevel(level) { rootInstance[rootLevelSym] = level;} 
   }
-  Object.setPrototypeOf(instance, proto)
 
-  if (customLevels || useLevelLabels || changeLevelName !== defaultOptions.changeLevelName) genLsCache(instance)
+  Object.setPrototypeOf(rootInstance, proto)
 
-  instance[setLevelSym](level)
+  if (customLevels || useLevelLabels || changeLevelName !== defaultOptions.changeLevelName) genLsCache(rootInstance)
 
-  return instance
+  rootInstance[setLevelSym](level)
+
+  return rootInstance
 }
 
 pino.extreme = (dest = process.stdout.fd) => buildSafeSonicBoom(dest, 4096, false)
