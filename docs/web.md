@@ -29,7 +29,7 @@ fastify.get('/', async (request, reply) => {
 ```
 
 The `logger` option can also be set to an object, which will be passed through directly
-as the [`pino` options object](api.md#options).
+as the [`pino` options object](/docs/api.md#options-object).
 
 See the [fastify documentation](https://www.fastify.io/docs/latest/Logging/) for more information.
 
