@@ -74,6 +74,7 @@ PR's to this document are welcome for any new transports!
 + [pino-couch](#pino-couch)
 + [pino-datadog](#pino-datadog)
 + [pino-elasticsearch](#pino-elasticsearch)
++ [pino-logdna](#pino-logdna)
 + [pino-mq](#pino-mq)
 + [pino-mysql](#pino-mysql)
 + [pino-papertrail](#pino-papertrail)
@@ -181,6 +182,15 @@ Then [create an index pattern](https://www.elastic.co/guide/en/kibana/current/se
 [pino-elasticsearch]: https://github.com/pinojs/pino-elasticsearch
 [elasticsearch]: https://www.elastic.co/products/elasticsearch
 [kibana]: https://www.elastic.co/products/kibana
+
+<a id="pino-logdna"></a>
+### pino-logdna
+
+The [pino-logdna](https://github.com/digitalmio/pino-logdna) is a transport that will forward logs to the [logdna](https://logdna.com) log service using their NPM module.
+
+```
+node yourapp.js | pino-logna --key logDnaKey
+```
 
 <a id="pino-mq"></a>
 ### pino-mq
