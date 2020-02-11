@@ -604,7 +604,7 @@ The `silent` logging level is a specialized level which will disable all logging
 there is no `silent` log method.
 
 <a id="islevelenabled"></a>
-### `logger.islevelenabled(level)`
+### `logger.isLevelEnabled(level)`
 
 A utility method for determining if a given log level will write to the destination.
 
