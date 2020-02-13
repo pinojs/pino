@@ -2,6 +2,7 @@
 
 const { test } = require('tap')
 const { sink, once, check } = require('./helper')
+const { levelKeySym } = require('../lib/symbols')
 const pino = require('../')
 
 test('set the level by string', async ({ is }) => {
@@ -257,12 +258,16 @@ test('resets levels from labels to numbers', async ({ is }) => {
   instance.info('hello world')
 })
 
+test('aliases changeLevelName to levelKey', async ({ is }) => {
+  is(pino({ changeLevelName: 'priority' })[levelKeySym], 'priority')
+})
+
 test('changes label naming when told to', async ({ is }) => {
   const expected = [{
     priority: 30,
     msg: 'hello world'
   }]
-  const instance = pino({ changeLevelName: 'priority' }, sink((result, enc, cb) => {
+  const instance = pino({ levelKey: 'priority' }, sink((result, enc, cb) => {
     const current = expected.shift()
     is(result.priority, current.priority)
     is(result.msg, current.msg)
@@ -323,11 +328,11 @@ test('produces labels for custom levels', async ({ is }) => {
   instance.foo('foobar')
 })
 
-test('setting changeLevelName does not affect labels when told to', async ({ is }) => {
+test('setting levelKey does not affect labels when told to', async ({ is }) => {
   const instance = pino(
     {
       useLevelLabels: true,
-      changeLevelName: 'priority'
+      levelKey: 'priority'
     },
     sink((result, enc, cb) => {
       is(result.priority, 'info')
