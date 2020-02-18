@@ -31,7 +31,9 @@ const {
   useLevelLabelsSym,
   changeLevelNameSym,
   mixinSym,
-  useOnlyCustomLevelsSym
+  useOnlyCustomLevelsSym,
+  bindingsSerializerSym,
+  levelSerializerSym
 } = symbols
 const { epochTime, nullTime } = time
 const { pid } = process
@@ -46,7 +48,13 @@ const defaultOptions = {
   prettyPrint: false,
   base: { pid, hostname },
   serializers: Object.assign(Object.create(null), {
-    err: defaultErrorSerializer
+    err: defaultErrorSerializer,
+    [bindingsSerializerSym] (bindings) {
+      return bindings
+    },
+    [levelSerializerSym] (label, number) {
+      return { level: number }
+    }
   }),
   timestamp: epochTime,
   name: undefined,
@@ -78,6 +86,13 @@ function pino (...args) {
     mixin,
     useOnlyCustomLevels
   } = opts
+
+  if (!serializers[levelSerializerSym]) {
+    serializers[levelSerializerSym] = defaultOptions.serializers[levelSerializerSym]
+  }
+  if (!serializers[bindingsSerializerSym]) {
+    serializers[bindingsSerializerSym] = defaultOptions.serializers[bindingsSerializerSym]
+  }
 
   const stringifiers = redact ? redaction(redact, stringify) : {}
   const formatOpts = redact
@@ -122,7 +137,7 @@ function pino (...args) {
   }
   Object.setPrototypeOf(instance, proto)
 
-  if (customLevels || useLevelLabels || changeLevelName !== defaultOptions.changeLevelName) genLsCache(instance)
+  genLsCache(instance)
 
   instance[setLevelSym](level)
 
