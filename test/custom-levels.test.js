@@ -251,14 +251,18 @@ test('does not share custom level state across siblings', async ({ doesNotThrow 
   })
 })
 
-test('custom level does not affect changeLevelName', async ({ is }) => {
+test('custom level does not affect the levels serializer', async ({ is }) => {
   const stream = sink()
   const logger = pino({
     customLevels: {
       foo: 35,
       bar: 45
     },
-    changeLevelName: 'priority'
+    serializers: {
+      [Symbol.for('pino.level')] (label, number) {
+        return { priority: number }
+      }
+    }
   }, stream)
 
   logger.foo('test')
