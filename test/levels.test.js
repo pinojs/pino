@@ -234,8 +234,8 @@ test('produces labels when told to', async ({ is }) => {
     msg: 'hello world'
   }]
   const instance = pino({
-    serializers: {
-      [Symbol.for('pino.level')] (label, number) {
+    formatters: {
+      level (label, number) {
         return { level: label }
       }
     }
@@ -269,8 +269,8 @@ test('changes label naming when told to', async ({ is }) => {
     msg: 'hello world'
   }]
   const instance = pino({
-    serializers: {
-      [Symbol.for('pino.level')] (label, number) {
+    formatters: {
+      level (label, number) {
         return { priority: number }
       }
     }
@@ -296,8 +296,8 @@ test('children produce labels when told to', async ({ is }) => {
     }
   ]
   const instance = pino({
-    serializers: {
-      [Symbol.for('pino.level')] (label, number) {
+    formatters: {
+      level (label, number) {
         return { level: label }
       }
     }
@@ -326,8 +326,8 @@ test('produces labels for custom levels', async ({ is }) => {
     }
   ]
   const opts = {
-    serializers: {
-      [Symbol.for('pino.level')] (label, number) {
+    formatters: {
+      level (label, number) {
         return { level: label }
       }
     },
@@ -348,8 +348,8 @@ test('produces labels for custom levels', async ({ is }) => {
 test('setting changeLevelName does not affect labels when told to', async ({ is }) => {
   const instance = pino(
     {
-      serializers: {
-        [Symbol.for('pino.level')] (label, number) {
+      formatters: {
+        level (label, number) {
           return { priority: label }
         }
       }

@@ -258,8 +258,8 @@ test('custom level does not affect the levels serializer', async ({ is }) => {
       foo: 35,
       bar: 45
     },
-    serializers: {
-      [Symbol.for('pino.level')] (label, number) {
+    formatters: {
+      level (label, number) {
         return { priority: number }
       }
     }
@@ -268,4 +268,26 @@ test('custom level does not affect the levels serializer', async ({ is }) => {
   logger.foo('test')
   const { priority } = await once(stream, 'data')
   is(priority, 35)
+})
+
+test('When useOnlyCustomLevels is set to true, the level formatter should only get custom levels', async ({ is }) => {
+  const stream = sink()
+  const logger = pino({
+    customLevels: {
+      answer: 42
+    },
+    useOnlyCustomLevels: true,
+    level: 42,
+    formatters: {
+      level (label, number) {
+        is(label, 'answer')
+        is(number, 42)
+        return { level: number }
+      }
+    }
+  }, stream)
+
+  logger.answer('test')
+  const { level } = await once(stream, 'data')
+  is(level, 42)
 })
