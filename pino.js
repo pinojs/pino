@@ -1,4 +1,5 @@
 'use strict'
+/* eslint no-prototype-builtins: 0 */
 const os = require('os')
 const stdSerializers = require('pino-std-serializers')
 const redaction = require('./lib/redaction')
@@ -32,8 +33,7 @@ const {
   changeLevelNameSym,
   mixinSym,
   useOnlyCustomLevelsSym,
-  bindingsSerializerSym,
-  levelSerializerSym
+  formattersSym
 } = symbols
 const { epochTime, nullTime } = time
 const { pid } = process
@@ -48,11 +48,13 @@ const defaultOptions = {
   prettyPrint: false,
   base: { pid, hostname },
   serializers: Object.assign(Object.create(null), {
-    err: defaultErrorSerializer,
-    [bindingsSerializerSym] (bindings) {
+    err: defaultErrorSerializer
+  }),
+  formatters: Object.assign(Object.create(null), {
+    bindings (bindings) {
       return bindings
     },
-    [levelSerializerSym] (label, number) {
+    level (label, number) {
       return { level: number }
     }
   }),
@@ -84,14 +86,15 @@ function pino (...args) {
     useLevelLabels,
     changeLevelName,
     mixin,
-    useOnlyCustomLevels
+    useOnlyCustomLevels,
+    formatters
   } = opts
 
-  if (!serializers[levelSerializerSym]) {
-    serializers[levelSerializerSym] = defaultOptions.serializers[levelSerializerSym]
+  if (!formatters.bindings) {
+    formatters.bindings = defaultOptions.formatters.bindings
   }
-  if (!serializers[bindingsSerializerSym]) {
-    serializers[bindingsSerializerSym] = defaultOptions.serializers[bindingsSerializerSym]
+  if (!formatters.level) {
+    formatters.level = defaultOptions.formatters.level
   }
 
   const stringifiers = redact ? redaction(redact, stringify) : {}
@@ -103,7 +106,8 @@ function pino (...args) {
     [chindingsSym]: '',
     [serializersSym]: serializers,
     [stringifiersSym]: stringifiers,
-    [stringifySym]: stringify
+    [stringifySym]: stringify,
+    [formattersSym]: formatters
   })
   const chindings = base === null ? '' : (name === undefined)
     ? coreChindings(base) : coreChindings(Object.assign({}, base, { name }))
@@ -133,7 +137,8 @@ function pino (...args) {
     [nestedKeySym]: nestedKey,
     [serializersSym]: serializers,
     [mixinSym]: mixin,
-    [chindingsSym]: chindings
+    [chindingsSym]: chindings,
+    [formattersSym]: formatters
   }
   Object.setPrototypeOf(instance, proto)
 
