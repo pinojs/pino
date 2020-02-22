@@ -23,6 +23,18 @@ test('default err namespace error serializer', async ({ is }) => {
   is(typeof o.err.stack, 'string')
 })
 
+test('converts Error instance to { err } object', async ({ is }) => {
+  const stream = sink()
+  const parent = pino(stream)
+
+  parent.info(ReferenceError('test'))
+  const o = await once(stream, 'data')
+  is(typeof o.err, 'object')
+  is(o.err.type, 'ReferenceError')
+  is(o.err.message, 'test')
+  is(typeof o.err.stack, 'string')
+})
+
 test('custom serializer overrides default err namespace error serializer', async ({ is }) => {
   const stream = sink()
   const parent = pino({

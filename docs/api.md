@@ -370,6 +370,10 @@ logger.info({MIX: {IN: true}})
 // {"level":30,"time":1531254555820,"pid":55956,"hostname":"x","MIX":{"IN":true}}
 ```
 
+> ## Note
+> If the `mergingObject` is an instance of `Error`, the object will be converted
+> to a serializable `{ err: mergingObject }` instance.
+
 <a id=message></a>
 #### `message` (String)
 
