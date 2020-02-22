@@ -2,7 +2,6 @@
 
 const { test } = require('tap')
 const { sink, once, check } = require('./helper')
-const { levelKeySym } = require('../lib/symbols')
 const pino = require('../')
 
 test('set the level by string', async ({ is }) => {
@@ -259,7 +258,12 @@ test('resets levels from labels to numbers', async ({ is }) => {
 })
 
 test('aliases changeLevelName to levelKey', async ({ is }) => {
-  is(pino({ changeLevelName: 'priority' })[levelKeySym], 'priority')
+  const instance = pino({ changeLevelName: 'priority' }, sink((result, enc, cb) => {
+    is(result.priority, 30)
+    cb()
+  }))
+
+  instance.info('hello world')
 })
 
 test('changes label naming when told to', async ({ is }) => {
