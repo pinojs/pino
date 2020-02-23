@@ -403,6 +403,36 @@ test('passes when creating a default value that exists in logger levels', async 
   })
 })
 
+test('log null value when message is null', async ({ is }) => {
+  const expected = {
+    msg: null,
+    level: 30
+  }
+
+  const stream = sink()
+  const instance = pino(stream)
+  instance.level = 'info'
+  instance.info(null)
+
+  const result = await once(stream, 'data')
+  check(is, result, expected.level, expected.msg)
+})
+
+test('concatenate multiple params when base param is null', async ({ is }) => {
+  const expected = {
+    msg: 'a string',
+    level: 30
+  }
+
+  const stream = sink()
+  const instance = pino(stream)
+  instance.level = 'info'
+  instance.info(null, 'a', 'string')
+
+  const result = await once(stream, 'data')
+  check(is, result, expected.level, expected.msg)
+})
+
 test('fatal method sync-flushes the destination if sync flushing is available', async ({ pass, doesNotThrow, plan }) => {
   plan(2)
   const stream = sink()
@@ -429,20 +459,4 @@ test('fatal method should call async when sync-flushing fails', ({ equal, fail, 
 
   const instance = pino(stream)
   doesNotThrow(() => instance.fatal(messages[0]))
-})
-
-test('log null value when message is null', async ({ is }) => {
-  const expected = {
-    msg: null,
-    level: 30
-  }
-
-  const stream = sink()
-  const instance = pino(stream)
-  instance.level = 'info'
-  instance.info(null)
-
-  const result = await once(stream, 'data')
-
-  check(is, result, expected.level, expected.msg)
 })
