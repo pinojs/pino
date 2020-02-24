@@ -359,8 +359,8 @@ test('set the base to null and use a serializer', async ({ is, same }) => {
   const stream = sink()
   const instance = pino({
     base: null,
-    serializers: {
-      [Symbol.for('pino.*')]: (input) => {
+    formatters: {
+      log (input) {
         return Object.assign({}, input, { additionalMessage: 'using pino' })
       }
     }
