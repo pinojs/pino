@@ -12,7 +12,9 @@ const {
   asChindings,
   final,
   stringify,
-  buildSafeSonicBoom
+  buildSafeSonicBoom,
+  DeprecationWarning,
+  Formatters
 } = require('./lib/tools')
 const { version } = require('./lib/meta')
 const {
@@ -29,8 +31,6 @@ const {
   formatOptsSym,
   messageKeySym,
   nestedKeySym,
-  useLevelLabelsSym,
-  changeLevelNameSym,
   mixinSym,
   useOnlyCustomLevelsSym,
   formattersSym
@@ -41,7 +41,6 @@ const hostname = os.hostname()
 const defaultErrorSerializer = stdSerializers.err
 const defaultOptions = {
   level: 'info',
-  useLevelLabels: false,
   messageKey: 'msg',
   nestedKey: null,
   enabled: true,
@@ -62,7 +61,6 @@ const defaultOptions = {
   name: undefined,
   redact: null,
   customLevels: null,
-  changeLevelName: 'level',
   useOnlyCustomLevels: false
 }
 
@@ -90,11 +88,34 @@ function pino (...args) {
     formatters
   } = opts
 
-  if (!formatters.bindings) {
-    formatters.bindings = defaultOptions.formatters.bindings
+  const allFormatters = new Formatters(
+    formatters.level,
+    formatters.bindings,
+    formatters.log
+  )
+
+  if (useLevelLabels && !changeLevelName) {
+    process.emitWarning(new DeprecationWarning('useLevelLabels is deprecated, use the formatters.level option instead', 'PINODEP001'))
+    allFormatters.level = labelsFormatter
+  } else if (changeLevelName && !useLevelLabels) {
+    process.emitWarning(new DeprecationWarning('changeLevelName is deprecated, use the formatters.level option instead', 'PINODEP002'))
+    allFormatters.level = levelNameFormatter(changeLevelName)
+  } else if (changeLevelName && useLevelLabels) {
+    process.emitWarning(new DeprecationWarning('useLevelLabels is deprecated, use the formatters.level option instead', 'PINODEP001'))
+    process.emitWarning(new DeprecationWarning('changeLevelName is deprecated, use the formatters.level option instead', 'PINODEP002'))
+    allFormatters.level = levelNameLabelFormatter(changeLevelName)
   }
-  if (!formatters.level) {
-    formatters.level = defaultOptions.formatters.level
+
+  if (serializers[Symbol.for('pino.*')]) {
+    process.emitWarning(new DeprecationWarning('The pino.* serializer is deprecated, use the formatters.log options instead', 'PINODEP003'))
+    allFormatters.log = serializers[Symbol.for('pino.*')]
+  }
+
+  if (!allFormatters.bindings) {
+    allFormatters.bindings = defaultOptions.formatters.bindings
+  }
+  if (!allFormatters.level) {
+    allFormatters.level = defaultOptions.formatters.level
   }
 
   const stringifiers = redact ? redaction(redact, stringify) : {}
@@ -107,7 +128,7 @@ function pino (...args) {
     [serializersSym]: serializers,
     [stringifiersSym]: stringifiers,
     [stringifySym]: stringify,
-    [formattersSym]: formatters
+    [formattersSym]: allFormatters
   })
   const chindings = base === null ? '' : (name === undefined)
     ? coreChindings(base) : coreChindings(Object.assign({}, base, { name }))
@@ -123,8 +144,6 @@ function pino (...args) {
 
   const instance = {
     levels,
-    [useLevelLabelsSym]: useLevelLabels,
-    [changeLevelNameSym]: changeLevelName,
     [useOnlyCustomLevelsSym]: useOnlyCustomLevels,
     [streamSym]: stream,
     [timeSym]: time,
@@ -138,7 +157,7 @@ function pino (...args) {
     [serializersSym]: serializers,
     [mixinSym]: mixin,
     [chindingsSym]: chindings,
-    [formattersSym]: formatters
+    [formattersSym]: allFormatters
   }
   Object.setPrototypeOf(instance, proto)
 
@@ -147,6 +166,22 @@ function pino (...args) {
   instance[setLevelSym](level)
 
   return instance
+}
+
+function labelsFormatter (label, number) {
+  return { level: label }
+}
+
+function levelNameFormatter (name) {
+  return function (label, number) {
+    return { [name]: number }
+  }
+}
+
+function levelNameLabelFormatter (name) {
+  return function (label, number) {
+    return { [name]: label }
+  }
 }
 
 pino.extreme = (dest = process.stdout.fd) => buildSafeSonicBoom(dest, 4096, false)
