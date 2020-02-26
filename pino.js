@@ -13,8 +13,7 @@ const {
   final,
   stringify,
   buildSafeSonicBoom,
-  DeprecationWarning,
-  Formatters
+  buildFormatters
 } = require('./lib/tools')
 const { version } = require('./lib/meta')
 const {
@@ -88,26 +87,26 @@ function pino (...args) {
     formatters
   } = opts
 
-  const allFormatters = new Formatters(
+  const allFormatters = buildFormatters(
     formatters.level,
     formatters.bindings,
     formatters.log
   )
 
   if (useLevelLabels && !changeLevelName) {
-    process.emitWarning(new DeprecationWarning('useLevelLabels is deprecated, use the formatters.level option instead', 'PINODEP001'))
+    process.emitWarning('useLevelLabels is deprecated, use the formatters.level option instead', 'Warning', 'PINODEP001')
     allFormatters.level = labelsFormatter
   } else if (changeLevelName && !useLevelLabels) {
-    process.emitWarning(new DeprecationWarning('changeLevelName is deprecated, use the formatters.level option instead', 'PINODEP002'))
+    process.emitWarning('changeLevelName is deprecated, use the formatters.level option instead', 'Warning', 'PINODEP002')
     allFormatters.level = levelNameFormatter(changeLevelName)
   } else if (changeLevelName && useLevelLabels) {
-    process.emitWarning(new DeprecationWarning('useLevelLabels is deprecated, use the formatters.level option instead', 'PINODEP001'))
-    process.emitWarning(new DeprecationWarning('changeLevelName is deprecated, use the formatters.level option instead', 'PINODEP002'))
+    process.emitWarning('useLevelLabels is deprecated, use the formatters.level option instead', 'Warning', 'PINODEP001')
+    process.emitWarning('changeLevelName is deprecated, use the formatters.level option instead', 'Warning', 'PINODEP002')
     allFormatters.level = levelNameLabelFormatter(changeLevelName)
   }
 
   if (serializers[Symbol.for('pino.*')]) {
-    process.emitWarning(new DeprecationWarning('The pino.* serializer is deprecated, use the formatters.log options instead', 'PINODEP003'))
+    process.emitWarning('The pino.* serializer is deprecated, use the formatters.log options instead', 'Warning', 'PINODEP003')
     allFormatters.log = serializers[Symbol.for('pino.*')]
   }
 
