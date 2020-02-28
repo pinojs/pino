@@ -254,14 +254,18 @@ Enables printing of level labels instead of level values in the printed logs.
 Warning: this option may not be supported by downstream transports.
 
 <a id="changeLevelName"></a>
-#### `changeLevelName` (String)
+#### `changeLevelName` (String) - DEPRECATED
+Use `levelKey` instead. This will be removed in v7.
+
+<a id="levelKey"></a>
+#### `levelKey` (String)
 
 Default: `'level'`
 
 Changes the property `level` to any string value you pass in:
 ```js
 const logger = pino({
-  changeLevelName: 'priority'
+  levelKey: 'priority'
 })
 logger.info('hello world')
 // {"priority":30,"time":1531257112193,"msg":"hello world","pid":55956,"hostname":"x","v":1}

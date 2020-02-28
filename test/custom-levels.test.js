@@ -251,14 +251,14 @@ test('does not share custom level state across siblings', async ({ doesNotThrow 
   })
 })
 
-test('custom level does not affect changeLevelName', async ({ is }) => {
+test('custom level does not affect levelKey', async ({ is }) => {
   const stream = sink()
   const logger = pino({
     customLevels: {
       foo: 35,
       bar: 45
     },
-    changeLevelName: 'priority'
+    levelKey: 'priority'
   }, stream)
 
   logger.foo('test')

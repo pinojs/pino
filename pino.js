@@ -29,7 +29,7 @@ const {
   messageKeySym,
   nestedKeySym,
   useLevelLabelsSym,
-  changeLevelNameSym,
+  levelKeySym,
   mixinSym,
   useOnlyCustomLevelsSym
 } = symbols
@@ -52,7 +52,7 @@ const defaultOptions = {
   name: undefined,
   redact: null,
   customLevels: null,
-  changeLevelName: 'level',
+  levelKey: 'level',
   useOnlyCustomLevels: false
 }
 
@@ -74,7 +74,7 @@ function pino (...args) {
     level,
     customLevels,
     useLevelLabels,
-    changeLevelName,
+    levelKey,
     mixin,
     useOnlyCustomLevels
   } = opts
@@ -105,7 +105,7 @@ function pino (...args) {
   const instance = {
     levels,
     [useLevelLabelsSym]: useLevelLabels,
-    [changeLevelNameSym]: changeLevelName,
+    [levelKeySym]: levelKey,
     [useOnlyCustomLevelsSym]: useOnlyCustomLevels,
     [streamSym]: stream,
     [timeSym]: time,
@@ -122,7 +122,7 @@ function pino (...args) {
   }
   Object.setPrototypeOf(instance, proto)
 
-  if (customLevels || useLevelLabels || changeLevelName !== defaultOptions.changeLevelName) genLsCache(instance)
+  if (customLevels || useLevelLabels || levelKey !== defaultOptions.levelKey) genLsCache(instance)
 
   instance[setLevelSym](level)
 
