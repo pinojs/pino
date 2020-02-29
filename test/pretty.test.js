@@ -272,3 +272,41 @@ test('works as expected with an object with the msg prop', async ({ isNot }) => 
   await once(child, 'close')
   isNot(actual.match(/\(123456 on abcdefghijklmnopqr\): hello/), null)
 })
+
+test('should not lose stream metadata for streams with `needsMetadataGsym` flag', async ({ isNot }) => {
+  const dest = new Writable({
+    objectMode: true,
+    write () {
+      isNot(typeof this.lastLevel === 'undefined', true)
+      isNot(typeof this.lastMsg === 'undefined', true)
+      isNot(typeof this.lastObj === 'undefined', true)
+      isNot(typeof this.lastTime === 'undefined', true)
+      isNot(typeof this.lastLogger === 'undefined', true)
+    }
+  })
+
+  dest[pino.symbols.needsMetadataGsym] = true
+
+  const log = pino({
+    prettyPrint: true
+  }, dest)
+  log.info('foo')
+})
+
+test('should not add stream metadata for streams without `needsMetadataGsym` flag', async ({ is }) => {
+  const dest = new Writable({
+    objectMode: true,
+    write () {
+      is(typeof this.lastLevel === 'undefined', true)
+      is(typeof this.lastMsg === 'undefined', true)
+      is(typeof this.lastObj === 'undefined', true)
+      is(typeof this.lastTime === 'undefined', true)
+      is(typeof this.lastLogger === 'undefined', true)
+    }
+  })
+
+  const log = pino({
+    prettyPrint: true
+  }, dest)
+  log.info('foo')
+})
