@@ -29,7 +29,7 @@ const {
   messageKeySym,
   nestedKeySym,
   useLevelLabelsSym,
-  changeLevelNameSym,
+  levelKeySym,
   mixinSym,
   useOnlyCustomLevelsSym
 } = symbols
@@ -52,7 +52,7 @@ const defaultOptions = {
   name: undefined,
   redact: null,
   customLevels: null,
-  changeLevelName: 'level',
+  levelKey: 'level',
   useOnlyCustomLevels: false
 }
 
@@ -61,7 +61,8 @@ const normalize = createArgsNormalizer(defaultOptions)
 const serializers = Object.assign(Object.create(null), stdSerializers)
 
 function pino (...args) {
-  const { opts, stream } = normalize(...args)
+  const instance = {}
+  const { opts, stream } = normalize(instance, ...args)
   const {
     redact,
     crlf,
@@ -74,7 +75,7 @@ function pino (...args) {
     level,
     customLevels,
     useLevelLabels,
-    changeLevelName,
+    levelKey,
     mixin,
     useOnlyCustomLevels
   } = opts
@@ -102,10 +103,10 @@ function pino (...args) {
   assertDefaultLevelFound(level, customLevels, useOnlyCustomLevels)
   const levels = mappings(customLevels, useOnlyCustomLevels)
 
-  const instance = {
+  Object.assign(instance, {
     levels,
     [useLevelLabelsSym]: useLevelLabels,
-    [changeLevelNameSym]: changeLevelName,
+    [levelKeySym]: levelKey,
     [useOnlyCustomLevelsSym]: useOnlyCustomLevels,
     [streamSym]: stream,
     [timeSym]: time,
@@ -119,10 +120,10 @@ function pino (...args) {
     [serializersSym]: serializers,
     [mixinSym]: mixin,
     [chindingsSym]: chindings
-  }
+  })
   Object.setPrototypeOf(instance, proto)
 
-  if (customLevels || useLevelLabels || changeLevelName !== defaultOptions.changeLevelName) genLsCache(instance)
+  if (customLevels || useLevelLabels || levelKey !== defaultOptions.levelKey) genLsCache(instance)
 
   instance[setLevelSym](level)
 

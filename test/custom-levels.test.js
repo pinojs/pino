@@ -251,17 +251,58 @@ test('does not share custom level state across siblings', async ({ doesNotThrow 
   })
 })
 
-test('custom level does not affect changeLevelName', async ({ is }) => {
+test('custom level does not affect levelKey', async ({ is }) => {
   const stream = sink()
   const logger = pino({
     customLevels: {
       foo: 35,
       bar: 45
     },
-    changeLevelName: 'priority'
+    levelKey: 'priority'
   }, stream)
 
   logger.foo('test')
   const { priority } = await once(stream, 'data')
   is(priority, 35)
+})
+
+test('custom levels accesible in prettifier function', async ({ plan, same }) => {
+  plan(1)
+  const logger = pino({
+    prettyPrint: true,
+    prettifier: function prettifierFactory () {
+      const instance = this
+      return function () {
+        same(instance.levels, {
+          labels: {
+            10: 'trace',
+            20: 'debug',
+            30: 'info',
+            35: 'foo',
+            40: 'warn',
+            45: 'bar',
+            50: 'error',
+            60: 'fatal'
+          },
+          values: {
+            trace: 10,
+            debug: 20,
+            info: 30,
+            warn: 40,
+            error: 50,
+            fatal: 60,
+            foo: 35,
+            bar: 45
+          }
+        })
+      }
+    },
+    customLevels: {
+      foo: 35,
+      bar: 45
+    },
+    changeLevelName: 'priority'
+  })
+
+  logger.foo('test')
 })
