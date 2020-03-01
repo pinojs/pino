@@ -122,3 +122,59 @@ test('Formatters combined', async ({ match }) => {
     nested: { object: true }
   })
 })
+
+test('Formatters in child logger', async ({ match }) => {
+  const stream = sink()
+  const logger = pino({
+    formatters: {
+      level (label, number) {
+        return {
+          log: {
+            level: label
+          }
+        }
+      },
+      bindings (bindings) {
+        return {
+          process: {
+            pid: bindings.pid
+          },
+          host: {
+            name: bindings.hostname
+          }
+        }
+      },
+      log (obj) {
+        return { hello: 'world', ...obj }
+      }
+    }
+  }, stream)
+
+  const child = logger.child({
+    foo: 'bar',
+    nested: { object: true },
+    formatters: {
+      bindings (bindings) {
+        return { ...bindings, faz: 'baz' }
+      }
+    }
+  })
+
+  const o = once(stream, 'data')
+  child.info('hello world')
+  match(await o, {
+    log: {
+      level: 'info'
+    },
+    process: {
+      pid: process.pid
+    },
+    host: {
+      name: hostname()
+    },
+    hello: 'world',
+    foo: 'bar',
+    nested: { object: true },
+    faz: 'baz'
+  })
+})
