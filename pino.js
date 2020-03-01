@@ -30,6 +30,8 @@ const {
   formatOptsSym,
   messageKeySym,
   nestedKeySym,
+  useLevelLabelsSym,
+  levelKeySym,
   mixinSym,
   useOnlyCustomLevelsSym,
   formattersSym
@@ -60,6 +62,7 @@ const defaultOptions = {
   name: undefined,
   redact: null,
   customLevels: null,
+  levelKey: 'level',
   useOnlyCustomLevels: false
 }
 
@@ -68,7 +71,8 @@ const normalize = createArgsNormalizer(defaultOptions)
 const serializers = Object.assign(Object.create(null), stdSerializers)
 
 function pino (...args) {
-  const { opts, stream } = normalize(...args)
+  const instance = {}
+  const { opts, stream } = normalize(instance, ...args)
   const {
     redact,
     crlf,
@@ -81,7 +85,7 @@ function pino (...args) {
     level,
     customLevels,
     useLevelLabels,
-    changeLevelName,
+    levelKey,
     mixin,
     useOnlyCustomLevels,
     formatters
@@ -93,15 +97,15 @@ function pino (...args) {
     formatters.log
   )
 
-  if (useLevelLabels && !changeLevelName) {
+  if (useLevelLabels && !(changeLevelName || levelKey)) {
     process.emitWarning('useLevelLabels is deprecated, use the formatters.level option instead', 'Warning', 'PINODEP001')
     allFormatters.level = labelsFormatter
-  } else if (changeLevelName && !useLevelLabels) {
-    process.emitWarning('changeLevelName is deprecated, use the formatters.level option instead', 'Warning', 'PINODEP002')
+  } else if ((changeLevelName || levelKey) && !useLevelLabels) {
+    process.emitWarning('changeLevelName and levelKey are deprecated, use the formatters.level option instead', 'Warning', 'PINODEP002')
     allFormatters.level = levelNameFormatter(changeLevelName)
-  } else if (changeLevelName && useLevelLabels) {
+  } else if ((changeLevelName || levelKey) && useLevelLabels) {
     process.emitWarning('useLevelLabels is deprecated, use the formatters.level option instead', 'Warning', 'PINODEP001')
-    process.emitWarning('changeLevelName is deprecated, use the formatters.level option instead', 'Warning', 'PINODEP002')
+    process.emitWarning('changeLevelName and levelKey are deprecated, use the formatters.level option instead', 'Warning', 'PINODEP002')
     allFormatters.level = levelNameLabelFormatter(changeLevelName)
   }
 
@@ -141,7 +145,7 @@ function pino (...args) {
   assertDefaultLevelFound(level, customLevels, useOnlyCustomLevels)
   const levels = mappings(customLevels, useOnlyCustomLevels)
 
-  const instance = {
+  Object.assign(instance, {
     levels,
     [useOnlyCustomLevelsSym]: useOnlyCustomLevels,
     [streamSym]: stream,

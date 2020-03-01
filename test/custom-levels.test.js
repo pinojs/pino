@@ -270,6 +270,7 @@ test('custom level does not affect the levels serializer', async ({ is }) => {
   is(priority, 35)
 })
 
+<<<<<<< HEAD
 test('When useOnlyCustomLevels is set to true, the level formatter should only get custom levels', async ({ is }) => {
   const stream = sink()
   const logger = pino({
@@ -290,4 +291,46 @@ test('When useOnlyCustomLevels is set to true, the level formatter should only g
   logger.answer('test')
   const { level } = await once(stream, 'data')
   is(level, 42)
+})
+
+test('custom levels accesible in prettifier function', async ({ plan, same }) => {
+  plan(1)
+  const logger = pino({
+    prettyPrint: true,
+    prettifier: function prettifierFactory () {
+      const instance = this
+      return function () {
+        same(instance.levels, {
+          labels: {
+            10: 'trace',
+            20: 'debug',
+            30: 'info',
+            35: 'foo',
+            40: 'warn',
+            45: 'bar',
+            50: 'error',
+            60: 'fatal'
+          },
+          values: {
+            trace: 10,
+            debug: 20,
+            info: 30,
+            warn: 40,
+            error: 50,
+            fatal: 60,
+            foo: 35,
+            bar: 45
+          }
+        })
+      }
+    },
+    customLevels: {
+      foo: 35,
+      bar: 45
+    },
+    changeLevelName: 'priority'
+  })
+
+  logger.foo('test')
+>>>>>>> next
 })
