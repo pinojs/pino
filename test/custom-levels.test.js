@@ -270,7 +270,6 @@ test('custom level does not affect the levels serializer', async ({ is }) => {
   is(priority, 35)
 })
 
-<<<<<<< HEAD
 test('When useOnlyCustomLevels is set to true, the level formatter should only get custom levels', async ({ is }) => {
   const stream = sink()
   const logger = pino({
@@ -332,5 +331,4 @@ test('custom levels accesible in prettifier function', async ({ plan, same }) =>
   })
 
   logger.foo('test')
->>>>>>> next
 })

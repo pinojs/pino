@@ -30,8 +30,6 @@ const {
   formatOptsSym,
   messageKeySym,
   nestedKeySym,
-  useLevelLabelsSym,
-  levelKeySym,
   mixinSym,
   useOnlyCustomLevelsSym,
   formattersSym
@@ -62,7 +60,7 @@ const defaultOptions = {
   name: undefined,
   redact: null,
   customLevels: null,
-  levelKey: 'level',
+  levelKey: undefined,
   useOnlyCustomLevels: false
 }
 
@@ -85,6 +83,7 @@ function pino (...args) {
     level,
     customLevels,
     useLevelLabels,
+    changeLevelName,
     levelKey,
     mixin,
     useOnlyCustomLevels,
@@ -102,11 +101,11 @@ function pino (...args) {
     allFormatters.level = labelsFormatter
   } else if ((changeLevelName || levelKey) && !useLevelLabels) {
     process.emitWarning('changeLevelName and levelKey are deprecated, use the formatters.level option instead', 'Warning', 'PINODEP002')
-    allFormatters.level = levelNameFormatter(changeLevelName)
+    allFormatters.level = levelNameFormatter(changeLevelName || levelKey)
   } else if ((changeLevelName || levelKey) && useLevelLabels) {
     process.emitWarning('useLevelLabels is deprecated, use the formatters.level option instead', 'Warning', 'PINODEP001')
     process.emitWarning('changeLevelName and levelKey are deprecated, use the formatters.level option instead', 'Warning', 'PINODEP002')
-    allFormatters.level = levelNameLabelFormatter(changeLevelName)
+    allFormatters.level = levelNameLabelFormatter(changeLevelName || levelKey)
   }
 
   if (serializers[Symbol.for('pino.*')]) {
@@ -161,7 +160,7 @@ function pino (...args) {
     [mixinSym]: mixin,
     [chindingsSym]: chindings,
     [formattersSym]: allFormatters
-  }
+  })
   Object.setPrototypeOf(instance, proto)
 
   genLsCache(instance)
