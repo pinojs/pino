@@ -41,6 +41,23 @@ test('changeLevelName', async ({ match, is }) => {
   process.removeListener('warning', onWarning)
 })
 
+test('levelKey', async ({ match, is }) => {
+  process.on('warning', onWarning)
+  function onWarning (warn) {
+    is(warn.code, 'PINODEP002')
+  }
+
+  const stream = sink()
+  const logger = pino({
+    levelKey: 'priority'
+  }, stream)
+
+  const o = once(stream, 'data')
+  logger.info('hello world')
+  match(await o, { priority: 30 })
+  process.removeListener('warning', onWarning)
+})
+
 test('useLevelLabels and changeLevelName', async ({ match, is }) => {
   let count = 0
   process.on('warning', onWarning)
