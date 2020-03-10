@@ -1,0 +1,47 @@
+name: Benchmarks
+on:
+  - push
+  - pull_request
+
+jobs:
+  benchmark_current:
+    name: benchmark current
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.base_ref }}
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - name: Install Modules
+        run: npm i
+      - name: Run Benchmark
+        run: npm run bench | tee current.txt
+      - name: Upload Current Results
+        uses: actions/upload-artifact@v1
+        with:
+          name: current
+          path: current.txt
+
+  benchmark_branch:
+    name: benchmark branch
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - name: Install Modules
+        run: npm i
+      - name: Run Benchmark
+        run: npm run bench | tee branch.txt
+      - name: Upload Branch Results
+        uses: actions/upload-artifact@v1
+        with:
+          name: branch
+          path: branch.txt
