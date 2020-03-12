@@ -22,6 +22,7 @@ function usage () {
     ・child      ⁃ child from a parent
     ・child-child ⁃ child from a child
     ・child-creation ⁃ child constructor
+    ・formatters ⁃ difference between with or without formatters
 
     Example:
 
@@ -46,7 +47,8 @@ const benchmarks = {
   'long-string': 'long-string.bench.js',
   child: 'child.bench.js',
   'child-child': 'child-child.bench.js',
-  'child-creation': 'child-creation.bench.js'
+  'child-creation': 'child-creation.bench.js',
+  formatters: 'formatters.bench.js'
 }
 
 function runBenchmark (name, done) {

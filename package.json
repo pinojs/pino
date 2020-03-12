@@ -31,6 +31,7 @@
     "bench-child": "node benchmarks/utils/runbench child",
     "bench-child-child": "node benchmarks/utils/runbench child-child",
     "bench-child-creation": "node benchmarks/utils/runbench child-creation",
+    "bench-formatters": "node benchmarks/utils/runbench formatters",
     "update-bench-doc": "node benchmarks/utils/generate-benchmark-doc > docs/benchmarks.md"
   },
   "bin": {
