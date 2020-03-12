@@ -355,7 +355,7 @@ test('set the base to null', async ({ is, same }) => {
   })
 })
 
-test('set the base to null and use a serializer', async ({ is, same }) => {
+test('set the base to null and use a formatter', async ({ is, same }) => {
   const stream = sink()
   const instance = pino({
     base: null,
