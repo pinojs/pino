@@ -197,6 +197,61 @@ test('Formatters in child logger', async ({ match }) => {
   })
 })
 
+test('Formatters without bindings in child logger', async ({ match }) => {
+  const stream = sink()
+  const logger = pino({
+    formatters: {
+      level (label, number) {
+        return {
+          log: {
+            level: label
+          }
+        }
+      },
+      bindings (bindings) {
+        return {
+          process: {
+            pid: bindings.pid
+          },
+          host: {
+            name: bindings.hostname
+          }
+        }
+      },
+      log (obj) {
+        return { hello: 'world', ...obj }
+      }
+    }
+  }, stream)
+
+  const child = logger.child({
+    foo: 'bar',
+    nested: { object: true },
+    formatters: {
+      log (obj) {
+        return { other: 'stuff', ...obj }
+      }
+    }
+  })
+
+  const o = once(stream, 'data')
+  child.info('hello world')
+  match(await o, {
+    log: {
+      level: 'info'
+    },
+    process: {
+      pid: process.pid
+    },
+    host: {
+      name: hostname()
+    },
+    foo: 'bar',
+    other: 'stuff',
+    nested: { object: true }
+  })
+})
+
 test('elastic common schema format', async ({ match, type }) => {
   const stream = sink()
   const ecs = {
