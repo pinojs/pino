@@ -58,6 +58,24 @@ test('bindings formatter', async ({ match }) => {
   })
 })
 
+test('no bindings formatter', async ({ match, notOk }) => {
+  const stream = sink()
+  const logger = pino({
+    formatters: {
+      bindings (bindings) {
+        return null
+      }
+    }
+  }, stream)
+
+  const o = once(stream, 'data')
+  logger.info('hello world')
+  const log = await o
+  notOk(log.hasOwnProperty('pid'))
+  notOk(log.hasOwnProperty('hostname'))
+  match(log, { msg: 'hello world' })
+})
+
 test('log formatter', async ({ match, is }) => {
   const stream = sink()
   const logger = pino({
@@ -176,5 +194,51 @@ test('Formatters in child logger', async ({ match }) => {
     foo: 'bar',
     nested: { object: true },
     faz: 'baz'
+  })
+})
+
+test('elastic common schema format', async ({ match, type }) => {
+  const stream = sink()
+  const ecs = {
+    formatters: {
+      level (label, number) {
+        return {
+          log: {
+            level: label,
+            logger: 'pino'
+          }
+        }
+      },
+      bindings (bindings) {
+        return {
+          process: {
+            pid: bindings.pid
+          },
+          host: {
+            name: bindings.hostname
+          }
+        }
+      },
+      log (obj) {
+        return { ecs: { version: '1.4.0' }, ...obj }
+      }
+    },
+    messageKey: 'message',
+    timestamp: () => `,"@timestamp":"${new Date(Date.now()).toISOString()}"`
+  }
+
+  const logger = pino({ ...ecs }, stream)
+
+  const o = once(stream, 'data')
+  logger.info({ foo: 'bar' }, 'hello world')
+  const log = await o
+  type(log['@timestamp'], 'string')
+  match(log, {
+    log: { level: 'info', logger: 'pino' },
+    process: { pid: process.pid },
+    host: { name: hostname() },
+    ecs: { version: '1.4.0' },
+    foo: 'bar',
+    message: 'hello world'
   })
 })
