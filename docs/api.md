@@ -202,6 +202,10 @@ matching the exact key of a serializer will be serialized using the defined seri
 
 * See [pino.stdSerializers](#pino-stdserializers)
 
+##### `serializers[Symbol.for('pino.*')]` (Function) - DEPRECATED
+
+Use `formatters.log` instead.
+
 #### `base` (Object)
 
 Default: `{pid: process.pid, hostname: os.hostname}`
