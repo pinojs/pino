@@ -164,7 +164,8 @@ const formatters = {
 ##### `bindings`
 
 Changes the shape of the bindings. The default shape is `{ pid, hostname }`.
-The function takes a single argument which is the bindings object. It will be called every time you create a child logger.
+The function takes a single argument, the bindings object. It will
+be called every time a child logger is created.
 
 ```js
 const formatters = {
