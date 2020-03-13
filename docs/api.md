@@ -143,7 +143,9 @@ If an object is supplied, three options can be specified:
 
 An object containing functions for formatting the shape of the log lines.
 These functions should return a JSONifiable object and
-should never throw. You can use this functions to shape the final JSON log in the way you need. For example you can use it for changing the level key name or enrich the default bindings.
+should never throw. These functions allow for full customization of
+the resulting log lines. For example, they can be used to change
+the level key name or to enrich the default metadata.
 
 ##### `level`
 
