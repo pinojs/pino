@@ -150,7 +150,8 @@ the level key name or to enrich the default metadata.
 ##### `level`
 
 Changes the shape of the log level. The default shape is `{ level: number }`.
-The function takes two arguments, the label of the level (eg `'info'`) and the numeric value (eg: `30`).
+The function takes two arguments, the label of the level (e.g. `'info'`)
+and the numeric value (e.g. `30`).
 
 ```js
 const formatters = {
