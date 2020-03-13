@@ -142,7 +142,7 @@ If an object is supplied, three options can be specified:
 #### `formatters` (Object)
 
 An object containing functions for formatting the shape of the log lines.
-These functions should return an JSONifiable object and they
+These functions should return a JSONifiable object and
 should never throw. You can use this functions to shape the final JSON log in the way you need. For example you can use it for changing the level key name or enrich the default bindings.
 
 ##### `level`
