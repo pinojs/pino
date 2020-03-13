@@ -177,7 +177,10 @@ const formatters = {
 
 ##### `log`
 
-Changes the shape of the log object. This function will be called every time one of the log methods (such as `.info`) is called with all the arguments passed to the log method but the message. By default it does not change the shape of the log object.
+Changes the shape of the log object. This function will be called every time
+one of the log methods (such as `.info`) is called. All arguments passed to the
+log method, except the message, will be pass to this function. By default it does
+not change the shape of the log object.
 
 ```js
 const formatters = {
