@@ -1,0 +1,4 @@
+esm: false
+ts: false
+jsx: false
+timeout: 480
