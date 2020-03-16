@@ -18,7 +18,7 @@
   "scripts": {
     "docs": "docsify serve",
     "browser-test": "airtap --local 8080 test/browser*test.js",
-    "test": "standard | snazzy && tap -J --no-cov test/*test.js",
+    "test": "standard | snazzy && tap --no-cov test/*test.js",
     "ci": "standard | snazzy && tap --100 test/*test.js",
     "cov-ci": "tap --100 --coverage-report=lcov test/*test.js",
     "cov-ui": "tap --coverage-report=html test/*test.js",
