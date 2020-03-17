@@ -130,7 +130,13 @@ function pino (...args) {
   return instance
 }
 
-pino.extreme = (dest = process.stdout.fd) => buildSafeSonicBoom({ dest, minLength: 4096, sync: false })
+pino.extreme = (dest = process.stdout.fd) => {
+  process.emitWarning(
+    'The pino.extreme() option is deprecated and will be removed in v7. Use pino.destination({ sync: false }) instead.',
+    { code: 'extreme_deprecation' }
+  )
+  return buildSafeSonicBoom({ dest, minLength: 4096, sync: false })
+}
 pino.destination = (dest = process.stdout.fd) => {
   if (typeof dest === 'object') {
     dest.dest = dest.dest || process.stdout.fd

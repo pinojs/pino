@@ -123,3 +123,20 @@ test('flush does nothing with sync true (default)', async () => {
   var instance = require('..')()
   instance.flush()
 })
+
+test('pino.extreme() emits a warning', async ({ is }) => {
+  const pino = require('..')
+  process.removeAllListeners('warning')
+  process.nextTick(() => pino.extreme(0))
+  const warning = await once(process, 'warning')
+  const expected = 'The pino.extreme() option is deprecated and will be removed in v7. Use pino.destination({ sync: false }) instead.'
+  is(expected, warning.message)
+  is('extreme_deprecation', warning.code)
+})
+
+test('pino.extreme() defaults to stdout', async ({ is }) => {
+  const pino = require('..')
+  process.removeAllListeners('warning')
+  const dest = pino.extreme()
+  is(dest.fd, process.stdout.fd)
+})
