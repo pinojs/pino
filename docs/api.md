@@ -575,7 +575,9 @@ sync: false })`.
 
 This is an asynchronous, fire and forget, operation.
 
-The use case is primarily for asynchronous logging, which may hold log lines while others are being written. The `logger.flush` method can be used to flush the logs
+The use case is primarily for asynchronous logging, which may buffer
+log lines while others are being written. The `logger.flush` method can be
+used to flush the logs
 on an long interval, say ten seconds. Such a strategy can provide an
 optimium balance between extremely efficient logging at high demand periods
 and safer logging at low demand periods.
