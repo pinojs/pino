@@ -89,6 +89,6 @@
     "flatstr": "^1.0.12",
     "pino-std-serializers": "^2.4.2",
     "quick-format-unescaped": "^3.0.3",
-    "sonic-boom": "^0.7.7"
+    "sonic-boom": "^1.0.0"
   }
 }

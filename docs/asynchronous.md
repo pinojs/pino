@@ -1,9 +1,10 @@
-# Extreme Mode
+# Asynchronous Logging
 
-In essence, extreme mode enables even faster performance by Pino.
+In essence, asynchronous logging enables even faster performance by Pino.
 
 In Pino's standard mode of operation log messages are directly written to the
-output stream as the messages are generated. Extreme mode works by buffering
+output stream as the messages are generated with a _blocking_ operation.
+Asynchronous logging works by buffering
 log messages and writing them in larger chunks.
 
 ## Caveats
@@ -41,15 +42,20 @@ logging and it is acceptable to potentially lose the most recent logs.
   In the case of `SIGHUP`, we will look to see if any other handlers are
   registered for the event. If not, we will proceed as we do with all other
   signals. If there are more handlers registered than just our own, we will
-  simply flush the extreme mode buffer.
+  simply flush the asynchronous logging buffer.
+
+### AWS Lambda
+
+On AWS Lambda we recommend to call `dest.flushSync()` at the end
+of each function execution to avoid losing data.
 
 ## Usage
 
-The `pino.extreme()` method will provide an Extreme Mode destination.
+The `pino.destination({ sync: false })` method will provide an asynchronous destination.
 
 ```js
 const pino = require('pino')
-const dest = pino.extreme() // logs to stdout with no args
+const dest = pino.destination({ sync: false }) // logs to stdout with no args
 const logger = pino(dest)
 ```
 
@@ -60,7 +66,7 @@ The following strategy can be used to minimize log loss:
 
 ```js
 const pino = require('pino')
-const dest = pino.extreme() // no arguments
+const dest = pino.destination({ sync: false })
 const logger = pino(dest)
 
 // asynchronously flush every 10 seconds to keep the buffer empty
@@ -90,6 +96,6 @@ An extreme destination is an instance of
 buffering.
 
 
-* See [`pino.extreme` api](/docs/api.md#pino-extreme)
+* See [`pino.destination` api](/docs/api.md#pino-destination)
 * See [`pino.final` api](/docs/api.md#pino-final)
 * See [`destination` parameter](/docs/api.md#destination)

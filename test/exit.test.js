@@ -22,9 +22,9 @@ test('pino.destination log everything when calling process.exit(0)', async ({ is
   isNot(actual.match(/world/), null)
 })
 
-test('pino.extreme does not log everything when calling process.exit(0)', async ({ is }) => {
+test('sync false does not log everything when calling process.exit(0)', async ({ is }) => {
   var actual = ''
-  const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'extreme-exit.js')])
+  const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'syncfalse-exit.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
     actual += s
@@ -37,9 +37,9 @@ test('pino.extreme does not log everything when calling process.exit(0)', async 
   is(actual.match(/world/), null)
 })
 
-test('pino.extreme logs everything when calling flushSync', async ({ isNot }) => {
+test('sync false logs everything when calling flushSync', async ({ isNot }) => {
   var actual = ''
-  const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'extreme-flush-exit.js')])
+  const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'syncfalse-flush-exit.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
     actual += s
