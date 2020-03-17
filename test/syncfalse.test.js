@@ -42,7 +42,7 @@ test('extreme mode', async ({ is, teardown }) => {
   var expected2 = expected.split('\n')[0]
   var actual2 = ''
 
-  const child = fork(join(__dirname, '/fixtures/extreme.js'), { silent: true })
+  const child = fork(join(__dirname, '/fixtures/syncfalse.js'), { silent: true })
   child.stdout.pipe(writer((s, enc, cb) => {
     actual2 += s
     cb()
@@ -58,7 +58,7 @@ test('extreme mode', async ({ is, teardown }) => {
   })
 })
 
-test('extreme mode with child', async ({ is, teardown }) => {
+test('sync false with child', async ({ is, teardown }) => {
   const now = Date.now
   const hostname = os.hostname
   const proc = process
@@ -96,7 +96,7 @@ test('extreme mode with child', async ({ is, teardown }) => {
   var expected2 = expected.split('\n')[0]
   var actual2 = ''
 
-  const child = fork(join(__dirname, '/fixtures/extreme-child.js'), { silent: true })
+  const child = fork(join(__dirname, '/fixtures/syncfalse-child.js'), { silent: true })
   child.stdout.pipe(writer((s, enc, cb) => {
     actual2 += s
     cb()
@@ -119,7 +119,7 @@ test('throw an error if extreme is passed', async ({ throws }) => {
   })
 })
 
-test('flush does nothing without extreme mode', async () => {
+test('flush does nothing with sync true (default)', async () => {
   var instance = require('..')()
   instance.flush()
 })
