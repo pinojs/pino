@@ -138,7 +138,7 @@ test('http response support', async ({ ok, same, error, teardown }) => {
       msg: 'my response',
       res: {
         statusCode: originalRes.statusCode,
-        headers: originalRes._headers
+        headers: originalRes.getHeaders()
       }
     })
   }))

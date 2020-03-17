@@ -4,6 +4,10 @@ const { test } = require('tap')
 const { sink, once, check } = require('./helper')
 const pino = require('../')
 
+// Silence all warnings for this test
+process.removeAllListeners('warning')
+process.on('warning', () => {})
+
 test('set the level by string', async ({ is }) => {
   const expected = [{
     level: 50,
