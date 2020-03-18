@@ -1,4 +1,5 @@
 'use strict'
+/* eslint no-prototype-builtins: 0 */
 const os = require('os')
 const stdSerializers = require('pino-std-serializers')
 const redaction = require('./lib/redaction')
@@ -11,7 +12,8 @@ const {
   asChindings,
   final,
   stringify,
-  buildSafeSonicBoom
+  buildSafeSonicBoom,
+  buildFormatters
 } = require('./lib/tools')
 const { version } = require('./lib/meta')
 const {
@@ -28,10 +30,9 @@ const {
   formatOptsSym,
   messageKeySym,
   nestedKeySym,
-  useLevelLabelsSym,
-  levelKeySym,
   mixinSym,
-  useOnlyCustomLevelsSym
+  useOnlyCustomLevelsSym,
+  formattersSym
 } = symbols
 const { epochTime, nullTime } = time
 const { pid } = process
@@ -39,7 +40,6 @@ const hostname = os.hostname()
 const defaultErrorSerializer = stdSerializers.err
 const defaultOptions = {
   level: 'info',
-  useLevelLabels: false,
   messageKey: 'msg',
   nestedKey: null,
   enabled: true,
@@ -48,11 +48,19 @@ const defaultOptions = {
   serializers: Object.assign(Object.create(null), {
     err: defaultErrorSerializer
   }),
+  formatters: Object.assign(Object.create(null), {
+    bindings (bindings) {
+      return bindings
+    },
+    level (label, number) {
+      return { level: number }
+    }
+  }),
   timestamp: epochTime,
   name: undefined,
   redact: null,
   customLevels: null,
-  levelKey: 'level',
+  levelKey: undefined,
   useOnlyCustomLevels: false
 }
 
@@ -75,10 +83,42 @@ function pino (...args) {
     level,
     customLevels,
     useLevelLabels,
+    changeLevelName,
     levelKey,
     mixin,
-    useOnlyCustomLevels
+    useOnlyCustomLevels,
+    formatters
   } = opts
+
+  const allFormatters = buildFormatters(
+    formatters.level,
+    formatters.bindings,
+    formatters.log
+  )
+
+  if (useLevelLabels && !(changeLevelName || levelKey)) {
+    process.emitWarning('useLevelLabels is deprecated, use the formatters.level option instead', 'Warning', 'PINODEP001')
+    allFormatters.level = labelsFormatter
+  } else if ((changeLevelName || levelKey) && !useLevelLabels) {
+    process.emitWarning('changeLevelName and levelKey are deprecated, use the formatters.level option instead', 'Warning', 'PINODEP002')
+    allFormatters.level = levelNameFormatter(changeLevelName || levelKey)
+  } else if ((changeLevelName || levelKey) && useLevelLabels) {
+    process.emitWarning('useLevelLabels is deprecated, use the formatters.level option instead', 'Warning', 'PINODEP001')
+    process.emitWarning('changeLevelName and levelKey are deprecated, use the formatters.level option instead', 'Warning', 'PINODEP002')
+    allFormatters.level = levelNameLabelFormatter(changeLevelName || levelKey)
+  }
+
+  if (serializers[Symbol.for('pino.*')]) {
+    process.emitWarning('The pino.* serializer is deprecated, use the formatters.log options instead', 'Warning', 'PINODEP003')
+    allFormatters.log = serializers[Symbol.for('pino.*')]
+  }
+
+  if (!allFormatters.bindings) {
+    allFormatters.bindings = defaultOptions.formatters.bindings
+  }
+  if (!allFormatters.level) {
+    allFormatters.level = defaultOptions.formatters.level
+  }
 
   const stringifiers = redact ? redaction(redact, stringify) : {}
   const formatOpts = redact
@@ -89,7 +129,8 @@ function pino (...args) {
     [chindingsSym]: '',
     [serializersSym]: serializers,
     [stringifiersSym]: stringifiers,
-    [stringifySym]: stringify
+    [stringifySym]: stringify,
+    [formattersSym]: allFormatters
   })
   const chindings = base === null ? '' : (name === undefined)
     ? coreChindings(base) : coreChindings(Object.assign({}, base, { name }))
@@ -105,8 +146,6 @@ function pino (...args) {
 
   Object.assign(instance, {
     levels,
-    [useLevelLabelsSym]: useLevelLabels,
-    [levelKeySym]: levelKey,
     [useOnlyCustomLevelsSym]: useOnlyCustomLevels,
     [streamSym]: stream,
     [timeSym]: time,
@@ -119,15 +158,32 @@ function pino (...args) {
     [nestedKeySym]: nestedKey,
     [serializersSym]: serializers,
     [mixinSym]: mixin,
-    [chindingsSym]: chindings
+    [chindingsSym]: chindings,
+    [formattersSym]: allFormatters
   })
   Object.setPrototypeOf(instance, proto)
 
-  if (customLevels || useLevelLabels || levelKey !== defaultOptions.levelKey) genLsCache(instance)
+  genLsCache(instance)
 
   instance[setLevelSym](level)
 
   return instance
+}
+
+function labelsFormatter (label, number) {
+  return { level: label }
+}
+
+function levelNameFormatter (name) {
+  return function (label, number) {
+    return { [name]: number }
+  }
+}
+
+function levelNameLabelFormatter (name) {
+  return function (label, number) {
+    return { [name]: label }
+  }
 }
 
 pino.extreme = (dest = process.stdout.fd) => {

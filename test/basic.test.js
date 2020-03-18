@@ -355,12 +355,12 @@ test('set the base to null', async ({ is, same }) => {
   })
 })
 
-test('set the base to null and use a serializer', async ({ is, same }) => {
+test('set the base to null and use a formatter', async ({ is, same }) => {
   const stream = sink()
   const instance = pino({
     base: null,
-    serializers: {
-      [Symbol.for('pino.*')]: (input) => {
+    formatters: {
+      log (input) {
         return Object.assign({}, input, { additionalMessage: 'using pino' })
       }
     }
@@ -376,10 +376,15 @@ test('set the base to null and use a serializer', async ({ is, same }) => {
   })
 })
 
-test('throw if creating child without bindings', async ({ throws }) => {
+test('throw if creating child without bindings', async ({ is, fail }) => {
   const stream = sink()
   const instance = pino(stream)
-  throws(() => instance.child())
+  try {
+    instance.child()
+    fail('it should throw')
+  } catch (err) {
+    is(err.message, 'missing bindings for child Pino')
+  }
 })
 
 test('correctly escapes msg strings with stray double quote at end', async ({ same }) => {

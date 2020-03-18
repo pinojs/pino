@@ -137,6 +137,58 @@ If an object is supplied, three options can be specified:
 * See the [redaction ⇗](/docs/redaction.md) documentation.
 * See [fast-redact#caveat ⇗](http://github.com/davidmarkclements/fast-redact#caveat)
 
+<a id=opt-formatters></a>
+#### `formatters` (Object)
+
+An object containing functions for formatting the shape of the log lines.
+These functions should return a JSONifiable object and
+should never throw. These functions allow for full customization of
+the resulting log lines. For example, they can be used to change
+the level key name or to enrich the default metadata.
+
+##### `level`
+
+Changes the shape of the log level. The default shape is `{ level: number }`.
+The function takes two arguments, the label of the level (e.g. `'info'`)
+and the numeric value (e.g. `30`).
+
+```js
+const formatters = {
+  level (label, number) {
+    return { level: number }
+  }
+}
+```
+
+##### `bindings`
+
+Changes the shape of the bindings. The default shape is `{ pid, hostname }`.
+The function takes a single argument, the bindings object. It will
+be called every time a child logger is created.
+
+```js
+const formatters = {
+  bindings (bindings) {
+    return { pid: bindings.pid, hostname: bindings.hostname }
+  }
+}
+```
+
+##### `log`
+
+Changes the shape of the log object. This function will be called every time
+one of the log methods (such as `.info`) is called. All arguments passed to the
+log method, except the message, will be pass to this function. By default it does
+not change the shape of the log object.
+
+```js
+const formatters = {
+  log (object) {
+    return object
+  }
+}
+```
+
 <a id=opt-serializers></a>
 #### `serializers` (Object)
 
@@ -149,12 +201,9 @@ matching the exact key of a serializer will be serialized using the defined seri
 
 * See [pino.stdSerializers](#pino-stdserializers)
 
-##### `serializers[Symbol.for('pino.*')]` (Function)
+##### `serializers[Symbol.for('pino.*')]` (Function) - DEPRECATED
 
-Default: `undefined`
-
-The `serializers` object may contain a key which is the global symbol: `Symbol.for('pino.*')`.
-This will act upon the complete log object rather than corresponding to a particular key.
+Use `formatters.log` instead.
 
 #### `base` (Object)
 
@@ -243,30 +292,18 @@ npm install pino-pretty
 ```
 
 <a id="useLevelLabels"></a>
-#### `useLevelLabels` (Boolean)
+#### `useLevelLabels` (Boolean) - DEPRECATED
 
-Default: `false`
-
-Enables printing of level labels instead of level values in the printed logs.
-Warning: this option may not be supported by downstream transports.
+Use `formatters.level` instead. This will be removed in v7.
 
 <a id="changeLevelName"></a>
 #### `changeLevelName` (String) - DEPRECATED
-Use `levelKey` instead. This will be removed in v7.
+Use `formatters.level` instead. This will be removed in v7.
 
 <a id="levelKey"></a>
-#### `levelKey` (String)
+#### `levelKey` (String) - DEPRECATED
 
-Default: `'level'`
-
-Changes the property `level` to any string value you pass in:
-```js
-const logger = pino({
-  levelKey: 'priority'
-})
-logger.info('hello world')
-// {"priority":30,"time":1531257112193,"msg":"hello world","pid":55956,"hostname":"x"}
-```
+Use `formatters.level` instead. This will be removed in v7.
 
 #### `browser` (Object)
 
