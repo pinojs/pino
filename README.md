@@ -2,7 +2,6 @@
 
 # pino
 [![Build Status](https://img.shields.io/github/workflow/status/pinojs/pino/CI)](https://github.com/pinojs/pino/actions)
-&nbsp;[![Coverage Status](https://img.shields.io/coveralls/github/pinojs/pino)](https://coveralls.io/github/pinojs/pino?branch=master)
 &nbsp;[![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](http://standardjs.com/)
 &nbsp;[![TypeScript definitions on DefinitelyTyped](https://img.shields.io/badge/DefinitelyTyped-.d.ts-brightgreen.svg?style=flat)](https://definitelytyped.org)
 

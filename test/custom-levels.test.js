@@ -6,6 +6,10 @@ const { test } = require('tap')
 const { sink, once } = require('./helper')
 const pino = require('../')
 
+// Silence all warnings for this test
+process.removeAllListeners('warning')
+process.on('warning', () => {})
+
 test('adds additional levels', async ({ is }) => {
   const stream = sink()
   const logger = pino({

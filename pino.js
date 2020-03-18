@@ -186,8 +186,21 @@ function levelNameLabelFormatter (name) {
   }
 }
 
-pino.extreme = (dest = process.stdout.fd) => buildSafeSonicBoom(dest, 4096, false)
-pino.destination = (dest = process.stdout.fd) => buildSafeSonicBoom(dest, 0, true)
+pino.extreme = (dest = process.stdout.fd) => {
+  process.emitWarning(
+    'The pino.extreme() option is deprecated and will be removed in v7. Use pino.destination({ sync: false }) instead.',
+    { code: 'extreme_deprecation' }
+  )
+  return buildSafeSonicBoom({ dest, minLength: 4096, sync: false })
+}
+pino.destination = (dest = process.stdout.fd) => {
+  if (typeof dest === 'object') {
+    dest.dest = dest.dest || process.stdout.fd
+    return buildSafeSonicBoom(dest)
+  } else {
+    return buildSafeSonicBoom({ dest, minLength: 0, sync: true })
+  }
+}
 
 pino.final = final
 pino.levels = mappings()

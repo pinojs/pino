@@ -22,7 +22,6 @@
   * [logger.version](#version)
 * [Statics](#statics)
   * [pino.destination()](#pino-destination)
-  * [pino.extreme()](#pino-extreme)
   * [pino.final()](#pino-final)
   * [pino.stdSerializers](#pino-stdserializers)
   * [pino.stdTimeFunctions](#pino-stdtimefunctions)
@@ -321,7 +320,7 @@ Default: `pino.destination(1)` (STDOUT)
 The `destination` parameter, at a minimum must be an object with a `write` method.
 An ordinary Node.js `stream` can be passed as the destination (such as the result
 of `fs.createWriteStream`) but for peak log writing performance it is strongly
-recommended to use `pino.destination` or `pino.extreme` to create the destination stream.
+recommended to use `pino.destination` to create the destination stream.
 
 ```js
 // pino.destination(1) by default
@@ -345,7 +344,6 @@ However, there are some special instances where `pino.destination` is not used a
 In these cases `process.stdout` is used instead.
 
 * See [`pino.destination`](#pino-destination)
-* See [`pino.extreme`](#pino-extreme)
 
 <a id="metadata"></a>
 #### `destination[Symbol.for('pino.metadata')]`
@@ -609,19 +607,20 @@ console.log(anotherChild.bindings())
 <a id="flush"></a>
 ### `logger.flush()`
 
-Flushes the content of the buffer when using a `pino.extreme` destination.
+Flushes the content of the buffer when using `pino.destination({
+sync: false })`.
 
 This is an asynchronous, fire and forget, operation.
 
-The use case is primarily for Extreme mode logging, which may hold up to
-4KiB of logs. The `logger.flush` method can be used to flush the logs
+The use case is primarily for asynchronous logging, which may buffer
+log lines while others are being written. The `logger.flush` method can be
+used to flush the logs
 on an long interval, say ten seconds. Such a strategy can provide an
 optimium balance between extremely efficient logging at high demand periods
 and safer logging at low demand periods.
 
-* See [`pino.extreme`](#pino-extreme)
 * See [`destination` parameter](#destination)
-* See [Extreme mode ⇗](/docs/extreme.md)
+* See [Asynchronous Logging ⇗](/docs/asynchronous.md)
 
 <a id="level"></a>
 ### `logger.level` (String) [Getter/Setter]
@@ -744,7 +743,7 @@ Exposes the Pino package version. Also available on the exported `pino` function
 ## Statics
 
 <a id="pino-destination"></a>
-### `pino.destination([target]) => SonicBoom`
+### `pino.destination([opts]) => SonicBoom`
 
 Create a Pino Destination instance: a stream-like object with
 significantly more throughput (over 30%) than a standard Node.js stream.
@@ -753,6 +752,11 @@ significantly more throughput (over 30%) than a standard Node.js stream.
 const pino = require('pino')
 const logger = pino(pino.destination('./my-file'))
 const logger2 = pino(pino.destination())
+const logger3 = pino(pino.destination({
+  dest: './my-file',
+  minLength: 4096, // Buffer before writing
+  sync: false // Asynchronous logging
+}))
 ```
 
 The `pino.destination` method may be passed a file path or a numerical file descriptor.
@@ -766,35 +770,7 @@ A `pino.destination` instance can also be used to reopen closed files
 * See [`destination` parameter](#destination)
 * See [`sonic-boom` ⇗](https://github.com/mcollina/sonic-boom)
 * See [Reopening log files](/docs/help.md#reopening)
-
-<a id="pino-extreme"></a>
-### `pino.extreme([target]) => SonicBoom`
-
-Create an extreme mode destination. This yields an additional 60% performance boost.
-There are trade-offs that should be understood before usage.
-
-```js
-const pino = require('pino')
-const logger = pino(pino.extreme('./my-file'))
-const logger2 = pino(pino.extreme())
-```
-
-The `pino.extreme` method may be passed a file path or a numerical file descriptor.
-By default, `pino.extreme` will use `process.stdout.fd` (1) as the file descriptor.
-
-`pino.extreme` is implemented with the [`sonic-boom` ⇗](https://github.com/mcollina/sonic-boom)
-module.
-
-A `pino.extreme` instance can also be used to reopen closed files
-(for example, for some log rotation scenarios), see [Reopening log files](/docs/help.md#reopening).
-
-On AWS Lambda we recommend to call `extreme.flushSync()` at the end
-of each function execution to avoid losing data.
-
-* See [`destination` parameter](#destination)
-* See [`sonic-boom` ⇗](https://github.com/mcollina/sonic-boom)
-* See [Extreme mode ⇗](/docs/extreme.md)
-* See [Reopening log files](/docs/help.md#reopening)
+* See [Asynchronous Logging ⇗](/docs/asynchronous.md)
 
 <a id="pino-final"></a>
 

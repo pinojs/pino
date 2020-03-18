@@ -1,7 +1,7 @@
 name: CI
 on: [push, pull_request]
 jobs:
-  build:
+  test:
     name: ${{ matrix.node-version }} ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
@@ -10,7 +10,7 @@ jobs:
         os: [macOS-latest, windows-latest, ubuntu-latest]
         node-version: [10, 12, 13]
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
@@ -18,21 +18,4 @@ jobs:
       - name: Install
         run: npm i
       - name: Tests
-        run: npm run test
-  coverage:
-    name: coverage
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-      - name: Use Node.js 12
-        uses: actions/setup-node@v1
-        with:
-          node-version: 12
-      - name: Install
-        run: npm i
-      - name: run with coverage
-        run: npm run cov-ci
-      - name: Coveralls
-        uses: coverallsapp/github-action@master
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+        run: npm test
