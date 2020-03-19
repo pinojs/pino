@@ -84,6 +84,7 @@ PR's to this document are welcome for any new transports!
 + [pino-syslog](#pino-syslog)
 + [pino-websocket](#pino-websocket)
 + [pino-http-send](#pino-http-send)
++ [pino-pg](#pino-pg)
 
 <a id="pino-applicationinsights"></a>
 ### pino-applicationinsights
@@ -385,3 +386,8 @@ transport that will batch logs and send to a specified URL.
 ```console
 $ node app.js | pino-http-send -u http://localhost:8080/logs
 ```
+
+<a id="pino-pg"></a>
+### pino-pg
+[pino-pg](https://www.npmjs.com/package/pino-pg) stores logs into PostgreSQL.
+Full documentation in the [readme](https://github.com/Xstoudi/pino-pg).
