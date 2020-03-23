@@ -116,7 +116,7 @@ test('redact option – interpolated object', async ({ is }) => {
   const stream = sink()
   const instance = pino({ redact: ['req.headers.cookie'] }, stream)
 
-  instance.info('test', {
+  instance.info('test %j', {
     req: {
       id: 7915,
       method: 'GET',
@@ -180,7 +180,7 @@ test('redact.paths option – interpolated object', async ({ is }) => {
   const stream = sink()
   const instance = pino({ redact: { paths: ['req.headers.cookie'] } }, stream)
 
-  instance.info('test', {
+  instance.info('test %j', {
     req: {
       id: 7915,
       method: 'GET',

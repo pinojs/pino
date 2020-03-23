@@ -456,7 +456,7 @@ test('log null value when message is null', async ({ is }) => {
   check(is, result, expected.level, expected.msg)
 })
 
-test('concatenate multiple params when base param is null', async ({ is }) => {
+test('formats when base param is null', async ({ is }) => {
   const expected = {
     msg: 'a string',
     level: 30
@@ -465,7 +465,7 @@ test('concatenate multiple params when base param is null', async ({ is }) => {
   const stream = sink()
   const instance = pino(stream)
   instance.level = 'info'
-  instance.info(null, 'a', 'string')
+  instance.info(null, 'a %s', 'string')
 
   const result = await once(stream, 'data')
   check(is, result, expected.level, expected.msg)

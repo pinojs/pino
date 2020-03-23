@@ -4,4 +4,4 @@ require('os').hostname = function () { return 'abcdefghijklmnopqr' }
 var pino = require(require.resolve('./../../../'))
 var log = pino({ prettyPrint: true })
 log.error(new Error('kaboom'))
-log.error(new Error('kaboom'), 'with', 'a', 'message')
+log.error(new Error('kaboom'), 'with a message')
