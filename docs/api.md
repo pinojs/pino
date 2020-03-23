@@ -448,9 +448,8 @@ then be interpolated accordingly.
 #### `...interpolationValues` (Any)
 
 All arguments supplied after `message` are serialized and interpolated according
-to any supplied printf-style placeholders (`%s`, `%d`, `%o`|`%O`|`%j`)
-or else concatenated together with the `message` string to form the final
-output `msg` value for the JSON log line.
+to any supplied printf-style placeholders (`%s`, `%d`, `%o`|`%O`|`%j`) to form
+the final output `msg` value for the JSON log line.
 
 ```js
 logger.info('hello', 'world')
