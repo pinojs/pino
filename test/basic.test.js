@@ -160,7 +160,7 @@ function levelTest (name, level) {
     instance.level = name
 
     const sym = Symbol('foo')
-    instance[name]('hello', sym)
+    instance[name]('hello %s', sym)
 
     const result = await once(stream, 'data')
 
@@ -628,7 +628,7 @@ test('fast-safe-stringify must be used when interpolating', async (t) => {
 
   const o = { a: { b: {} } }
   o.a.b.c = o.a.b
-  instance.info('test', o)
+  instance.info('test %j', o)
 
   const { msg } = await once(stream, 'data')
   t.is(msg, 'test {"a":{"b":{"c":"[Circular]"}}}')
