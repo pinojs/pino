@@ -14,7 +14,6 @@ test('metadata works', async ({ ok, same, is }) => {
     write (chunk) {
       is(instance, this.lastLogger)
       is(30, this.lastLevel)
-      is('a msg', this.lastMsg)
       ok(Number(this.lastTime) >= now)
       same(this.lastObj, { hello: 'world', msg: 'a msg' })
       const result = JSON.parse(chunk)
@@ -39,7 +38,6 @@ test('child loggers works', async ({ ok, same, is }) => {
     write (chunk) {
       is(child, this.lastLogger)
       is(30, this.lastLevel)
-      is('a msg', this.lastMsg)
       same(this.lastObj, { from: 'child', msg: 'a msg' })
       const result = JSON.parse(chunk)
       ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
@@ -65,7 +63,6 @@ test('without object', async ({ ok, same, is }) => {
     write (chunk) {
       is(instance, this.lastLogger)
       is(30, this.lastLevel)
-      is('a msg', this.lastMsg)
       same({ msg: 'a msg' }, this.lastObj)
       const result = JSON.parse(chunk)
       ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
