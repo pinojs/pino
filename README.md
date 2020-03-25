@@ -21,6 +21,7 @@
 * [Ecosystem ⇗](/docs/ecosystem.md)
 * [Legacy](/docs/legacy.md)
 * [Help ⇗](/docs/help.md)
+* [Long Term Support Policy ⇗](/docs/lts.md)
 
 ## Install
 
