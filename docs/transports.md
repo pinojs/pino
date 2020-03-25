@@ -74,17 +74,19 @@ PR's to this document are welcome for any new transports!
 + [pino-couch](#pino-couch)
 + [pino-datadog](#pino-datadog)
 + [pino-elasticsearch](#pino-elasticsearch)
++ [pino-http-send](#pino-http-send)
 + [pino-mq](#pino-mq)
 + [pino-mysql](#pino-mysql)
 + [pino-papertrail](#pino-papertrail)
++ [pino-pg](#pino-pg)
 + [pino-redis](#pino-redis)
 + [pino-sentry](#pino-sentry)
 + [pino-socket](#pino-socket)
 + [pino-stackdriver](#pino-stackdriver)
 + [pino-syslog](#pino-syslog)
 + [pino-websocket](#pino-websocket)
-+ [pino-http-send](#pino-http-send)
-+ [pino-pg](#pino-pg)
+
+
 
 <a id="pino-applicationinsights"></a>
 ### pino-applicationinsights
@@ -183,6 +185,16 @@ Then [create an index pattern](https://www.elastic.co/guide/en/kibana/current/se
 [elasticsearch]: https://www.elastic.co/products/elasticsearch
 [kibana]: https://www.elastic.co/products/kibana
 
+<a id="pino-http-send"></a>
+### pino-http-send
+
+[pino-http-send](https://npmjs.com/package/pino-http-send) is a configurable and low overhead
+transport that will batch logs and send to a specified URL.
+
+```console
+$ node app.js | pino-http-send -u http://localhost:8080/logs
+```
+
 <a id="pino-mq"></a>
 ### pino-mq
 
@@ -224,6 +236,11 @@ node yourapp.js | pino-papertrail --host bar.papertrailapp.com --port 12345 --ap
 
 
 for full documentation of command line switches read [readme](https://github.com/ovhemert/pino-papertrail#readme)
+
+<a id="pino-pg"></a>
+### pino-pg
+[pino-pg](https://www.npmjs.com/package/pino-pg) stores logs into PostgreSQL.
+Full documentation in the [readme](https://github.com/Xstoudi/pino-pg).
 
 <a id="pino-mysql"></a>
 ### pino-mysql
@@ -376,18 +393,3 @@ $ node app.js | pino-websocket -a my-websocket-server.example.com -p 3004
 ```
 
 For full documentation of command line switches read [readme](https://github.com/abeai/pino-webscoket#README)
-
-<a id="pino-http-send"></a>
-### pino-http-send
-
-[pino-http-send](https://npmjs.com/package/pino-http-send) is a configurable and low overhead
-transport that will batch logs and send to a specified URL.
-
-```console
-$ node app.js | pino-http-send -u http://localhost:8080/logs
-```
-
-<a id="pino-pg"></a>
-### pino-pg
-[pino-pg](https://www.npmjs.com/package/pino-pg) stores logs into PostgreSQL.
-Full documentation in the [readme](https://github.com/Xstoudi/pino-pg).
