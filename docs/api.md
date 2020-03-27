@@ -20,16 +20,13 @@
   * [logger\[Symbol.for('pino.serializers')\]](#serializers)
   * [Event: 'level-change'](#level-change)
   * [logger.version](#version)
-  * [logger.LOG_VERSION](#log_version)
 * [Statics](#statics)
   * [pino.destination()](#pino-destination)
-  * [pino.extreme()](#pino-extreme)
   * [pino.final()](#pino-final)
   * [pino.stdSerializers](#pino-stdserializers)
   * [pino.stdTimeFunctions](#pino-stdtimefunctions)
   * [pino.symbols](#pino-symbols)
   * [pino.version](#pino-version)
-  * [pino.LOG_VERSION](#pino-LOG_VERSION)
 
 <a id="export"></a>
 ## `pino([options], [destination]) => logger`
@@ -140,6 +137,58 @@ If an object is supplied, three options can be specified:
 * See the [redaction ⇗](/docs/redaction.md) documentation.
 * See [fast-redact#caveat ⇗](http://github.com/davidmarkclements/fast-redact#caveat)
 
+<a id=opt-formatters></a>
+#### `formatters` (Object)
+
+An object containing functions for formatting the shape of the log lines.
+These functions should return a JSONifiable object and
+should never throw. These functions allow for full customization of
+the resulting log lines. For example, they can be used to change
+the level key name or to enrich the default metadata.
+
+##### `level`
+
+Changes the shape of the log level. The default shape is `{ level: number }`.
+The function takes two arguments, the label of the level (e.g. `'info'`)
+and the numeric value (e.g. `30`).
+
+```js
+const formatters = {
+  level (label, number) {
+    return { level: number }
+  }
+}
+```
+
+##### `bindings`
+
+Changes the shape of the bindings. The default shape is `{ pid, hostname }`.
+The function takes a single argument, the bindings object. It will
+be called every time a child logger is created.
+
+```js
+const formatters = {
+  bindings (bindings) {
+    return { pid: bindings.pid, hostname: bindings.hostname }
+  }
+}
+```
+
+##### `log`
+
+Changes the shape of the log object. This function will be called every time
+one of the log methods (such as `.info`) is called. All arguments passed to the
+log method, except the message, will be pass to this function. By default it does
+not change the shape of the log object.
+
+```js
+const formatters = {
+  log (object) {
+    return object
+  }
+}
+```
+
 <a id=opt-serializers></a>
 #### `serializers` (Object)
 
@@ -152,12 +201,9 @@ matching the exact key of a serializer will be serialized using the defined seri
 
 * See [pino.stdSerializers](#pino-stdserializers)
 
-##### `serializers[Symbol.for('pino.*')]` (Function)
+##### `serializers[Symbol.for('pino.*')]` (Function) - DEPRECATED
 
-Default: `undefined`
-
-The `serializers` object may contain a key which is the global symbol: `Symbol.for('pino.*')`.
-This will act upon the complete log object rather than corresponding to a particular key.
+Use `formatters.log` instead.
 
 #### `base` (Object)
 
@@ -246,30 +292,18 @@ npm install pino-pretty
 ```
 
 <a id="useLevelLabels"></a>
-#### `useLevelLabels` (Boolean)
+#### `useLevelLabels` (Boolean) - DEPRECATED
 
-Default: `false`
-
-Enables printing of level labels instead of level values in the printed logs.
-Warning: this option may not be supported by downstream transports.
+Use `formatters.level` instead. This will be removed in v7.
 
 <a id="changeLevelName"></a>
 #### `changeLevelName` (String) - DEPRECATED
-Use `levelKey` instead. This will be removed in v7.
+Use `formatters.level` instead. This will be removed in v7.
 
 <a id="levelKey"></a>
-#### `levelKey` (String)
+#### `levelKey` (String) - DEPRECATED
 
-Default: `'level'`
-
-Changes the property `level` to any string value you pass in:
-```js
-const logger = pino({
-  levelKey: 'priority'
-})
-logger.info('hello world')
-// {"priority":30,"time":1531257112193,"msg":"hello world","pid":55956,"hostname":"x","v":1}
-```
+Use `formatters.level` instead. This will be removed in v7.
 
 #### `browser` (Object)
 
@@ -286,7 +320,7 @@ Default: `pino.destination(1)` (STDOUT)
 The `destination` parameter, at a minimum must be an object with a `write` method.
 An ordinary Node.js `stream` can be passed as the destination (such as the result
 of `fs.createWriteStream`) but for peak log writing performance it is strongly
-recommended to use `pino.destination` or `pino.extreme` to create the destination stream.
+recommended to use `pino.destination` to create the destination stream.
 
 ```js
 // pino.destination(1) by default
@@ -310,7 +344,6 @@ However, there are some special instances where `pino.destination` is not used a
 In these cases `process.stdout` is used instead.
 
 * See [`pino.destination`](#pino-destination)
-* See [`pino.extreme`](#pino-extreme)
 
 <a id="metadata"></a>
 #### `destination[Symbol.for('pino.metadata')]`
@@ -373,7 +406,7 @@ of the `mergingObject` is copied in to the JSON log line.
 
 ```js
 logger.info({MIX: {IN: true}})
-// {"level":30,"time":1531254555820,"pid":55956,"hostname":"x","MIX":{"IN":true},"v":1}
+// {"level":30,"time":1531254555820,"pid":55956,"hostname":"x","MIX":{"IN":true}}
 ```
 
 <a id=message></a>
@@ -387,7 +420,7 @@ JSON log line under the `msg` key:
 
 ```js
 logger.info('hello world')
-// {"level":30,"time":1531257112193,"msg":"hello world","pid":55956,"hostname":"x","v":1}
+// {"level":30,"time":1531257112193,"msg":"hello world","pid":55956,"hostname":"x"}
 ```
 
 The `message` parameter takes precedence over the `mergedObject`.
@@ -415,23 +448,22 @@ then be interpolated accordingly.
 #### `...interpolationValues` (Any)
 
 All arguments supplied after `message` are serialized and interpolated according
-to any supplied printf-style placeholders (`%s`, `%d`, `%o`|`%O`|`%j`)
-or else concatenated together with the `message` string to form the final
-output `msg` value for the JSON log line.
+to any supplied printf-style placeholders (`%s`, `%d`, `%o`|`%O`|`%j`) to form
+the final output `msg` value for the JSON log line.
 
 ```js
 logger.info('hello', 'world')
-// {"level":30,"time":1531257618044,"msg":"hello world","pid":55956,"hostname":"x","v":1}
+// {"level":30,"time":1531257618044,"msg":"hello world","pid":55956,"hostname":"x"}
 ```
 
 ```js
 logger.info('hello', {worldly: 1})
-// {"level":30,"time":1531257797727,"msg":"hello {\"worldly\":1}","pid":55956,"hostname":"x","v":1}
+// {"level":30,"time":1531257797727,"msg":"hello {\"worldly\":1}","pid":55956,"hostname":"x"}
 ```
 
 ```js
 logger.info('%o hello', {worldly: 1})
-// {"level":30,"time":1531257826880,"msg":"{\"worldly\":1} hello","pid":55956,"hostname":"x","v":1}
+// {"level":30,"time":1531257826880,"msg":"{\"worldly\":1} hello","pid":55956,"hostname":"x"}
 ```
 
 * See [`message` log method parameter](#message)
@@ -520,9 +552,9 @@ via the returned child logger.
 ```js
 const child = logger.child({ MIX: {IN: 'always'} })
 child.info('hello')
-// {"level":30,"time":1531258616689,"msg":"hello","pid":64849,"hostname":"x","MIX":{"IN":"always"},"v":1}
+// {"level":30,"time":1531258616689,"msg":"hello","pid":64849,"hostname":"x","MIX":{"IN":"always"}}
 child.info('child!')
-// {"level":30,"time":1531258617401,"msg":"child!","pid":64849,"hostname":"x","MIX":{"IN":"always"},"v":1}
+// {"level":30,"time":1531258617401,"msg":"child!","pid":64849,"hostname":"x","MIX":{"IN":"always"}}
 ```
 
 The `bindings` object may contain any key except for reserved configuration keys `level` and `serializers`.
@@ -549,10 +581,10 @@ any configured parent serializers.
 ```js
 const logger = require('pino')()
 logger.info({test: 'will appear'})
-// {"level":30,"time":1531259759482,"pid":67930,"hostname":"x","test":"will appear","v":1}
+// {"level":30,"time":1531259759482,"pid":67930,"hostname":"x","test":"will appear"}
 const child = logger.child({serializers: {test: () => `child-only serializer`}})
 child.info({test: 'will be overwritten'})
-// {"level":30,"time":1531259784008,"pid":67930,"hostname":"x","test":"child-only serializer","v":1}
+// {"level":30,"time":1531259784008,"pid":67930,"hostname":"x","test":"child-only serializer"}
 ```
 
 * See [`serializers` option](#opt-serializers)
@@ -574,19 +606,20 @@ console.log(anotherChild.bindings())
 <a id="flush"></a>
 ### `logger.flush()`
 
-Flushes the content of the buffer when using a `pino.extreme` destination.
+Flushes the content of the buffer when using `pino.destination({
+sync: false })`.
 
 This is an asynchronous, fire and forget, operation.
 
-The use case is primarily for Extreme mode logging, which may hold up to
-4KiB of logs. The `logger.flush` method can be used to flush the logs
+The use case is primarily for asynchronous logging, which may buffer
+log lines while others are being written. The `logger.flush` method can be
+used to flush the logs
 on an long interval, say ten seconds. Such a strategy can provide an
 optimium balance between extremely efficient logging at high demand periods
 and safer logging at low demand periods.
 
-* See [`pino.extreme`](#pino-extreme)
 * See [`destination` parameter](#destination)
-* See [Extreme mode ⇗](/docs/extreme.md)
+* See [Asynchronous Logging ⇗](/docs/asynchronous.md)
 
 <a id="level"></a>
 ### `logger.level` (String) [Getter/Setter]
@@ -706,18 +739,10 @@ Exposes the Pino package version. Also available on the exported `pino` function
 
 * See [`pino.version`](#pino-version)
 
-<a id="log_version"></a>
-### `logger.LOG_VERSION` (Number)
-
-Holds the current log format version as output in the `v` property of each log record.
-Also available on the exported `pino` function.
-
-* See [`pino.LOG_VERSION`](#pino-LOG_VERSION)
-
 ## Statics
 
 <a id="pino-destination"></a>
-### `pino.destination([target]) => SonicBoom`
+### `pino.destination([opts]) => SonicBoom`
 
 Create a Pino Destination instance: a stream-like object with
 significantly more throughput (over 30%) than a standard Node.js stream.
@@ -726,6 +751,11 @@ significantly more throughput (over 30%) than a standard Node.js stream.
 const pino = require('pino')
 const logger = pino(pino.destination('./my-file'))
 const logger2 = pino(pino.destination())
+const logger3 = pino(pino.destination({
+  dest: './my-file',
+  minLength: 4096, // Buffer before writing
+  sync: false // Asynchronous logging
+}))
 ```
 
 The `pino.destination` method may be passed a file path or a numerical file descriptor.
@@ -739,35 +769,7 @@ A `pino.destination` instance can also be used to reopen closed files
 * See [`destination` parameter](#destination)
 * See [`sonic-boom` ⇗](https://github.com/mcollina/sonic-boom)
 * See [Reopening log files](/docs/help.md#reopening)
-
-<a id="pino-extreme"></a>
-### `pino.extreme([target]) => SonicBoom`
-
-Create an extreme mode destination. This yields an additional 60% performance boost.
-There are trade-offs that should be understood before usage.
-
-```js
-const pino = require('pino')
-const logger = pino(pino.extreme('./my-file'))
-const logger2 = pino(pino.extreme())
-```
-
-The `pino.extreme` method may be passed a file path or a numerical file descriptor.
-By default, `pino.extreme` will use `process.stdout.fd` (1) as the file descriptor.
-
-`pino.extreme` is implemented with the [`sonic-boom` ⇗](https://github.com/mcollina/sonic-boom)
-module.
-
-A `pino.extreme` instance can also be used to reopen closed files
-(for example, for some log rotation scenarios), see [Reopening log files](/docs/help.md#reopening).
-
-On AWS Lambda we recommend to call `extreme.flushSync()` at the end
-of each function execution to avoid losing data.
-
-* See [`destination` parameter](#destination)
-* See [`sonic-boom` ⇗](https://github.com/mcollina/sonic-boom)
-* See [Extreme mode ⇗](/docs/extreme.md)
-* See [Reopening log files](/docs/help.md#reopening)
+* See [Asynchronous Logging ⇗](/docs/asynchronous.md)
 
 <a id="pino-final"></a>
 
@@ -859,10 +861,3 @@ for general use.
 Exposes the Pino package version. Also available on the logger instance.
 
 * See [`logger.version`](#version)
-
-<a id="pino-log_version"></a>
-### `pino.LOG_VERSION` (Number)
-
-Holds the current log format version as output in the `v` property of each log record. Also available on the logger instance.
-
-* See [`logger.LOG_VERSION`](#log_version)

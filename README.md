@@ -1,6 +1,9 @@
 ![banner](pino-banner.png)
 
-# pino&nbsp;&nbsp;[![Build Status](https://travis-ci.org/pinojs/pino.svg?branch=master)](https://travis-ci.org/pinojs/pino)&nbsp;[![Coverage Status](https://coveralls.io/repos/github/pinojs/pino/badge.svg?branch=master)](https://coveralls.io/github/pinojs/pino?branch=master) [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](http://standardjs.com/) [![TypeScript definitions on DefinitelyTyped](https://definitelytyped.org/badges/standard.svg)](https://definitelytyped.org)
+# pino
+[![Build Status](https://img.shields.io/github/workflow/status/pinojs/pino/CI)](https://github.com/pinojs/pino/actions)
+&nbsp;[![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](http://standardjs.com/)
+&nbsp;[![TypeScript definitions on DefinitelyTyped](https://img.shields.io/badge/DefinitelyTyped-.d.ts-brightgreen.svg?style=flat)](https://definitelytyped.org)
 
 [Very low overhead](#low-overhead) Node.js logger, inspired by Bunyan.
 
@@ -18,6 +21,7 @@
 * [Ecosystem ⇗](/docs/ecosystem.md)
 * [Legacy](/docs/legacy.md)
 * [Help ⇗](/docs/help.md)
+* [Long Term Support Policy ⇗](/docs/lts.md)
 
 ## Install
 
@@ -39,8 +43,8 @@ child.info('hello child!')
 This produces:
 
 ```
-{"level":30,"time":1531171074631,"msg":"hello world","pid":657,"hostname":"Davids-MBP-3.fritz.box","v":1}
-{"level":30,"time":1531171082399,"msg":"hello child!","pid":657,"hostname":"Davids-MBP-3.fritz.box","a":"property","v":1}
+{"level":30,"time":1531171074631,"msg":"hello world","pid":657,"hostname":"Davids-MBP-3.fritz.box"}
+{"level":30,"time":1531171082399,"msg":"hello child!","pid":657,"hostname":"Davids-MBP-3.fritz.box","a":"property"}
 ```
 
 For using Pino with a web framework see:

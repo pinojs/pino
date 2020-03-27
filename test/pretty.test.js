@@ -7,13 +7,7 @@ const execa = require('execa')
 const writer = require('flush-write-stream')
 const { once } = require('./helper')
 const pino = require('../')
-const tap = require('tap')
-
-const isWin = process.platform === 'win32'
-if (isWin) {
-  tap.comment('Skipping pretty printing tests on Windows as colour codes are different and tests fail')
-  process.exit(0)
-}
+const strip = require('strip-ansi')
 
 test('can be enabled via exported pino function', async ({ isNot }) => {
   var actual = ''
@@ -24,7 +18,7 @@ test('can be enabled via exported pino function', async ({ isNot }) => {
     cb()
   }))
   await once(child, 'close')
-  isNot(actual.match(/\(123456 on abcdefghijklmnopqr\): h/), null)
+  isNot(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): h/), null)
 })
 
 test('can be enabled via exported pino function with pretty configuration', async ({ isNot }) => {
@@ -36,7 +30,7 @@ test('can be enabled via exported pino function with pretty configuration', asyn
     cb()
   }))
   await once(child, 'close')
-  isNot(actual.match(/^INFO.*h/), null)
+  isNot(strip(actual).match(/^INFO.*h/), null)
 })
 
 test('can be enabled via exported pino function with prettifier', async ({ isNot }) => {
@@ -49,7 +43,7 @@ test('can be enabled via exported pino function with prettifier', async ({ isNot
   }))
 
   await once(child, 'close')
-  isNot(actual.match(/^INFO.*h/), null)
+  isNot(strip(actual).match(/^INFO.*h/), null)
 })
 
 test('does not throw error when enabled with stream specified', async ({ doesNotThrow }) => {
@@ -111,11 +105,11 @@ test('parses and outputs chindings', async ({ is, isNot }) => {
     cb()
   }))
   await once(child, 'close')
-  isNot(actual.match(/\(123456 on abcdefghijklmnopqr\): h/), null)
-  isNot(actual.match(/\(123456 on abcdefghijklmnopqr\): h2/), null)
-  isNot(actual.match(/a: 1/), null)
-  isNot(actual.match(/b: 2/), null)
-  is(actual.match(/a: 1/g).length, 3)
+  isNot(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): h/), null)
+  isNot(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): h2/), null)
+  isNot(strip(actual).match(/a: 1/), null)
+  isNot(strip(actual).match(/b: 2/), null)
+  is(strip(actual).match(/a: 1/g).length, 3)
 })
 
 test('applies serializers', async ({ is, isNot }) => {
@@ -127,8 +121,8 @@ test('applies serializers', async ({ is, isNot }) => {
     cb()
   }))
   await once(child, 'close')
-  isNot(actual.match(/\(123456 on abcdefghijklmnopqr\): h/), null)
-  isNot(actual.match(/foo: "bar"/), null)
+  isNot(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): h/), null)
+  isNot(strip(actual).match(/foo: "bar"/), null)
 })
 
 test('applies redaction rules', async ({ is, isNot }) => {
@@ -140,9 +134,9 @@ test('applies redaction rules', async ({ is, isNot }) => {
     cb()
   }))
   await once(child, 'close')
-  isNot(actual.match(/\(123456 on abcdefghijklmnopqr\): h/), null)
-  isNot(actual.match(/\[Redacted\]/), null)
-  is(actual.match(/object/), null)
+  isNot(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): h/), null)
+  isNot(strip(actual).match(/\[Redacted\]/), null)
+  is(strip(actual).match(/object/), null)
 })
 
 test('dateformat', async ({ isNot }) => {
@@ -154,7 +148,7 @@ test('dateformat', async ({ isNot }) => {
     cb()
   }))
   await once(child, 'close')
-  isNot(actual.match(/\(123456 on abcdefghijklmnopqr\): h/), null)
+  isNot(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): h/), null)
 })
 
 test('without timestamp', async ({ isNot }) => {
@@ -166,7 +160,7 @@ test('without timestamp', async ({ isNot }) => {
     cb()
   }))
   await once(child, 'close')
-  isNot(actual.slice(2), '[]')
+  isNot(strip(actual).slice(2), '[]')
 })
 
 test('with custom timestamp', async ({ is }) => {
@@ -178,7 +172,7 @@ test('with custom timestamp', async ({ is }) => {
     cb()
   }))
   await once(child, 'close')
-  is(actual.slice(0, 8), '["test"]')
+  is(strip(actual).slice(0, 8), '["test"]')
 })
 
 test('with custom timestamp label', async ({ is }) => {
@@ -190,7 +184,7 @@ test('with custom timestamp label', async ({ is }) => {
     cb()
   }))
   await once(child, 'close')
-  is(actual.slice(0, 8), '["test"]')
+  is(strip(actual).slice(0, 8), '["test"]')
 })
 
 test('errors', async ({ isNot }) => {
@@ -202,9 +196,9 @@ test('errors', async ({ isNot }) => {
     cb()
   }))
   await once(child, 'close')
-  isNot(actual.match(/\(123456 on abcdefghijklmnopqr\): kaboom/), null)
-  isNot(actual.match(/\(123456 on abcdefghijklmnopqr\): with a message/), null)
-  isNot(actual.match(/.*error\.js.*/), null)
+  isNot(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): kaboom/), null)
+  isNot(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): with a message/), null)
+  isNot(strip(actual).match(/.*error\.js.*/), null)
 })
 
 test('errors with props', async ({ isNot }) => {
@@ -216,10 +210,10 @@ test('errors with props', async ({ isNot }) => {
     cb()
   }))
   await once(child, 'close')
-  isNot(actual.match(/\(123456 on abcdefghijklmnopqr\): kaboom/), null)
-  isNot(actual.match(/code: ENOENT/), null)
-  isNot(actual.match(/errno: 1/), null)
-  isNot(actual.match(/.*error-props\.js.*/), null)
+  isNot(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): kaboom/), null)
+  isNot(strip(actual).match(/code: ENOENT/), null)
+  isNot(strip(actual).match(/errno: 1/), null)
+  isNot(strip(actual).match(/.*error-props\.js.*/), null)
 })
 
 test('final works with pretty', async ({ isNot }) => {
@@ -231,8 +225,8 @@ test('final works with pretty', async ({ isNot }) => {
     cb()
   }))
   await once(child, 'close')
-  isNot(actual.match(/WARN\s+\(123456 on abcdefghijklmnopqr\): pino.final with prettyPrint does not support flushing/), null)
-  isNot(actual.match(/INFO\s+\(123456 on abcdefghijklmnopqr\): beforeExit/), null)
+  isNot(strip(actual).match(/WARN\s+\(123456 on abcdefghijklmnopqr\): pino.final with prettyPrint does not support flushing/), null)
+  isNot(strip(actual).match(/INFO\s+\(123456 on abcdefghijklmnopqr\): beforeExit/), null)
 })
 
 test('final works when returning a logger', async ({ isNot }) => {
@@ -244,8 +238,8 @@ test('final works when returning a logger', async ({ isNot }) => {
     cb()
   }))
   await once(child, 'close')
-  isNot(actual.match(/WARN\s+\(123456 on abcdefghijklmnopqr\): pino.final with prettyPrint does not support flushing/), null)
-  isNot(actual.match(/INFO\s+\(123456 on abcdefghijklmnopqr\): after/), null)
+  isNot(strip(actual).match(/WARN\s+\(123456 on abcdefghijklmnopqr\): pino.final with prettyPrint does not support flushing/), null)
+  isNot(strip(actual).match(/INFO\s+\(123456 on abcdefghijklmnopqr\): after/), null)
 })
 
 test('final works without prior logging', async ({ isNot }) => {
@@ -257,8 +251,8 @@ test('final works without prior logging', async ({ isNot }) => {
     cb()
   }))
   await once(child, 'close')
-  isNot(actual.match(/WARN\s+: pino.final with prettyPrint does not support flushing/), null)
-  isNot(actual.match(/INFO\s+\(123456 on abcdefghijklmnopqr\): beforeExit/), null)
+  isNot(strip(actual).match(/WARN\s+: pino.final with prettyPrint does not support flushing/), null)
+  isNot(strip(actual).match(/INFO\s+\(123456 on abcdefghijklmnopqr\): beforeExit/), null)
 })
 
 test('works as expected with an object with the msg prop', async ({ isNot }) => {
@@ -270,7 +264,7 @@ test('works as expected with an object with the msg prop', async ({ isNot }) => 
     cb()
   }))
   await once(child, 'close')
-  isNot(actual.match(/\(123456 on abcdefghijklmnopqr\): hello/), null)
+  isNot(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): hello/), null)
 })
 
 test('should not lose stream metadata for streams with `needsMetadataGsym` flag', async ({ isNot }) => {

@@ -4,6 +4,10 @@ const { test } = require('tap')
 const { sink, once, check } = require('./helper')
 const pino = require('../')
 
+// Silence all warnings for this test
+process.removeAllListeners('warning')
+process.on('warning', () => {})
+
 test('set the level by string', async ({ is }) => {
   const expected = [{
     level: 50,
@@ -233,7 +237,13 @@ test('produces labels when told to', async ({ is }) => {
     level: 'info',
     msg: 'hello world'
   }]
-  const instance = pino({ useLevelLabels: true }, sink((result, enc, cb) => {
+  const instance = pino({
+    formatters: {
+      level (label, number) {
+        return { level: label }
+      }
+    }
+  }, sink((result, enc, cb) => {
     const current = expected.shift()
     check(is, result, current.level, current.msg)
     cb()
@@ -271,7 +281,13 @@ test('changes label naming when told to', async ({ is }) => {
     priority: 30,
     msg: 'hello world'
   }]
-  const instance = pino({ levelKey: 'priority' }, sink((result, enc, cb) => {
+  const instance = pino({
+    formatters: {
+      level (label, number) {
+        return { priority: number }
+      }
+    }
+  }, sink((result, enc, cb) => {
     const current = expected.shift()
     is(result.priority, current.priority)
     is(result.msg, current.msg)
@@ -292,7 +308,13 @@ test('children produce labels when told to', async ({ is }) => {
       msg: 'child 2'
     }
   ]
-  const instance = pino({ useLevelLabels: true }, sink((result, enc, cb) => {
+  const instance = pino({
+    formatters: {
+      level (label, number) {
+        return { level: label }
+      }
+    }
+  }, sink((result, enc, cb) => {
     const current = expected.shift()
     check(is, result, current.level, current.msg)
     cb()
@@ -317,7 +339,11 @@ test('produces labels for custom levels', async ({ is }) => {
     }
   ]
   const opts = {
-    useLevelLabels: true,
+    formatters: {
+      level (label, number) {
+        return { level: label }
+      }
+    },
     customLevels: {
       foo: 35
     }
@@ -335,8 +361,11 @@ test('produces labels for custom levels', async ({ is }) => {
 test('setting levelKey does not affect labels when told to', async ({ is }) => {
   const instance = pino(
     {
-      useLevelLabels: true,
-      levelKey: 'priority'
+      formatters: {
+        level (label, number) {
+          return { priority: label }
+        }
+      }
     },
     sink((result, enc, cb) => {
       is(result.priority, 'info')
@@ -410,6 +439,36 @@ test('passes when creating a default value that exists in logger levels', async 
   pino({
     level: 30
   })
+})
+
+test('log null value when message is null', async ({ is }) => {
+  const expected = {
+    msg: null,
+    level: 30
+  }
+
+  const stream = sink()
+  const instance = pino(stream)
+  instance.level = 'info'
+  instance.info(null)
+
+  const result = await once(stream, 'data')
+  check(is, result, expected.level, expected.msg)
+})
+
+test('formats when base param is null', async ({ is }) => {
+  const expected = {
+    msg: 'a string',
+    level: 30
+  }
+
+  const stream = sink()
+  const instance = pino(stream)
+  instance.level = 'info'
+  instance.info(null, 'a %s', 'string')
+
+  const result = await once(stream, 'data')
+  check(is, result, expected.level, expected.msg)
 })
 
 test('fatal method sync-flushes the destination if sync flushing is available', async ({ pass, doesNotThrow, plan }) => {

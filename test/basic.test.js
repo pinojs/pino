@@ -106,7 +106,6 @@ function levelTest (name, level) {
     is(result.hostname, hostname)
     is(result.level, level)
     is(result.hello, 'world')
-    is(result.v, 1)
     same(Object.keys(obj), ['hello'])
   })
 
@@ -124,8 +123,7 @@ function levelTest (name, level) {
       hostname: hostname,
       level: level,
       msg: 'a string',
-      hello: 'world',
-      v: 1
+      hello: 'world'
     })
     same(Object.keys(obj), ['hello'])
   })
@@ -143,8 +141,7 @@ function levelTest (name, level) {
       hostname: hostname,
       level: level,
       msg: 'string',
-      hello: 'world',
-      v: 1
+      hello: 'world'
     })
   })
 
@@ -163,7 +160,7 @@ function levelTest (name, level) {
     instance.level = name
 
     const sym = Symbol('foo')
-    instance[name]('hello', sym)
+    instance[name]('hello %s', sym)
 
     const result = await once(stream, 'data')
 
@@ -191,8 +188,7 @@ function levelTest (name, level) {
         type: 'Error',
         message: err.message,
         stack: err.stack
-      },
-      v: 1
+      }
     })
   })
 
@@ -210,8 +206,7 @@ function levelTest (name, level) {
       hostname: hostname,
       level: level,
       msg: 'hello world',
-      hello: 'world',
-      v: 1
+      hello: 'world'
     })
   })
 }
@@ -261,8 +256,7 @@ test('set the name', async ({ is, same }) => {
     hostname: hostname,
     level: 60,
     name: 'hello',
-    msg: 'this is fatal',
-    v: 1
+    msg: 'this is fatal'
   })
 })
 
@@ -281,8 +275,7 @@ test('set the messageKey', async ({ is, same }) => {
     pid: pid,
     hostname: hostname,
     level: 30,
-    fooMessage: message,
-    v: 1
+    fooMessage: message
   })
 })
 
@@ -301,8 +294,7 @@ test('set the nestedKey', async ({ is, same }) => {
     pid: pid,
     hostname: hostname,
     level: 30,
-    stuff: object,
-    v: 1
+    stuff: object
   })
 })
 
@@ -317,8 +309,7 @@ test('set undefined properties', async ({ is, same }) => {
     pid: pid,
     hostname: hostname,
     level: 30,
-    hello: 'world',
-    v: 1
+    hello: 'world'
   })
 })
 
@@ -345,8 +336,7 @@ test('set the base', async ({ is, same }) => {
   same(result, {
     a: 'b',
     level: 60,
-    msg: 'this is fatal',
-    v: 1
+    msg: 'this is fatal'
   })
 })
 
@@ -361,17 +351,16 @@ test('set the base to null', async ({ is, same }) => {
   delete result.time
   same(result, {
     level: 60,
-    msg: 'this is fatal',
-    v: 1
+    msg: 'this is fatal'
   })
 })
 
-test('set the base to null and use a serializer', async ({ is, same }) => {
+test('set the base to null and use a formatter', async ({ is, same }) => {
   const stream = sink()
   const instance = pino({
     base: null,
-    serializers: {
-      [Symbol.for('pino.*')]: (input) => {
+    formatters: {
+      log (input) {
         return Object.assign({}, input, { additionalMessage: 'using pino' })
       }
     }
@@ -383,15 +372,19 @@ test('set the base to null and use a serializer', async ({ is, same }) => {
   same(result, {
     level: 60,
     msg: 'this is fatal too',
-    additionalMessage: 'using pino',
-    v: 1
+    additionalMessage: 'using pino'
   })
 })
 
-test('throw if creating child without bindings', async ({ throws }) => {
+test('throw if creating child without bindings', async ({ is, fail }) => {
   const stream = sink()
   const instance = pino(stream)
-  throws(() => instance.child())
+  try {
+    instance.child()
+    fail('it should throw')
+  } catch (err) {
+    is(err.message, 'missing bindings for child Pino')
+  }
 })
 
 test('correctly escapes msg strings with stray double quote at end', async ({ same }) => {
@@ -408,8 +401,7 @@ test('correctly escapes msg strings with stray double quote at end', async ({ sa
     hostname: hostname,
     level: 60,
     name: 'hello',
-    msg: 'this contains "',
-    v: 1
+    msg: 'this contains "'
   })
 })
 
@@ -426,8 +418,7 @@ test('correctly escape msg strings with unclosed double quote', async ({ same })
     hostname: hostname,
     level: 60,
     name: 'hello',
-    msg: '" this contains',
-    v: 1
+    msg: '" this contains'
   })
 })
 
@@ -443,8 +434,7 @@ test('object and format string', async ({ same }) => {
     pid: pid,
     hostname: hostname,
     level: 30,
-    msg: 'foo bar',
-    v: 1
+    msg: 'foo bar'
   })
 })
 
@@ -459,8 +449,7 @@ test('object and format string property', async ({ same }) => {
     hostname: hostname,
     level: 30,
     msg: 'foo bar',
-    answer: 42,
-    v: 1
+    answer: 42
   })
 })
 
@@ -485,8 +474,7 @@ test('correctly supports stderr', async ({ same }) => {
         pid: pid,
         hostname: hostname,
         level: 60,
-        msg: 'a message',
-        v: 1
+        msg: 'a message'
       })
     }
   }
@@ -504,8 +492,7 @@ test('normalize number to string', async ({ same }) => {
     pid: pid,
     hostname: hostname,
     level: 30,
-    msg: '1',
-    v: 1
+    msg: '1'
   })
 })
 
@@ -520,8 +507,7 @@ test('normalize number to string with an object', async ({ same }) => {
     hostname: hostname,
     level: 30,
     msg: '1',
-    answer: 42,
-    v: 1
+    answer: 42
   })
 })
 
@@ -537,8 +523,7 @@ test('handles objects with null prototype', async ({ same }) => {
     pid: pid,
     hostname: hostname,
     level: 30,
-    test: 'test',
-    v: 1
+    test: 'test'
   })
 })
 
@@ -556,8 +541,7 @@ test('pino.destination', async ({ same }) => {
     pid: pid,
     hostname: hostname,
     level: 30,
-    msg: 'hello',
-    v: 1
+    msg: 'hello'
   })
 })
 
@@ -575,8 +559,7 @@ test('auto pino.destination with a string', async ({ same }) => {
     pid: pid,
     hostname: hostname,
     level: 30,
-    msg: 'hello',
-    v: 1
+    msg: 'hello'
   })
 })
 
@@ -594,8 +577,7 @@ test('auto pino.destination with a string as second argument', async ({ same }) 
     pid: pid,
     hostname: hostname,
     level: 30,
-    msg: 'hello',
-    v: 1
+    msg: 'hello'
   })
 })
 
@@ -615,8 +597,7 @@ test('does not override opts with a string as second argument', async ({ same })
     hostname: hostname,
     level: 30,
     time: 'none',
-    msg: 'hello',
-    v: 1
+    msg: 'hello'
   })
 })
 
@@ -647,7 +628,7 @@ test('fast-safe-stringify must be used when interpolating', async (t) => {
 
   const o = { a: { b: {} } }
   o.a.b.c = o.a.b
-  instance.info('test', o)
+  instance.info('test %j', o)
 
   const { msg } = await once(stream, 'data')
   t.is(msg, 'test {"a":{"b":{"c":"[Circular]"}}}')

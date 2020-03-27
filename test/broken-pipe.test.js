@@ -23,7 +23,7 @@ t.jobs = 42
 
 test('basic.js')
 test('destination.js')
-test('extreme.js')
+test('syncfalse.js')
 
 t.test('let error pass through', ({ is, plan }) => {
   plan(3)

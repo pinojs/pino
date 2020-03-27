@@ -94,12 +94,6 @@ test('exposes levels object', ({ end, same }) => {
   end()
 })
 
-test('exposes LOG_VERSION', ({ end, is }) => {
-  is(pino.LOG_VERSION, 1)
-
-  end()
-})
-
 test('exposes faux stdSerializers', ({ end, ok, same }) => {
   ok(pino.stdSerializers)
   // make sure faux stdSerializers match pino-std-serializers
@@ -197,7 +191,7 @@ test('opts.browser.write func string joining', ({ end, ok, is }) => {
       }
     }
   })
-  instance.info('test', 'test2', 'test3')
+  instance.info('test %s %s', 'test2', 'test3')
 
   end()
 })
@@ -213,7 +207,7 @@ test('opts.browser.write func string joining when asObject is true', ({ end, ok,
       }
     }
   })
-  instance.info('test', 'test2', 'test3')
+  instance.info('test %s %s', 'test2', 'test3')
 
   end()
 })
@@ -229,7 +223,7 @@ test('opts.browser.write func string joining when asObject is true', ({ end, ok,
       }
     }
   })
-  instance.info('test', 'test2', 'test3')
+  instance.info('test %s %s', 'test2', 'test3')
 
   end()
 })
@@ -244,7 +238,7 @@ test('opts.browser.write func string object joining', ({ end, ok, is }) => {
       }
     }
   })
-  instance.info('test', { test: 'test2' }, { test: 'test3' })
+  instance.info('test %j %j', { test: 'test2' }, { test: 'test3' })
 
   end()
 })
@@ -260,7 +254,7 @@ test('opts.browser.write func string object joining when asObject is true', ({ e
       }
     }
   })
-  instance.info('test', { test: 'test2' }, { test: 'test3' })
+  instance.info('test %j %j', { test: 'test2' }, { test: 'test3' })
 
   end()
 })

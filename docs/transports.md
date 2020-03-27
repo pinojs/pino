@@ -385,7 +385,7 @@ $ node app.js | pino-syslog | pino-socket -a syslog.example.com
 Example output for the "hello world" log:
 
 ```
-<134>Apr  1 16:44:58 MacBook-Pro-3 none[94473]: {"pid":94473,"hostname":"MacBook-Pro-3","level":30,"msg":"hello world","time":1459529098958,"v":1}
+<134>Apr  1 16:44:58 MacBook-Pro-3 none[94473]: {"pid":94473,"hostname":"MacBook-Pro-3","level":30,"msg":"hello world","time":1459529098958}
 ```
 
 [pino-syslog]: https://www.npmjs.com/package/pino-syslog

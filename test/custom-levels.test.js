@@ -6,6 +6,10 @@ const { test } = require('tap')
 const { sink, once } = require('./helper')
 const pino = require('../')
 
+// Silence all warnings for this test
+process.removeAllListeners('warning')
+process.on('warning', () => {})
+
 test('adds additional levels', async ({ is }) => {
   const stream = sink()
   const logger = pino({
@@ -251,19 +255,45 @@ test('does not share custom level state across siblings', async ({ doesNotThrow 
   })
 })
 
-test('custom level does not affect levelKey', async ({ is }) => {
+test('custom level does not affect the levels serializer', async ({ is }) => {
   const stream = sink()
   const logger = pino({
     customLevels: {
       foo: 35,
       bar: 45
     },
-    levelKey: 'priority'
+    formatters: {
+      level (label, number) {
+        return { priority: number }
+      }
+    }
   }, stream)
 
   logger.foo('test')
   const { priority } = await once(stream, 'data')
   is(priority, 35)
+})
+
+test('When useOnlyCustomLevels is set to true, the level formatter should only get custom levels', async ({ is }) => {
+  const stream = sink()
+  const logger = pino({
+    customLevels: {
+      answer: 42
+    },
+    useOnlyCustomLevels: true,
+    level: 42,
+    formatters: {
+      level (label, number) {
+        is(label, 'answer')
+        is(number, 42)
+        return { level: number }
+      }
+    }
+  }, stream)
+
+  logger.answer('test')
+  const { level } = await once(stream, 'data')
+  is(level, 42)
 })
 
 test('custom levels accesible in prettifier function', async ({ plan, same }) => {

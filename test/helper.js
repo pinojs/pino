@@ -5,7 +5,6 @@ const writer = require('flush-write-stream')
 const split = require('split2')
 const pid = process.pid
 const hostname = os.hostname()
-const v = 1
 
 const isWin = process.platform === 'win32'
 
@@ -43,7 +42,6 @@ function check (is, chunk, level, msg) {
   is(chunk.hostname, hostname)
   is(chunk.level, level)
   is(chunk.msg, msg)
-  is(chunk.v, v)
 }
 
 function sleep (ms) {
