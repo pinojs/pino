@@ -13,7 +13,8 @@ const {
   final,
   stringify,
   buildSafeSonicBoom,
-  buildFormatters
+  buildFormatters,
+  noop
 } = require('./lib/tools')
 const { version } = require('./lib/meta')
 const {
@@ -159,7 +160,8 @@ function pino (...args) {
     [serializersSym]: serializers,
     [mixinSym]: mixin,
     [chindingsSym]: chindings,
-    [formattersSym]: allFormatters
+    [formattersSym]: allFormatters,
+    silent: noop
   })
   Object.setPrototypeOf(instance, proto)
 
