@@ -47,5 +47,29 @@ tap.test('log method hook', t => {
     t.match(await o, { msg: 'a' })
   })
 
+  t.test('children get the hook', async t => {
+    t.plan(4)
+
+    const stream = sink()
+    const root = pino({
+      hooks: {
+        logMethod (args, method) {
+          t.pass()
+          method.apply(this, [args.join('-')])
+        }
+      }
+    }, stream)
+    const child = root.child({ child: 'one' })
+    const grandchild = child.child({ child: 'two' })
+
+    let o = once(stream, 'data')
+    child.info('a', 'b')
+    t.match(await o, { msg: 'a-b' })
+
+    o = once(stream, 'data')
+    grandchild.info('c', 'd')
+    t.match(await o, { msg: 'c-d' })
+  })
+
   t.end()
 })
