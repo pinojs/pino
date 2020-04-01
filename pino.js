@@ -32,7 +32,8 @@ const {
   nestedKeySym,
   mixinSym,
   useOnlyCustomLevelsSym,
-  formattersSym
+  formattersSym,
+  hooksSym
 } = symbols
 const { epochTime, nullTime } = time
 const { pid } = process
@@ -56,6 +57,9 @@ const defaultOptions = {
       return { level: number }
     }
   }),
+  hooks: {
+    logMethod: undefined
+  },
   timestamp: epochTime,
   name: undefined,
   redact: null,
@@ -87,7 +91,8 @@ function pino (...args) {
     levelKey,
     mixin,
     useOnlyCustomLevels,
-    formatters
+    formatters,
+    hooks
   } = opts
 
   const allFormatters = buildFormatters(
@@ -159,7 +164,8 @@ function pino (...args) {
     [serializersSym]: serializers,
     [mixinSym]: mixin,
     [chindingsSym]: chindings,
-    [formattersSym]: allFormatters
+    [formattersSym]: allFormatters,
+    [hooksSym]: hooks
   })
   Object.setPrototypeOf(instance, proto)
 
