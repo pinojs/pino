@@ -137,6 +137,37 @@ If an object is supplied, three options can be specified:
 * See the [redaction ⇗](/docs/redaction.md) documentation.
 * See [fast-redact#caveat ⇗](http://github.com/davidmarkclements/fast-redact#caveat)
 
+<a id=opt-hooks></a>
+#### `hooks` (Object)
+
+An object mapping to hook functions. Hook functions allow for customizing
+internal logger operations. Hook functions ***must*** be synchronous functions.
+
+##### `logMethod`
+
+Allows for manipulating the parameters passed to logger methods. The signature
+for this hook is `logMethod (args, method) {}`, where `args` is an array
+of the arguments that were passed to the log method and `method` is the log
+method itself. This hook ***must*** invoke the `method` function by using
+apply, like so: `method.apply(this, newArgumentsArray)`.
+
+For example, Pino expects a binding object to be the first parameter with an
+optional string message as the second parameter. Using this hook the parameters
+can be flipped:
+
+```js
+const hooks = {
+  logMethod (inputArgs, method) {
+    if (inputArgs.length >= 2) {
+      const arg1 = inputArgs.shift()
+      const arg2 = inputArgs.shift()
+      return method.apply(this, [arg2, arg1, ...inputArgs])
+    }
+    return method.apply(this, inputArgs)
+  }
+}
+```
+
 <a id=opt-formatters></a>
 #### `formatters` (Object)
 
