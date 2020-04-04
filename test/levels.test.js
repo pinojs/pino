@@ -498,3 +498,55 @@ test('fatal method should call async when sync-flushing fails', ({ equal, fail, 
   const instance = pino(stream)
   doesNotThrow(() => instance.fatal(messages[0]))
 })
+
+test('calling silent method on logger instance', async ({ fail }) => {
+  const instance = pino({ level: 'silent' }, sink((result, enc) => {
+    fail('no data should be logged')
+  }))
+  instance.silent('hello world')
+})
+
+test('calling silent method on child logger', async ({ fail }) => {
+  const child = pino({ level: 'silent' }, sink((result, enc) => {
+    fail('no data should be logged')
+  })).child({})
+  child.silent('hello world')
+})
+
+test('changing level from info to silent and back to info', async ({ is }) => {
+  const expected = {
+    level: 30,
+    msg: 'hello world'
+  }
+  const stream = sink()
+  const instance = pino({ level: 'info' }, stream)
+
+  instance.level = 'silent'
+  instance.info('hello world')
+  let result = stream.read()
+  is(result, null)
+
+  instance.level = 'info'
+  instance.info('hello world')
+  result = await once(stream, 'data')
+  check(is, result, expected.level, expected.msg)
+})
+
+test('changing level from info to silent and back to info in child logger', async ({ is }) => {
+  const expected = {
+    level: 30,
+    msg: 'hello world'
+  }
+  const stream = sink()
+  const child = pino({ level: 'info' }, stream).child({})
+
+  child.level = 'silent'
+  child.info('hello world')
+  let result = stream.read()
+  is(result, null)
+
+  child.level = 'info'
+  child.info('hello world')
+  result = await once(stream, 'data')
+  check(is, result, expected.level, expected.msg)
+})
