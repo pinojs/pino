@@ -112,6 +112,19 @@ test('parses and outputs chindings', async ({ is, isNot }) => {
   is(strip(actual).match(/a: 1/g).length, 3)
 })
 
+test('applies formatters', async ({ is, isNot }) => {
+  var actual = ''
+  const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'formatters.js')])
+
+  child.stdout.pipe(writer((s, enc, cb) => {
+    actual += s
+    cb()
+  }))
+  await once(child, 'close')
+  isNot(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): h/), null)
+  isNot(strip(actual).match(/foo: "formatted_bar"/), null)
+})
+
 test('parses and outputs chindings with serializer', async ({ is, isNot }) => {
   var actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'child-with-serializer.js')])
