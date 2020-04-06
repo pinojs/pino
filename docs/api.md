@@ -11,6 +11,7 @@
   * [logger.warn()](#warn)
   * [logger.error()](#error)
   * [logger.fatal()](#fatal)
+  * [logger.silent()](#silent)
   * [logger.child()](#child)
   * [logger.bindings()](#bindings)
   * [logger.flush()](#flush)
@@ -560,6 +561,10 @@ the process crashes or exits.
 * See [`message` log method parameter](#message)
 * See [`...interpolationValues` log method parameter](#interpolationvalues)
 
+<a id="silent"><a>
+### `logger.silent()`
+
+Noop function.
 
 <a id="child"></a>
 ### `logger.child(bindings) => logger`
@@ -669,7 +674,7 @@ The logging level is a *minimum* level based on the associated value of that lev
 For instance if `logger.level` is `info` *(30)* then `info` *(30)*, `warn` *(40)*, `error` *(50)* and `fatal` *(60)* log methods will be enabled but the `trace` *(10)* and `debug` *(20)* methods, being less than 30, will not.
 
 The `silent` logging level is a specialized level which will disable all logging,
-there is no `silent` log method.
+the `silent` log method is a noop function.
 
 <a id="islevelenabled"></a>
 ### `logger.isLevelEnabled(level)`
