@@ -125,6 +125,25 @@ test('applies formatters', async ({ is, isNot }) => {
   isNot(strip(actual).match(/foo: "formatted_bar"/), null)
 })
 
+test('parses and outputs chindings with serializer', async ({ is, isNot }) => {
+  var actual = ''
+  const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'child-with-serializer.js')])
+
+  child.stdout.pipe(writer((s, enc, cb) => {
+    actual += s
+    cb()
+  }))
+  await once(child, 'close')
+  isNot(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): h/), null)
+  isNot(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): h2/), null)
+  isNot(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): h3/), null)
+  isNot(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): h4/), null)
+  isNot(strip(actual).match(/a: 2/), null)
+  isNot(strip(actual).match(/a: 16/), null)
+  isNot(strip(actual).match(/a: 42/), null)
+  is(strip(actual).match(/a: /g).length, 4)
+})
+
 test('applies serializers', async ({ is, isNot }) => {
   var actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'serializers.js')])

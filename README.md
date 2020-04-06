@@ -5,7 +5,7 @@
 &nbsp;[![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](http://standardjs.com/)
 &nbsp;[![TypeScript definitions on DefinitelyTyped](https://img.shields.io/badge/DefinitelyTyped-.d.ts-brightgreen.svg?style=flat)](https://definitelytyped.org)
 
-[Very low overhead](#low-overhead) Node.js logger, inspired by Bunyan.
+[Very low overhead](#low-overhead) Node.js logger.
 
 ## Documentation
 
