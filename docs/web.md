@@ -37,12 +37,14 @@ See the [fastify documentation](https://www.fastify.io/docs/latest/Logging/) for
 ## Pino with Express
 
 ```sh
-npm install express-pino-logger
+npm install pino-http
 ```
 
 ```js
-const app = require('express')()
-const pino = require('express-pino-logger')()
+import express from 'express'
+const app = express()
+import PinoExpressLogger from 'pino-http'
+const pino = PinoExpressLogger()
 
 app.use(pino)
 
@@ -54,7 +56,7 @@ app.get('/', function (req, res) {
 app.listen(3000)
 ```
 
-See the [express-pino-logger readme](http://npm.im/express-pino-logger) for more info.
+See the [pino-http readme](http://npm.im/pino-http) for more info.
 
 <a id="hapi"></a>
 ## Pino with Hapi
