@@ -488,7 +488,7 @@ logger.info('%o hello %s', {worldly: 1}, 'world')
 ```
 
 Since pino v6, we do not automatically concatenate and cast to string
-in the interpolation values:
+consecutive parameters:
 
 ```js
 logger.info('hello', 'world')
