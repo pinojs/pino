@@ -164,7 +164,8 @@ Pino's default log destination is the singular destination of `stdout`. While
 not recommended for performance reasons, multiple destinations can be targeted
 bu using [`pino-multi-stream`](https://github.com/pinojs/pino-multi-stream).
 
-In this example we use `STDERR` for `error` level and `stdout` as default for others (`debug`, `info`, `warn`).
+In this example we use `stderr` for `error` level logs and `stdout` as default
+for all other levels (e.g. `debug`, `info`, and `warn`).
 
 ```js
 const pino = require('pino')
