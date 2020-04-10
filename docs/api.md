@@ -484,7 +484,7 @@ the final output `msg` value for the JSON log line.
 
 ```js
 logger.info('%o hello %s', {worldly: 1}, 'world')
-// {"level":30,"time":1531257826880,"msg":"{\"worldly\":1} hello","pid":55956,"hostname":"x"}
+// {"level":30,"time":1531257826880,"msg":"{\"worldly\":1} hello world","pid":55956,"hostname":"x"}
 ```
 
 Since pino v6, we do not automatically concatenate and cast to string
