@@ -160,7 +160,9 @@ ExecStart=/bin/sh -c '/path/to/node app.js | pino-transport'
 <a id="multi-stream"></a>
 ## Log to different streams
 
-Default destination is `STDOUT`. If you want to use different streams based on log level you can use `pino-multi-stream`.
+Pino's default log destination is the singular destination of `stdout`. While
+not recommended for performance reasons, multiple destinations can be targeted
+bu using [`pino-multi-stream`](https://github.com/pinojs/pino-multi-stream).
 
 In this example we use `STDERR` for `error` level and `stdout` as default for others (`debug`, `info`, `warn`).
 
