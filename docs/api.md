@@ -483,18 +483,17 @@ to any supplied printf-style placeholders (`%s`, `%d`, `%o`|`%O`|`%j`) to form
 the final output `msg` value for the JSON log line.
 
 ```js
-logger.info('hello', 'world')
-// {"level":30,"time":1531257618044,"msg":"hello world","pid":55956,"hostname":"x"}
-```
-
-```js
-logger.info('hello', {worldly: 1})
-// {"level":30,"time":1531257797727,"msg":"hello {\"worldly\":1}","pid":55956,"hostname":"x"}
-```
-
-```js
-logger.info('%o hello', {worldly: 1})
+logger.info('%o hello %s', {worldly: 1}, 'world')
 // {"level":30,"time":1531257826880,"msg":"{\"worldly\":1} hello","pid":55956,"hostname":"x"}
+```
+
+Since pino v6, we do not automatically concatenate and cast to string
+in the interpolation values:
+
+```js
+logger.info('hello', 'world')
+// {"level":30,"time":1531257618044,"msg":"hello","pid":55956,"hostname":"x"}
+// world is missing
 ```
 
 * See [`message` log method parameter](#message)
