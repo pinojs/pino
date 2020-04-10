@@ -4,6 +4,7 @@
   * [options](#options)
   * [destination](#destination)
   * [destination\[Symbol.for('pino.metadata')\]](#metadata)
+  * [destination: pino-multi-stream](#multi-stream)
 * [Logger Instance](#logger)
   * [logger.trace()](#trace)
   * [logger.debug()](#debug)
@@ -412,6 +413,30 @@ console.log(
 ```
 
 * See [`pino-multi-stream` ⇗](https://github.com/pinojs/pino-multi-stream)
+
+<a id="level-streams"></a>
+#### `Destination: pino-multi-stream`
+
+Default destination is `STDOUT`. If you want to use different streams based on log level you can use `pino-multi-stream`.
+
+In this example we use `STDERR` for `error` and `fatal` levels and `stdout` as default for others.
+
+```js
+const pino = require('pino')
+
+const { multistream } = require('pino-multi-stream')
+var streams = [
+  {stream: process.stdout},
+  {level: 'error', stream: process.stderr},
+  {level: 'fatal', stream: process.stderr}
+]
+
+const logger = pino({
+  name: 'my-app',
+  level: 'info',
+}, multistream(streams))
+
+```
 
 <a id="logger"></a>
 ## Logger Instance
