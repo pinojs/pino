@@ -6,6 +6,7 @@
 * [Saving to multiple files](#multiple)
 * [Log filtering](#filter-logs)
 * [Transports and systemd](#transport-systemd)
+* [Log to different streams](#multi-stream)
 * [Duplicate keys](#dupe-keys)
 * [Log levels as labels instead of numbers](#level-string)
 * [Pino with `debug`](#debug)
@@ -155,6 +156,29 @@ this challenge is to use a subshell:
 ```
 ExecStart=/bin/sh -c '/path/to/node app.js | pino-transport'
 ```
+
+<a id="multi-stream"></a>
+## Log to different streams
+
+Default destination is `STDOUT`. If you want to use different streams based on log level you can use `pino-multi-stream`.
+
+In this example we use `STDERR` for `error` level and `stdout` as default for others (`debug`, `info`, `warn`).
+
+```js
+const pino = require('pino')
+const { multistream } = require('pino-multi-stream')
+var streams = [
+  {level: 'debug', stream: process.stdout},
+  {level: 'error', stream: process.stderr},
+  {level: 'fatal', stream: process.stderr}
+]
+
+const logger = pino({
+  name: 'my-app',
+  level: 'info',
+}, multistream(streams))
+```
+
 
 <a id="dupe-keys"></a>
 ## How Pino handles duplicate keys
