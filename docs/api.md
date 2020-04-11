@@ -143,6 +143,7 @@ If an object is supplied, three options can be specified:
 An object mapping to hook functions. Hook functions allow for customizing
 internal logger operations. Hook functions ***must*** be synchronous functions.
 
+<a id="logmethod"></a>
 ##### `logMethod`
 
 Allows for manipulating the parameters passed to logger methods. The signature
@@ -496,7 +497,25 @@ logger.info('hello', 'world')
 // world is missing
 ```
 
+However, it's possible to inject a hook to modify this behavior:
+
+```js
+const pinoOptions = {
+  hooks: { logMethod }
+}
+
+function logMethod (args, method) {
+  if (args.length === 2) {
+    args[0] = `${args[0]} %j`
+  }
+  method.apply(this, args)
+}
+
+const logger = pino(pinoOptions)
+```
+
 * See [`message` log method parameter](#message)
+* See [`logMethod` hook](#logmethod)
 
 <a id="trace"></a>
 ### `logger.trace([mergingObject], [message], [...interpolationValues])`
