@@ -144,6 +144,7 @@ If an object is supplied, three options can be specified:
 An object mapping to hook functions. Hook functions allow for customizing
 internal logger operations. Hook functions ***must*** be synchronous functions.
 
+<a id="logmethod"></a>
 ##### `logMethod`
 
 Allows for manipulating the parameters passed to logger methods. The signature
@@ -484,21 +485,38 @@ to any supplied printf-style placeholders (`%s`, `%d`, `%o`|`%O`|`%j`) to form
 the final output `msg` value for the JSON log line.
 
 ```js
+logger.info('%o hello %s', {worldly: 1}, 'world')
+// {"level":30,"time":1531257826880,"msg":"{\"worldly\":1} hello world","pid":55956,"hostname":"x"}
+```
+
+Since pino v6, we do not automatically concatenate and cast to string
+consecutive parameters:
+
+```js
 logger.info('hello', 'world')
-// {"level":30,"time":1531257618044,"msg":"hello world","pid":55956,"hostname":"x"}
+// {"level":30,"time":1531257618044,"msg":"hello","pid":55956,"hostname":"x"}
+// world is missing
 ```
 
-```js
-logger.info('hello', {worldly: 1})
-// {"level":30,"time":1531257797727,"msg":"hello {\"worldly\":1}","pid":55956,"hostname":"x"}
-```
+However, it's possible to inject a hook to modify this behavior:
 
 ```js
-logger.info('%o hello', {worldly: 1})
-// {"level":30,"time":1531257826880,"msg":"{\"worldly\":1} hello","pid":55956,"hostname":"x"}
+const pinoOptions = {
+  hooks: { logMethod }
+}
+
+function logMethod (args, method) {
+  if (args.length === 2) {
+    args[0] = `${args[0]} %j`
+  }
+  method.apply(this, args)
+}
+
+const logger = pino(pinoOptions)
 ```
 
 * See [`message` log method parameter](#message)
+* See [`logMethod` hook](#logmethod)
 
 <a id="trace"></a>
 ### `logger.trace([mergingObject], [message], [...interpolationValues])`
