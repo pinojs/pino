@@ -3,13 +3,15 @@
 Since HTTP logging is a primary use case, Pino has first class support for the Node.js
 web framework ecosystem.
 
-+ [Pino with Fastify](#fastify)
-+ [Pino with Express](#express)
-+ [Pino with Hapi](#hapi)
-+ [Pino with Restify](#restify)
-+ [Pino with Koa](#koa)
-+ [Pino with Node core `http`](#http)
-+ [Pino with Nest](#nest)
+- [Web Frameworks](#web-frameworks)
+  - [Pino with Fastify](#pino-with-fastify)
+  - [Pino with Express](#pino-with-express)
+  - [Pino with Hapi](#pino-with-hapi)
+  - [Pino with Restify](#pino-with-restify)
+  - [Pino with Koa](#pino-with-koa)
+    - [Koa](#koa)
+  - [Pino with Node core `http`](#pino-with-node-core-http)
+  - [Pino with Nest](#pino-with-nest)
 
 <a id="fastify"></a>
 ## Pino with Fastify
@@ -41,10 +43,8 @@ npm install pino-http
 ```
 
 ```js
-import express from 'express'
-const app = express()
-import PinoExpressLogger from 'pino-http'
-const pino = PinoExpressLogger()
+const app = require('express')()
+const pino = require('pino-http')()
 
 app.use(pino)
 
