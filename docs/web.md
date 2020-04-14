@@ -3,13 +3,14 @@
 Since HTTP logging is a primary use case, Pino has first class support for the Node.js
 web framework ecosystem.
 
-+ [Pino with Fastify](#fastify)
-+ [Pino with Express](#express)
-+ [Pino with Hapi](#hapi)
-+ [Pino with Restify](#restify)
-+ [Pino with Koa](#koa)
-+ [Pino with Node core `http`](#http)
-+ [Pino with Nest](#nest)
+- [Web Frameworks](#web-frameworks)
+  - [Pino with Fastify](#pino-with-fastify)
+  - [Pino with Express](#pino-with-express)
+  - [Pino with Hapi](#pino-with-hapi)
+  - [Pino with Restify](#pino-with-restify)
+  - [Pino with Koa](#pino-with-koa)
+  - [Pino with Node core `http`](#pino-with-node-core-http)
+  - [Pino with Nest](#pino-with-nest)
 
 <a id="fastify"></a>
 ## Pino with Fastify
@@ -37,12 +38,12 @@ See the [fastify documentation](https://www.fastify.io/docs/latest/Logging/) for
 ## Pino with Express
 
 ```sh
-npm install express-pino-logger
+npm install pino-http
 ```
 
 ```js
 const app = require('express')()
-const pino = require('express-pino-logger')()
+const pino = require('pino-http')()
 
 app.use(pino)
 
@@ -54,7 +55,7 @@ app.get('/', function (req, res) {
 app.listen(3000)
 ```
 
-See the [express-pino-logger readme](http://npm.im/express-pino-logger) for more info.
+See the [pino-http readme](http://npm.im/pino-http) for more info.
 
 <a id="hapi"></a>
 ## Pino with Hapi
@@ -143,8 +144,6 @@ See the [restify-pino-logger readme](http://npm.im/restify-pino-logger) for more
 
 <a id="koa"></a>
 ## Pino with Koa
-
-### Koa
 
 ```sh
 npm install koa-pino-logger
