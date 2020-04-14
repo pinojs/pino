@@ -9,7 +9,6 @@ web framework ecosystem.
   - [Pino with Hapi](#pino-with-hapi)
   - [Pino with Restify](#pino-with-restify)
   - [Pino with Koa](#pino-with-koa)
-    - [Koa](#koa)
   - [Pino with Node core `http`](#pino-with-node-core-http)
   - [Pino with Nest](#pino-with-nest)
 
@@ -145,8 +144,6 @@ See the [restify-pino-logger readme](http://npm.im/restify-pino-logger) for more
 
 <a id="koa"></a>
 ## Pino with Koa
-
-### Koa
 
 ```sh
 npm install koa-pino-logger
