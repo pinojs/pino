@@ -7,6 +7,18 @@ output stream as the messages are generated with a _blocking_ operation.
 Asynchronous logging works by buffering
 log messages and writing them in larger chunks.
 
+```js
+const pino = require('pino')
+const logger = pino(pino.destination({
+  dest: './my-file', // omit for stdout
+  minLength: 4096, // Buffer before writing
+  sync: false // Asynchronous logging
+}))
+```
+
+* See [`pino.destination`](/docs/api.md#pino-destination)
+* `pino.destination` is implemented on [`sonic-boom` ⇗](https://github.com/mcollina/sonic-boom).
+
 ## Caveats
 
 This has a couple of important caveats:
