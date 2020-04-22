@@ -17,7 +17,7 @@
 * [Transports ⇗](/docs/transports.md)
 * [Web Frameworks ⇗](/docs/web.md)
 * [Pretty Printing ⇗](/docs/pretty.md)
-* [Extreme Mode ⇗](/docs/extreme.md)
+* [Asynchronous Logging ⇗](/docs/asynchronous.md)
 * [Ecosystem ⇗](/docs/ecosystem.md)
 * [Legacy](/docs/legacy.md)
 * [Help ⇗](/docs/help.md)

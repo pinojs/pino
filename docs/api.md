@@ -346,7 +346,7 @@ documented in the [Browser API ⇗](/docs/browser.md) documentation.
 * See [Browser API ⇗](/docs/browser.md)
 
 <a id="destination"></a>
-### `destination` (SonicBoom | WritableStream | String)
+### `destination` (SonicBoom | WritableStream | String | Object)
 
 Default: `pino.destination(1)` (STDOUT)
 
@@ -368,6 +368,9 @@ const stderrLogger = require('pino')(opts, pino.destination(2))
 
 // automatic wrapping in pino.destination
 const fileLogger = require('pino')('/log/path')
+
+// Asynchronous logging
+const fileLogger = pino(pino.destination({ dest: '/log/path', sync: false }))
 ```
 
 However, there are some special instances where `pino.destination` is not used as the default:
