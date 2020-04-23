@@ -4,53 +4,51 @@
 
 ```
 BASIC benchmark averages
-Bunyan average: 549.042ms
-Winston average: 467.873ms
-Bole average: 201.529ms
-Debug average: 253.724ms
-LogLevel average: 282.653ms
-Pino average: 188.956ms
-PinoExtreme average: 108.809ms
+Bunyan average: 775.758ms
+Winston average: 673.231ms
+Bole average: 466.211ms
+Debug average: 469.900ms
+LogLevel average: 464.293ms
+Pino average: 383.885ms
+PinoAsync average: 180.870ms
+PinoNodeStream average: 385.438ms
 ```
 
 `pino.info({'hello': 'world'})`:
 
 ```
 OBJECT benchmark averages
-BunyanObj average: 564.363ms
-WinstonObj average: 464.824ms
-BoleObj average: 230.220ms
-LogLevelObject average: 474.857ms
-PinoObj average: 201.442ms
-PinoUnsafeObj average: 202.687ms
-PinoExtremeObj average: 108.689ms
-PinoUnsafeExtremeObj average: 106.718ms
+BunyanObj average: 833.112ms
+WinstonObj average: 723.240ms
+BoleObj average: 512.905ms
+LogLevelObject average: 853.441ms
+PinoObj average: 397.299ms
+PinoAsyncObj average: 186.173ms
+PinoNodeStreamObj average: 408.604ms
 ```
 
 `pino.info(aBigDeeplyNestedObject)`:
 
 ```
 DEEPOBJECT benchmark averages
-BunyanDeepObj average: 5293.279ms
-WinstonDeepObj average: 9020.292ms
-BoleDeepObj average: 9169.043ms
-LogLevelDeepObj average: 15260.917ms
-PinoDeepObj average: 8467.807ms
-PinoUnsafeDeepObj average: 6159.227ms
-PinoExtremeDeepObj average: 8354.557ms
-PinoUnsafeExtremeDeepObj average: 6214.073ms
+BunyanDeepObj average: 2.411ms
+WinstonDeepObj average: 4.112ms
+BoleDeepObj average: 3.896ms
+LogLevelDeepObj average: 10.800ms
+PinoDeepObj average: 4.080ms
+PinoAsyncDeepObj average: 3.938ms
+PinoNodeStreamDeepObj average: 4.232ms
 ```
 
 `pino.info('hello %s %j %d', 'world', {obj: true}, 4, {another: 'obj'})`:
 
 ```
-BunyanInterpolateExtra average: 778.408ms
-WinstonInterpolateExtra average: 627.956ms
-BoleInterpolateExtra average: 429.757ms
-PinoInterpolateExtra average: 316.043ms
-PinoUnsafeInterpolateExtra average: 316.809ms
-PinoExtremeInterpolateExtra average: 218.468ms
-PinoUnsafeExtremeInterpolateExtra average: 215.040ms
+BunyanInterpolateExtra average: 1.225ms
+WinstonInterpolateExtra average: 618.904ms
+BoleInterpolateExtra average: 796.188ms
+PinoInterpolateExtra average: 522.410ms
+PinoAsyncInterpolateExtra average: 332.498ms
+PinoNodeStreamInterpolateExtra average: 545.632ms
 ```
 
 For a fair comparison, [LogLevel](http://npm.im/loglevel) was extended

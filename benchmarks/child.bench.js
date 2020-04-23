@@ -10,7 +10,7 @@ const plogNodeStream = pino(dest).child({ a: 'property' })
 delete require.cache[require.resolve('../')]
 const plogDest = require('../')(pino.destination('/dev/null')).child({ a: 'property' })
 delete require.cache[require.resolve('../')]
-const plogExtreme = require('../')(pino.extreme('/dev/null')).child({ a: 'property' })
+const plogAsync = require('../')(pino.destination({ dest: '/dev/null', sync: false, minLength: 4096 }))
 
 const max = 10
 const blog = bunyan.createLogger({
@@ -45,9 +45,9 @@ const run = bench([
     }
     setImmediate(cb)
   },
-  function benchPinoExtremeChild (cb) {
+  function benchPinoAssyncChild (cb) {
     for (var i = 0; i < max; i++) {
-      plogExtreme.info({ hello: 'world' })
+      plogAsync.info({ hello: 'world' })
     }
     setImmediate(cb)
   },

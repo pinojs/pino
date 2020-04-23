@@ -11,7 +11,7 @@ const plogNodeStream = pino(dest)
 delete require.cache[require.resolve('../')]
 const plogDest = require('../')(pino.destination('/dev/null'))
 delete require.cache[require.resolve('../')]
-const plogExtreme = require('../')(pino.extreme('/dev/null'))
+const plogAsync = require('../')(pino.destination({ dest: '/dev/null', sync: false, minLength: 4096 }))
 
 const crypto = require('crypto')
 
@@ -64,9 +64,9 @@ var run = bench([
     }
     setImmediate(cb)
   },
-  function benchPinoExtreme (cb) {
+  function benchPinoAsync (cb) {
     for (var i = 0; i < max; i++) {
-      plogExtreme.info(longStr)
+      plogAsync.info(longStr)
     }
     setImmediate(cb)
   },
