@@ -9,7 +9,7 @@ const plogNodeStream = pino(dest).child({ a: 'property' }).child({ sub: 'child' 
 delete require.cache[require.resolve('../')]
 const plogDest = require('../')(pino.destination('/dev/null'))
 delete require.cache[require.resolve('../')]
-const plogExtreme = require('../')(pino.extreme('/dev/null'))
+const plogAsync = require('../')(pino.destination({ dest: '/dev/null', sync: false, minLength: 4096 }))
   .child({ a: 'property' })
   .child({ sub: 'child' })
 
@@ -35,9 +35,9 @@ const run = bench([
     }
     setImmediate(cb)
   },
-  function benchPinoExtremeChildChild (cb) {
+  function benchPinoAsyncChildChild (cb) {
     for (var i = 0; i < max; i++) {
-      plogExtreme.info({ hello: 'world' })
+      plogAsync.info({ hello: 'world' })
     }
     setImmediate(cb)
   },

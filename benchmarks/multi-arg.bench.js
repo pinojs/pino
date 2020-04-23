@@ -7,18 +7,12 @@ const bole = require('bole')('bench')
 const winston = require('winston')
 const fs = require('fs')
 const dest = fs.createWriteStream('/dev/null')
-const loglevel = require('./utils/wrap-log-level')(dest)
 const plogNodeStream = pino(dest)
 delete require.cache[require.resolve('../')]
 const plogDest = require('../')(pino.destination('/dev/null'))
 delete require.cache[require.resolve('../')]
-const plogExtreme = require('../')(pino.extreme('/dev/null'))
+const plogAsync = require('../')(pino.destination({ dest: '/dev/null', sync: false, minLength: 4096 }))
 delete require.cache[require.resolve('../')]
-
-process.env.DEBUG = 'dlog'
-const debug = require('debug')
-const dlog = debug('dlog')
-dlog.log = function (s) { dest.write(s) }
 
 const deep = require('../package.json')
 deep.deep = Object.assign({}, JSON.parse(JSON.stringify(deep)))
@@ -49,54 +43,6 @@ const chill = winston.createLogger({
 const max = 10
 
 const run = bench([
-  function benchBunyanMulti (cb) {
-    for (var i = 0; i < max; i++) {
-      blog.info('hello', 'world')
-    }
-    setImmediate(cb)
-  },
-  function benchWinstonMulti (cb) {
-    for (var i = 0; i < max; i++) {
-      chill.log('info', 'hello', 'world')
-    }
-    setImmediate(cb)
-  },
-  function benchBoleMulti (cb) {
-    for (var i = 0; i < max; i++) {
-      bole.info('hello', 'world')
-    }
-    setImmediate(cb)
-  },
-  function benchLogLevelMulti (cb) {
-    for (var i = 0; i < max; i++) {
-      loglevel.info('hello', 'world')
-    }
-    setImmediate(cb)
-  },
-  function benchDebugMulti (cb) {
-    for (var i = 0; i < max; i++) {
-      dlog('hello', 'world')
-    }
-    setImmediate(cb)
-  },
-  function benchPinoMulti (cb) {
-    for (var i = 0; i < max; i++) {
-      plogDest.info('hello', 'world')
-    }
-    setImmediate(cb)
-  },
-  function benchPinoExtremeMulti (cb) {
-    for (var i = 0; i < max; i++) {
-      plogExtreme.info('hello', 'world')
-    }
-    setImmediate(cb)
-  },
-  function benchPinoNodeStreamMulti (cb) {
-    for (var i = 0; i < max; i++) {
-      plogNodeStream.info('hello', 'world')
-    }
-    setImmediate(cb)
-  },
   function benchBunyanInterpolate (cb) {
     for (var i = 0; i < max; i++) {
       blog.info('hello %s', 'world')
@@ -121,9 +67,9 @@ const run = bench([
     }
     setImmediate(cb)
   },
-  function benchPinoExtremeInterpolate (cb) {
+  function benchPinoAsyncInterpolate (cb) {
     for (var i = 0; i < max; i++) {
-      plogExtreme.info('hello %s', 'world')
+      plogAsync.info('hello %s', 'world')
     }
     setImmediate(cb)
   },
@@ -158,9 +104,9 @@ const run = bench([
     }
     setImmediate(cb)
   },
-  function benchPinoExtremeInterpolateAll (cb) {
+  function benchPinoAsyncInterpolateAll (cb) {
     for (var i = 0; i < max; i++) {
-      plogExtreme.info('hello %s %j %d', 'world', { obj: true }, 4)
+      plogAsync.info('hello %s %j %d', 'world', { obj: true }, 4)
     }
     setImmediate(cb)
   },
@@ -194,9 +140,9 @@ const run = bench([
     }
     setImmediate(cb)
   },
-  function benchPinoExtremeInterpolateExtra (cb) {
+  function benchPinoAsyncInterpolateExtra (cb) {
     for (var i = 0; i < max; i++) {
-      plogExtreme.info('hello %s %j %d', 'world', { obj: true }, 4, { another: 'obj' })
+      plogAsync.info('hello %s %j %d', 'world', { obj: true }, 4, { another: 'obj' })
     }
     setImmediate(cb)
   },
@@ -230,9 +176,9 @@ const run = bench([
     }
     setImmediate(cb)
   },
-  function benchPinoExtremeInterpolateDeep (cb) {
+  function benchPinoAsyncInterpolateDeep (cb) {
     for (var i = 0; i < max; i++) {
-      plogExtreme.info('hello %j', deep)
+      plogAsync.info('hello %j', deep)
     }
     setImmediate(cb)
   },

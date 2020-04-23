@@ -11,7 +11,7 @@ const plogNodeStream = pino(dest)
 delete require.cache[require.resolve('../')]
 const plogDest = require('../')(pino.destination('/dev/null'))
 delete require.cache[require.resolve('../')]
-const plogExtreme = require('../')(pino.extreme('/dev/null'))
+const plogAsync = require('../')(pino.destination({ dest: '/dev/null', sync: false, minLength: 4096 }))
 delete require.cache[require.resolve('../')]
 
 const loglevel = require('./utils/wrap-log-level')(dest)
@@ -71,9 +71,9 @@ const run = bench([
     }
     setImmediate(cb)
   },
-  function benchPinoExtremeDeepObj (cb) {
+  function benchPinoAsyncDeepObj (cb) {
     for (var i = 0; i < max; i++) {
-      plogExtreme.info(deep)
+      plogAsync.info(deep)
     }
     setImmediate(cb)
   },
