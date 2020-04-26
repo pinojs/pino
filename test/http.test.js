@@ -16,8 +16,8 @@ test('http request support', async ({ ok, same, error, teardown }) => {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     same(chunk, {
-      pid: pid,
-      hostname: hostname,
+      pid,
+      hostname,
       level: 30,
       msg: 'my request',
       req: {
@@ -54,8 +54,8 @@ test('http request support via serializer', async ({ ok, same, error, teardown }
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     same(chunk, {
-      pid: pid,
-      hostname: hostname,
+      pid,
+      hostname,
       level: 30,
       msg: 'my request',
       req: {
@@ -70,7 +70,7 @@ test('http request support via serializer', async ({ ok, same, error, teardown }
 
   const server = http.createServer(function (req, res) {
     originalReq = req
-    instance.info({ req: req }, 'my request')
+    instance.info({ req }, 'my request')
     res.end('hello')
   })
   server.unref()
@@ -93,8 +93,8 @@ test('http request support via serializer without request connection', async ({ 
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     const expected = {
-      pid: pid,
-      hostname: hostname,
+      pid,
+      hostname,
       level: 30,
       msg: 'my request',
       req: {
@@ -113,7 +113,7 @@ test('http request support via serializer without request connection', async ({ 
   const server = http.createServer(function (req, res) {
     originalReq = req
     delete req.connection
-    instance.info({ req: req }, 'my request')
+    instance.info({ req }, 'my request')
     res.end('hello')
   })
   server.unref()
@@ -132,8 +132,8 @@ test('http response support', async ({ ok, same, error, teardown }) => {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     same(chunk, {
-      pid: pid,
-      hostname: hostname,
+      pid,
+      hostname,
       level: 30,
       msg: 'my response',
       res: {
@@ -168,8 +168,8 @@ test('http response support via a serializer', async ({ ok, same, error, teardow
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     same(chunk, {
-      pid: pid,
-      hostname: hostname,
+      pid,
+      hostname,
       level: 30,
       msg: 'my response',
       res: {
@@ -186,7 +186,7 @@ test('http response support via a serializer', async ({ ok, same, error, teardow
     res.setHeader('x-single', 'y')
     res.setHeader('x-multi', [1, 2])
     res.end('hello')
-    instance.info({ res: res }, 'my response')
+    instance.info({ res }, 'my response')
   })
 
   server.unref()
@@ -209,8 +209,8 @@ test('http request support via serializer in a child', async ({ ok, same, error,
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     same(chunk, {
-      pid: pid,
-      hostname: hostname,
+      pid,
+      hostname,
       level: 30,
       msg: 'my request',
       req: {
@@ -225,7 +225,7 @@ test('http request support via serializer in a child', async ({ ok, same, error,
 
   const server = http.createServer(function (req, res) {
     originalReq = req
-    const child = instance.child({ req: req })
+    const child = instance.child({ req })
     child.info('my request')
     res.end('hello')
   })

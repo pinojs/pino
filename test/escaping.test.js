@@ -18,8 +18,8 @@ function testEscape (ch, key) {
     const result = await once(stream, 'data')
     delete result.time
     same(result, {
-      pid: pid,
-      hostname: hostname,
+      pid,
+      hostname,
       level: 60,
       name: 'hello',
       msg: 'this contains ' + key
@@ -82,8 +82,8 @@ test('correctly escape `hello \\u001F world \\n \\u0022`', async ({ same }) => {
   const result = await once(stream, 'data')
   delete result.time
   same(result, {
-    pid: pid,
-    hostname: hostname,
+    pid,
+    hostname,
     level: 60,
     name: 'hello',
     msg: 'hello \u001F world \n \u0022'

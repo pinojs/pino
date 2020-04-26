@@ -21,8 +21,8 @@ test('metadata works', async ({ ok, same, is }) => {
       ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
       delete result.time
       same(result, {
-        pid: pid,
-        hostname: hostname,
+        pid,
+        hostname,
         level: 30,
         hello: 'world',
         msg: 'a msg'
@@ -45,8 +45,8 @@ test('child loggers works', async ({ ok, same, is }) => {
       ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
       delete result.time
       same(result, {
-        pid: pid,
-        hostname: hostname,
+        pid,
+        hostname,
         level: 30,
         hello: 'world',
         from: 'child',
@@ -71,8 +71,8 @@ test('without object', async ({ ok, same, is }) => {
       ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
       delete result.time
       same(result, {
-        pid: pid,
-        hostname: hostname,
+        pid,
+        hostname,
         level: 30,
         msg: 'a msg'
       })
@@ -94,8 +94,8 @@ test('without msg', async ({ ok, same, is }) => {
       ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
       delete result.time
       same(result, {
-        pid: pid,
-        hostname: hostname,
+        pid,
+        hostname,
         level: 30,
         hello: 'world'
       })
