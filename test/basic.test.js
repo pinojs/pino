@@ -119,9 +119,9 @@ function levelTest (name, level) {
     is(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
     delete result.time
     same(result, {
-      pid: pid,
-      hostname: hostname,
-      level: level,
+      pid,
+      hostname,
+      level,
       msg: 'a string',
       hello: 'world'
     })
@@ -137,9 +137,9 @@ function levelTest (name, level) {
     is(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
     delete result.time
     same(result, {
-      pid: pid,
-      hostname: hostname,
-      level: level,
+      pid,
+      hostname,
+      level,
       msg: 'string',
       hello: 'world'
     })
@@ -181,9 +181,9 @@ function levelTest (name, level) {
     is(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
     delete result.time
     same(result, {
-      pid: pid,
-      hostname: hostname,
-      level: level,
+      pid,
+      hostname,
+      level,
       err: {
         type: 'Error',
         message: err.message,
@@ -202,9 +202,9 @@ function levelTest (name, level) {
     is(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
     delete result.time
     same(result, {
-      pid: pid,
-      hostname: hostname,
-      level: level,
+      pid,
+      hostname,
+      level,
       msg: 'hello world',
       hello: 'world'
     })
@@ -252,8 +252,8 @@ test('set the name', async ({ is, same }) => {
   is(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
   delete result.time
   same(result, {
-    pid: pid,
-    hostname: hostname,
+    pid,
+    hostname,
     level: 60,
     name: 'hello',
     msg: 'this is fatal'
@@ -272,8 +272,8 @@ test('set the messageKey', async ({ is, same }) => {
   is(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
   delete result.time
   same(result, {
-    pid: pid,
-    hostname: hostname,
+    pid,
+    hostname,
     level: 30,
     fooMessage: message
   })
@@ -291,8 +291,8 @@ test('set the nestedKey', async ({ is, same }) => {
   is(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
   delete result.time
   same(result, {
-    pid: pid,
-    hostname: hostname,
+    pid,
+    hostname,
     level: 30,
     stuff: object
   })
@@ -306,8 +306,8 @@ test('set undefined properties', async ({ is, same }) => {
   is(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
   delete result.time
   same(result, {
-    pid: pid,
-    hostname: hostname,
+    pid,
+    hostname,
     level: 30,
     hello: 'world'
   })
@@ -397,8 +397,8 @@ test('correctly escapes msg strings with stray double quote at end', async ({ sa
   const result = await once(stream, 'data')
   delete result.time
   same(result, {
-    pid: pid,
-    hostname: hostname,
+    pid,
+    hostname,
     level: 60,
     name: 'hello',
     msg: 'this contains "'
@@ -414,8 +414,8 @@ test('correctly escape msg strings with unclosed double quote', async ({ same })
   const result = await once(stream, 'data')
   delete result.time
   same(result, {
-    pid: pid,
-    hostname: hostname,
+    pid,
+    hostname,
     level: 60,
     name: 'hello',
     msg: '" this contains'
@@ -431,8 +431,8 @@ test('object and format string', async ({ same }) => {
   const result = await once(stream, 'data')
   delete result.time
   same(result, {
-    pid: pid,
-    hostname: hostname,
+    pid,
+    hostname,
     level: 30,
     msg: 'foo bar'
   })
@@ -445,8 +445,8 @@ test('object and format string property', async ({ same }) => {
   const result = await once(stream, 'data')
   delete result.time
   same(result, {
-    pid: pid,
-    hostname: hostname,
+    pid,
+    hostname,
     level: 30,
     msg: 'foo bar',
     answer: 42
@@ -471,8 +471,8 @@ test('correctly supports stderr', async ({ same }) => {
       result = JSON.parse(result)
       delete result.time
       same(result, {
-        pid: pid,
-        hostname: hostname,
+        pid,
+        hostname,
         level: 60,
         msg: 'a message'
       })
@@ -489,8 +489,8 @@ test('normalize number to string', async ({ same }) => {
   const result = await once(stream, 'data')
   delete result.time
   same(result, {
-    pid: pid,
-    hostname: hostname,
+    pid,
+    hostname,
     level: 30,
     msg: '1'
   })
@@ -503,8 +503,8 @@ test('normalize number to string with an object', async ({ same }) => {
   const result = await once(stream, 'data')
   delete result.time
   same(result, {
-    pid: pid,
-    hostname: hostname,
+    pid,
+    hostname,
     level: 30,
     msg: '1',
     answer: 42
@@ -520,8 +520,8 @@ test('handles objects with null prototype', async ({ same }) => {
   const result = await once(stream, 'data')
   delete result.time
   same(result, {
-    pid: pid,
-    hostname: hostname,
+    pid,
+    hostname,
     level: 30,
     test: 'test'
   })
@@ -538,8 +538,8 @@ test('pino.destination', async ({ same }) => {
   const result = JSON.parse(readFileSync(tmp).toString())
   delete result.time
   same(result, {
-    pid: pid,
-    hostname: hostname,
+    pid,
+    hostname,
     level: 30,
     msg: 'hello'
   })
@@ -556,8 +556,8 @@ test('auto pino.destination with a string', async ({ same }) => {
   const result = JSON.parse(readFileSync(tmp).toString())
   delete result.time
   same(result, {
-    pid: pid,
-    hostname: hostname,
+    pid,
+    hostname,
     level: 30,
     msg: 'hello'
   })
@@ -574,8 +574,8 @@ test('auto pino.destination with a string as second argument', async ({ same }) 
   const result = JSON.parse(readFileSync(tmp).toString())
   delete result.time
   same(result, {
-    pid: pid,
-    hostname: hostname,
+    pid,
+    hostname,
     level: 30,
     msg: 'hello'
   })
@@ -593,8 +593,8 @@ test('does not override opts with a string as second argument', async ({ same })
   await watchFileCreated(tmp)
   const result = JSON.parse(readFileSync(tmp).toString())
   same(result, {
-    pid: pid,
-    hostname: hostname,
+    pid,
+    hostname,
     level: 30,
     time: 'none',
     msg: 'hello'

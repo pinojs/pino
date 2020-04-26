@@ -473,7 +473,7 @@ function levelTest (name) {
         err: pino.stdSerializers.err
       }
     })
-    instance[name]({ err: err })
+    instance[name]({ err })
   })
 
   test('child logger for level ' + name, ({ end, is }) => {
@@ -512,7 +512,7 @@ function consoleMethodTest (level, method) {
       is(args[0], 'test')
       end()
     })
-    const instance = require('../browser')({ level: level })
+    const instance = require('../browser')({ level })
     instance[level]('test')
   })
 }

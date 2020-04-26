@@ -22,9 +22,9 @@ test('err is serialized with additional properties set on the Error object', asy
   ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
   delete result.time
   same(result, {
-    pid: pid,
-    hostname: hostname,
-    level: level,
+    pid,
+    hostname,
+    level,
     type: 'Error',
     msg: err.message,
     stack: err.stack,
@@ -42,9 +42,9 @@ test('type should be retained, even if type is a property', async ({ ok, same })
   ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
   delete result.time
   same(result, {
-    pid: pid,
-    hostname: hostname,
-    level: level,
+    pid,
+    hostname,
+    level,
     type: 'bar',
     msg: err.message,
     stack: err.stack
@@ -62,9 +62,9 @@ test('type, message and stack should be first level properties', async ({ ok, sa
   ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
   delete result.time
   same(result, {
-    pid: pid,
-    hostname: hostname,
-    level: level,
+    pid,
+    hostname,
+    level,
     type: 'Error',
     msg: err.message,
     stack: err.stack,
@@ -87,9 +87,9 @@ test('err serializer', async ({ ok, same }) => {
   ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
   delete result.time
   same(result, {
-    pid: pid,
-    hostname: hostname,
-    level: level,
+    pid,
+    hostname,
+    level,
     err: {
       type: 'Error',
       message: err.message,
@@ -111,9 +111,9 @@ test('an error with statusCode property is not confused for a http response', as
   ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
   delete result.time
   same(result, {
-    pid: pid,
-    hostname: hostname,
-    level: level,
+    pid,
+    hostname,
+    level,
     type: 'Error',
     msg: err.message,
     stack: err.stack,
@@ -163,8 +163,8 @@ test('correctly ignores toString on errors', async ({ same }) => {
   const result = await once(stream, 'data')
   delete result.time
   same(result, {
-    pid: pid,
-    hostname: hostname,
+    pid,
+    hostname,
     level: 60,
     type: 'Error',
     msg: err.message,

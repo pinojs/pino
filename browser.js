@@ -58,10 +58,10 @@ function pino (opts) {
   })
 
   var setOpts = {
-    transmit: transmit,
-    serialize: serialize,
+    transmit,
+    serialize,
     asObject: opts.browser.asObject,
-    levels: levels
+    levels
   }
   logger.levels = pino.levels
   logger.level = level
@@ -191,10 +191,10 @@ function wrap (opts, logger, level) {
         var methodValue = pino.levels.values[level]
         if (methodValue < transmitValue) return
         transmit(this, {
-          ts: ts,
+          ts,
           methodLevel: level,
-          methodValue: methodValue,
-          transmitLevel: transmitLevel,
+          methodValue,
+          transmitLevel,
           transmitValue: pino.levels.values[opts.transmit.level || logger.level],
           send: opts.transmit.send,
           val: logger.levelVal
