@@ -6,26 +6,26 @@ const fs = require('fs')
 const dest = fs.createWriteStream('/dev/null')
 const plog = pino(dest)
 delete require.cache[require.resolve('../../')]
-const plogExtreme = require('../../')(pino.extreme('/dev/null'))
+const plogAsync = require('../../')(pino.destination({ dest: '/dev/null', sync: false }))
 delete require.cache[require.resolve('../../')]
 const plogUnsafe = require('../../')({ safe: false }, dest)
 delete require.cache[require.resolve('../../')]
-const plogUnsafeExtreme = require('../../')(
+const plogUnsafeAsync = require('../../')(
   { safe: false },
-  pino.extreme('/dev/null')
+  pino.destination({ dest: '/dev/null', sync: false })
 )
 const plogRedact = pino({ redact: ['a.b.c'] }, dest)
 delete require.cache[require.resolve('../../')]
-const plogExtremeRedact = require('../../')(
+const plogAsyncRedact = require('../../')(
   { redact: ['a.b.c'] },
-  pino.extreme('/dev/null')
+  pino.destination({ dest: '/dev/null', sync: false })
 )
 delete require.cache[require.resolve('../../')]
 const plogUnsafeRedact = require('../../')({ redact: ['a.b.c'], safe: false }, dest)
 delete require.cache[require.resolve('../../')]
-const plogUnsafeExtremeRedact = require('../../')(
+const plogUnsafeAsyncRedact = require('../../')(
   { redact: ['a.b.c'], safe: false },
-  pino.extreme('/dev/null')
+  pino.destination({ dest: '/dev/null', sync: false })
 )
 
 const max = 10
@@ -57,27 +57,27 @@ const run = bench([
     }
     setImmediate(cb)
   },
-  function benchPinoExtremeNoRedact (cb) {
+  function benchPinoAsyncNoRedact (cb) {
     for (var i = 0; i < max; i++) {
-      plogExtreme.info({ a: { b: { c: 'redact me.', d: 'leave me' } } })
+      plogAsync.info({ a: { b: { c: 'redact me.', d: 'leave me' } } })
     }
     setImmediate(cb)
   },
-  function benchPinoExtremeRedact (cb) {
+  function benchPinoAsyncRedact (cb) {
     for (var i = 0; i < max; i++) {
-      plogExtremeRedact.info({ a: { b: { c: 'redact me.', d: 'leave me' } } })
+      plogAsyncRedact.info({ a: { b: { c: 'redact me.', d: 'leave me' } } })
     }
     setImmediate(cb)
   },
-  function benchPinoUnsafeExtremeNoRedact (cb) {
+  function benchPinoUnsafeAsyncNoRedact (cb) {
     for (var i = 0; i < max; i++) {
-      plogUnsafeExtreme.info({ a: { b: { c: 'redact me.', d: 'leave me' } } })
+      plogUnsafeAsync.info({ a: { b: { c: 'redact me.', d: 'leave me' } } })
     }
     setImmediate(cb)
   },
-  function benchPinoUnsafeExtremeRedact (cb) {
+  function benchPinoUnsafeAsyncRedact (cb) {
     for (var i = 0; i < max; i++) {
-      plogUnsafeExtremeRedact.info({ a: { b: { c: 'redact me.', d: 'leave me' } } })
+      plogUnsafeAsyncRedact.info({ a: { b: { c: 'redact me.', d: 'leave me' } } })
     }
     setImmediate(cb)
   }
