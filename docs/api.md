@@ -111,9 +111,9 @@ const logger = pino({
   }
 })
 logger.info('hello')
-// {"level":30,"time":1573664685466,"pid":78742,"hostname":"x","line":1,"msg":"hello","v":1}
+// {"level":30,"time":1573664685466,"pid":78742,"hostname":"x","line":1,"msg":"hello"}
 logger.info('world')
-// {"level":30,"time":1573664685469,"pid":78742,"hostname":"x","line":2,"msg":"world","v":1}
+// {"level":30,"time":1573664685469,"pid":78742,"hostname":"x","line":2,"msg":"world"}
 ```
 
 #### `redact` (Array | Object):
@@ -285,7 +285,7 @@ The string key for the 'message' in the JSON object.
 
 Default: `null`
 
-If there's a chance that objects being logged have properties that conflict with those from pino itself (`level`, `timestamp`, `v`, `pid`, etc)
+If there's a chance that objects being logged have properties that conflict with those from pino itself (`level`, `timestamp`, `pid`, etc)
 and duplicate keys in your log records are undesirable, pino can be configured with a `nestedKey` option that causes any `object`s that are logged
 to be placed under a key whose name is the value of `nestedKey`.
 
@@ -301,7 +301,7 @@ const thing = { level: 'hi', time: 'never', foo: 'bar'} // has pino-conflicting 
 logger.info(thing)
 
 // logs the following:
-// {"level":30,"time":1578357790020,"pid":91736,"hostname":"x","payload":{"level":"hi","time":"never","foo":"bar"},"v":1}
+// {"level":30,"time":1578357790020,"pid":91736,"hostname":"x","payload":{"level":"hi","time":"never","foo":"bar"}}
 ```
 In this way, logged objects' properties don't conflict with pino's standard logging properties,
 and searching for logged objects can start from a consistent path.
