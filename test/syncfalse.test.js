@@ -8,7 +8,7 @@ const { fork } = require('child_process')
 const writer = require('flush-write-stream')
 const { once, getPathToNull } = require('./helper')
 
-test('extreme mode', async ({ is, teardown }) => {
+test('asynchronous logging', async ({ is, teardown }) => {
   const now = Date.now
   const hostname = os.hostname
   const proc = process
@@ -31,12 +31,12 @@ test('extreme mode', async ({ is, teardown }) => {
   dest.write = (s) => {
     actual += s
   }
-  const extreme = pino(dest)
+  const asyncLogger = pino(dest)
 
   var i = 44
   while (i--) {
     normal.info('h')
-    extreme.info('h')
+    asyncLogger.info('h')
   }
 
   var expected2 = expected.split('\n')[0]
@@ -83,15 +83,15 @@ test('sync false with child', async ({ is, teardown }) => {
 
   const dest = createWriteStream(getPathToNull())
   dest.write = function (s) { actual += s }
-  const extreme = pino(dest).child({ hello: 'world' })
+  const asyncLogger = pino(dest).child({ hello: 'world' })
 
   var i = 500
   while (i--) {
     normal.info('h')
-    extreme.info('h')
+    asyncLogger.info('h')
   }
 
-  extreme.flush()
+  asyncLogger.flush()
 
   var expected2 = expected.split('\n')[0]
   var actual2 = ''

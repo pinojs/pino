@@ -671,8 +671,8 @@ This is an asynchronous, fire and forget, operation.
 The use case is primarily for asynchronous logging, which may buffer
 log lines while others are being written. The `logger.flush` method can be
 used to flush the logs
-on an long interval, say ten seconds. Such a strategy can provide an
-optimium balance between extremely efficient logging at high demand periods
+on a long interval, say ten seconds. Such a strategy can provide an
+optimum balance between extremely efficient logging at high demand periods
 and safer logging at low demand periods.
 
 * See [`destination` parameter](#destination)
@@ -837,7 +837,7 @@ or create an exit listener function.
 
 The `finalLogger` is a specialist logger that synchronously flushes
 on every write. This is important to guarantee final log writes,
-both when using `pino.extreme` target.
+when using `pino.destination({ sync: false })` target.
 
 Since final log writes cannot be guaranteed with normal Node.js streams,
 if the `destination` parameter of the `logger` supplied to `pino.final`
@@ -874,8 +874,8 @@ finalLogger.info('exiting...')
 
 * See [`destination` parameter](#destination)
 * See [Exit logging help](/docs/help.md#exit-logging)
-* See [Extreme mode ⇗](/docs/extreme.md)
-* See [Log loss prevention ⇗](/docs/extreme.md#log-loss-prevention)
+* See [Asynchronous logging ⇗](/docs/asynchronous.md)
+* See [Log loss prevention ⇗](/docs/asynchronous.md#log-loss-prevention)
 
 <a id="pino-stdserializers"></a>
 ### `pino.stdSerializers` (Object)

@@ -20,7 +20,7 @@ or exits of it's own accord we may want to write some final logs – particular
 in cases of error.
 
 Writing to a Node.js stream on exit is not necessarily guaranteed, and naively writing
-to an Extreme Mode logger on exit will definitely lead to lost logs.
+to an asynchronous logger on exit will definitely lead to lost logs.
 
 To write logs in an exit handler, create the handler with [`pino.final`](/docs/api.md#pino-final):
 
@@ -75,8 +75,8 @@ help.
 ## Reopening log files
 
 In cases where a log rotation tool doesn't offer a copy-truncate capabilities,
-or where using them is deemed inappropriate `pino.destination` and `pino.extreme`
-destinations are able to reopen file paths after a file has been moved away.
+or where using them is deemed inappropriate, `pino.destination`
+is able to reopen file paths after a file has been moved away.
 
 One way to use this is to set up a `SIGUSR2` or `SIGHUP` signal handler that
 reopens the log file destination, making sure to write the process PID out
@@ -87,7 +87,7 @@ somewhere so the log rotation tool knows where to send the signal.
 const fs = require('fs')
 fs.writeFileSync('/var/run/myapp.pid', process.pid)
 
-const dest = pino.destination('/log/file') // pino.extreme will also work
+const dest = pino.destination('/log/file')
 const logger = require('pino')(dest)
 process.on('SIGHUP', () => dest.reopen())
 ```
@@ -211,7 +211,7 @@ The popular [`debug`](http://npm.im/debug) is used in many modules across the ec
 
 The [`pino-debug`](http://github.com/pinojs/pino-debug) module
 can capture calls to `debug` loggers and run them
-through `pino` instead. This results in a 10x (20x in extreme mode)
+through `pino` instead. This results in a 10x (20x in asynchronous mode)
 performance improvement - even though `pino-debug` is logging additional
 data and wrapping it in JSON.
 

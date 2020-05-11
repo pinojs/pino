@@ -8,7 +8,7 @@ const plog = pino(dest)
 delete require.cache[require.resolve('../../')]
 const plogDest = require('../../')(pino.destination('/dev/null'))
 delete require.cache[require.resolve('../../')]
-const plogExtreme = require('../../')(pino.extreme('/dev/null'))
+const plogAsync = require('../../')(pino.destination({ dest: '/dev/null', sync: false }))
 const deep = require('../../package.json')
 deep.deep = JSON.parse(JSON.stringify(deep))
 deep.deep.deep = JSON.parse(JSON.stringify(deep))
@@ -29,9 +29,9 @@ const run = bench([
     }
     setImmediate(cb)
   },
-  function benchPinoExtremeLongString (cb) {
+  function benchPinoAsyncLongString (cb) {
     for (var i = 0; i < max; i++) {
-      plogExtreme.info(longStr)
+      plogAsync.info(longStr)
     }
     setImmediate(cb)
   },
@@ -47,9 +47,9 @@ const run = bench([
     }
     setImmediate(cb)
   },
-  function benchPinoExtremeDeepObj (cb) {
+  function benchPinoAsyncDeepObj (cb) {
     for (var i = 0; i < max; i++) {
-      plogExtreme.info(deep)
+      plogAsync.info(deep)
     }
     setImmediate(cb)
   },
@@ -65,9 +65,9 @@ const run = bench([
     }
     setImmediate(cb)
   },
-  function benchPinoExtremeInterpolateDeep (cb) {
+  function benchPinoAsyncInterpolateDeep (cb) {
     for (var i = 0; i < max; i++) {
-      plogExtreme.info('hello %j', deep)
+      plogAsync.info('hello %j', deep)
     }
     setImmediate(cb)
   }
