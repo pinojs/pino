@@ -30,11 +30,11 @@ This has a couple of important caveats:
   (up to 4KB of logs)
   * For instance, a power cut will mean up to 4KB of buffered logs will be lost
 
-So in summary, only use extreme mode when performing an extreme amount of
-logging and it is acceptable to potentially lose the most recent logs.
+So in summary, use asynchronous logging only when performing an extreme amount of
+logging, and it is acceptable to potentially lose the most recent logs.
 
 * Pino will register handlers for the following process events/signals so that
-  Pino can flush the extreme mode buffer:
+  Pino can flush the asynchronous logger buffer:
 
   + `beforeExit`
   + `exit`
@@ -102,11 +102,6 @@ process.on('SIGINT', () => handler(null, 'SIGINT'))
 process.on('SIGQUIT', () => handler(null, 'SIGQUIT'))
 process.on('SIGTERM', () => handler(null, 'SIGTERM'))
 ```
-
-An extreme destination is an instance of
-[`SonicBoom`](https://github.com/mcollina/sonic-boom) with `4096`
-buffering.
-
 
 * See [`pino.destination` api](/docs/api.md#pino-destination)
 * See [`pino.final` api](/docs/api.md#pino-final)
