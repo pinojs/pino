@@ -33,9 +33,8 @@ module.exports = function myPrettifier (options) {
   return function prettifier (inputData) {
     let logObject
     if (typeof inputData === 'string') {
-      const parsedData = someJsonParser(inputData)
-      logObject = (isPinoLog(parsedData)) ? parsedData : undefined
-    } else if (isObject(inputData) && isPinoLog(inputData)) {
+      logObject = someJsonParser(inputData)
+    } else if (isObject(inputData)) {
       logObject = inputData
     }
     if (!logObject) return inputData
@@ -44,10 +43,6 @@ module.exports = function myPrettifier (options) {
 
   function isObject (input) {
     return Object.prototype.toString.apply(input) === '[object Object]'
-  }
-
-  function isPinoLog (log) {
-    return log && (log.hasOwnProperty('v') && log.v === 1)
   }
 }
 ```
