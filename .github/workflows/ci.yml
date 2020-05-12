@@ -22,4 +22,4 @@ jobs:
         run: npm test
       - name: Test without coverage
         if: matrix.os == 'windows-latest'
-        run: npm test
+        run: npm run without-cov
