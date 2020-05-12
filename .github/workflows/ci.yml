@@ -17,5 +17,9 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: Install
         run: npm i
-      - name: Tests
+      - name: Test with coverage
+        if: matrix.os != 'windows-latest'
         run: npm test
+      - name: Test without coverage
+        if: matrix.os == 'windows-latest'
+        run: npm run without-cov
