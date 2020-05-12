@@ -19,6 +19,7 @@
     "docs": "docsify serve",
     "browser-test": "airtap --local 8080 test/browser*test.js",
     "test": "standard | snazzy && tap --100 test/*test.js",
+    "without-cov": "standard | snazzy && tap --no-cov test/*test.js",
     "cov-ui": "tap --coverage-report=html test/*test.js",
     "bench": "node benchmarks/utils/runbench all",
     "bench-basic": "node benchmarks/utils/runbench basic",

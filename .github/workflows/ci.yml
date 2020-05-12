@@ -17,5 +17,10 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: Install
         run: npm i
-      - name: Tests
-        run: npm test
+      - name: Test
+        run: |
+              if [ "$RUNNER_OS" == "Windows ]; then
+                npm run without-cov
+              elseif
+                npm test
+              fi
