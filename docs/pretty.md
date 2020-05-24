@@ -85,10 +85,10 @@ will be written to the destination stream.
   See the [`pino-pretty` documentation][pp] for more information on the options
   that can be passed via `prettyPrint`.
    
-  Pretty stream doesn't guarantee final log writes and corresponding warning is written to logs on 
-  first synchronous flushing.
-  To disable this warning, e.g. if you use pretty stream consciously and know that some logs can be lost,
-  you can pass `suppressFlushSyncWarning : true` to prettyPrint:
+The default prettifier write stream does not guarantee final log writes.
+Correspondingly, a warning is written to logs on first synchronous flushing.
+This warning may be suppressed by passing `suppressFlushSyncWarning : true` to
+`prettyPrint`:
   ```js
   const pino = require('pino')
   const log = pino({
