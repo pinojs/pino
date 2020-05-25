@@ -287,6 +287,18 @@ test('final works without prior logging', async ({ isNot }) => {
   isNot(strip(actual).match(/INFO\s+\(123456 on abcdefghijklmnopqr\): beforeExit/), null)
 })
 
+test('suppress flush sync warning when corresponding option is specified', async ({ isNot, is }) => {
+  var actual = ''
+  const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'suppress-flush-sync-warning.js')])
+
+  child.stdout.pipe(writer((s, enc, cb) => {
+    actual += s
+    cb()
+  }))
+  await once(child, 'close')
+  is(strip(actual).match(/WARN\s+\(123456 on abcdefghijklmnopqr\): pino.final with prettyPrint does not support flushing/), null)
+})
+
 test('works as expected with an object with the msg prop', async ({ isNot }) => {
   var actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'obj-msg-prop.js')])
