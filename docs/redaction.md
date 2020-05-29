@@ -131,3 +131,7 @@ It's extremely important that path strings do not originate from user input.
 The `fast-redact` module uses a VM context to syntax check the paths, user input
 should never be combined with such an approach. See the [`fast-redact` Caveat](https://github.com/davidmarkclements/fast-redact#caveat)
 and the [`fast-redact` Approach](https://github.com/davidmarkclements/fast-redact#approach) for in-depth information.
+
+## Alternatives
+
+Alternative to Pino's native redaction, [CabinJS](https://cabinjs.com) may serve your needs out of the box.  CabinJS is a JavaScript logging package and middleware which automatically strips 1600+ sensitive field names, credit card numbers, BasicAuth headers, Social Security Numbers, JSON Web Tokens, API Keys, CSRF Tokens, Stripe Tokens, Passwords, Salts, Hashes, Bank Account Numbers, Bank Routing Numbers, and more.  It also reduces disk storage costs by converting Stream, Buffer, and ArrayBuffer log data into simplified descriptive objects.  Cabin also populates a `app` property in your log metadata which contains your packages name, version, node version, git hash, git tag, environment, hostname, and pid. Lastly, it is a drop-in replacement and alternative to many existing logging solutions, including bunyan, and works great with pino plugged in out of the box.  Read more at <https://cabinjs.com>.
