@@ -711,3 +711,36 @@ test('supports leading bracket notation (single-segment path, wilcard)', async (
   const o = await once(stream, 'data')
   is(o['a.a'], '[Redacted]')
 })
+
+test('child bindings are redacted using wildcard path', async ({ is }) => {
+  const stream = sink()
+  const instance = pino({ redact: ['*.headers.cookie'] }, stream)
+  instance.child({
+    req: {
+      method: 'GET',
+      url: '/',
+      headers: {
+        cookie: 'SESSID=298zf09hf012fh2; csrftoken=u32t4o3tb3gg43; _gat=1;'
+      }
+    }
+  }).info('message completed')
+  const { req } = await once(stream, 'data')
+  is(req.headers.cookie, '[Redacted]')
+})
+
+test('child bindings are redacted using wildcard and plain path keys', async ({ is }) => {
+  const stream = sink()
+  const instance = pino({ redact: ['req.method', '*.headers.cookie'] }, stream)
+  instance.child({
+    req: {
+      method: 'GET',
+      url: '/',
+      headers: {
+        cookie: 'SESSID=298zf09hf012fh2; csrftoken=u32t4o3tb3gg43; _gat=1;'
+      }
+    }
+  }).info('message completed')
+  const { req } = await once(stream, 'data')
+  is(req.headers.cookie, '[Redacted]')
+  is(req.method, '[Redacted]')
+})
