@@ -117,7 +117,7 @@ logger.info('world')
 ```
 
 Be aware of providing a shared object for mixins. 
-In the case bellow, passing `mergingObject` argument to the first `info` call will mutate global `mixin` object.
+In the following example, passing `mergingObject` argument to the first `info` call will mutate the global `mixin` object:
 ```js
 const mixin = {
     appName: 'My app'
