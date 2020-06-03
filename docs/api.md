@@ -116,7 +116,7 @@ logger.info('world')
 // {"level":30,"time":1573664685469,"pid":78742,"hostname":"x","line":2,"msg":"world"}
 ```
 
-Be aware providing shared object for mixins. 
+Be aware of providing a shared object for mixins. 
 In the case bellow, passing `mergingObject` argument to the first `info` call will mutate global `mixin` object.
 ```js
 const mixin = {
