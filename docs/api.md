@@ -116,7 +116,7 @@ logger.info('world')
 // {"level":30,"time":1573664685469,"pid":78742,"hostname":"x","line":2,"msg":"world"}
 ```
 
-Be aware of providing a shared object for mixins. 
+The result of `mixin()` is supposed to be a _new_ object. For performance reason, the object returned by `mixin()` will be mutated by pino.
 In the following example, passing `mergingObject` argument to the first `info` call will mutate the global `mixin` object:
 ```js
 const mixin = {
