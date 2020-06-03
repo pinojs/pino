@@ -116,6 +116,28 @@ logger.info('world')
 // {"level":30,"time":1573664685469,"pid":78742,"hostname":"x","line":2,"msg":"world"}
 ```
 
+Be aware providing shared object for mixins. 
+In the case bellow, passing `mergingObject` argument to the first `info` call will mutate global `mixin` object.
+```js
+const mixin = {
+    appName: 'My app'
+}
+
+const logger = pino({
+    mixin() {
+        return mixin
+    }
+})
+
+pino.info({
+    description: 'Ok'
+}, 'Message 1')
+// {"level":30,"time":1591195061437,"pid":16012,"hostname":"x","appName":"My app","description":"Ok" "msg":"Message 1"}
+pino.info('Message 2')
+// {"level":30,"time":1591195061437,"pid":16012,"hostname":"x","appName":"My app","description":"Ok","msg":"Message 2"}
+// Note: the second log contains "description":"Ok" text, even if it was not provided.
+```
+
 #### `redact` (Array | Object):
 
 Default: `undefined`
