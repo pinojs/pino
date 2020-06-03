@@ -138,8 +138,8 @@ pino.info('Message 2')
 // Note: the second log contains "description":"Ok" text, even if it was not provided.
 ```
 
-If you want to just add additional info to each log message, you should look at the child loggers.
-* See [child loggers ⇗](/docs/child-loggers.md).
+If the `mixin` feature is being used merely to add static metadata to each log message,
+then a [child logger ⇗](/docs/child-loggers.md) should be used instead.
 
 #### `redact` (Array | Object):
 
