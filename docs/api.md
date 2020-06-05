@@ -116,6 +116,31 @@ logger.info('world')
 // {"level":30,"time":1573664685469,"pid":78742,"hostname":"x","line":2,"msg":"world"}
 ```
 
+The result of `mixin()` is supposed to be a _new_ object. For performance reason, the object returned by `mixin()` will be mutated by pino.
+In the following example, passing `mergingObject` argument to the first `info` call will mutate the global `mixin` object:
+```js
+const mixin = {
+    appName: 'My app'
+}
+
+const logger = pino({
+    mixin() {
+        return mixin
+    }
+})
+
+pino.info({
+    description: 'Ok'
+}, 'Message 1')
+// {"level":30,"time":1591195061437,"pid":16012,"hostname":"x","appName":"My app","description":"Ok" "msg":"Message 1"}
+pino.info('Message 2')
+// {"level":30,"time":1591195061437,"pid":16012,"hostname":"x","appName":"My app","description":"Ok","msg":"Message 2"}
+// Note: the second log contains "description":"Ok" text, even if it was not provided.
+```
+
+If the `mixin` feature is being used merely to add static metadata to each log message,
+then a [child logger ⇗](/docs/child-loggers.md) should be used instead.
+
 #### `redact` (Array | Object):
 
 Default: `undefined`
