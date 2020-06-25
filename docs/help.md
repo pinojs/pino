@@ -11,6 +11,7 @@
 * [Log levels as labels instead of numbers](#level-string)
 * [Pino with `debug`](#debug)
 * [Unicode and Windows terminal](#windows)
+* [Mapping Pino Log Levels to Google Cloud Logging (Stackdriver) Serverity Levels](#stackdriver)
 
 <a id="exit-logging"></a>
 ## Exit logging
@@ -240,3 +241,42 @@ is possible to configure the terminal to visualize those characters
 correctly with the use of [`chcp`](https://ss64.com/nt/chcp.html) by
 executing in the terminal `chcp 65001`. This is a known limitation of
 Node.js.
+
+<a id="stackdriver"></a>
+## Mapping Pino Log Levels to Google Cloud Logging (Stackdriver) Serverity Levels
+
+Google Cloud Logging uses `severity` levels instead log levels. As a result, all logs may show as INFO
+level logs while completely ignoring the level set in the pino log. Google Cloud Logging also prefers that
+log data is present inside a `message` key instead of the default `msg` key that Pino uses. Use a technique
+similar to the one below to retain log levels in Google Clould Logging
+
+```js
+const pino = require('pino')
+
+// https://cloud.google.com/logging/docs/reference/v2/rest/v2/LogEntry#logseverity
+const PinoLevelToSeverityLookup = {  
+  'trace': 'DEFAULT',
+  'fatal': 'CRITICAL',
+  'debug': 'DEBUG',
+  'info': 'INFO',
+  'warn': 'WARNING',
+  'error': 'ERROR',
+}
+
+const defaultPinoConf = {
+  messageKey: 'message',
+  formatters: {
+    level(label, number) {
+      return { 
+        severity: PinoLevelToSeverityLookup[label] || PinoLevelToSeverityLookup['info'],
+        level: number,
+      }
+    },
+  },
+}
+
+module.exports = function createLogger(options) {
+  return pino(Object.assign({}, options, defaultPinoConf))
+}
+```
+
