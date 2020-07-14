@@ -169,7 +169,8 @@ function pino (...args) {
     [hooksSym]: hooks,
     silent: noop
   })
-  Object.setPrototypeOf(instance, proto)
+
+  Object.setPrototypeOf(instance, proto())
 
   genLsCache(instance)
 
