@@ -141,6 +141,7 @@ function levelTest (name, level) {
       hostname,
       level,
       msg: 'string',
+      originalMsg: 'object',
       hello: 'world'
     })
   })
