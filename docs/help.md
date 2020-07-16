@@ -272,6 +272,9 @@ const defaultPinoConf = {
         level: number,
       }
     },
+    log(message) {
+      return { message }
+    }
   },
 }
 
