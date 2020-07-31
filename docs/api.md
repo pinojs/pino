@@ -488,8 +488,6 @@ The `message` parameter takes precedence over the `mergedObject`.
 That is, if a `mergedObject` contains a `msg` property, and a `message` parameter
 is supplied in addition, the `msg` property in the output log will be the value of
 the `message` parameter not the value of the `msg` property on the `mergedObject`.
-In case this conflict occurs, the `msg` property from the object will be preserved
-in the key `originalMsg`.
 
 The `messageKey` option can be used at instantiation time to change the namespace
 from `msg` to another string as preferred.
