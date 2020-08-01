@@ -12,6 +12,7 @@
 * [Pino with `debug`](#debug)
 * [Unicode and Windows terminal](#windows)
 * [Mapping Pino Log Levels to Google Cloud Logging (Stackdriver) Serverity Levels](#stackdriver)
+* [Avoid Message Conflict](#avoid-message-conflict)
 
 <a id="exit-logging"></a>
 ## Exit logging
@@ -281,4 +282,35 @@ const defaultPinoConf = {
 module.exports = function createLogger(options) {
   return pino(Object.assign({}, options, defaultPinoConf))
 }
+```
+
+<a id="avoid-message-conflict"></a>
+## Avoid Message Conflict
+
+As described in the [`message` documentation](./api.md#message), when a log
+is written like `log.info({ msg: 'a message' }, 'another message')` then the
+final output JSON will have `"msg":"another message"` and the `'a message'`
+string will be lost. To overcome this, the [`logMethod` hook](./api.md#logmethod)
+can be used:
+
+```js
+'use strict'
+
+const log = require('pino')({
+  level: 'debug',
+  hooks: {
+    logMethod (inputArgs, method) {
+      if (inputArgs.length === 2 && inputArgs[0].msg) {
+       inputArgs[0].originalMsg = inputArgs[0].msg
+      }
+      return method.apply(this, inputArgs)
+    }
+  }
+})
+
+log.info('no original message')
+log.info({ msg: 'mapped to originalMsg' }, 'a message')
+
+// {"level":30,"time":1596313323106,"pid":63739,"hostname":"foo","msg":"no original message"}
+// {"level":30,"time":1596313323107,"pid":63739,"hostname":"foo","msg":"a message","originalMsg":"mapped to originalMsg"}
 ```

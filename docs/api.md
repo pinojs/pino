@@ -470,7 +470,7 @@ logger.info({MIX: {IN: true}})
 // {"level":30,"time":1531254555820,"pid":55956,"hostname":"x","MIX":{"IN":true}}
 ```
 
-<a id=message></a>
+<a id="message"></a>
 #### `message` (String)
 
 A `message` string can optionally be supplied as the first parameter, or
@@ -488,8 +488,8 @@ The `message` parameter takes precedence over the `mergedObject`.
 That is, if a `mergedObject` contains a `msg` property, and a `message` parameter
 is supplied in addition, the `msg` property in the output log will be the value of
 the `message` parameter not the value of the `msg` property on the `mergedObject`.
-In case this conflict occurs, the `msg` property from the object will be preserved
-in the key `originalMsg`.
+See [Avoid Message Conflict](./help.md#avoid-message-conflict) for information
+on how to overcome this limitation.
 
 The `messageKey` option can be used at instantiation time to change the namespace
 from `msg` to another string as preferred.
@@ -507,7 +507,7 @@ then be interpolated accordingly.
 * See [`messageKey` pino option](#opt-messagekey)
 * See [`...interpolationValues` log method parameter](#interpolationvalues)
 
-<a id=interpolationvalues></a>
+<a id="interpolationvalues"></a>
 #### `...interpolationValues` (Any)
 
 All arguments supplied after `message` are serialized and interpolated according
