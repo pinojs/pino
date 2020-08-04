@@ -229,3 +229,14 @@ test('non-overridden serializers are available in the children', async ({ is }) 
   parent.fatal({ onlyChild: 'test' })
   is((await o4).onlyChild, 'test')
 })
+
+test('custom serializer for messageKey', async (t) => {
+  const stream = sink()
+  const instance = pino({ serializers: { msg: () => '422' } }, stream)
+
+  const o = { num: NaN }
+  instance.info(o, 42)
+
+  const { msg } = await once(stream, 'data')
+  t.is(msg, '422')
+})

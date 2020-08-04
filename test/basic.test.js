@@ -681,3 +681,36 @@ test('correctly log NaN', async (t) => {
   const { num } = await once(stream, 'data')
   t.is(num, null)
 })
+
+test('correctly skip function', async (t) => {
+  const stream = sink()
+  const instance = pino(stream)
+
+  const o = { num: NaN }
+  instance.info(o, () => {})
+
+  const { msg } = await once(stream, 'data')
+  t.is(msg, undefined)
+})
+
+test('correctly skip Infinity', async (t) => {
+  const stream = sink()
+  const instance = pino(stream)
+
+  const o = { num: NaN }
+  instance.info(o, Infinity)
+
+  const { msg } = await once(stream, 'data')
+  t.is(msg, null)
+})
+
+test('correctly skip Infinity', async (t) => {
+  const stream = sink()
+  const instance = pino(stream)
+
+  const o = { num: NaN }
+  instance.info(o, 42)
+
+  const { msg } = await once(stream, 'data')
+  t.is(msg, 42)
+})
