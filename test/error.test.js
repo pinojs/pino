@@ -171,3 +171,50 @@ test('correctly ignores toString on errors', async ({ same }) => {
     stack: err.stack
   })
 })
+
+test('correctly adds error information when nestedKey is used', async ({ same }) => {
+  const err = new Error('myerror')
+  err.toString = () => undefined
+  const stream = sink()
+  const instance = pino({
+    test: 'this',
+    nestedKey: 'obj'
+  }, stream)
+  instance.fatal(err)
+  const result = await once(stream, 'data')
+  delete result.time
+  same(result, {
+    pid,
+    hostname,
+    level: 60,
+    obj: {
+      type: 'Error',
+      stack: err.stack
+    },
+    msg: err.message
+  })
+})
+
+test('correctly adds msg on error when nestedKey is used', async ({ same }) => {
+  const err = new Error('myerror')
+  err.toString = () => undefined
+  const stream = sink()
+  const instance = pino({
+    test: 'this',
+    nestedKey: 'obj'
+  }, stream)
+  instance.fatal(err, 'msg message')
+  const result = await once(stream, 'data')
+  delete result.time
+  same(result, {
+    pid,
+    hostname,
+    level: 60,
+    obj: {
+      type: 'Error',
+      stack: err.stack,
+      message: err.message
+    },
+    msg: 'msg message'
+  })
+})

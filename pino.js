@@ -34,7 +34,8 @@ const {
   mixinSym,
   useOnlyCustomLevelsSym,
   formattersSym,
-  hooksSym
+  hooksSym,
+  nestedKeyStrSym
 } = symbols
 const { epochTime, nullTime } = time
 const { pid } = process
@@ -162,6 +163,8 @@ function pino (...args) {
     [formatOptsSym]: formatOpts,
     [messageKeySym]: messageKey,
     [nestedKeySym]: nestedKey,
+    // protect against injection
+    [nestedKeyStrSym]: nestedKey ? `,${JSON.stringify(nestedKey)}:{` : '',
     [serializersSym]: serializers,
     [mixinSym]: mixin,
     [chindingsSym]: chindings,

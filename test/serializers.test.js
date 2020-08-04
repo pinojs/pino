@@ -43,6 +43,29 @@ test('custom serializer overrides default err namespace error serializer', async
   is(typeof o.err.s, 'string')
 })
 
+test('custom serializer overrides default err namespace error serializer when nestedKey is on', async ({ is }) => {
+  const stream = sink()
+  const parent = pino({
+    nestedKey: 'obj',
+    serializers: {
+      err: (e) => {
+        return {
+          t: e.constructor.name,
+          m: e.message,
+          s: e.stack
+        }
+      }
+    }
+  }, stream)
+
+  parent.info({ err: ReferenceError('test') })
+  const o = await once(stream, 'data')
+  is(typeof o.obj.err, 'object')
+  is(o.obj.err.t, 'ReferenceError')
+  is(o.obj.err.m, 'test')
+  is(typeof o.obj.err.s, 'string')
+})
+
 test('null overrides default err namespace error serializer', async ({ is }) => {
   const stream = sink()
   const parent = pino({ serializers: { err: null } }, stream)
