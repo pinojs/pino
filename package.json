@@ -81,7 +81,7 @@
     "strip-ansi": "^6.0.0",
     "tap": "^14.10.8",
     "tape": "^4.13.2",
-    "through2": "^3.0.2",
+    "through2": "^4.0.0",
     "winston": "^3.3.3"
   },
   "dependencies": {
