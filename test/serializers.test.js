@@ -1,6 +1,7 @@
 'use strict'
 const { test } = require('tap')
 const { sink, once } = require('./helper')
+const stdSerializers = require('pino-std-serializers')
 const pino = require('../')
 
 const parentSerializers = {
@@ -91,13 +92,17 @@ test('child does not overwrite parent serializers', async ({ is }) => {
   is((await o2).test, 'child')
 })
 
-test('Symbol.for(\'pino.serializers\')', async ({ is, isNot }) => {
+test('Symbol.for(\'pino.serializers\')', async ({ is, isNot, deepEqual }) => {
   const stream = sink()
+  const expected = Object.assign({
+    err: stdSerializers.err
+  }, parentSerializers)
   const parent = pino({ serializers: parentSerializers }, stream)
   const child = parent.child({ a: 'property' })
 
-  is(parent[Symbol.for('pino.serializers')], parentSerializers)
-  is(child[Symbol.for('pino.serializers')], parentSerializers)
+  deepEqual(parent[Symbol.for('pino.serializers')], expected)
+  deepEqual(child[Symbol.for('pino.serializers')], expected)
+  is(parent[Symbol.for('pino.serializers')], child[Symbol.for('pino.serializers')])
 
   const child2 = parent.child({
     serializers: {
@@ -124,14 +129,17 @@ test('children inherit parent serializers', async ({ is }) => {
   is(o.test, 'parent')
 })
 
-test('children inherit parent Symbol serializers', async ({ is, isNot }) => {
+test('children inherit parent Symbol serializers', async ({ is, isNot, deepEqual }) => {
   const stream = sink()
   const symbolSerializers = {
     [Symbol.for('pino.*')]: parentSerializers.test
   }
+  const expected = Object.assign({
+    err: stdSerializers.err
+  }, symbolSerializers)
   const parent = pino({ serializers: symbolSerializers }, stream)
 
-  is(parent[Symbol.for('pino.serializers')], symbolSerializers)
+  deepEqual(parent[Symbol.for('pino.serializers')], expected)
 
   const child = parent.child({
     serializers: {

@@ -174,3 +174,41 @@ test('assign mixin()', async ({ same }) => {
     hello: 'world'
   })
 })
+
+test('no err serializer', async ({ same }) => {
+  const err = new Error('myerror')
+  const stream = sink()
+  const instance = pino({
+    serializers: {}
+  }, stream)
+  instance.fatal(err)
+  const result = await once(stream, 'data')
+  delete result.time
+  same(result, {
+    pid,
+    hostname,
+    level: 60,
+    type: 'Error',
+    msg: err.message,
+    stack: err.stack
+  })
+})
+
+test('empty serializer', async ({ same }) => {
+  const err = new Error('myerror')
+  const stream = sink()
+  const instance = pino({
+    serializers: {
+      err () {}
+    }
+  }, stream)
+  instance.fatal(err)
+  const result = await once(stream, 'data')
+  delete result.time
+  same(result, {
+    pid,
+    hostname,
+    level: 60,
+    msg: err.message
+  })
+})
