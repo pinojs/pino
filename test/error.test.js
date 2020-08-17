@@ -212,8 +212,7 @@ test('correctly adds msg on error when nestedKey is used', async ({ same }) => {
     level: 60,
     obj: {
       type: 'Error',
-      stack: err.stack,
-      message: err.message
+      stack: err.stack
     },
     msg: 'msg message'
   })
