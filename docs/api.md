@@ -258,7 +258,7 @@ should never throw. When logging an object, each top-level property
 matching the exact key of a serializer will be serialized using the defined serializer.
 
 The serializers are applied when a property in the logged object matches a property
-in the serialiers. The only exception is the `err` serializer as it is also applied in case
+in the serializers. The only exception is the `err` serializer as it is also applied in case
 the object is an instance of `Error`, e.g. `logger.info(new Error('kaboom'))`.
 
 * See [pino.stdSerializers](#pino-stdserializers)
