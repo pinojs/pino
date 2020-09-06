@@ -4,7 +4,7 @@ const pino = require('../browser')
 
 Date.now = () => 1599400603614
 
-test('prints null timestamp', ({ end, is }) => {
+test('null timestamp', ({ end, is }) => {
   const instance = pino({
     timestamp: pino.stdTimeFunctions.nullTime,
     browser: {
@@ -18,7 +18,7 @@ test('prints null timestamp', ({ end, is }) => {
   end()
 })
 
-test('prints iso timestamp', ({ end, is }) => {
+test('iso timestamp', ({ end, is }) => {
   const instance = pino({
     timestamp: pino.stdTimeFunctions.isoTime,
     browser: {
@@ -32,7 +32,7 @@ test('prints iso timestamp', ({ end, is }) => {
   end()
 })
 
-test('prints epoch timestamp', ({ end, is }) => {
+test('epoch timestamp', ({ end, is }) => {
   const instance = pino({
     timestamp: pino.stdTimeFunctions.epochTime,
     browser: {
@@ -46,7 +46,7 @@ test('prints epoch timestamp', ({ end, is }) => {
   end()
 })
 
-test('prints unix timestamp', ({ end, is }) => {
+test('unix timestamp', ({ end, is }) => {
   const instance = pino({
     timestamp: pino.stdTimeFunctions.unixTime,
     browser: {
@@ -60,7 +60,7 @@ test('prints unix timestamp', ({ end, is }) => {
   end()
 })
 
-test('prints epoch timestamp by default', ({ end, is }) => {
+test('epoch timestamp by default', ({ end, is }) => {
   const instance = pino({
     browser: {
       asObject: true,
@@ -73,7 +73,7 @@ test('prints epoch timestamp by default', ({ end, is }) => {
   end()
 })
 
-test('prints epoch timestamp by default', ({ end, is }) => {
+test('not print timestamp if the option is false', ({ end, is }) => {
   const instance = pino({
     timestamp: false,
     browser: {
