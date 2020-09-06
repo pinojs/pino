@@ -311,7 +311,7 @@ function getTimeFunction (opts) {
   if (opts.timestamp === false) {
     return nullTime
   }
-  return Date.now
+  return epochTime
 }
 
 function mock () { return {} }
