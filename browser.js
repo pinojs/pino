@@ -61,7 +61,8 @@ function pino (opts) {
     transmit,
     serialize,
     asObject: opts.browser.asObject,
-    levels
+    levels,
+    timestamp: getTimeFunction(opts)
   }
   logger.levels = pino.levels
   logger.level = level
@@ -160,6 +161,7 @@ pino.levels = {
 }
 
 pino.stdSerializers = stdSerializers
+pino.stdTimeFunctions = Object.assign({}, { nullTime, epochTime, unixTime, isoTime })
 
 function set (opts, logger, level, fallback) {
   var proto = Object.getPrototypeOf(logger)
@@ -174,7 +176,7 @@ function wrap (opts, logger, level) {
 
   logger[level] = (function (write) {
     return function LOG () {
-      var ts = Date.now()
+      var ts = opts.timestamp()
       var args = new Array(arguments.length)
       var proto = (Object.getPrototypeOf && Object.getPrototypeOf(this) === _console) ? _console : this
       for (var i = 0; i < args.length; i++) args[i] = arguments[i]
@@ -208,7 +210,11 @@ function asObject (logger, level, args, ts) {
   if (logger._serialize) applySerializers(args, logger._serialize, logger.serializers, logger._stdErrSerialize)
   var argsCloned = args.slice()
   var msg = argsCloned[0]
-  var o = { time: ts, level: pino.levels.values[level] }
+  var o = {}
+  if (ts) {
+    o.time = ts
+  }
+  o.level = pino.levels.values[level]
   var lvl = (logger._childLevel | 0) + 1
   if (lvl < 1) lvl = 1
   // deliberate, catching objects, arrays
@@ -298,15 +304,30 @@ function asErrValue (err) {
   return obj
 }
 
+function getTimeFunction (opts) {
+  if (typeof opts.timestamp === 'function') {
+    return opts.timestamp
+  }
+  if (opts.timestamp === false) {
+    return nullTime
+  }
+  return Date.now
+}
+
 function mock () { return {} }
 function passthrough (a) { return a }
 function noop () {}
+
+function nullTime () { return false }
+function epochTime () { return Date.now() }
+function unixTime () { return Math.round(Date.now() / 1000.0) }
+function isoTime () { return new Date(Date.now()).toISOString() } // using Date.now() for testability
 
 /* eslint-disable */
 /* istanbul ignore next */
 function pfGlobalThisOrFallback () {
   function defd (o) { return typeof o !== 'undefined' && o }
-  try { 
+  try {
     if (typeof globalThis !== 'undefined') return globalThis
     Object.defineProperty(Object.prototype, 'globalThis', {
       get: function () {
@@ -316,7 +337,7 @@ function pfGlobalThisOrFallback () {
       configurable: true
     })
     return globalThis
-  } catch (e) { 
+  } catch (e) {
     return defd(self) || defd(window) || defd(this) || {}
   }
 }
