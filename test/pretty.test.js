@@ -218,7 +218,7 @@ test('with custom timestamp', async ({ is }) => {
     cb()
   }))
   await once(child, 'close')
-  is(strip(actual).slice(0, 8), '["test"]')
+  is(strip(actual).slice(0, 6), '[test]')
 })
 
 test('with custom timestamp label', async ({ is }) => {
@@ -230,7 +230,7 @@ test('with custom timestamp label', async ({ is }) => {
     cb()
   }))
   await once(child, 'close')
-  is(strip(actual).slice(0, 8), '["test"]')
+  is(strip(actual).slice(0, 6), '[test]')
 })
 
 test('errors', async ({ isNot }) => {
