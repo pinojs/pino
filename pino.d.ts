@@ -11,6 +11,7 @@
 //                 Adam Vigneaux <https://github.com/AdamVig>
 //                 Austin Beer <https://github.com/austin-beer>
 //                 Michel Nemnom <https://github.com/Pegase745>
+//                 Igor Savin <https://github.com/kibertoad>
 // TypeScript Version: 2.7
 
 /// <reference types="node"/>
