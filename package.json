@@ -98,7 +98,7 @@
     "flatstr": "^1.0.12",
     "pino-std-serializers": "^2.4.2",
     "quick-format-unescaped": "^4.0.1",
-    "sonic-boom": "^1.0.2"
+    "sonic-boom": "^1.2.0"
   },
   "tsd": {
     "directory": "test/types"
