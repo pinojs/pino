@@ -218,4 +218,16 @@ pino.stdTimeFunctions = Object.assign({}, time)
 pino.symbols = symbols
 pino.version = version
 
+/**
+ * These export configurations enable JS and TS developers
+ * to consumer pino in whatever way best suits their needs.
+ * Some examples of supported import syntax includes:
+ * - `const pino = require('pino')`
+ * - `const { P } = require('pino')`
+ * - `import * as pino from 'pino'`
+ * - `import { P } from 'pino'`
+ * - `import pino from 'pino'`
+ */
+pino.P = pino
+pino.default = pino
 module.exports = pino

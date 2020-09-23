@@ -27,7 +27,7 @@ export default P
  * relative protocol is enabled. Default: process.stdout
  * @returns a new logger instance.
  */
-declare function P(optionsOrStream?: P.LoggerOptions | P.DestinationStream): P.Logger;
+export function P(optionsOrStream?: P.LoggerOptions | P.DestinationStream): P.Logger;
 
 /**
  * @param [options]: an options object
@@ -35,9 +35,9 @@ declare function P(optionsOrStream?: P.LoggerOptions | P.DestinationStream): P.L
  * relative protocol is enabled. Default: process.stdout
  * @returns a new logger instance.
  */
-declare function P(options: P.LoggerOptions, stream: P.DestinationStream): P.Logger;
+export function P(options: P.LoggerOptions, stream: P.DestinationStream): P.Logger;
 
-declare namespace P {
+export namespace P {
     /**
      * Holds the current log format version (as output in the v property of each log record).
      */
@@ -55,68 +55,7 @@ declare namespace P {
     /**
      * Provides functions for serializing objects common to many projects.
      */
-    const stdSerializers: {
-        /**
-         * Generates a JSONifiable object from the HTTP `request` object passed to the `createServer` callback of Node's HTTP server.
-         */
-        req: typeof pinoStdSerializers.req;
-        /**
-         * Generates a JSONifiable object from the HTTP `response` object passed to the `createServer` callback of Node's HTTP server.
-         */
-        res: typeof pinoStdSerializers.res;
-        /**
-         * Serializes an Error object.
-         */
-        err: typeof pinoStdSerializers.err;
-        /**
-         * Returns an object:
-         * ```
-         * {
-         *   req: {}
-         * }
-         * ```
-         * where req is the request as serialized by the standard request serializer.
-         * @param req The request to serialize
-         * @return An object
-         */
-        mapHttpRequest: typeof pinoStdSerializers.mapHttpRequest;
-        /**
-         * Returns an object:
-         * ```
-         * {
-         *   res: {}
-         * }
-         * ```
-         * where res is the response as serialized by the standard response serializer.
-         * @param res The response to serialize.
-         * @return An object.
-         */
-        mapHttpResponse: typeof pinoStdSerializers.mapHttpResponse;
-        /**
-         * A utility method for wrapping the default error serializer. Allows custom serializers to work with the
-         * already serialized object.
-         * @param customSerializer The custom error serializer. Accepts a single parameter: the newly serialized
-         * error object. Returns the new (or updated) error object.
-         * @return A new error serializer.
-         */
-        wrapErrorSerializer: typeof pinoStdSerializers.wrapErrorSerializer;
-        /**
-         * A utility method for wrapping the default request serializer. Allows custom serializers to work with the
-         * already serialized object.
-         * @param customSerializer The custom request serializer. Accepts a single parameter: the newly serialized
-         * request object. Returns the new (or updated) request object.
-         * @return A new error serializer.
-         */
-        wrapRequestSerializer: typeof pinoStdSerializers.wrapRequestSerializer;
-        /**
-         * A utility method for wrapping the default response serializer. Allows custom serializers to work with the
-         * already serialized object.
-         * @param customSerializer The custom response serializer. Accepts a single parameter: the newly serialized
-         * response object. Returns the new (or updated) response object.
-         * @return A new error serializer.
-         */
-        wrapResponseSerializer: typeof pinoStdSerializers.wrapResponseSerializer;
-    };
+    const stdSerializers: typeof pinoStdSerializers;
     /**
      * Provides functions for generating the timestamp property in the log output. You can set the `timestamp` option during
      * initialization to one of these functions to adjust the output format. Alternatively, you can specify your own time function.

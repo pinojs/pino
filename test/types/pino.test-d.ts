@@ -1,10 +1,26 @@
-import pino from '../../pino';
+import { expectType } from "tsd";
 import { IncomingMessage, ServerResponse } from 'http';
 import { Socket } from 'net';
+
+import P from "../../pino";
+import pino from '../../pino';
+import { P as pinoNamed } from "../../pino";
+import * as pinoStar from "../../pino";
+import pinoCjsImport = require ("../../pino");
+const pinoCjs = require("../../pino");
+const { P: pinoCjsNamed } = require('pino')
 
 const log = pino();
 const info = log.info;
 const error = log.error;
+
+expectType<pino.Logger>(pinoNamed());
+expectType<pino.Logger>(pinoStar.default());
+expectType<pino.Logger>(pinoStar.P());
+expectType<pino.Logger>(pinoCjsImport.default());
+expectType<pino.Logger>(pinoCjsImport.P());
+expectType<any>(pinoCjsNamed());
+expectType<any>(pinoCjs());
 
 info('hello world');
 error('this is at error level');
@@ -234,3 +250,11 @@ pino(destinationViaStream);
 pino({ name: 'my-logger' }, destinationViaStream);
 pino(destinationViaOptionsObject);
 pino({ name: 'my-logger' }, destinationViaOptionsObject);
+
+const levelChangeEventListener: P.LevelChangeEventListener = (
+    lvl: P.LevelWithSilent | string,
+    val: number,
+    prevLvl: P.LevelWithSilent | string,
+    prevVal: number,
+) => {}
+expectType<P.LevelChangeEventListener>(levelChangeEventListener)
