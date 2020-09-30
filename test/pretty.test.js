@@ -112,6 +112,20 @@ test('parses and outputs chindings', async ({ is, isNot }) => {
   is(strip(actual).match(/a: 1/g).length, 3)
 })
 
+test('applies updated chindings', async ({ is, isNot }) => {
+  var actual = ''
+  const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'child-with-updated-chindings.js')])
+
+  child.stdout.pipe(writer((s, enc, cb) => {
+    actual += s
+    cb()
+  }))
+  await once(child, 'close')
+  isNot(strip(actual).match(/foo: 123/), null)
+  isNot(strip(actual).match(/foo: 456/), null)
+  isNot(strip(actual).match(/bar: 789/), null)
+})
+
 test('applies formatters', async ({ is, isNot }) => {
   var actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'formatters.js')])
@@ -204,7 +218,7 @@ test('with custom timestamp', async ({ is }) => {
     cb()
   }))
   await once(child, 'close')
-  is(strip(actual).slice(0, 8), '["test"]')
+  is(strip(actual).slice(0, 6), '[test]')
 })
 
 test('with custom timestamp label', async ({ is }) => {
@@ -216,7 +230,7 @@ test('with custom timestamp label', async ({ is }) => {
     cb()
   }))
   await once(child, 'close')
-  is(strip(actual).slice(0, 8), '["test"]')
+  is(strip(actual).slice(0, 6), '[test]')
 })
 
 test('errors', async ({ isNot }) => {
