@@ -85,7 +85,7 @@
     "winston": "^3.3.3"
   },
   "dependencies": {
-    "fast-redact": "^2.0.0",
+    "fast-redact": "^3.0.0",
     "fast-safe-stringify": "^2.0.7",
     "flatstr": "^1.0.12",
     "pino-std-serializers": "^2.4.2",
