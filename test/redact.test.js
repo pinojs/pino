@@ -221,6 +221,16 @@ test('redact.censor option – sets the redact value', async ({ is }) => {
 
 test('redact.censor option – can be a function that accepts value and path arguments', async ({ is }) => {
   const stream = sink()
+  const instance = pino({ redact: { paths: ['topLevel'], censor: (value, path) => value + ' ' + path.join('.') } }, stream)
+  instance.info({
+    topLevel: 'test'
+  })
+  const { topLevel } = await once(stream, 'data')
+  is(topLevel, 'test topLevel')
+})
+
+test('redact.censor option – can be a function that accepts value and path arguments (nested path)', async ({ is }) => {
+  const stream = sink()
   const instance = pino({ redact: { paths: ['req.headers.cookie'], censor: (value, path) => value + ' ' + path.join('.') } }, stream)
   instance.info({
     req: {
