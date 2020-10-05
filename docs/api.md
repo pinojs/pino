@@ -153,7 +153,7 @@ Each path must be a string using a syntax which corresponds to JavaScript dot an
 If an object is supplied, three options can be specified:
   * `paths` (array): Required. An array of paths. See [redaction - Path Syntax ⇗](/docs/redaction.md#paths) for specifics.
   * `censor` (String|Function|Undefined): Optional. When supplied as a String the `censor` option will overwrite keys which are to be redacted. When set to `undefined` the the key will be removed entirely from the object.
-    The `censor` option may also be a mapping function. The (synchronous) mapping function is called with the unredacted value. The value returned from the mapping function becomes the applied censor value. Default: `'[Redacted]'`
+    The `censor` option may also be a mapping function. The (synchronous) mapping function has the signature `(value, path) => redactedValue` and is called with the unredacted `value` and `path` to the key being redacted, as an array. For example given a redaction path of `a.b.c` the `path` argument would be `['a', 'b', 'c']`. The value returned from the mapping function becomes the applied censor value. Default: `'[Redacted]'`
     value synchronously.
     Default: `'[Redacted]'`
   * `remove` (Boolean): Optional. Instead of censoring the value, remove both the key and the value. Default: `false`

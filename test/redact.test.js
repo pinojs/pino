@@ -219,6 +219,37 @@ test('redact.censor option – sets the redact value', async ({ is }) => {
   is(req.headers.cookie, 'test')
 })
 
+test('redact.censor option – can be a function that accepts value and path arguments', async ({ is }) => {
+  const stream = sink()
+  const instance = pino({ redact: { paths: ['topLevel'], censor: (value, path) => value + ' ' + path.join('.') } }, stream)
+  instance.info({
+    topLevel: 'test'
+  })
+  const { topLevel } = await once(stream, 'data')
+  is(topLevel, 'test topLevel')
+})
+
+test('redact.censor option – can be a function that accepts value and path arguments (nested path)', async ({ is }) => {
+  const stream = sink()
+  const instance = pino({ redact: { paths: ['req.headers.cookie'], censor: (value, path) => value + ' ' + path.join('.') } }, stream)
+  instance.info({
+    req: {
+      id: 7915,
+      method: 'GET',
+      url: '/',
+      headers: {
+        host: 'localhost:3000',
+        connection: 'keep-alive',
+        cookie: 'SESSID=298zf09hf012fh2; csrftoken=u32t4o3tb3gg43; _gat=1;'
+      },
+      remoteAddress: '::ffff:127.0.0.1',
+      remotePort: 58022
+    }
+  })
+  const { req } = await once(stream, 'data')
+  is(req.headers.cookie, 'SESSID=298zf09hf012fh2; csrftoken=u32t4o3tb3gg43; _gat=1; req.headers.cookie')
+})
+
 test('redact.remove option – removes both key and value', async ({ is }) => {
   const stream = sink()
   const instance = pino({ redact: { paths: ['req.headers.cookie'], remove: true } }, stream)
