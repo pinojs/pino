@@ -103,6 +103,7 @@ in standard EcmaScript, with two additions:
 
 * paths may start with bracket notation
 * paths may contain the asterisk `*` to denote a wildcard
+* paths are **case sensitive**
 
 By way of example, the following are all valid paths:
 
