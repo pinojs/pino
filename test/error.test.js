@@ -32,25 +32,6 @@ test('err is serialized with additional properties set on the Error object', asy
   })
 })
 
-test('type should be retained, even if type is a property', async ({ ok, same }) => {
-  const stream = sink()
-  const err = Object.assign(new Error('myerror'), { type: 'bar' })
-  const instance = pino(stream)
-  instance.level = name
-  instance[name](err)
-  const result = await once(stream, 'data')
-  ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
-  delete result.time
-  same(result, {
-    pid,
-    hostname,
-    level,
-    type: 'bar',
-    msg: err.message,
-    stack: err.stack
-  })
-})
-
 test('type, message and stack should be first level properties', async ({ ok, same }) => {
   const stream = sink()
   const err = Object.assign(new Error('foo'), { foo: 'bar' })
@@ -169,5 +150,65 @@ test('correctly ignores toString on errors', async ({ same }) => {
     type: 'Error',
     msg: err.message,
     stack: err.stack
+  })
+})
+
+test('assign mixin()', async ({ same }) => {
+  const err = new Error('myerror')
+  const stream = sink()
+  const instance = pino({
+    mixin () {
+      return { hello: 'world' }
+    }
+  }, stream)
+  instance.fatal(err)
+  const result = await once(stream, 'data')
+  delete result.time
+  same(result, {
+    pid,
+    hostname,
+    level: 60,
+    type: 'Error',
+    msg: err.message,
+    stack: err.stack,
+    hello: 'world'
+  })
+})
+
+test('no err serializer', async ({ same }) => {
+  const err = new Error('myerror')
+  const stream = sink()
+  const instance = pino({
+    serializers: {}
+  }, stream)
+  instance.fatal(err)
+  const result = await once(stream, 'data')
+  delete result.time
+  same(result, {
+    pid,
+    hostname,
+    level: 60,
+    type: 'Error',
+    msg: err.message,
+    stack: err.stack
+  })
+})
+
+test('empty serializer', async ({ same }) => {
+  const err = new Error('myerror')
+  const stream = sink()
+  const instance = pino({
+    serializers: {
+      err () {}
+    }
+  }, stream)
+  instance.fatal(err)
+  const result = await once(stream, 'data')
+  delete result.time
+  same(result, {
+    pid,
+    hostname,
+    level: 60,
+    msg: err.message
   })
 })
