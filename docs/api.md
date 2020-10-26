@@ -258,8 +258,7 @@ should never throw. When logging an object, each top-level property
 matching the exact key of a serializer will be serialized using the defined serializer.
 
 The serializers are applied when a property in the logged object matches a property
-in the serializers. The only exception is the `err` serializer as it is also applied in case
-the object is an instance of `Error`, e.g. `logger.info(new Error('kaboom'))`.
+in the serializers.
 
 * See [pino.stdSerializers](#pino-stdserializers)
 
@@ -474,6 +473,9 @@ logger.info({MIX: {IN: true}})
 // {"level":30,"time":1531254555820,"pid":55956,"hostname":"x","MIX":{"IN":true}}
 ```
 
+If the object is of type Error, it is wrapped in an object containing a property err (`{ err: mergingObject }`).
+This allows for a unified error handling flow.
+
 <a id="message"></a>
 #### `message` (String)
 
@@ -494,6 +496,9 @@ is supplied in addition, the `msg` property in the output log will be the value 
 the `message` parameter not the value of the `msg` property on the `mergedObject`.
 See [Avoid Message Conflict](./help.md#avoid-message-conflict) for information
 on how to overcome this limitation.
+
+If no `message` parameter is provided, and the `mergedObject` is of type `Error` or it has a property named `err`, the 
+`message` parameter is set to the `message` value of the error.
 
 The `messageKey` option can be used at instantiation time to change the namespace
 from `msg` to another string as preferred.

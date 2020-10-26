@@ -257,8 +257,8 @@ test('errors with props', async ({ isNot }) => {
   }))
   await once(child, 'close')
   isNot(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): kaboom/), null)
-  isNot(strip(actual).match(/code: ENOENT/), null)
-  isNot(strip(actual).match(/errno: 1/), null)
+  isNot(strip(actual).match(/"code": "ENOENT"/), null)
+  isNot(strip(actual).match(/"errno": 1/), null)
   isNot(strip(actual).match(/.*error-props\.js.*/), null)
 })
 

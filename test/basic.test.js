@@ -188,7 +188,8 @@ function levelTest (name, level) {
         type: 'Error',
         message: err.message,
         stack: err.stack
-      }
+      },
+      msg: err.message
     })
   })
 
