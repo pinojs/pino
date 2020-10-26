@@ -704,7 +704,7 @@ test('correctly skip Infinity', async (t) => {
   t.is(msg, null)
 })
 
-test('correctly skip Infinity', async (t) => {
+test('correctly log number', async (t) => {
   const stream = sink()
   const instance = pino(stream)
 
