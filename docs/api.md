@@ -99,7 +99,7 @@ logger.info('hello') // Will throw an error saying info in not found in logger o
 Default: `undefined`
 
 If provided, the `mixin` function is called each time one of the active
-logging methods is called. The function must synchronously return an
+logging methods is called. The first and only parameter is the value `mergeObject` or an empty object. The function must synchronously return an
 object. The properties of the returned object will be added to the
 logged JSON.
 
@@ -124,7 +124,7 @@ const mixin = {
 }
 
 const logger = pino({
-    mixin() {
+    mixin({ description }) {
         return mixin
     }
 })
