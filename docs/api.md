@@ -15,7 +15,7 @@
   * [logger.child()](#child)
   * [logger.bindings()](#bindings)
   * [logger.flush()](#flush)
-  * [logger.level](#level)
+  * [logger.level](#logger-level)
   * [logger.isLevelEnabled()](#islevelenabled)
   * [logger.levels](#levels)
   * [logger\[Symbol.for('pino.serializers')\]](#serializers)
@@ -707,7 +707,7 @@ and safer logging at low demand periods.
 * See [`destination` parameter](#destination)
 * See [Asynchronous Logging ⇗](/docs/asynchronous.md)
 
-<a id="level"></a>
+<a id="logger-level"></a>
 ### `logger.level` (String) [Getter/Setter]
 
 Set this property to the desired logging level.
