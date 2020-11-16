@@ -124,8 +124,10 @@ const mixin = {
 }
 
 const logger = pino({
-    mixin({ description }) {
-        return mixin
+    mixin(obj) {
+        return {
+          description: obj.description
+        }
     }
 })
 
