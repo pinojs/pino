@@ -74,6 +74,7 @@ PR's to this document are welcome for any new transports!
 + [pino-couch](#pino-couch)
 + [pino-datadog](#pino-datadog)
 + [pino-elasticsearch](#pino-elasticsearch)
++ [pino-gelf](#pino-gelf)
 + [pino-http-send](#pino-http-send)
 + [pino-logflare](#pino-logflare)
 + [pino-mq](#pino-mq)
@@ -185,6 +186,19 @@ Then [create an index pattern](https://www.elastic.co/guide/en/kibana/current/se
 [pino-elasticsearch]: https://github.com/pinojs/pino-elasticsearch
 [elasticsearch]: https://www.elastic.co/products/elasticsearch
 [kibana]: https://www.elastic.co/products/kibana
+
+<a id="pino-gelf"></a>
+### pino-gelf
+
+Pino GELF ([pino-gelf]) is a transport for the Pino logger. Pino GELF receives Pino logs from stdin and transforms them into [GELF format][gelf] before sending them to a remote [Graylog server][graylog] via UDP.
+
+```sh
+$ node your-app.js | pino-gelf log
+```
+
+[pino-gelf]: https://github.com/pinojs/pino-gelf
+[gelf]: https://docs.graylog.org/en/2.1/pages/gelf.html
+[graylog]: https://www.graylog.org/
 
 <a id="pino-http-send"></a>
 ### pino-http-send
