@@ -3,6 +3,7 @@
 const os = require('os')
 const writer = require('flush-write-stream')
 const split = require('split2')
+const { existsSync, statSync } = require('fs')
 const pid = process.pid
 const hostname = os.hostname()
 
@@ -50,4 +51,25 @@ function sleep (ms) {
   })
 }
 
-module.exports = { getPathToNull, sink, check, once, sleep }
+function watchFileCreated (filename) {
+  return new Promise((resolve, reject) => {
+    const TIMEOUT = 800
+    const INTERVAL = 100
+    const threshold = TIMEOUT / INTERVAL
+    let counter = 0
+    const interval = setInterval(() => {
+      // On some CI runs file is created but not filled
+      if (existsSync(filename) && statSync(filename).size !== 0) {
+        clearInterval(interval)
+        resolve()
+      } else if (counter <= threshold) {
+        counter++
+      } else {
+        clearInterval(interval)
+        reject(new Error(`${filename} was not created.`))
+      }
+    }, INTERVAL)
+  })
+}
+
+module.exports = { getPathToNull, sink, check, once, sleep, watchFileCreated }
