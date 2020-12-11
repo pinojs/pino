@@ -1,31 +1,13 @@
 'use strict'
 const os = require('os')
 const { join } = require('path')
-const { readFileSync, existsSync, statSync } = require('fs')
+const { readFileSync } = require('fs')
 const { test } = require('tap')
-const { sink, check, once } = require('./helper')
+const { sink, check, once, watchFileCreated } = require('./helper')
 const pino = require('../')
 const { version } = require('../package.json')
 const { pid } = process
 const hostname = os.hostname()
-const watchFileCreated = (filename) => new Promise((resolve, reject) => {
-  const TIMEOUT = 800
-  const INTERVAL = 100
-  const threshold = TIMEOUT / INTERVAL
-  let counter = 0
-  const interval = setInterval(() => {
-    // On some CI runs file is created but not filled
-    if (existsSync(filename) && statSync(filename).size !== 0) {
-      clearInterval(interval)
-      resolve()
-    } else if (counter <= threshold) {
-      counter++
-    } else {
-      clearInterval(interval)
-      reject(new Error(`${filename} was not created.`))
-    }
-  }, INTERVAL)
-})
 
 test('pino version is exposed on export', async ({ is }) => {
   is(pino.version, version)
@@ -680,4 +662,13 @@ test('correctly log NaN', async (t) => {
 
   const { num } = await once(stream, 'data')
   t.is(num, null)
+})
+
+test('offers a .default() method to please typescript', async ({ is }) => {
+  is(pino.default, pino)
+
+  const stream = sink()
+  const instance = pino.default(stream)
+  instance.info('hello world')
+  check(is, await once(stream, 'data'), 30, 'hello world')
 })

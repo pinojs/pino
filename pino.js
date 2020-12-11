@@ -195,14 +195,17 @@ function levelNameLabelFormatter (name) {
   }
 }
 
-pino.extreme = (dest = process.stdout.fd) => {
+module.exports = pino
+
+module.exports.extreme = (dest = process.stdout.fd) => {
   process.emitWarning(
     'The pino.extreme() option is deprecated and will be removed in v7. Use pino.destination({ sync: false }) instead.',
     { code: 'extreme_deprecation' }
   )
   return buildSafeSonicBoom({ dest, minLength: 4096, sync: false })
 }
-pino.destination = (dest = process.stdout.fd) => {
+
+module.exports.destination = (dest = process.stdout.fd) => {
   if (typeof dest === 'object') {
     dest.dest = dest.dest || process.stdout.fd
     return buildSafeSonicBoom(dest)
@@ -211,11 +214,13 @@ pino.destination = (dest = process.stdout.fd) => {
   }
 }
 
-pino.final = final
-pino.levels = mappings()
-pino.stdSerializers = serializers
-pino.stdTimeFunctions = Object.assign({}, time)
-pino.symbols = symbols
-pino.version = version
+module.exports.final = final
+module.exports.levels = mappings()
+module.exports.stdSerializers = serializers
+module.exports.stdTimeFunctions = Object.assign({}, time)
+module.exports.symbols = symbols
+module.exports.version = version
 
-module.exports = pino
+// Enables default and name export with TypeScript and Babel
+module.exports.default = pino
+module.exports.pino = pino
