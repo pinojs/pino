@@ -12,7 +12,7 @@ const {
   asChindings,
   final,
   stringify,
-  buildSafeSonicBoom,
+  buildSafePinole,
   buildFormatters,
   noop
 } = require('./lib/tools')
@@ -202,15 +202,30 @@ module.exports.extreme = (dest = process.stdout.fd) => {
     'The pino.extreme() option is deprecated and will be removed in v7. Use pino.destination({ sync: false }) instead.',
     { code: 'extreme_deprecation' }
   )
-  return buildSafeSonicBoom({ dest, minLength: 4096, sync: false })
+  return buildSafePinole({ dest, minLength: 4096, sync: false })
 }
 
 module.exports.destination = (dest = process.stdout.fd) => {
   if (typeof dest === 'object') {
     dest.dest = dest.dest || process.stdout.fd
-    return buildSafeSonicBoom(dest)
+    return buildSafePinole(dest)
   } else {
-    return buildSafeSonicBoom({ dest, minLength: 0, sync: true })
+    return buildSafePinole({ dest, minLength: 0, sync: true })
+  }
+}
+
+module.exports.transport = (transport, opts = {}) => {
+  if (typeof transport === 'object') {
+    opts = transport
+    if (typeof opts.transport !== 'string') {
+      throw Error('transport must be a string and must be specified')
+    }
+    return buildSafePinole(opts)
+  } else {
+    if (typeof transport !== 'string') {
+      throw Error('transport must be a string and must be specified')
+    }
+    return buildSafePinole({ ...opts, transport })
   }
 }
 
