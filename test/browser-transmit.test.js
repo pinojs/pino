@@ -127,7 +127,7 @@ test('supplies a timestamp (ts) in logEvent object which is exactly the same as 
   var expected
   const logger = pino({
     browser: {
-      asObject: true, // implict because `write`, but just to be explicit
+      asObject: true, // implicit because `write`, but just to be explicit
       write (o) {
         expected = o.time
       },

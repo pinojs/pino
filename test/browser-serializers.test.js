@@ -290,7 +290,7 @@ test('children serializers get called when inherited from parent', ({ end, is })
   end()
 })
 
-test('non overriden serializers are available in the children', ({ end, is }) => {
+test('non overridden serializers are available in the children', ({ end, is }) => {
   const pSerializers = {
     onlyParent: () => 'parent',
     shared: () => 'parent'

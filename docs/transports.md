@@ -42,7 +42,7 @@ external processes so that the threading capabilities of the OS can be
 used (or other CPUs).
 
 One consequence of this methodology is that "error" logs do not get written to
-`stderr`. However, since Pino logs are in a parseable format, it is possible to
+`stderr`. However, since Pino logs are in a parsable format, it is possible to
 use tools like [pino-tee][pino-tee] or [jq][jq] to work with the logs. For
 example, to view only logs marked as "error" logs:
 
