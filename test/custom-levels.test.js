@@ -296,7 +296,7 @@ test('When useOnlyCustomLevels is set to true, the level formatter should only g
   is(level, 42)
 })
 
-test('custom levels accesible in prettifier function', async ({ plan, same }) => {
+test('custom levels accessible in prettifier function', async ({ plan, same }) => {
   plan(1)
   const logger = pino({
     prettyPrint: true,
