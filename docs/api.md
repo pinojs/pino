@@ -163,7 +163,7 @@ If an object is supplied, three options can be specified:
 **WARNING**: Never allow user input to define redacted paths.
 
 * See the [redaction ⇗](/docs/redaction.md) documentation.
-* See [fast-redact#caveat ⇗](http://github.com/davidmarkclements/fast-redact#caveat)
+* See [fast-redact#caveat ⇗](https://github.com/davidmarkclements/fast-redact#caveat)
 
 <a id=opt-hooks></a>
 #### `hooks` (Object)

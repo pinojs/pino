@@ -120,7 +120,7 @@ Given a similar scenario as in the [Log rotation](#rotate) section a basic
 
 Let's assume we want to store all error messages to a separate log file.
 
-Install [pino-tee](http://npm.im/pino-tee) with:
+Install [pino-tee](https://npm.im/pino-tee) with:
 
 ```bash
 npm i pino-tee -g
@@ -209,15 +209,15 @@ the logs human friendly.
 <a id="debug"></a>
 ## Pino with `debug`
 
-The popular [`debug`](http://npm.im/debug) is used in many modules across the ecosystem.
+The popular [`debug`](https://npm.im/debug) is used in many modules across the ecosystem.
 
-The [`pino-debug`](http://github.com/pinojs/pino-debug) module
+The [`pino-debug`](https://github.com/pinojs/pino-debug) module
 can capture calls to `debug` loggers and run them
 through `pino` instead. This results in a 10x (20x in asynchronous mode)
 performance improvement - even though `pino-debug` is logging additional
 data and wrapping it in JSON.
 
-To quickly enable this install [`pino-debug`](http://github.com/pinojs/pino-debug)
+To quickly enable this install [`pino-debug`](https://github.com/pinojs/pino-debug)
 and preload it with the `-r` flag, enabling any `debug` logs with the
 `DEBUG` environment variable:
 
@@ -226,8 +226,8 @@ $ npm i pino-debug
 $ DEBUG=* node -r pino-debug app.js
 ```
 
-[`pino-debug`](http://github.com/pinojs/pino-debug) also offers fine grain control to map specific `debug`
-namespaces to `pino` log levels. See [`pino-debug`](http://github.com/pinojs/pino-debug)
+[`pino-debug`](https://github.com/pinojs/pino-debug) also offers fine grain control to map specific `debug`
+namespaces to `pino` log levels. See [`pino-debug`](https://github.com/pinojs/pino-debug)
 for more.
 
 <a id="windows"></a>
