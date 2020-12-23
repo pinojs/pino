@@ -14,7 +14,7 @@ Please send a PR to add new modules!
 + [`express-pino-logger`](https://github.com/pinojs/express-pino-logger): use
 Pino to log requests within [express](https://expressjs.com/).
 + [`koa-pino-logger`](https://github.com/pinojs/koa-pino-logger): use Pino to
-log requests within [Koa](http://koajs.com/).
+log requests within [Koa](https://koajs.com/).
 + [`pino-arborsculpture`](https://github.com/pinojs/pino-arborsculpture): change
 log levels at runtime.
 + [`pino-caller`](https://github.com/pinojs/pino-caller): add callsite to the log line.

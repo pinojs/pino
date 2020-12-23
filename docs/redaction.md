@@ -115,7 +115,7 @@ By way of example, the following are all valid paths:
 
 ## Overhead
 
-Pino's redaction functionality is built on top of [`fast-redact`](http://github.com/davidmarkclements/fast-redact)
+Pino's redaction functionality is built on top of [`fast-redact`](https://github.com/davidmarkclements/fast-redact)
 which adds about 2% overhead to `JSON.stringify` when using paths without wildcards.
 
 When used with pino logger with a single redacted path, any overhead is within noise -
