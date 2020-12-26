@@ -70,3 +70,4 @@ prettifier inspired by the [logrus](https://github.com/sirupsen/logrus) logger.
 + [`pino-rotating-file`](https://github.com/homeaway/pino-rotating-file): a hapi-pino log transport for splitting logs into separate, automatically rotating files.
 + [`cls-proxify`](https://github.com/keenondrums/cls-proxify): integration of pino and [CLS](https://github.com/jeff-lewis/cls-hooked). Useful for creating dynamically configured child loggers (e.g. with added trace ID) for each request. 
 + [`pino-tiny`](https://github.com/holmok/pino-tiny): a tiny (and exentsible?) little log formatter for pino.
++ [`pino-dev`](https://github.com/dnjstrom/pino-dev): simple prettifier for pino with built-in support for common ecosystem packages.
