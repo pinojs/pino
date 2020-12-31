@@ -175,10 +175,10 @@ internal logger operations. Hook functions ***must*** be synchronous functions.
 ##### `logMethod`
 
 Allows for manipulating the parameters passed to logger methods. The signature
-for this hook is `logMethod (args, method) {}`, where `args` is an array
+for this hook is `logMethod (args, method, level) {}`, where `args` is an array
 of the arguments that were passed to the log method and `method` is the log
-method itself. This hook ***must*** invoke the `method` function by using
-apply, like so: `method.apply(this, newArgumentsArray)`.
+method itself, `level` is the log level itself. This hook ***must*** invoke the
+`method` function by using apply, like so: `method.apply(this, newArgumentsArray)`.
 
 For example, Pino expects a binding object to be the first parameter with an
 optional string message as the second parameter. Using this hook the parameters
@@ -186,7 +186,7 @@ can be flipped:
 
 ```js
 const hooks = {
-  logMethod (inputArgs, method) {
+  logMethod (inputArgs, method, level) {
     if (inputArgs.length >= 2) {
       const arg1 = inputArgs.shift()
       const arg2 = inputArgs.shift()
