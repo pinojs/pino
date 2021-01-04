@@ -15,7 +15,7 @@
   * [logger.child()](#child)
   * [logger.bindings()](#bindings)
   * [logger.flush()](#flush)
-  * [logger.level](#level)
+  * [logger.level](#logger-level)
   * [logger.isLevelEnabled()](#islevelenabled)
   * [logger.levels](#levels)
   * [logger\[Symbol.for('pino.serializers')\]](#serializers)
@@ -99,7 +99,7 @@ logger.info('hello') // Will throw an error saying info in not found in logger o
 Default: `undefined`
 
 If provided, the `mixin` function is called each time one of the active
-logging methods is called. The function must synchronously return an
+logging methods is called. The first and only parameter is the value `mergeObject` or an empty object. The function must synchronously return an
 object. The properties of the returned object will be added to the
 logged JSON.
 
@@ -124,8 +124,10 @@ const mixin = {
 }
 
 const logger = pino({
-    mixin() {
-        return mixin
+    mixin(obj) {
+        return {
+          description: obj.description
+        }
     }
 })
 
@@ -258,7 +260,8 @@ should never throw. When logging an object, each top-level property
 matching the exact key of a serializer will be serialized using the defined serializer.
 
 The serializers are applied when a property in the logged object matches a property
-in the serializers.
+in the serializers. The only exception is the `err` serializer as it is also applied in case
+the object is an instance of `Error`, e.g. `logger.info(new Error('kaboom'))`.
 
 * See [pino.stdSerializers](#pino-stdserializers)
 
@@ -714,7 +717,7 @@ and safer logging at low demand periods.
 * See [`destination` parameter](#destination)
 * See [Asynchronous Logging ⇗](/docs/asynchronous.md)
 
-<a id="level"></a>
+<a id="logger-level"></a>
 ### `logger.level` (String) [Getter/Setter]
 
 Set this property to the desired logging level.

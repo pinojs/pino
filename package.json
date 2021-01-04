@@ -1,6 +1,6 @@
 {
   "name": "pino",
-  "version": "6.7.0",
+  "version": "6.8.0",
   "description": "super fast, all natural json logger",
   "main": "pino.js",
   "browser": "./browser.js",
@@ -18,8 +18,8 @@
   "scripts": {
     "docs": "docsify serve",
     "browser-test": "airtap --local 8080 test/browser*test.js",
-    "test": "standard | snazzy && tap --100 test/*test.js",
-    "cov-ui": "tap --coverage-report=html test/*test.js",
+    "test": "standard | snazzy && tap --100 test/*test.js test/*/*test.js",
+    "cov-ui": "tap --coverage-report=html test/*test.js test/*/*test.js",
     "bench": "node benchmarks/utils/runbench all",
     "bench-basic": "node benchmarks/utils/runbench basic",
     "bench-object": "node benchmarks/utils/runbench object",
