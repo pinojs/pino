@@ -25,10 +25,36 @@ test('err is serialized with additional properties set on the Error object', asy
     pid,
     hostname,
     level,
-    type: 'Error',
-    msg: err.message,
-    stack: err.stack,
-    foo: err.foo
+    err: {
+      type: 'Error',
+      message: err.message,
+      stack: err.stack,
+      foo: err.foo
+    },
+    msg: err.message
+  })
+})
+
+test('type should be detected based on constructor', async ({ ok, same }) => {
+  class Bar extends Error {}
+  const stream = sink()
+  const err = new Bar('myerror')
+  const instance = pino(stream)
+  instance.level = name
+  instance[name](err)
+  const result = await once(stream, 'data')
+  ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
+  delete result.time
+  same(result, {
+    pid,
+    hostname,
+    level,
+    err: {
+      type: 'Bar',
+      message: err.message,
+      stack: err.stack
+    },
+    msg: err.message
   })
 })
 
@@ -46,10 +72,13 @@ test('type, message and stack should be first level properties', async ({ ok, sa
     pid,
     hostname,
     level,
-    type: 'Error',
-    msg: err.message,
-    stack: err.stack,
-    foo: err.foo
+    err: {
+      type: 'Error',
+      message: err.message,
+      stack: err.stack,
+      foo: err.foo
+    },
+    msg: err.message
   })
 })
 
@@ -76,7 +105,8 @@ test('err serializer', async ({ ok, same }) => {
       message: err.message,
       stack: err.stack,
       foo: err.foo
-    }
+    },
+    msg: err.message
   })
 })
 
@@ -95,10 +125,13 @@ test('an error with statusCode property is not confused for a http response', as
     pid,
     hostname,
     level,
-    type: 'Error',
-    msg: err.message,
-    stack: err.stack,
-    statusCode: err.statusCode
+    err: {
+      type: 'Error',
+      message: err.message,
+      stack: err.stack,
+      statusCode: err.statusCode
+    },
+    msg: err.message
   })
 })
 
@@ -124,8 +157,8 @@ test('stack is rendered as any other property if it\'s not a string', t => {
   var instance = pino(sink(function (chunk, enc, cb) {
     t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
-    t.equal(chunk.hasOwnProperty('stack'), true)
-    t.equal(chunk.stack, null)
+    t.equal(chunk.err.hasOwnProperty('stack'), true)
+    t.equal(chunk.err.stack, null)
     cb()
   }))
 
@@ -147,9 +180,12 @@ test('correctly ignores toString on errors', async ({ same }) => {
     pid,
     hostname,
     level: 60,
-    type: 'Error',
-    msg: err.message,
-    stack: err.stack
+    err: {
+      type: 'Error',
+      message: err.message,
+      stack: err.stack
+    },
+    msg: err.message
   })
 })
 
@@ -168,10 +204,13 @@ test('assign mixin()', async ({ same }) => {
     pid,
     hostname,
     level: 60,
-    type: 'Error',
-    msg: err.message,
-    stack: err.stack,
-    hello: 'world'
+    hello: 'world',
+    err: {
+      type: 'Error',
+      message: err.message,
+      stack: err.stack
+    },
+    msg: err.message
   })
 })
 
@@ -188,9 +227,78 @@ test('no err serializer', async ({ same }) => {
     pid,
     hostname,
     level: 60,
-    type: 'Error',
-    msg: err.message,
-    stack: err.stack
+    err: {
+      type: 'Error',
+      message: err.message,
+      stack: err.stack
+    },
+    msg: err.message
+  })
+})
+
+test('empty serializer', async ({ same }) => {
+  const err = new Error('myerror')
+  const stream = sink()
+  const instance = pino({
+    serializers: {
+      err () {}
+    }
+  }, stream)
+  instance.fatal(err)
+  const result = await once(stream, 'data')
+  delete result.time
+  same(result, {
+    pid,
+    hostname,
+    level: 60,
+    msg: err.message
+  })
+})
+
+test('assign mixin()', async ({ same }) => {
+  const err = new Error('myerror')
+  const stream = sink()
+  const instance = pino({
+    mixin () {
+      return { hello: 'world' }
+    }
+  }, stream)
+  instance.fatal(err)
+  const result = await once(stream, 'data')
+  delete result.time
+  same(result, {
+    pid,
+    hostname,
+    level: 60,
+    hello: 'world',
+    err: {
+      type: 'Error',
+      message: err.message,
+      stack: err.stack
+    },
+    msg: err.message
+  })
+})
+
+test('no err serializer', async ({ same }) => {
+  const err = new Error('myerror')
+  const stream = sink()
+  const instance = pino({
+    serializers: {}
+  }, stream)
+  instance.fatal(err)
+  const result = await once(stream, 'data')
+  delete result.time
+  same(result, {
+    pid,
+    hostname,
+    level: 60,
+    err: {
+      type: 'Error',
+      message: err.message,
+      stack: err.stack
+    },
+    msg: err.message
   })
 })
 
