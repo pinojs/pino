@@ -558,7 +558,7 @@ Errors can be supplied as either the first parameter or if already using `mergin
 logger.info(new Error("test"))
 // {"level":30,"time":1531257618044,"msg":"test","stack":"...","type":"Error","pid":55956,"hostname":"x"}
 
-logger.info({err: new Error("test"), otherkey: 123}, "some text")
+logger.info({ err: new Error("test"), otherkey: 123 }, "some text")
 // {"level":30,"time":1531257618044,"err":{"msg": "test", "stack":"...","type":"Error"},"msg":"some text","pid":55956,"hostname":"x","otherkey":123}
 ```
 
