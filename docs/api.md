@@ -550,7 +550,7 @@ const logger = pino(pinoOptions)
 * See [`message` log method parameter](#message)
 * See [`logMethod` hook](#logmethod)
 
-<a id="errors"></a>
+<a id="error-serialization"></a>
 #### Errors
 
 Errors can be supplied as either the first parameter or if already using `mergingObject` then as the `err` on the `mergingObject`.
