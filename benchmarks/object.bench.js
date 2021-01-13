@@ -36,42 +36,49 @@ const max = 10
 
 const run = bench([
   function benchBunyanObj (cb) {
+    /* eslint no-var: off */
     for (var i = 0; i < max; i++) {
       blog.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
   function benchWinstonObj (cb) {
+    /* eslint no-var: off */
     for (var i = 0; i < max; i++) {
       chill.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
   function benchBoleObj (cb) {
+    /* eslint no-var: off */
     for (var i = 0; i < max; i++) {
       bole.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
   function benchLogLevelObject (cb) {
+    /* eslint no-var: off */
     for (var i = 0; i < max; i++) {
       loglevel.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
   function benchPinoObj (cb) {
+    /* eslint no-var: off */
     for (var i = 0; i < max; i++) {
       plogDest.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
   function benchPinoAsyncObj (cb) {
+    /* eslint no-var: off */
     for (var i = 0; i < max; i++) {
       plogAsync.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
   function benchPinoNodeStreamObj (cb) {
+    /* eslint no-var: off */
     for (var i = 0; i < max; i++) {
       plogNodeStream.info({ hello: 'world' })
     }
