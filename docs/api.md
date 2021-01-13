@@ -553,7 +553,11 @@ const logger = pino(pinoOptions)
 <a id="error-serialization"></a>
 #### Errors
 
-Errors can be supplied as either the first parameter or if already using `mergingObject` then as the (by default, can be changed via the `serializers` option when creating a logger) `err` property on the `mergingObject`.
+Errors can be supplied as either the first parameter or if already using `mergingObject` then as the `err` property on the `mergingObject`.
+
+> ## Note
+> This section describes the default configuration. The error serializer can be
+> mapped to a different key using the [`serializers`](#opt-serializers) option.
 ```js
 logger.info(new Error("test"))
 // {"level":30,"time":1531257618044,"msg":"test","stack":"...","type":"Error","pid":55956,"hostname":"x"}
