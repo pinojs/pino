@@ -550,6 +550,18 @@ const logger = pino(pinoOptions)
 * See [`message` log method parameter](#message)
 * See [`logMethod` hook](#logmethod)
 
+<a id="errors"></a>
+#### Errors
+
+Errors can be supplied as either the first parameter or if already using `mergingObject` then as the `err` on the `mergingObject`.
+```js
+logger.info(new Error("test"))
+// {"level":30,"time":1531257618044,"msg":"test","stack":"...","type":"Error","pid":55956,"hostname":"x"}
+
+logger.info({err: new Error("test"), otherkey: 123}, "some text")
+// {"level":30,"time":1531257618044,"err":{"msg": "test", "stack":"...","type":"Error"},"msg":"some text","pid":55956,"hostname":"x","otherkey":123}
+```
+
 <a id="trace"></a>
 ### `logger.trace([mergingObject], [message], [...interpolationValues])`
 
