@@ -138,11 +138,16 @@ function pino (...args) {
     [stringifySym]: stringify,
     [formattersSym]: allFormatters
   })
-  const chindings = base === null
-    ? ''
-    : (name === undefined)
-        ? coreChindings(base)
-        : coreChindings(Object.assign({}, base, { name }))
+
+  let chindings = ''
+  if (base !== null) {
+    if (name === undefined) {
+      chindings = coreChindings(base);
+    } else {
+      chindings = coreChindings(Object.assign({}, base, { name }));
+    }
+  } 
+
   const time = (timestamp instanceof Function)
     ? timestamp
     : (timestamp ? epochTime : nullTime)
