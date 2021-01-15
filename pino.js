@@ -142,11 +142,11 @@ function pino (...args) {
   let chindings = ''
   if (base !== null) {
     if (name === undefined) {
-      chindings = coreChindings(base);
+      chindings = coreChindings(base)
     } else {
-      chindings = coreChindings(Object.assign({}, base, { name }));
+      chindings = coreChindings(Object.assign({}, base, { name }))
     }
-  } 
+  }
 
   const time = (timestamp instanceof Function)
     ? timestamp
