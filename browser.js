@@ -231,12 +231,11 @@ function asObject (logger, level, args, ts) {
 }
 
 function applySerializers (args, serialize, serializers, stdErrSerialize) {
-  /* eslint no-var: off */
-  for (var i in args) {
+  for (const i in args) {
     if (stdErrSerialize && args[i] instanceof Error) {
       args[i] = pino.stdSerializers.err(args[i])
     } else if (typeof args[i] === 'object' && !Array.isArray(args[i])) {
-      for (var k in args[i]) {
+      for (const k in args[i]) {
         if (serialize && serialize.indexOf(k) > -1 && k in serializers) {
           args[i][k] = serializers[k](args[i][k])
         }
@@ -300,8 +299,7 @@ function asErrValue (err) {
     msg: err.message,
     stack: err.stack
   }
-  /* eslint no-var: off */
-  for (var key in err) {
+  for (const key in err) {
     if (obj[key] === undefined) {
       obj[key] = err[key]
     }

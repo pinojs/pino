@@ -97,8 +97,7 @@ test('exposes levels object', ({ end, same }) => {
 test('exposes faux stdSerializers', ({ end, ok, same }) => {
   ok(pino.stdSerializers)
   // make sure faux stdSerializers match pino-std-serializers
-  /* eslint no-var: off */
-  for (var serializer in pinoStdSerializers) {
+  for (const serializer in pinoStdSerializers) {
     ok(pino.stdSerializers[serializer], `pino.stdSerializers.${serializer}`)
   }
   // confirm faux methods return empty objects
