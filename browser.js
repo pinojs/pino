@@ -180,7 +180,6 @@ function wrap (opts, logger, level) {
       const ts = opts.timestamp()
       const args = new Array(arguments.length)
       const proto = (Object.getPrototypeOf && Object.getPrototypeOf(this) === _console) ? _console : this
-      /* eslint no-var: off */
       for (var i = 0; i < args.length; i++) args[i] = arguments[i]
 
       if (opts.serialize && !opts.asObject) {
@@ -248,7 +247,6 @@ function bind (parent, bindings, level) {
   return function () {
     const args = new Array(1 + arguments.length)
     args[0] = bindings
-    /* eslint no-var: off */
     for (var i = 1; i < args.length; i++) {
       args[i] = arguments[i - 1]
     }

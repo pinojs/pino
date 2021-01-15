@@ -17,35 +17,30 @@ const max = 100
 
 const run = bench([
   function benchPinoNoCustomLevel (cb) {
-    /* eslint no-var: off */
     for (var i = 0; i < max; i++) {
       base.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
   function benchPinoCustomLevel (cb) {
-    /* eslint no-var: off */
     for (var i = 0; i < max; i++) {
       baseCl.foo({ hello: 'world' })
     }
     setImmediate(cb)
   },
   function benchChildNoCustomLevel (cb) {
-    /* eslint no-var: off */
     for (var i = 0; i < max; i++) {
       child.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
   function benchPinoChildCustomLevel (cb) {
-    /* eslint no-var: off */
     for (var i = 0; i < max; i++) {
       childCl.foo({ hello: 'world' })
     }
     setImmediate(cb)
   },
   function benchPinoChildInheritedCustomLevel (cb) {
-    /* eslint no-var: off */
     for (var i = 0; i < max; i++) {
       childOfBaseCl.foo({ hello: 'world' })
     }
@@ -53,7 +48,6 @@ const run = bench([
   },
   function benchPinoChildCreation (cb) {
     const child = base.child({})
-    /* eslint no-var: off */
     for (var i = 0; i < max; i++) {
       child.info({ hello: 'world' })
     }
@@ -63,7 +57,6 @@ const run = bench([
     const child = base.child({
       customLevels: { foo: 31 }
     })
-    /* eslint no-var: off */
     for (var i = 0; i < max; i++) {
       child.foo({ hello: 'world' })
     }

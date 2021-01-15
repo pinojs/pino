@@ -33,7 +33,6 @@ function build (dest) {
       } else {
         array = new Array(arguments.length + 1)
         array[0] = '[' + time.toISOString() + ']'
-        /* eslint no-var: off */
         for (var i = 0; i < arguments.length; i++) {
           array[i + 1] = arguments[i]
         }

@@ -28,7 +28,6 @@ require('bole').output({
 const run = bench([
   function benchBunyanCreation (cb) {
     const child = blog.child({ a: 'property' })
-    /* eslint no-var: off */
     for (var i = 0; i < max; i++) {
       child.info({ hello: 'world' })
     }
@@ -36,7 +35,6 @@ const run = bench([
   },
   function benchBoleCreation (cb) {
     const child = bole('child')
-    /* eslint no-var: off */
     for (var i = 0; i < max; i++) {
       child.info({ hello: 'world' })
     }
@@ -44,7 +42,6 @@ const run = bench([
   },
   function benchPinoCreation (cb) {
     const child = plogDest.child({ a: 'property' })
-    /* eslint no-var: off */
     for (var i = 0; i < max; i++) {
       child.info({ hello: 'world' })
     }
@@ -52,7 +49,6 @@ const run = bench([
   },
   function benchPinoAsyncCreation (cb) {
     const child = plogAsync.child({ a: 'property' })
-    /* eslint no-var: off */
     for (var i = 0; i < max; i++) {
       child.info({ hello: 'world' })
     }
@@ -60,7 +56,6 @@ const run = bench([
   },
   function benchPinoNodeStreamCreation (cb) {
     const child = plogNodeStream.child({ a: 'property' })
-    /* eslint no-var: off */
     for (var i = 0; i < max; i++) {
       child.info({ hello: 'world' })
     }

@@ -17,63 +17,54 @@ const max = 100
 
 const run = bench([
   function benchPinoBase (cb) {
-    /* eslint no-var: off */
     for (var i = 0; i < max; i++) {
       base.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
   function benchPinoChild (cb) {
-    /* eslint no-var: off */
     for (var i = 0; i < max; i++) {
       child.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
   function benchPinoChildChild (cb) {
-    /* eslint no-var: off */
     for (var i = 0; i < max; i++) {
       childChild.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
   function benchPinoChildChildChild (cb) {
-    /* eslint no-var: off */
     for (var i = 0; i < max; i++) {
       childChildChild.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
   function benchPinoChildChildChildChild (cb) {
-    /* eslint no-var: off */
     for (var i = 0; i < max; i++) {
       childChildChildChild.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
   function benchPinoChild2 (cb) {
-    /* eslint no-var: off */
     for (var i = 0; i < max; i++) {
       child2.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
   function benchPinoBaseSerilalizers (cb) {
-    /* eslint no-var: off */
     for (var i = 0; i < max; i++) {
       baseSerializers.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
   function benchPinoBaseSerilalizersChild (cb) {
-    /* eslint no-var: off */
     for (var i = 0; i < max; i++) {
       baseSerializersChild.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
   function benchPinoBaseSerilalizersChildSeriazliers (cb) {
-    /* eslint no-var: off */
     for (var i = 0; i < max; i++) {
       baseSerializersChildSerializers.info({ hello: 'world' })
     }

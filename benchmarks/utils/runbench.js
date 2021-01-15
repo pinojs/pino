@@ -91,7 +91,6 @@ function runBenchmark (name, done) {
 
 function sum (arr) {
   let result = 0
-  /* eslint no-var: off */
   for (var i = 0; i < arr.length; i += 1) {
     result += Number.parseFloat(arr[i].time)
   }
@@ -101,7 +100,6 @@ function sum (arr) {
 function displayResults (results) {
   if (quiet === false) console.log('==========')
   const benchNames = Object.keys(results)
-  /* eslint no-var: off */
   for (var i = 0; i < benchNames.length; i += 1) {
     console.log(`${benchNames[i].toUpperCase()} benchmark averages`)
     const benchmark = results[benchNames[i]]
@@ -130,7 +128,6 @@ if (selectedBenchmark !== 'all') {
   benchQueue.push(toBench.bind({ name: selectedBenchmark }))
 } else {
   const keys = Object.keys(benchmarks)
-  /* eslint no-var: off */
   for (var i = 0; i < keys.length; i += 1) {
     benchQueue.push(toBench.bind({ name: keys[i] }))
   }

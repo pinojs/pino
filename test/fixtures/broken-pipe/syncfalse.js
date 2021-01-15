@@ -7,7 +7,6 @@ require('os').hostname = function () { return 'abcdefghijklmnopqr' }
 const pino = require('../../..')
 const logger = pino(pino.destination({ sync: false }))
 
-/* eslint no-var: off */
 for (var i = 0; i < 1000; i++) {
   logger.info('hello world')
 }

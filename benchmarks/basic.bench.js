@@ -43,56 +43,48 @@ const chill = winston.createLogger({
 
 const run = bench([
   function benchBunyan (cb) {
-    /* eslint no-var: off */
     for (var i = 0; i < max; i++) {
       blog.info('hello world')
     }
     setImmediate(cb)
   },
   function benchWinston (cb) {
-    /* eslint no-var: off */
     for (var i = 0; i < max; i++) {
       chill.log('info', 'hello world')
     }
     setImmediate(cb)
   },
   function benchBole (cb) {
-    /* eslint no-var: off */
     for (var i = 0; i < max; i++) {
       bole.info('hello world')
     }
     setImmediate(cb)
   },
   function benchDebug (cb) {
-    /* eslint no-var: off */
     for (var i = 0; i < max; i++) {
       dlog('hello world')
     }
     setImmediate(cb)
   },
   function benchLogLevel (cb) {
-    /* eslint no-var: off */
     for (var i = 0; i < max; i++) {
       loglevel.info('hello world')
     }
     setImmediate(cb)
   },
   function benchPino (cb) {
-    /* eslint no-var: off */
     for (var i = 0; i < max; i++) {
       plogDest.info('hello world')
     }
     setImmediate(cb)
   },
   function benchPinoAsync (cb) {
-    /* eslint no-var: off */
     for (var i = 0; i < max; i++) {
       plogAsync.info('hello world')
     }
     setImmediate(cb)
   },
   function benchPinoNodeStream (cb) {
-    /* eslint no-var: off */
     for (var i = 0; i < max; i++) {
       plogNodeStream.info('hello world')
     }
