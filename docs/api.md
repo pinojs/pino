@@ -124,18 +124,16 @@ const mixin = {
 }
 
 const logger = pino({
-    mixin(obj) {
-        return {
-          description: obj.description
-        }
+    mixin() {
+        return mixin;
     }
 })
 
-pino.info({
+logger.info({
     description: 'Ok'
 }, 'Message 1')
 // {"level":30,"time":1591195061437,"pid":16012,"hostname":"x","appName":"My app","description":"Ok" "msg":"Message 1"}
-pino.info('Message 2')
+logger.info('Message 2')
 // {"level":30,"time":1591195061437,"pid":16012,"hostname":"x","appName":"My app","description":"Ok","msg":"Message 2"}
 // Note: the second log contains "description":"Ok" text, even if it was not provided.
 ```
