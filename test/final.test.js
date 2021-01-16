@@ -44,7 +44,7 @@ test('returns an exit listener function', async ({ is }) => {
 
 test('listener function immediately sync flushes when fired (sync false)', async ({ pass, fail }) => {
   const dest = pino.destination({ dest: getPathToNull(), sync: false })
-  var passed = false
+  let passed = false
   dest.flushSync = () => {
     passed = true
     pass('flushSync called')
@@ -56,7 +56,7 @@ test('listener function immediately sync flushes when fired (sync false)', async
 
 test('listener function immediately sync flushes when fired (sync true)', async ({ pass, fail }) => {
   const dest = pino.destination({ dest: getPathToNull(), sync: true })
-  var passed = false
+  let passed = false
   dest.flushSync = () => {
     passed = true
     pass('flushSync called')
@@ -75,7 +75,7 @@ test('swallows the non-ready error', async ({ doesNotThrow }) => {
 
 test('listener function triggers handler function parameter', async ({ pass, fail }) => {
   const dest = pino.destination({ dest: getPathToNull(), sync: false })
-  var passed = false
+  let passed = false
   pino.final(pino(dest), () => {
     passed = true
     pass('handler function triggered')
@@ -140,8 +140,8 @@ test('returns a specialized final logger instance if no handler is passed', asyn
 test('final logger instances synchronously flush after a log method call', async ({ pass, fail, error }) => {
   const dest = pino.destination({ dest: getPathToNull(), sync: false })
   const logger = pino(dest)
-  var passed = false
-  var count = 0
+  let passed = false
+  let count = 0
   dest.flushSync = () => {
     count++
     if (count === 2) {
@@ -164,8 +164,8 @@ test('also instruments custom log methods', async ({ pass, fail, error }) => {
       foo: 35
     }
   }, dest)
-  var passed = false
-  var count = 0
+  let passed = false
+  let count = 0
   dest.flushSync = () => {
     count++
     if (count === 2) {

@@ -8,7 +8,7 @@ const { once } = require('./helper')
 
 // https://github.com/pinojs/pino/issues/542
 test('pino.destination log everything when calling process.exit(0)', async ({ isNot }) => {
-  var actual = ''
+  let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'destination-exit.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
@@ -23,7 +23,7 @@ test('pino.destination log everything when calling process.exit(0)', async ({ is
 })
 
 test('pino with no args log everything when calling process.exit(0)', async ({ isNot }) => {
-  var actual = ''
+  let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'default-exit.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
@@ -38,7 +38,7 @@ test('pino with no args log everything when calling process.exit(0)', async ({ i
 })
 
 test('sync false does not log everything when calling process.exit(0)', async ({ is }) => {
-  var actual = ''
+  let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'syncfalse-exit.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
@@ -53,7 +53,7 @@ test('sync false does not log everything when calling process.exit(0)', async ({
 })
 
 test('sync false logs everything when calling flushSync', async ({ isNot }) => {
-  var actual = ''
+  let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'syncfalse-flush-exit.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {

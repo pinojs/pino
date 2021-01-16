@@ -20,8 +20,8 @@ test('asynchronous logging', async ({ is, teardown }) => {
   os.hostname = () => 'abcdefghijklmnopqr'
   delete require.cache[require.resolve('../')]
   const pino = require('../')
-  var expected = ''
-  var actual = ''
+  let expected = ''
+  let actual = ''
   const normal = pino(writer((s, enc, cb) => {
     expected += s
     cb()
@@ -33,14 +33,14 @@ test('asynchronous logging', async ({ is, teardown }) => {
   }
   const asyncLogger = pino(dest)
 
-  var i = 44
+  let i = 44
   while (i--) {
     normal.info('h')
     asyncLogger.info('h')
   }
 
-  var expected2 = expected.split('\n')[0]
-  var actual2 = ''
+  const expected2 = expected.split('\n')[0]
+  let actual2 = ''
 
   const child = fork(join(__dirname, '/fixtures/syncfalse.js'), { silent: true })
   child.stdout.pipe(writer((s, enc, cb) => {
@@ -74,8 +74,8 @@ test('sync false with child', async ({ is, teardown }) => {
   }
   delete require.cache[require.resolve('../')]
   const pino = require('../')
-  var expected = ''
-  var actual = ''
+  let expected = ''
+  let actual = ''
   const normal = pino(writer((s, enc, cb) => {
     expected += s
     cb()
@@ -85,7 +85,7 @@ test('sync false with child', async ({ is, teardown }) => {
   dest.write = function (s) { actual += s }
   const asyncLogger = pino(dest).child({ hello: 'world' })
 
-  var i = 500
+  let i = 500
   while (i--) {
     normal.info('h')
     asyncLogger.info('h')
@@ -93,8 +93,8 @@ test('sync false with child', async ({ is, teardown }) => {
 
   asyncLogger.flush()
 
-  var expected2 = expected.split('\n')[0]
-  var actual2 = ''
+  const expected2 = expected.split('\n')[0]
+  let actual2 = ''
 
   const child = fork(join(__dirname, '/fixtures/syncfalse-child.js'), { silent: true })
   child.stdout.pipe(writer((s, enc, cb) => {
@@ -120,7 +120,7 @@ test('throw an error if extreme is passed', async ({ throws }) => {
 })
 
 test('flush does nothing with sync true (default)', async () => {
-  var instance = require('..')()
+  const instance = require('..')()
   instance.flush()
 })
 

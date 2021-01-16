@@ -218,7 +218,7 @@ if (process.title !== 'browser') {
 }
 
 test('child does not overwrite parent serializers', ({ end, is }) => {
-  var c = 0
+  let c = 0
   const parent = pino({
     serializers: parentSerializers,
     browser: {
@@ -301,7 +301,7 @@ test('non overridden serializers are available in the children', ({ end, is }) =
     onlyChild: () => 'child'
   }
 
-  var c = 0
+  let c = 0
 
   const parent = pino({
     serializers: pSerializers,

@@ -11,7 +11,7 @@ const { pid } = process
 const hostname = os.hostname()
 
 test('http request support', async ({ ok, same, error, teardown }) => {
-  var originalReq
+  let originalReq
   const instance = pino(sink((chunk, enc) => {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
@@ -45,7 +45,7 @@ test('http request support', async ({ ok, same, error, teardown }) => {
 })
 
 test('http request support via serializer', async ({ ok, same, error, teardown }) => {
-  var originalReq
+  let originalReq
   const instance = pino({
     serializers: {
       req: pino.stdSerializers.req
@@ -85,7 +85,7 @@ test('http request support via serializer', async ({ ok, same, error, teardown }
 
 // skipped because request connection is deprecated since v13, and request socket is always available
 skip('http request support via serializer without request connection', async ({ ok, same, error, teardown }) => {
-  var originalReq
+  let originalReq
   const instance = pino({
     serializers: {
       req: pino.stdSerializers.req
@@ -128,7 +128,7 @@ skip('http request support via serializer without request connection', async ({ 
 })
 
 test('http response support', async ({ ok, same, error, teardown }) => {
-  var originalRes
+  let originalRes
   const instance = pino(sink((chunk, enc) => {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
@@ -201,7 +201,7 @@ test('http response support via a serializer', async ({ ok, same, error, teardow
 })
 
 test('http request support via serializer in a child', async ({ ok, same, error, teardown }) => {
-  var originalReq
+  let originalReq
   const instance = pino({
     serializers: {
       req: pino.stdSerializers.req

@@ -10,7 +10,7 @@ const pino = require('../')
 const strip = require('strip-ansi')
 
 test('can be enabled via exported pino function', async ({ isNot }) => {
-  var actual = ''
+  let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'basic.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
@@ -22,7 +22,7 @@ test('can be enabled via exported pino function', async ({ isNot }) => {
 })
 
 test('can be enabled via exported pino function with pretty configuration', async ({ isNot }) => {
-  var actual = ''
+  let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'level-first.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
@@ -34,7 +34,7 @@ test('can be enabled via exported pino function with pretty configuration', asyn
 })
 
 test('can be enabled via exported pino function with prettifier', async ({ isNot }) => {
-  var actual = ''
+  let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'pretty-factory.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
@@ -85,7 +85,7 @@ test('can send pretty print to custom stream', async ({ is }) => {
 })
 
 test('ignores `undefined` from prettifier', async ({ is }) => {
-  var actual = ''
+  let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'skipped-output.js')])
 
   child.stdout.pipe(writer((s, enc) => {
@@ -97,7 +97,7 @@ test('ignores `undefined` from prettifier', async ({ is }) => {
 })
 
 test('parses and outputs chindings', async ({ is, isNot }) => {
-  var actual = ''
+  let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'child.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
@@ -113,7 +113,7 @@ test('parses and outputs chindings', async ({ is, isNot }) => {
 })
 
 test('applies updated chindings', async ({ is, isNot }) => {
-  var actual = ''
+  let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'child-with-updated-chindings.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
@@ -127,7 +127,7 @@ test('applies updated chindings', async ({ is, isNot }) => {
 })
 
 test('applies formatters', async ({ is, isNot }) => {
-  var actual = ''
+  let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'formatters.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
@@ -140,7 +140,7 @@ test('applies formatters', async ({ is, isNot }) => {
 })
 
 test('parses and outputs chindings with serializer', async ({ is, isNot }) => {
-  var actual = ''
+  let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'child-with-serializer.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
@@ -159,7 +159,7 @@ test('parses and outputs chindings with serializer', async ({ is, isNot }) => {
 })
 
 test('applies serializers', async ({ is, isNot }) => {
-  var actual = ''
+  let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'serializers.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
@@ -172,7 +172,7 @@ test('applies serializers', async ({ is, isNot }) => {
 })
 
 test('applies redaction rules', async ({ is, isNot }) => {
-  var actual = ''
+  let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'redact.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
@@ -186,7 +186,7 @@ test('applies redaction rules', async ({ is, isNot }) => {
 })
 
 test('dateformat', async ({ isNot }) => {
-  var actual = ''
+  let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'dateformat.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
@@ -198,7 +198,7 @@ test('dateformat', async ({ isNot }) => {
 })
 
 test('without timestamp', async ({ isNot }) => {
-  var actual = ''
+  let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'no-time.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
@@ -210,7 +210,7 @@ test('without timestamp', async ({ isNot }) => {
 })
 
 test('with custom timestamp', async ({ is }) => {
-  var actual = ''
+  let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'custom-time.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
@@ -222,7 +222,7 @@ test('with custom timestamp', async ({ is }) => {
 })
 
 test('with custom timestamp label', async ({ is }) => {
-  var actual = ''
+  let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'custom-time-label.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
@@ -234,7 +234,7 @@ test('with custom timestamp label', async ({ is }) => {
 })
 
 test('errors', async ({ isNot }) => {
-  var actual = ''
+  let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'error.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
@@ -248,7 +248,7 @@ test('errors', async ({ isNot }) => {
 })
 
 test('errors with props', async ({ isNot }) => {
-  var actual = ''
+  let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'error-props.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
@@ -263,7 +263,7 @@ test('errors with props', async ({ isNot }) => {
 })
 
 test('final works with pretty', async ({ isNot }) => {
-  var actual = ''
+  let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'final.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
@@ -276,7 +276,7 @@ test('final works with pretty', async ({ isNot }) => {
 })
 
 test('final works when returning a logger', async ({ isNot }) => {
-  var actual = ''
+  let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'final-return.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
@@ -289,7 +289,7 @@ test('final works when returning a logger', async ({ isNot }) => {
 })
 
 test('final works without prior logging', async ({ isNot }) => {
-  var actual = ''
+  let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'final-no-log-before.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
@@ -302,7 +302,7 @@ test('final works without prior logging', async ({ isNot }) => {
 })
 
 test('suppress flush sync warning when corresponding option is specified', async ({ isNot, is }) => {
-  var actual = ''
+  let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'suppress-flush-sync-warning.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
@@ -314,7 +314,7 @@ test('suppress flush sync warning when corresponding option is specified', async
 })
 
 test('works as expected with an object with the msg prop', async ({ isNot }) => {
-  var actual = ''
+  let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'obj-msg-prop.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {

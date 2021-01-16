@@ -107,7 +107,7 @@ test('level-change event', async ({ is }) => {
   instance.removeListener('level-change', handle)
   instance.level = 'info'
 
-  var count = 0
+  let count = 0
 
   const l1 = () => count++
   const l2 = () => count++
