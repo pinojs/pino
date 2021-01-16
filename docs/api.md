@@ -289,12 +289,20 @@ Set to `true` to logs newline delimited JSON with `\r\n` instead of `\n`.
 Default: `true`
 
 Enables or disables the inclusion of a timestamp in the
-log message. If a function is supplied, it must synchronously return a JSON string
+log message. If a function is supplied, it must synchronously return a partial JSON string
 representation of the time, e.g. `,"time":1493426328206` (which is the default).
 
 If set to `false`, no timestamp will be included in the output.
+
 See [stdTimeFunctions](#pino-stdtimefunctions) for a set of available functions
 for passing in as a value for this option.
+
+Example:
+```js
+timestamp: () => `,"time":"${new Date(Date.now()).toISOString()}"`
+// which is equivilent to:
+// timestamp: stdTimeFunctions.isoTime
+```
 
 **Caution**: attempting to format time in-process will significantly impact logging performance.
 
