@@ -18,7 +18,7 @@
   "scripts": {
     "docs": "docsify serve",
     "browser-test": "airtap --local 8080 test/browser*test.js",
-    "lint": "eslint . --config=eslintrc.json",
+    "lint": "eslint .",
     "test": "npm run lint && tap --100 test/*test.js test/*/*test.js",
     "cov-ui": "tap --coverage-report=html test/*test.js test/*/*test.js",
     "bench": "node benchmarks/utils/runbench all",
