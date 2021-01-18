@@ -76,6 +76,7 @@ PR's to this document are welcome for any new transports!
 + [pino-elasticsearch](#pino-elasticsearch)
 + [pino-gelf](#pino-gelf)
 + [pino-http-send](#pino-http-send)
++ [pino-kafka](#pino-kafka)
 + [pino-logflare](#pino-logflare)
 + [pino-mq](#pino-mq)
 + [pino-mysql](#pino-mysql)
@@ -208,6 +209,15 @@ transport that will batch logs and send to a specified URL.
 
 ```console
 $ node app.js | pino-http-send -u http://localhost:8080/logs
+```
+
+<a id="pino-kafka"></a>
+### pino-kafka
+
+[pino-kafka](https://github.com/ayZagen/pino-kafka) transport to send logs to [Apache Kafka](https://kafka.apache.org/).
+
+```sh
+$ node index.js | pino-kafka -b 10.10.10.5:9200 -d mytopic
 ```
 
 <a id="pino-logflare"></a>
