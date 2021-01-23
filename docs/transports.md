@@ -1,6 +1,6 @@
 # Transports
 
-A "transport" for Pino is supplementary tool which consumes Pino logs.
+A "transport" for Pino is a supplementary tool which consumes Pino logs.
 
 Consider the following example:
 
