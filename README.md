@@ -1,9 +1,12 @@
 ![banner](pino-banner.png)
 
 # pino
+[![npm version](https://img.shields.io/npm/v/pino)](https://www.npmjs.com/package/pino)
 [![Build Status](https://img.shields.io/github/workflow/status/pinojs/pino/CI)](https://github.com/pinojs/pino/actions)
-&nbsp;[![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](https://standardjs.com/)
-&nbsp;[![TypeScript definitions on DefinitelyTyped](https://img.shields.io/badge/DefinitelyTyped-.d.ts-brightgreen.svg?style=flat)](https://definitelytyped.org)
+[![Known Vulnerabilities](https://snyk.io/test/github/pinojs/pino/badge.svg)](https://snyk.io/test/github/fastify/pino)
+[![Coverage Status](https://coveralls.io/repos/github/pinojs/pino/badge.svg?branch=master)](https://coveralls.io/github/pinojs/pino?branch=master)
+[![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](https://standardjs.com/)
+[![TypeScript definitions on DefinitelyTyped](https://img.shields.io/badge/DefinitelyTyped-.d.ts-brightgreen.svg?style=flat)](https://definitelytyped.org)
 
 [Very low overhead](#low-overhead) Node.js logger.
 
