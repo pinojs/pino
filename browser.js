@@ -16,6 +16,19 @@ const stdSerializers = {
   err: asErrValue
 }
 
+function shouldSerialize (serialize, serializers) {
+  if (Array.isArray(serialize)) {
+    const hasToFilter = serialize.filter(function (k) {
+      return k !== '!stdSerializers.err'
+    })
+    return hasToFilter
+  } else if (serialize === true) {
+    return Object.keys(serializers)
+  }
+
+  return false
+}
+
 function pino (opts) {
   opts = opts || {}
   opts.browser = opts.browser || {}
@@ -26,11 +39,7 @@ function pino (opts) {
   const proto = opts.browser.write || _console
   if (opts.browser.write) opts.browser.asObject = true
   const serializers = opts.serializers || {}
-  const serialize = Array.isArray(opts.browser.serialize)
-    ? opts.browser.serialize.filter(function (k) {
-        return k !== '!stdSerializers.err'
-      })
-    : opts.browser.serialize === true ? Object.keys(serializers) : false
+  const serialize = shouldSerialize(opts.browser.serialize, serializers)
   let stdErrSerialize = opts.browser.serialize
 
   if (
