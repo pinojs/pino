@@ -297,8 +297,8 @@ test('final works without prior logging', async ({ isNot }) => {
     cb()
   }))
   await once(child, 'close')
-  isNot(strip(actual).match(/WARN\s+: pino.final with prettyPrint does not support flushing/), null)
-  isNot(strip(actual).match(/INFO\s+\(123456 on abcdefghijklmnopqr\): beforeExit/), null)
+  isNot(strip(actual).match(/WARN\s*: pino.final with prettyPrint does not support flushing/), null)
+  isNot(strip(actual).match(/INFO\s*\(123456 on abcdefghijklmnopqr\): beforeExit/), null)
 })
 
 test('suppress flush sync warning when corresponding option is specified', async ({ isNot, is }) => {
