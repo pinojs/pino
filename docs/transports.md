@@ -84,6 +84,7 @@ PR's to this document are welcome for any new transports!
 + [pino-pg](#pino-pg)
 + [pino-redis](#pino-redis)
 + [pino-sentry](#pino-sentry)
++ [pino-seq](#pino-seq)
 + [pino-socket](#pino-socket)
 + [pino-stackdriver](#pino-stackdriver)
 + [pino-syslog](#pino-syslog)
@@ -320,6 +321,19 @@ For full documentation of command line switches see the [pino-sentry readme](htt
 
 [pino-sentry]: https://www.npmjs.com/package/pino-sentry
 [Sentry]: https://sentry.io/
+
+
+<a id="pino-seq"></a>
+### pino-seq
+
+[pino-seq][pino-seq] supports both out-of-process and in-process log forwarding to [Seq][Seq].
+
+```sh
+$ node app.js | pino-seq --serverUrl http://localhost:5341 --apiKey 1234567890 --property applicationName=MyNodeApp
+```
+
+[pino-seq]: https://www.npmjs.com/package/pino-seq
+[Seq]: https://datalust.co/seq
 
 <a id="pino-socket"></a>
 ### pino-socket
