@@ -524,6 +524,21 @@ test('normalize bigint to string', async ({ same }) => {
   })
 })
 
+test('normalize nested object with bigint to string', async ({ same }) => {
+  const stream = sink()
+  const instance = pino(stream)
+  const bigInt = { a: { b: 1n } }
+  instance.info({ bigInt })
+  const result = await once(stream, 'data')
+  delete result.time
+  same(result, {
+    pid,
+    hostname,
+    level: 30,
+    bigInt: { a: { b: '1n' } }
+  })
+})
+
 test('object and format bigInt property', async ({ same }) => {
   const stream = sink()
   const instance = pino(stream)
