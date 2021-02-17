@@ -509,6 +509,36 @@ test('handles objects with null prototype', async ({ same }) => {
   })
 })
 
+test('normalize bigint to string', async ({ same }) => {
+  const stream = sink()
+  const instance = pino(stream)
+  const bigInt = 1n
+  instance.info({ bigInt })
+  const result = await once(stream, 'data')
+  delete result.time
+  same(result, {
+    pid,
+    hostname,
+    level: 30,
+    bigInt: `${bigInt.toString()}n`
+  })
+})
+
+test('object and format bigInt property', async ({ same }) => {
+  const stream = sink()
+  const instance = pino(stream)
+  instance.info({ answer: 42n }, 'foo %s', 1n)
+  const result = await once(stream, 'data')
+  delete result.time
+  same(result, {
+    pid,
+    hostname,
+    level: 30,
+    msg: 'foo 1',
+    answer: '42n'
+  })
+})
+
 test('pino.destination', async ({ same }) => {
   const tmp = join(
     os.tmpdir(),
