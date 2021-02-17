@@ -550,7 +550,8 @@ test('object and format bigInt property', async ({ same }) => {
     hostname,
     level: 30,
     msg: 'foo 1',
-    answer: '42n'
+    answer: '42n',
+    foo: { bar: '9007199254741001n' }
   })
 })
 
