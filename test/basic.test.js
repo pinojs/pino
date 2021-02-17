@@ -542,7 +542,7 @@ test('normalize nested object with bigint to string', async ({ same }) => {
 test('object and format bigInt property', async ({ same }) => {
   const stream = sink()
   const instance = pino(stream)
-  instance.info({ answer: 42n }, 'foo %s', 1n)
+  instance.info({ answer: 42n, foo: { bar: BigInt(Number.MAX_SAFE_INTEGER) + 10n } }, 'foo %s', 1n)
   const result = await once(stream, 'data')
   delete result.time
   same(result, {
