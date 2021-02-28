@@ -287,10 +287,10 @@ module.exports = function createLogger(options) {
 <a id="avoid-message-conflict"></a>
 ## Avoid Message Conflict
 
-As described in the [`message` documentation](./api.md#message), when a log
+As described in the [`message` documentation](/docs/api.md#message), when a log
 is written like `log.info({ msg: 'a message' }, 'another message')` then the
 final output JSON will have `"msg":"another message"` and the `'a message'`
-string will be lost. To overcome this, the [`logMethod` hook](./api.md#logmethod)
+string will be lost. To overcome this, the [`logMethod` hook](/docs/api.md#logmethod)
 can be used:
 
 ```js
