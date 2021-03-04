@@ -555,7 +555,7 @@ const logger = pino(pinoOptions)
 
 ```js
 logger.info('hello', 'world', 'and', 'hola mundo')
-// {"level":30,"time":1614876433202,"pid":92820,"hostname":"x","msg":"hello 'world' 'and' 'hola mundo'"}
+// {"level":30,"time":1614876645498,"pid":92846,"hostname":"x","msg":"hello, 'world', 'and', 'hola mundo', {\"f\":1.3}"}
 ```
 
 * See [`message` log method parameter](#message)
