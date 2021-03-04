@@ -544,8 +544,8 @@ const pinoOptions = {
 }
 
 function logMethod (args, method) {
-  if (args.length >= 2) {
-    args[0] = args[0] + " %j".repeat(args.length - 1);
+  if (typeof args[0] === "string" && args.length >= 2) {
+    args[0] += ", %j".repeat(args.length - 1);
   }
   method.apply(this, args)
 }
