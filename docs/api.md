@@ -544,13 +544,18 @@ const pinoOptions = {
 }
 
 function logMethod (args, method) {
-  if (args.length === 2) {
-    args[0] = `${args[0]} %j`
+  if (args.length >= 2) {
+    args[0] = args[0] + " %j".repeat(args.length - 1);
   }
   method.apply(this, args)
 }
 
 const logger = pino(pinoOptions)
+```
+
+```js
+logger.info('hello', 'world', 'and', 'hola mundo')
+// {"level":30,"time":1614876433202,"pid":92820,"hostname":"x","msg":"hello 'world' 'and' 'hola mundo'"}
 ```
 
 * See [`message` log method parameter](#message)
