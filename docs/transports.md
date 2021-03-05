@@ -77,6 +77,7 @@ PR's to this document are welcome for any new transports!
 + [pino-gelf](#pino-gelf)
 + [pino-http-send](#pino-http-send)
 + [pino-kafka](#pino-kafka)
++ [pino-logdna](#pino-logdna)
 + [pino-logflare](#pino-logflare)
 + [pino-mq](#pino-mq)
 + [pino-mysql](#pino-mysql)
@@ -220,6 +221,17 @@ $ node app.js | pino-http-send -u http://localhost:8080/logs
 ```sh
 $ node index.js | pino-kafka -b 10.10.10.5:9200 -d mytopic
 ```
+
+<a id="pino-logdna"></a>
+### pino-logdna
+
+[pino-logdna](https://github.com/logdna/pino-logdna) transport to send logs to [LogDNA](https://logdna.com).
+
+```sh
+$ node index.js | pino-logdna --key YOUR_INGESTION_KEY
+```
+
+Tags and other metadata can be included using the available command line options. See the [pino-logdna readme](https://github.com/logdna/pino-logdna#options) for a full list.
 
 <a id="pino-logflare"></a>
 ### pino-logflare
