@@ -60,7 +60,7 @@
   },
   "homepage": "http://getpino.io",
   "devDependencies": {
-    "airtap": "4.0.1",
+    "airtap": "4.0.3",
     "benchmark": "^2.1.4",
     "bole": "^4.0.0",
     "bunyan": "^1.8.14",
