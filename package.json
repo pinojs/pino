@@ -94,7 +94,7 @@
     "fast-safe-stringify": "^2.0.7",
     "flatstr": "^1.0.12",
     "pino-std-serializers": "^3.1.0",
-    "quick-format-unescaped": "^4.0.1",
+    "quick-format-unescaped": "~4.0.1",
     "sonic-boom": "^1.0.2"
   }
 }
