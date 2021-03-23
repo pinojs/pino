@@ -452,4 +452,4 @@ Example output for the "hello world" log:
 $ node app.js | pino-websocket -a my-websocket-server.example.com -p 3004
 ```
 
-For full documentation of command line switches read [readme](https://github.com/abeai/pino-webscoket#README)
+For full documentation of command line switches read the [README](https://github.com/abeai/pino-websocket#readme).
