@@ -14,12 +14,12 @@ tap.test('log method hook', t => {
         logMethod (args, method, level) {
           t.type(args, Array)
           t.type(level, 'number')
-          t.is(args.length, 3)
-          t.is(level, this.levels.values.info)
-          t.deepEqual(args, ['a', 'b', 'c'])
+          t.equal(args.length, 3)
+          t.equal(level, this.levels.values.info)
+          t.same(args, ['a', 'b', 'c'])
 
           t.type(method, Function)
-          t.is(method.name, 'LOG')
+          t.equal(method.name, 'LOG')
 
           method.apply(this, [args.join('-')])
         }
@@ -81,7 +81,7 @@ tap.test('log method hook', t => {
       hooks: {
         logMethod (args, method, level) {
           t.type(level, 'number')
-          t.is(level, this.levels.values.error)
+          t.equal(level, this.levels.values.error)
 
           method.apply(this, [args.join('-')])
         }

@@ -8,7 +8,7 @@ const { fork } = require('child_process')
 const writer = require('flush-write-stream')
 const { once, getPathToNull } = require('./helper')
 
-test('asynchronous logging', async ({ is, teardown }) => {
+test('asynchronous logging', async ({ equal, teardown }) => {
   const now = Date.now
   const hostname = os.hostname
   const proc = process
@@ -48,8 +48,8 @@ test('asynchronous logging', async ({ is, teardown }) => {
     cb()
   }))
   await once(child, 'close')
-  is(actual, expected)
-  is(actual2.trim(), expected2)
+  equal(actual, expected)
+  equal(actual2.trim(), expected2)
 
   teardown(() => {
     os.hostname = hostname
@@ -58,7 +58,7 @@ test('asynchronous logging', async ({ is, teardown }) => {
   })
 })
 
-test('sync false with child', async ({ is, teardown }) => {
+test('sync false with child', async ({ equal, teardown }) => {
   const now = Date.now
   const hostname = os.hostname
   const proc = process
@@ -102,8 +102,8 @@ test('sync false with child', async ({ is, teardown }) => {
     cb()
   }))
   await once(child, 'close')
-  is(actual, expected)
-  is(actual2.trim(), expected2)
+  equal(actual, expected)
+  equal(actual2.trim(), expected2)
 
   teardown(() => {
     os.hostname = hostname
@@ -124,19 +124,19 @@ test('flush does nothing with sync true (default)', async () => {
   instance.flush()
 })
 
-test('pino.extreme() emits a warning', async ({ is }) => {
+test('pino.extreme() emits a warning', async ({ equal }) => {
   const pino = require('..')
   process.removeAllListeners('warning')
   process.nextTick(() => pino.extreme(0))
   const warning = await once(process, 'warning')
   const expected = 'The pino.extreme() option is deprecated and will be removed in v7. Use pino.destination({ sync: false }) instead.'
-  is(expected, warning.message)
-  is('extreme_deprecation', warning.code)
+  equal(expected, warning.message)
+  equal('extreme_deprecation', warning.code)
 })
 
-test('pino.extreme() defaults to stdout', async ({ is }) => {
+test('pino.extreme() defaults to stdout', async ({ equal }) => {
   const pino = require('..')
   process.removeAllListeners('warning')
   const dest = pino.extreme()
-  is(dest.fd, process.stdout.fd)
+  equal(dest.fd, process.stdout.fd)
 })

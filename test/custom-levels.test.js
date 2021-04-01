@@ -10,7 +10,7 @@ const pino = require('../')
 process.removeAllListeners('warning')
 process.on('warning', () => {})
 
-test('adds additional levels', async ({ is }) => {
+test('adds additional levels', async ({ equal }) => {
   const stream = sink()
   const logger = pino({
     customLevels: {
@@ -21,10 +21,10 @@ test('adds additional levels', async ({ is }) => {
 
   logger.foo('test')
   const { level } = await once(stream, 'data')
-  is(level, 35)
+  equal(level, 35)
 })
 
-test('custom levels does not override default levels', async ({ is }) => {
+test('custom levels does not override default levels', async ({ equal }) => {
   const stream = sink()
   const logger = pino({
     customLevels: {
@@ -34,10 +34,10 @@ test('custom levels does not override default levels', async ({ is }) => {
 
   logger.info('test')
   const { level } = await once(stream, 'data')
-  is(level, 30)
+  equal(level, 30)
 })
 
-test('default levels can be redefined using custom levels', async ({ is }) => {
+test('default levels can be redefined using custom levels', async ({ equal }) => {
   const stream = sink()
   const logger = pino({
     customLevels: {
@@ -47,14 +47,14 @@ test('default levels can be redefined using custom levels', async ({ is }) => {
     useOnlyCustomLevels: true
   }, stream)
 
-  is(logger.hasOwnProperty('info'), true)
+  equal(logger.hasOwnProperty('info'), true)
 
   logger.info('test')
   const { level } = await once(stream, 'data')
-  is(level, 35)
+  equal(level, 35)
 })
 
-test('custom levels overrides default level label if use useOnlyCustomLevels', async ({ is }) => {
+test('custom levels overrides default level label if use useOnlyCustomLevels', async ({ equal }) => {
   const stream = sink()
   const logger = pino({
     customLevels: {
@@ -64,10 +64,10 @@ test('custom levels overrides default level label if use useOnlyCustomLevels', a
     level: 'foo'
   }, stream)
 
-  is(logger.hasOwnProperty('info'), false)
+  equal(logger.hasOwnProperty('info'), false)
 })
 
-test('custom levels overrides default level value if use useOnlyCustomLevels', async ({ is }) => {
+test('custom levels overrides default level value if use useOnlyCustomLevels', async ({ equal }) => {
   const stream = sink()
   const logger = pino({
     customLevels: {
@@ -77,10 +77,10 @@ test('custom levels overrides default level value if use useOnlyCustomLevels', a
     level: 35
   }, stream)
 
-  is(logger.hasOwnProperty('info'), false)
+  equal(logger.hasOwnProperty('info'), false)
 })
 
-test('custom levels are inherited by children', async ({ is }) => {
+test('custom levels are inherited by children', async ({ equal }) => {
   const stream = sink()
   const logger = pino({
     customLevels: {
@@ -90,12 +90,12 @@ test('custom levels are inherited by children', async ({ is }) => {
 
   logger.child({ childMsg: 'ok' }).foo('test')
   const { msg, childMsg, level } = await once(stream, 'data')
-  is(level, 35)
-  is(childMsg, 'ok')
-  is(msg, 'test')
+  equal(level, 35)
+  equal(childMsg, 'ok')
+  equal(msg, 'test')
 })
 
-test('custom levels can be specified on child bindings', async ({ is }) => {
+test('custom levels can be specified on child bindings', async ({ equal }) => {
   const stream = sink()
   const logger = pino(stream).child({
     customLevels: {
@@ -106,12 +106,12 @@ test('custom levels can be specified on child bindings', async ({ is }) => {
 
   logger.foo('test')
   const { msg, childMsg, level } = await once(stream, 'data')
-  is(level, 35)
-  is(childMsg, 'ok')
-  is(msg, 'test')
+  equal(level, 35)
+  equal(childMsg, 'ok')
+  equal(msg, 'test')
 })
 
-test('customLevels property child bindings does not get logged', async ({ is }) => {
+test('customLevels property child bindings does not get logged', async ({ equal }) => {
   const stream = sink()
   const logger = pino(stream).child({
     customLevels: {
@@ -122,10 +122,10 @@ test('customLevels property child bindings does not get logged', async ({ is }) 
 
   logger.foo('test')
   const { customLevels } = await once(stream, 'data')
-  is(customLevels, undefined)
+  equal(customLevels, undefined)
 })
 
-test('throws when specifying pre-existing parent labels via child bindings', async ({ is, throws }) => {
+test('throws when specifying pre-existing parent labels via child bindings', async ({ equal, throws }) => {
   const stream = sink()
   throws(() => pino({
     customLevels: {
@@ -148,11 +148,11 @@ test('throws when specifying pre-existing parent labels via child bindings', asy
       }
     })
   } catch ({ message }) {
-    is(message, 'levels cannot be overridden')
+    equal(message, 'levels cannot be overridden')
   }
 })
 
-test('throws when specifying pre-existing parent values via child bindings', async ({ is, throws }) => {
+test('throws when specifying pre-existing parent values via child bindings', async ({ equal, throws }) => {
   const stream = sink()
   throws(() => pino({
     customLevels: {
@@ -175,11 +175,11 @@ test('throws when specifying pre-existing parent values via child bindings', asy
       }
     })
   } catch ({ message }) {
-    is(message, 'pre-existing level values cannot be used for new levels')
+    equal(message, 'pre-existing level values cannot be used for new levels')
   }
 })
 
-test('throws when specifying core values via child bindings', async ({ is, throws }) => {
+test('throws when specifying core values via child bindings', async ({ equal, throws }) => {
   const stream = sink()
   throws(() => pino(stream).child({
     customLevels: {
@@ -194,11 +194,11 @@ test('throws when specifying core values via child bindings', async ({ is, throw
       }
     })
   } catch ({ message }) {
-    is(message, 'pre-existing level values cannot be used for new levels')
+    equal(message, 'pre-existing level values cannot be used for new levels')
   }
 })
 
-test('throws when useOnlyCustomLevels is set true without customLevels', async ({ is, throws }) => {
+test('throws when useOnlyCustomLevels is set true without customLevels', async ({ equal, throws }) => {
   const stream = sink()
   throws(() => pino({
     useOnlyCustomLevels: true
@@ -209,37 +209,37 @@ test('throws when useOnlyCustomLevels is set true without customLevels', async (
       useOnlyCustomLevels: true
     }, stream)
   } catch ({ message }) {
-    is(message, 'customLevels is required if useOnlyCustomLevels is set true')
+    equal(message, 'customLevels is required if useOnlyCustomLevels is set true')
   }
 })
 
-test('custom level on one instance does not affect other instances', async ({ is }) => {
+test('custom level on one instance does not affect other instances', async ({ equal }) => {
   pino({
     customLevels: {
       foo: 37
     }
   })
-  is(typeof pino().foo, 'undefined')
+  equal(typeof pino().foo, 'undefined')
 })
 
-test('setting level below or at custom level will successfully log', async ({ is }) => {
+test('setting level below or at custom level will successfully log', async ({ equal }) => {
   const stream = sink()
   const instance = pino({ customLevels: { foo: 35 } }, stream)
   instance.level = 'foo'
   instance.info('nope')
   instance.foo('bar')
   const { msg } = await once(stream, 'data')
-  is(msg, 'bar')
+  equal(msg, 'bar')
 })
 
-test('custom level below level threshold will not log', async ({ is }) => {
+test('custom level below level threshold will not log', async ({ equal }) => {
   const stream = sink()
   const instance = pino({ customLevels: { foo: 15 } }, stream)
   instance.level = 'info'
   instance.info('bar')
   instance.foo('nope')
   const { msg } = await once(stream, 'data')
-  is(msg, 'bar')
+  equal(msg, 'bar')
 })
 
 test('does not share custom level state across siblings', async ({ doesNotThrow }) => {
@@ -255,7 +255,7 @@ test('does not share custom level state across siblings', async ({ doesNotThrow 
   })
 })
 
-test('custom level does not affect the levels serializer', async ({ is }) => {
+test('custom level does not affect the levels serializer', async ({ equal }) => {
   const stream = sink()
   const logger = pino({
     customLevels: {
@@ -271,10 +271,10 @@ test('custom level does not affect the levels serializer', async ({ is }) => {
 
   logger.foo('test')
   const { priority } = await once(stream, 'data')
-  is(priority, 35)
+  equal(priority, 35)
 })
 
-test('When useOnlyCustomLevels is set to true, the level formatter should only get custom levels', async ({ is }) => {
+test('When useOnlyCustomLevels is set to true, the level formatter should only get custom levels', async ({ equal }) => {
   const stream = sink()
   const logger = pino({
     customLevels: {
@@ -284,8 +284,8 @@ test('When useOnlyCustomLevels is set to true, the level formatter should only g
     level: 42,
     formatters: {
       level (label, number) {
-        is(label, 'answer')
-        is(number, 42)
+        equal(label, 'answer')
+        equal(number, 42)
         return { level: number }
       }
     }
@@ -293,7 +293,7 @@ test('When useOnlyCustomLevels is set to true, the level formatter should only g
 
   logger.answer('test')
   const { level } = await once(stream, 'data')
-  is(level, 42)
+  equal(level, 42)
 })
 
 test('custom levels accessible in prettifier function', async ({ plan, same }) => {
