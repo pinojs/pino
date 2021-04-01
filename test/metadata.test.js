@@ -7,14 +7,14 @@ const pino = require('../')
 const { pid } = process
 const hostname = os.hostname()
 
-test('metadata works', async ({ ok, same, is }) => {
+test('metadata works', async ({ ok, same, equal }) => {
   const now = Date.now()
   const instance = pino({}, {
     [Symbol.for('pino.metadata')]: true,
     write (chunk) {
-      is(instance, this.lastLogger)
-      is(30, this.lastLevel)
-      is('a msg', this.lastMsg)
+      equal(instance, this.lastLogger)
+      equal(30, this.lastLevel)
+      equal('a msg', this.lastMsg)
       ok(Number(this.lastTime) >= now)
       same(this.lastObj, { hello: 'world', msg: 'a msg' })
       const result = JSON.parse(chunk)
@@ -33,13 +33,13 @@ test('metadata works', async ({ ok, same, is }) => {
   instance.info({ hello: 'world' }, 'a msg')
 })
 
-test('child loggers works', async ({ ok, same, is }) => {
+test('child loggers works', async ({ ok, same, equal }) => {
   const instance = pino({}, {
     [Symbol.for('pino.metadata')]: true,
     write (chunk) {
-      is(child, this.lastLogger)
-      is(30, this.lastLevel)
-      is('a msg', this.lastMsg)
+      equal(child, this.lastLogger)
+      equal(30, this.lastLevel)
+      equal('a msg', this.lastMsg)
       same(this.lastObj, { from: 'child', msg: 'a msg' })
       const result = JSON.parse(chunk)
       ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
@@ -59,13 +59,13 @@ test('child loggers works', async ({ ok, same, is }) => {
   child.info({ from: 'child' }, 'a msg')
 })
 
-test('without object', async ({ ok, same, is }) => {
+test('without object', async ({ ok, same, equal }) => {
   const instance = pino({}, {
     [Symbol.for('pino.metadata')]: true,
     write (chunk) {
-      is(instance, this.lastLogger)
-      is(30, this.lastLevel)
-      is('a msg', this.lastMsg)
+      equal(instance, this.lastLogger)
+      equal(30, this.lastLevel)
+      equal('a msg', this.lastMsg)
       same({ msg: 'a msg' }, this.lastObj)
       const result = JSON.parse(chunk)
       ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
@@ -82,13 +82,13 @@ test('without object', async ({ ok, same, is }) => {
   instance.info('a msg')
 })
 
-test('without msg', async ({ ok, same, is }) => {
+test('without msg', async ({ ok, same, equal }) => {
   const instance = pino({}, {
     [Symbol.for('pino.metadata')]: true,
     write (chunk) {
-      is(instance, this.lastLogger)
-      is(30, this.lastLevel)
-      is(undefined, this.lastMsg)
+      equal(instance, this.lastLogger)
+      equal(30, this.lastLevel)
+      equal(undefined, this.lastMsg)
       same({ hello: 'world' }, this.lastObj)
       const result = JSON.parse(chunk)
       ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')

@@ -5,11 +5,11 @@ import { pino, destination } from '../../pino.js'
 import { join } from 'path'
 import { readFileSync } from 'fs'
 
-t.test('named exports support', async ({ is }) => {
+t.test('named exports support', async ({ equal }) => {
   const stream = sink()
   const instance = pino(stream)
   instance.info('hello world')
-  check(is, await once(stream, 'data'), 30, 'hello world')
+  check(equal, await once(stream, 'data'), 30, 'hello world')
 })
 
 t.test('destination', async ({ same }) => {

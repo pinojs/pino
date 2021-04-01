@@ -7,7 +7,7 @@ const writer = require('flush-write-stream')
 const { once } = require('./helper')
 
 // https://github.com/pinojs/pino/issues/542
-test('pino.destination log everything when calling process.exit(0)', async ({ isNot }) => {
+test('pino.destination log everything when calling process.exit(0)', async ({ not }) => {
   let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'destination-exit.js')])
 
@@ -18,11 +18,11 @@ test('pino.destination log everything when calling process.exit(0)', async ({ is
 
   await once(child, 'close')
 
-  isNot(actual.match(/hello/), null)
-  isNot(actual.match(/world/), null)
+  not(actual.match(/hello/), null)
+  not(actual.match(/world/), null)
 })
 
-test('pino with no args log everything when calling process.exit(0)', async ({ isNot }) => {
+test('pino with no args log everything when calling process.exit(0)', async ({ not }) => {
   let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'default-exit.js')])
 
@@ -33,11 +33,11 @@ test('pino with no args log everything when calling process.exit(0)', async ({ i
 
   await once(child, 'close')
 
-  isNot(actual.match(/hello/), null)
-  isNot(actual.match(/world/), null)
+  not(actual.match(/hello/), null)
+  not(actual.match(/world/), null)
 })
 
-test('sync false does not log everything when calling process.exit(0)', async ({ is }) => {
+test('sync false does not log everything when calling process.exit(0)', async ({ equal }) => {
   let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'syncfalse-exit.js')])
 
@@ -48,11 +48,11 @@ test('sync false does not log everything when calling process.exit(0)', async ({
 
   await once(child, 'close')
 
-  is(actual.match(/hello/), null)
-  is(actual.match(/world/), null)
+  equal(actual.match(/hello/), null)
+  equal(actual.match(/world/), null)
 })
 
-test('sync false logs everything when calling flushSync', async ({ isNot }) => {
+test('sync false logs everything when calling flushSync', async ({ not }) => {
   let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'syncfalse-flush-exit.js')])
 
@@ -63,6 +63,6 @@ test('sync false logs everything when calling flushSync', async ({ isNot }) => {
 
   await once(child, 'close')
 
-  isNot(actual.match(/hello/), null)
-  isNot(actual.match(/world/), null)
+  not(actual.match(/hello/), null)
+  not(actual.match(/world/), null)
 })

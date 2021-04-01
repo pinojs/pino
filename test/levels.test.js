@@ -10,7 +10,7 @@ const levelsLib = require('../lib/levels')
 process.removeAllListeners('warning')
 process.on('warning', () => {})
 
-test('set the level by string', async ({ is }) => {
+test('set the level by string', async ({ equal }) => {
   const expected = [{
     level: 50,
     msg: 'this is an error'
@@ -26,7 +26,7 @@ test('set the level by string', async ({ is }) => {
   instance.fatal('this is fatal')
   const result = await once(stream, 'data')
   const current = expected.shift()
-  check(is, result, current.level, current.msg)
+  check(equal, result, current.level, current.msg)
 })
 
 test('the wrong level throws', async ({ throws }) => {
@@ -36,7 +36,7 @@ test('the wrong level throws', async ({ throws }) => {
   })
 })
 
-test('set the level by number', async ({ is }) => {
+test('set the level by number', async ({ equal }) => {
   const expected = [{
     level: 50,
     msg: 'this is an error'
@@ -53,29 +53,29 @@ test('set the level by number', async ({ is }) => {
   instance.fatal('this is fatal')
   const result = await once(stream, 'data')
   const current = expected.shift()
-  check(is, result, current.level, current.msg)
+  check(equal, result, current.level, current.msg)
 })
 
-test('exposes level string mappings', async ({ is }) => {
-  is(pino.levels.values.error, 50)
+test('exposes level string mappings', async ({ equal }) => {
+  equal(pino.levels.values.error, 50)
 })
 
-test('exposes level number mappings', async ({ is }) => {
-  is(pino.levels.labels[50], 'error')
+test('exposes level number mappings', async ({ equal }) => {
+  equal(pino.levels.labels[50], 'error')
 })
 
-test('returns level integer', async ({ is }) => {
+test('returns level integer', async ({ equal }) => {
   const instance = pino({ level: 'error' })
-  is(instance.levelVal, 50)
+  equal(instance.levelVal, 50)
 })
 
-test('child returns level integer', async ({ is }) => {
+test('child returns level integer', async ({ equal }) => {
   const parent = pino({ level: 'error' })
   const child = parent.child({ foo: 'bar' })
-  is(child.levelVal, 50)
+  equal(child.levelVal, 50)
 })
 
-test('set the level via exported pino function', async ({ is }) => {
+test('set the level via exported pino function', async ({ equal }) => {
   const expected = [{
     level: 50,
     msg: 'this is an error'
@@ -91,16 +91,16 @@ test('set the level via exported pino function', async ({ is }) => {
   instance.fatal('this is fatal')
   const result = await once(stream, 'data')
   const current = expected.shift()
-  check(is, result, current.level, current.msg)
+  check(equal, result, current.level, current.msg)
 })
 
-test('level-change event', async ({ is }) => {
+test('level-change event', async ({ equal }) => {
   const instance = pino()
   function handle (lvl, val, prevLvl, prevVal) {
-    is(lvl, 'trace')
-    is(val, 10)
-    is(prevLvl, 'info')
-    is(prevVal, 30)
+    equal(lvl, 'trace')
+    equal(val, 10)
+    equal(prevLvl, 'info')
+    equal(prevVal, 30)
   }
   instance.on('level-change', handle)
   instance.level = 'trace'
@@ -124,7 +124,7 @@ test('level-change event', async ({ is }) => {
   instance.removeListener('level-change', l2)
   instance.level = 'info'
 
-  is(count, 6)
+  equal(count, 6)
 })
 
 test('enable', async ({ fail }) => {
@@ -186,7 +186,7 @@ test('exposed labels', async ({ same }) => {
   ])
 })
 
-test('setting level in child', async ({ is }) => {
+test('setting level in child', async ({ equal }) => {
   const expected = [{
     level: 50,
     msg: 'this is an error'
@@ -196,7 +196,7 @@ test('setting level in child', async ({ is }) => {
   }]
   const instance = pino(sink((result, enc, cb) => {
     const current = expected.shift()
-    check(is, result, current.level, current.msg)
+    check(equal, result, current.level, current.msg)
     cb()
   })).child({ level: 30 })
 
@@ -206,13 +206,13 @@ test('setting level in child', async ({ is }) => {
   instance.fatal('this is fatal')
 })
 
-test('setting level by assigning a number to level', async ({ is }) => {
+test('setting level by assigning a number to level', async ({ equal }) => {
   const instance = pino()
-  is(instance.levelVal, 30)
-  is(instance.level, 'info')
+  equal(instance.levelVal, 30)
+  equal(instance.level, 'info')
   instance.level = 50
-  is(instance.levelVal, 50)
-  is(instance.level, 'error')
+  equal(instance.levelVal, 50)
+  equal(instance.level, 'error')
 })
 
 test('setting level by number to unknown value results in a throw', async ({ throws }) => {
@@ -220,13 +220,13 @@ test('setting level by number to unknown value results in a throw', async ({ thr
   throws(() => { instance.level = 973 })
 })
 
-test('setting level by assigning a known label to level', async ({ is }) => {
+test('setting level by assigning a known label to level', async ({ equal }) => {
   const instance = pino()
-  is(instance.levelVal, 30)
-  is(instance.level, 'info')
+  equal(instance.levelVal, 30)
+  equal(instance.level, 'info')
   instance.level = 'error'
-  is(instance.levelVal, 50)
-  is(instance.level, 'error')
+  equal(instance.levelVal, 50)
+  equal(instance.level, 'error')
 })
 
 test('levelVal is read only', async ({ throws }) => {
@@ -234,7 +234,7 @@ test('levelVal is read only', async ({ throws }) => {
   throws(() => { instance.levelVal = 20 })
 })
 
-test('produces labels when told to', async ({ is }) => {
+test('produces labels when told to', async ({ equal }) => {
   const expected = [{
     level: 'info',
     msg: 'hello world'
@@ -247,14 +247,14 @@ test('produces labels when told to', async ({ is }) => {
     }
   }, sink((result, enc, cb) => {
     const current = expected.shift()
-    check(is, result, current.level, current.msg)
+    check(equal, result, current.level, current.msg)
     cb()
   }))
 
   instance.info('hello world')
 })
 
-test('resets levels from labels to numbers', async ({ is }) => {
+test('resets levels from labels to numbers', async ({ equal }) => {
   const expected = [{
     level: 30,
     msg: 'hello world'
@@ -262,23 +262,23 @@ test('resets levels from labels to numbers', async ({ is }) => {
   pino({ useLevelLabels: true })
   const instance = pino({ useLevelLabels: false }, sink((result, enc, cb) => {
     const current = expected.shift()
-    check(is, result, current.level, current.msg)
+    check(equal, result, current.level, current.msg)
     cb()
   }))
 
   instance.info('hello world')
 })
 
-test('aliases changeLevelName to levelKey', async ({ is }) => {
+test('aliases changeLevelName to levelKey', async ({ equal }) => {
   const instance = pino({ changeLevelName: 'priority' }, sink((result, enc, cb) => {
-    is(result.priority, 30)
+    equal(result.priority, 30)
     cb()
   }))
 
   instance.info('hello world')
 })
 
-test('changes label naming when told to', async ({ is }) => {
+test('changes label naming when told to', async ({ equal }) => {
   const expected = [{
     priority: 30,
     msg: 'hello world'
@@ -291,15 +291,15 @@ test('changes label naming when told to', async ({ is }) => {
     }
   }, sink((result, enc, cb) => {
     const current = expected.shift()
-    is(result.priority, current.priority)
-    is(result.msg, current.msg)
+    equal(result.priority, current.priority)
+    equal(result.msg, current.msg)
     cb()
   }))
 
   instance.info('hello world')
 })
 
-test('children produce labels when told to', async ({ is }) => {
+test('children produce labels when told to', async ({ equal }) => {
   const expected = [
     {
       level: 'info',
@@ -318,7 +318,7 @@ test('children produce labels when told to', async ({ is }) => {
     }
   }, sink((result, enc, cb) => {
     const current = expected.shift()
-    check(is, result, current.level, current.msg)
+    check(equal, result, current.level, current.msg)
     cb()
   }))
 
@@ -329,7 +329,7 @@ test('children produce labels when told to', async ({ is }) => {
   child2.info('child 2')
 })
 
-test('produces labels for custom levels', async ({ is }) => {
+test('produces labels for custom levels', async ({ equal }) => {
   const expected = [
     {
       level: 'info',
@@ -352,7 +352,7 @@ test('produces labels for custom levels', async ({ is }) => {
   }
   const instance = pino(opts, sink((result, enc, cb) => {
     const current = expected.shift()
-    check(is, result, current.level, current.msg)
+    check(equal, result, current.level, current.msg)
     cb()
   }))
 
@@ -360,7 +360,7 @@ test('produces labels for custom levels', async ({ is }) => {
   instance.foo('foobar')
 })
 
-test('setting levelKey does not affect labels when told to', async ({ is }) => {
+test('setting levelKey does not affect labels when told to', async ({ equal }) => {
   const instance = pino(
     {
       formatters: {
@@ -370,7 +370,7 @@ test('setting levelKey does not affect labels when told to', async ({ is }) => {
       }
     },
     sink((result, enc, cb) => {
-      is(result.priority, 'info')
+      equal(result.priority, 'info')
       cb()
     })
   )
@@ -378,7 +378,7 @@ test('setting levelKey does not affect labels when told to', async ({ is }) => {
   instance.info('hello world')
 })
 
-test('throws when creating a default label that does not exist in logger levels', async ({ is, throws }) => {
+test('throws when creating a default label that does not exist in logger levels', async ({ equal, throws }) => {
   const defaultLevel = 'foo'
   throws(() => {
     pino({
@@ -393,11 +393,11 @@ test('throws when creating a default label that does not exist in logger levels'
       level: defaultLevel
     })
   } catch ({ message }) {
-    is(message, `default level:${defaultLevel} must be included in custom levels`)
+    equal(message, `default level:${defaultLevel} must be included in custom levels`)
   }
 })
 
-test('throws when creating a default value that does not exist in logger levels', async ({ is, throws }) => {
+test('throws when creating a default value that does not exist in logger levels', async ({ equal, throws }) => {
   const defaultLevel = 15
   throws(() => {
     pino({
@@ -412,11 +412,11 @@ test('throws when creating a default value that does not exist in logger levels'
       level: defaultLevel
     })
   } catch ({ message }) {
-    is(message, `default level:${defaultLevel} must be included in custom levels`)
+    equal(message, `default level:${defaultLevel} must be included in custom levels`)
   }
 })
 
-test('throws when creating a default value that does not exist in logger levels', async ({ is, throws }) => {
+test('throws when creating a default value that does not exist in logger levels', async ({ equal, throws }) => {
   throws(() => {
     pino({
       customLevels: {
@@ -433,17 +433,17 @@ test('throws when creating a default value that does not exist in logger levels'
       useOnlyCustomLevels: true
     })
   } catch ({ message }) {
-    is(message, 'default level:info must be included in custom levels')
+    equal(message, 'default level:info must be included in custom levels')
   }
 })
 
-test('passes when creating a default value that exists in logger levels', async ({ is, throws }) => {
+test('passes when creating a default value that exists in logger levels', async ({ equal, throws }) => {
   pino({
     level: 30
   })
 })
 
-test('log null value when message is null', async ({ is }) => {
+test('log null value when message is null', async ({ equal }) => {
   const expected = {
     msg: null,
     level: 30
@@ -455,10 +455,10 @@ test('log null value when message is null', async ({ is }) => {
   instance.info(null)
 
   const result = await once(stream, 'data')
-  check(is, result, expected.level, expected.msg)
+  check(equal, result, expected.level, expected.msg)
 })
 
-test('formats when base param is null', async ({ is }) => {
+test('formats when base param is null', async ({ equal }) => {
   const expected = {
     msg: 'a string',
     level: 30
@@ -470,7 +470,7 @@ test('formats when base param is null', async ({ is }) => {
   instance.info(null, 'a %s', 'string')
 
   const result = await once(stream, 'data')
-  check(is, result, expected.level, expected.msg)
+  check(equal, result, expected.level, expected.msg)
 })
 
 test('fatal method sync-flushes the destination if sync flushing is available', async ({ pass, doesNotThrow, plan }) => {
@@ -515,7 +515,7 @@ test('calling silent method on child logger', async ({ fail }) => {
   child.silent('hello world')
 })
 
-test('changing level from info to silent and back to info', async ({ is }) => {
+test('changing level from info to silent and back to info', async ({ equal }) => {
   const expected = {
     level: 30,
     msg: 'hello world'
@@ -526,15 +526,15 @@ test('changing level from info to silent and back to info', async ({ is }) => {
   instance.level = 'silent'
   instance.info('hello world')
   let result = stream.read()
-  is(result, null)
+  equal(result, null)
 
   instance.level = 'info'
   instance.info('hello world')
   result = await once(stream, 'data')
-  check(is, result, expected.level, expected.msg)
+  check(equal, result, expected.level, expected.msg)
 })
 
-test('changing level from info to silent and back to info in child logger', async ({ is }) => {
+test('changing level from info to silent and back to info in child logger', async ({ equal }) => {
   const expected = {
     level: 30,
     msg: 'hello world'
@@ -545,17 +545,17 @@ test('changing level from info to silent and back to info in child logger', asyn
   child.level = 'silent'
   child.info('hello world')
   let result = stream.read()
-  is(result, null)
+  equal(result, null)
 
   child.level = 'info'
   child.info('hello world')
   result = await once(stream, 'data')
-  check(is, result, expected.level, expected.msg)
+  check(equal, result, expected.level, expected.msg)
 })
 
 // testing for potential loss of Pino constructor scope from serializers - an edge case with circular refs see:  https://github.com/pinojs/pino/issues/833
-test('trying to get levels when `this` is no longer a Pino instance returns an empty string', async ({ is }) => {
+test('trying to get levels when `this` is no longer a Pino instance returns an empty string', async ({ equal }) => {
   const notPinoInstance = { some: 'object', getLevel: levelsLib.getLevel }
   const blankedLevelValue = notPinoInstance.getLevel()
-  is(blankedLevelValue, '')
+  equal(blankedLevelValue, '')
 })
