@@ -835,7 +835,7 @@ The listener is passed four arguments:
 ```js
 const logger = require('pino')()
 logger.on('level-change', (lvl, val, prevLvl, prevVal) => {
-  console.log('%s (%d) was changed to %s (%d)', lvl, val, prevLvl, prevVal)
+  console.log('%s (%d) was changed to %s (%d)', prevLvl, prevVal, lvl, val)
 })
 logger.level = 'trace' // trigger event
 ```
