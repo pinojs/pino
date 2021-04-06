@@ -6,8 +6,8 @@ const { fork } = require('child_process')
 const { once } = require('./helper')
 const writer = require('flush-write-stream')
 
-test('do not use SonicBoom is someone tampered with process.stdout.write', async ({ isNot }) => {
-  var actual = ''
+test('do not use SonicBoom is someone tampered with process.stdout.write', async ({ not }) => {
+  let actual = ''
   const child = fork(join(__dirname, 'fixtures', 'stdout-hack-protection.js'), { silent: true })
 
   child.stdout.pipe(writer((s, enc, cb) => {
@@ -15,5 +15,5 @@ test('do not use SonicBoom is someone tampered with process.stdout.write', async
     cb()
   }))
   await once(child, 'close')
-  isNot(actual.match(/^hack/), null)
+  not(actual.match(/^hack/), null)
 })

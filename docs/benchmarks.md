@@ -51,6 +51,6 @@ PinoAsyncInterpolateExtra average: 209.552ms
 PinoNodeStreamInterpolateExtra average: 413.195ms
 ```
 
-For a fair comparison, [LogLevel](http://npm.im/loglevel) was extended
-to include a timestamp and [bole](http://npm.im/bole) had
+For a fair comparison, [LogLevel](https://npm.im/loglevel) was extended
+to include a timestamp and [bole](https://npm.im/bole) had
 `fastTime` mode switched on.

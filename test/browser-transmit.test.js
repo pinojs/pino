@@ -17,7 +17,7 @@ test('throws if transmit object does not have send function', ({ end, throws }) 
 })
 
 test('calls send function after write', ({ end, is }) => {
-  var c = 0
+  let c = 0
   const logger = pino({
     browser: {
       write: () => {
@@ -124,10 +124,10 @@ test('passes send function message objects in logEvent object when asObject is s
 })
 
 test('supplies a timestamp (ts) in logEvent object which is exactly the same as the `time` property in asObject mode', ({ end, is }) => {
-  var expected
+  let expected
   const logger = pino({
     browser: {
-      asObject: true, // implict because `write`, but just to be explicit
+      asObject: true, // implicit because `write`, but just to be explicit
       write (o) {
         expected = o.time
       },
@@ -188,7 +188,7 @@ test('passes send function level:{label, value} via logEvent object', ({ end, is
 })
 
 test('calls send function according to transmit.level', ({ end, is }) => {
-  var c = 0
+  let c = 0
   const logger = pino({
     browser: {
       write: noop,
@@ -209,7 +209,7 @@ test('calls send function according to transmit.level', ({ end, is }) => {
 })
 
 test('transmit.level defaults to logger level', ({ end, is }) => {
-  var c = 0
+  let c = 0
   const logger = pino({
     level: 'error',
     browser: {
@@ -230,7 +230,7 @@ test('transmit.level defaults to logger level', ({ end, is }) => {
 })
 
 test('transmit.level is effective even if lower than logger level', ({ end, is }) => {
-  var c = 0
+  let c = 0
   const logger = pino({
     level: 'error',
     browser: {
@@ -312,8 +312,8 @@ test('applies all serializers to messages and bindings (serialize:true)', ({ end
 })
 
 test('extracts correct bindings and raw messages over multiple transmits', ({ end, same, is }) => {
-  var messages = null
-  var bindings = null
+  let messages = null
+  let bindings = null
 
   const logger = pino({
     browser: {

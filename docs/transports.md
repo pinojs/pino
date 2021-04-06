@@ -1,6 +1,6 @@
 # Transports
 
-A "transport" for Pino is supplementary tool which consumes Pino logs.
+A "transport" for Pino is a supplementary tool which consumes Pino logs.
 
 Consider the following example:
 
@@ -42,7 +42,7 @@ external processes so that the threading capabilities of the OS can be
 used (or other CPUs).
 
 One consequence of this methodology is that "error" logs do not get written to
-`stderr`. However, since Pino logs are in a parseable format, it is possible to
+`stderr`. However, since Pino logs are in a parsable format, it is possible to
 use tools like [pino-tee][pino-tee] or [jq][jq] to work with the logs. For
 example, to view only logs marked as "error" logs:
 
@@ -76,6 +76,8 @@ PR's to this document are welcome for any new transports!
 + [pino-elasticsearch](#pino-elasticsearch)
 + [pino-gelf](#pino-gelf)
 + [pino-http-send](#pino-http-send)
++ [pino-kafka](#pino-kafka)
++ [pino-logdna](#pino-logdna)
 + [pino-logflare](#pino-logflare)
 + [pino-mq](#pino-mq)
 + [pino-mysql](#pino-mysql)
@@ -83,6 +85,7 @@ PR's to this document are welcome for any new transports!
 + [pino-pg](#pino-pg)
 + [pino-redis](#pino-redis)
 + [pino-sentry](#pino-sentry)
++ [pino-seq](#pino-seq)
 + [pino-socket](#pino-socket)
 + [pino-stackdriver](#pino-stackdriver)
 + [pino-syslog](#pino-syslog)
@@ -210,6 +213,26 @@ transport that will batch logs and send to a specified URL.
 $ node app.js | pino-http-send -u http://localhost:8080/logs
 ```
 
+<a id="pino-kafka"></a>
+### pino-kafka
+
+[pino-kafka](https://github.com/ayZagen/pino-kafka) transport to send logs to [Apache Kafka](https://kafka.apache.org/).
+
+```sh
+$ node index.js | pino-kafka -b 10.10.10.5:9200 -d mytopic
+```
+
+<a id="pino-logdna"></a>
+### pino-logdna
+
+[pino-logdna](https://github.com/logdna/pino-logdna) transport to send logs to [LogDNA](https://logdna.com).
+
+```sh
+$ node index.js | pino-logdna --key YOUR_INGESTION_KEY
+```
+
+Tags and other metadata can be included using the available command line options. See the [pino-logdna readme](https://github.com/logdna/pino-logdna#options) for a full list.
+
 <a id="pino-logflare"></a>
 ### pino-logflare
 
@@ -310,6 +333,19 @@ For full documentation of command line switches see the [pino-sentry readme](htt
 
 [pino-sentry]: https://www.npmjs.com/package/pino-sentry
 [Sentry]: https://sentry.io/
+
+
+<a id="pino-seq"></a>
+### pino-seq
+
+[pino-seq][pino-seq] supports both out-of-process and in-process log forwarding to [Seq][Seq].
+
+```sh
+$ node app.js | pino-seq --serverUrl http://localhost:5341 --apiKey 1234567890 --property applicationName=MyNodeApp
+```
+
+[pino-seq]: https://www.npmjs.com/package/pino-seq
+[Seq]: https://datalust.co/seq
 
 <a id="pino-socket"></a>
 ### pino-socket
@@ -416,4 +452,4 @@ Example output for the "hello world" log:
 $ node app.js | pino-websocket -a my-websocket-server.example.com -p 3004
 ```
 
-For full documentation of command line switches read [readme](https://github.com/abeai/pino-webscoket#README)
+For full documentation of command line switches read the [README](https://github.com/abeai/pino-websocket#readme).

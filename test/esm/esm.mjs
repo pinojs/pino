@@ -4,9 +4,9 @@ import helper from '../helper.js'
 
 const { sink, check, once } = helper
 
-t.test('esm support', async ({ is }) => {
+t.test('esm support', async ({ equal }) => {
   const stream = sink()
   const instance = pino(stream)
   instance.info('hello world')
-  check(is, await once(stream, 'data'), 30, 'hello world')
+  check(equal, await once(stream, 'data'), 30, 'hello world')
 })

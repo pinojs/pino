@@ -6,18 +6,20 @@ const pino = require('../')
 
 tap.test('log method hook', t => {
   t.test('gets invoked', async t => {
-    t.plan(6)
+    t.plan(8)
 
     const stream = sink()
     const logger = pino({
       hooks: {
-        logMethod (args, method) {
+        logMethod (args, method, level) {
           t.type(args, Array)
-          t.is(args.length, 3)
-          t.deepEqual(args, ['a', 'b', 'c'])
+          t.type(level, 'number')
+          t.equal(args.length, 3)
+          t.equal(level, this.levels.values.info)
+          t.same(args, ['a', 'b', 'c'])
 
           t.type(method, Function)
-          t.is(method.name, 'LOG')
+          t.equal(method.name, 'LOG')
 
           method.apply(this, [args.join('-')])
         }
@@ -69,6 +71,26 @@ tap.test('log method hook', t => {
     o = once(stream, 'data')
     grandchild.info('c', 'd')
     t.match(await o, { msg: 'c-d' })
+  })
+
+  t.test('get log level', async t => {
+    t.plan(3)
+
+    const stream = sink()
+    const logger = pino({
+      hooks: {
+        logMethod (args, method, level) {
+          t.type(level, 'number')
+          t.equal(level, this.levels.values.error)
+
+          method.apply(this, [args.join('-')])
+        }
+      }
+    }, stream)
+
+    const o = once(stream, 'data')
+    logger.error('a')
+    t.match(await o, { msg: 'a' })
   })
 
   t.end()

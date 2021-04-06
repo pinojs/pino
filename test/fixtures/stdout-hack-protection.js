@@ -7,5 +7,5 @@ process.stdout.write = function (chunk) {
 
 Date.now = function () { return 1459875739796 }
 require('os').hostname = function () { return 'abcdefghijklmnopqr' }
-var pino = require(require.resolve('../../'))()
+const pino = require(require.resolve('../../'))()
 pino.info('me')

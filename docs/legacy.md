@@ -26,7 +26,7 @@ Node v0.10 or Node v0.12 is supported on the [Pino v2](#pino-v2-documentation) l
 
 ## Migration
 
-### Pino v4 to to Pino v5
+### Pino v4 to Pino v5
 
 #### Logging Destination
 

@@ -9,8 +9,8 @@ const { once } = require('./helper')
 const pino = require('../')
 const strip = require('strip-ansi')
 
-test('can be enabled via exported pino function', async ({ isNot }) => {
-  var actual = ''
+test('can be enabled via exported pino function', async ({ not }) => {
+  let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'basic.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
@@ -18,11 +18,11 @@ test('can be enabled via exported pino function', async ({ isNot }) => {
     cb()
   }))
   await once(child, 'close')
-  isNot(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): h/), null)
+  not(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): h/), null)
 })
 
-test('can be enabled via exported pino function with pretty configuration', async ({ isNot }) => {
-  var actual = ''
+test('can be enabled via exported pino function with pretty configuration', async ({ not }) => {
+  let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'level-first.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
@@ -30,11 +30,11 @@ test('can be enabled via exported pino function with pretty configuration', asyn
     cb()
   }))
   await once(child, 'close')
-  isNot(strip(actual).match(/^INFO.*h/), null)
+  not(strip(actual).match(/^INFO.*h/), null)
 })
 
-test('can be enabled via exported pino function with prettifier', async ({ isNot }) => {
-  var actual = ''
+test('can be enabled via exported pino function with prettifier', async ({ not }) => {
+  let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'pretty-factory.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
@@ -43,14 +43,14 @@ test('can be enabled via exported pino function with prettifier', async ({ isNot
   }))
 
   await once(child, 'close')
-  isNot(strip(actual).match(/^INFO.*h/), null)
+  not(strip(actual).match(/^INFO.*h/), null)
 })
 
 test('does not throw error when enabled with stream specified', async ({ doesNotThrow }) => {
   doesNotThrow(() => pino({ prettyPrint: true }, process.stdout))
 })
 
-test('throws when prettyPrint is true but pino-pretty module is not installed', async ({ throws, is }) => {
+test('throws when prettyPrint is true but pino-pretty module is not installed', async ({ throws, equal }) => {
   // pino pretty *is* installed, and probably also cached, so rather than
   // messing with the filesystem the simplest way to generate a not found
   // error is to simulate it:
@@ -60,17 +60,17 @@ test('throws when prettyPrint is true but pino-pretty module is not installed', 
   }
   throws(() => pino({ prettyPrint: true }))
   try { pino({ prettyPrint: true }) } catch ({ message }) {
-    is(message, 'Missing `pino-pretty` module: `pino-pretty` must be installed separately')
+    equal(message, 'Missing `pino-pretty` module: `pino-pretty` must be installed separately')
   }
 
   require.cache[require.resolve('pino-pretty')].exports = prettyFactory
 })
 
-test('can send pretty print to custom stream', async ({ is }) => {
+test('can send pretty print to custom stream', async ({ equal }) => {
   const dest = new Writable({
     objectMode: true,
     write (formatted, enc) {
-      is(/^INFO.*foo\n$/.test(formatted), true)
+      equal(/^INFO.*foo\n$/.test(formatted), true)
     }
   })
 
@@ -84,8 +84,8 @@ test('can send pretty print to custom stream', async ({ is }) => {
   log.info('foo')
 })
 
-test('ignores `undefined` from prettifier', async ({ is }) => {
-  var actual = ''
+test('ignores `undefined` from prettifier', async ({ equal }) => {
+  let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'skipped-output.js')])
 
   child.stdout.pipe(writer((s, enc) => {
@@ -93,11 +93,11 @@ test('ignores `undefined` from prettifier', async ({ is }) => {
   }))
 
   await once(child, 'close')
-  is(actual, '')
+  equal(actual, '')
 })
 
-test('parses and outputs chindings', async ({ is, isNot }) => {
-  var actual = ''
+test('parses and outputs chindings', async ({ equal, not }) => {
+  let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'child.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
@@ -105,15 +105,15 @@ test('parses and outputs chindings', async ({ is, isNot }) => {
     cb()
   }))
   await once(child, 'close')
-  isNot(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): h/), null)
-  isNot(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): h2/), null)
-  isNot(strip(actual).match(/a: 1/), null)
-  isNot(strip(actual).match(/b: 2/), null)
-  is(strip(actual).match(/a: 1/g).length, 3)
+  not(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): h/), null)
+  not(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): h2/), null)
+  not(strip(actual).match(/a: 1/), null)
+  not(strip(actual).match(/b: 2/), null)
+  equal(strip(actual).match(/a: 1/g).length, 3)
 })
 
-test('applies updated chindings', async ({ is, isNot }) => {
-  var actual = ''
+test('applies updated chindings', async ({ not }) => {
+  let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'child-with-updated-chindings.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
@@ -121,13 +121,13 @@ test('applies updated chindings', async ({ is, isNot }) => {
     cb()
   }))
   await once(child, 'close')
-  isNot(strip(actual).match(/foo: 123/), null)
-  isNot(strip(actual).match(/foo: 456/), null)
-  isNot(strip(actual).match(/bar: 789/), null)
+  not(strip(actual).match(/foo: 123/), null)
+  not(strip(actual).match(/foo: 456/), null)
+  not(strip(actual).match(/bar: 789/), null)
 })
 
-test('applies formatters', async ({ is, isNot }) => {
-  var actual = ''
+test('applies formatters', async ({ not }) => {
+  let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'formatters.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
@@ -135,12 +135,12 @@ test('applies formatters', async ({ is, isNot }) => {
     cb()
   }))
   await once(child, 'close')
-  isNot(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): h/), null)
-  isNot(strip(actual).match(/foo: "formatted_bar"/), null)
+  not(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): h/), null)
+  not(strip(actual).match(/foo: "formatted_bar"/), null)
 })
 
-test('parses and outputs chindings with serializer', async ({ is, isNot }) => {
-  var actual = ''
+test('parses and outputs chindings with serializer', async ({ equal, not }) => {
+  let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'child-with-serializer.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
@@ -148,18 +148,18 @@ test('parses and outputs chindings with serializer', async ({ is, isNot }) => {
     cb()
   }))
   await once(child, 'close')
-  isNot(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): h/), null)
-  isNot(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): h2/), null)
-  isNot(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): h3/), null)
-  isNot(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): h4/), null)
-  isNot(strip(actual).match(/a: 2/), null)
-  isNot(strip(actual).match(/a: 16/), null)
-  isNot(strip(actual).match(/a: 42/), null)
-  is(strip(actual).match(/a: /g).length, 4)
+  not(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): h/), null)
+  not(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): h2/), null)
+  not(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): h3/), null)
+  not(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): h4/), null)
+  not(strip(actual).match(/a: 2/), null)
+  not(strip(actual).match(/a: 16/), null)
+  not(strip(actual).match(/a: 42/), null)
+  equal(strip(actual).match(/a: /g).length, 4)
 })
 
-test('applies serializers', async ({ is, isNot }) => {
-  var actual = ''
+test('applies serializers', async ({ not }) => {
+  let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'serializers.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
@@ -167,12 +167,12 @@ test('applies serializers', async ({ is, isNot }) => {
     cb()
   }))
   await once(child, 'close')
-  isNot(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): h/), null)
-  isNot(strip(actual).match(/foo: "bar"/), null)
+  not(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): h/), null)
+  not(strip(actual).match(/foo: "bar"/), null)
 })
 
-test('applies redaction rules', async ({ is, isNot }) => {
-  var actual = ''
+test('applies redaction rules', async ({ equal, not }) => {
+  let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'redact.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
@@ -180,13 +180,13 @@ test('applies redaction rules', async ({ is, isNot }) => {
     cb()
   }))
   await once(child, 'close')
-  isNot(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): h/), null)
-  isNot(strip(actual).match(/\[Redacted\]/), null)
-  is(strip(actual).match(/object/), null)
+  not(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): h/), null)
+  not(strip(actual).match(/\[Redacted\]/), null)
+  equal(strip(actual).match(/object/), null)
 })
 
-test('dateformat', async ({ isNot }) => {
-  var actual = ''
+test('dateformat', async ({ not }) => {
+  let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'dateformat.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
@@ -194,11 +194,11 @@ test('dateformat', async ({ isNot }) => {
     cb()
   }))
   await once(child, 'close')
-  isNot(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): h/), null)
+  not(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): h/), null)
 })
 
-test('without timestamp', async ({ isNot }) => {
-  var actual = ''
+test('without timestamp', async ({ not }) => {
+  let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'no-time.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
@@ -206,11 +206,11 @@ test('without timestamp', async ({ isNot }) => {
     cb()
   }))
   await once(child, 'close')
-  isNot(strip(actual).slice(2), '[]')
+  not(strip(actual).slice(2), '[]')
 })
 
-test('with custom timestamp', async ({ is }) => {
-  var actual = ''
+test('with custom timestamp', async ({ equal }) => {
+  let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'custom-time.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
@@ -218,11 +218,11 @@ test('with custom timestamp', async ({ is }) => {
     cb()
   }))
   await once(child, 'close')
-  is(strip(actual).slice(0, 6), '[test]')
+  equal(strip(actual).slice(0, 6), '[test]')
 })
 
-test('with custom timestamp label', async ({ is }) => {
-  var actual = ''
+test('with custom timestamp label', async ({ equal }) => {
+  let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'custom-time-label.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
@@ -230,11 +230,11 @@ test('with custom timestamp label', async ({ is }) => {
     cb()
   }))
   await once(child, 'close')
-  is(strip(actual).slice(0, 6), '[test]')
+  equal(strip(actual).slice(0, 6), '[test]')
 })
 
-test('errors', async ({ isNot }) => {
-  var actual = ''
+test('errors', async ({ not }) => {
+  let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'error.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
@@ -242,13 +242,13 @@ test('errors', async ({ isNot }) => {
     cb()
   }))
   await once(child, 'close')
-  isNot(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): kaboom/), null)
-  isNot(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): with a message/), null)
-  isNot(strip(actual).match(/.*error\.js.*/), null)
+  not(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): kaboom/), null)
+  not(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): with a message/), null)
+  not(strip(actual).match(/.*error\.js.*/), null)
 })
 
-test('errors with props', async ({ isNot }) => {
-  var actual = ''
+test('errors with props', async ({ not }) => {
+  let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'error-props.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
@@ -256,14 +256,14 @@ test('errors with props', async ({ isNot }) => {
     cb()
   }))
   await once(child, 'close')
-  isNot(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): kaboom/), null)
-  isNot(strip(actual).match(/"code": "ENOENT"/), null)
-  isNot(strip(actual).match(/"errno": 1/), null)
-  isNot(strip(actual).match(/.*error-props\.js.*/), null)
+  not(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): kaboom/), null)
+  not(strip(actual).match(/"code": "ENOENT"/), null)
+  not(strip(actual).match(/"errno": 1/), null)
+  not(strip(actual).match(/.*error-props\.js.*/), null)
 })
 
-test('final works with pretty', async ({ isNot }) => {
-  var actual = ''
+test('final works with pretty', async ({ not }) => {
+  let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'final.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
@@ -271,12 +271,12 @@ test('final works with pretty', async ({ isNot }) => {
     cb()
   }))
   await once(child, 'close')
-  isNot(strip(actual).match(/WARN\s+\(123456 on abcdefghijklmnopqr\): pino.final with prettyPrint does not support flushing/), null)
-  isNot(strip(actual).match(/INFO\s+\(123456 on abcdefghijklmnopqr\): beforeExit/), null)
+  not(strip(actual).match(/WARN\s+\(123456 on abcdefghijklmnopqr\): pino.final with prettyPrint does not support flushing/), null)
+  not(strip(actual).match(/INFO\s+\(123456 on abcdefghijklmnopqr\): beforeExit/), null)
 })
 
-test('final works when returning a logger', async ({ isNot }) => {
-  var actual = ''
+test('final works when returning a logger', async ({ not }) => {
+  let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'final-return.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
@@ -284,12 +284,12 @@ test('final works when returning a logger', async ({ isNot }) => {
     cb()
   }))
   await once(child, 'close')
-  isNot(strip(actual).match(/WARN\s+\(123456 on abcdefghijklmnopqr\): pino.final with prettyPrint does not support flushing/), null)
-  isNot(strip(actual).match(/INFO\s+\(123456 on abcdefghijklmnopqr\): after/), null)
+  not(strip(actual).match(/WARN\s+\(123456 on abcdefghijklmnopqr\): pino.final with prettyPrint does not support flushing/), null)
+  not(strip(actual).match(/INFO\s+\(123456 on abcdefghijklmnopqr\): after/), null)
 })
 
-test('final works without prior logging', async ({ isNot }) => {
-  var actual = ''
+test('final works without prior logging', async ({ not }) => {
+  let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'final-no-log-before.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
@@ -297,12 +297,12 @@ test('final works without prior logging', async ({ isNot }) => {
     cb()
   }))
   await once(child, 'close')
-  isNot(strip(actual).match(/WARN\s+: pino.final with prettyPrint does not support flushing/), null)
-  isNot(strip(actual).match(/INFO\s+\(123456 on abcdefghijklmnopqr\): beforeExit/), null)
+  not(strip(actual).match(/WARN\s*: pino.final with prettyPrint does not support flushing/), null)
+  not(strip(actual).match(/INFO\s*\(123456 on abcdefghijklmnopqr\): beforeExit/), null)
 })
 
-test('suppress flush sync warning when corresponding option is specified', async ({ isNot, is }) => {
-  var actual = ''
+test('suppress flush sync warning when corresponding option is specified', async ({ equal }) => {
+  let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'suppress-flush-sync-warning.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
@@ -310,11 +310,11 @@ test('suppress flush sync warning when corresponding option is specified', async
     cb()
   }))
   await once(child, 'close')
-  is(strip(actual).match(/WARN\s+\(123456 on abcdefghijklmnopqr\): pino.final with prettyPrint does not support flushing/), null)
+  equal(strip(actual).match(/WARN\s+\(123456 on abcdefghijklmnopqr\): pino.final with prettyPrint does not support flushing/), null)
 })
 
-test('works as expected with an object with the msg prop', async ({ isNot }) => {
-  var actual = ''
+test('works as expected with an object with the msg prop', async ({ not }) => {
+  let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'obj-msg-prop.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
@@ -322,18 +322,18 @@ test('works as expected with an object with the msg prop', async ({ isNot }) => 
     cb()
   }))
   await once(child, 'close')
-  isNot(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): hello/), null)
+  not(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): hello/), null)
 })
 
-test('should not lose stream metadata for streams with `needsMetadataGsym` flag', async ({ isNot }) => {
+test('should not lose stream metadata for streams with `needsMetadataGsym` flag', async ({ not }) => {
   const dest = new Writable({
     objectMode: true,
     write () {
-      isNot(typeof this.lastLevel === 'undefined', true)
-      isNot(typeof this.lastMsg === 'undefined', true)
-      isNot(typeof this.lastObj === 'undefined', true)
-      isNot(typeof this.lastTime === 'undefined', true)
-      isNot(typeof this.lastLogger === 'undefined', true)
+      not(typeof this.lastLevel === 'undefined', true)
+      not(typeof this.lastMsg === 'undefined', true)
+      not(typeof this.lastObj === 'undefined', true)
+      not(typeof this.lastTime === 'undefined', true)
+      not(typeof this.lastLogger === 'undefined', true)
     }
   })
 
@@ -345,15 +345,15 @@ test('should not lose stream metadata for streams with `needsMetadataGsym` flag'
   log.info('foo')
 })
 
-test('should not add stream metadata for streams without `needsMetadataGsym` flag', async ({ is }) => {
+test('should not add stream metadata for streams without `needsMetadataGsym` flag', async ({ equal }) => {
   const dest = new Writable({
     objectMode: true,
     write () {
-      is(typeof this.lastLevel === 'undefined', true)
-      is(typeof this.lastMsg === 'undefined', true)
-      is(typeof this.lastObj === 'undefined', true)
-      is(typeof this.lastTime === 'undefined', true)
-      is(typeof this.lastLogger === 'undefined', true)
+      equal(typeof this.lastLevel === 'undefined', true)
+      equal(typeof this.lastMsg === 'undefined', true)
+      equal(typeof this.lastObj === 'undefined', true)
+      equal(typeof this.lastTime === 'undefined', true)
+      equal(typeof this.lastLogger === 'undefined', true)
     }
   })
 
