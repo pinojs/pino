@@ -964,7 +964,7 @@ log.info('this will be written to /tmp/debug.stream.out and /tmp/info.stream.out
 log.fatal('this will be written to /tmp/debug.stream.out, /tmp/info.stream.out and /tmp/fatal.stream.out')
 ```
 
-In order for `multistream` to work, the log level _____must__ be set to the lowest level used in the streams array.
+In order for `multistream` to work, the log level __must__ be set to the lowest level used in the streams array.
 
 #### Options
 
