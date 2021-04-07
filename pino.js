@@ -223,6 +223,8 @@ module.exports.destination = (dest = process.stdout.fd) => {
   }
 }
 
+module.exports.multistream = require('./lib/multistream')
+
 module.exports.final = final
 module.exports.levels = mappings()
 module.exports.stdSerializers = serializers

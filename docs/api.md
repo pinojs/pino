@@ -24,6 +24,7 @@
 * [Statics](#statics)
   * [pino.destination()](#pino-destination)
   * [pino.final()](#pino-final)
+  * [pino.multistream()](#pino-multistream)
   * [pino.stdSerializers](#pino-stdserializers)
   * [pino.stdTimeFunctions](#pino-stdtimefunctions)
   * [pino.symbols](#pino-symbols)
@@ -937,6 +938,73 @@ finalLogger.info('exiting...')
 * See [Exit logging help](/docs/help.md#exit-logging)
 * See [Asynchronous logging ⇗](/docs/asynchronous.md)
 * See [Log loss prevention ⇗](/docs/asynchronous.md#log-loss-prevention)
+
+<a id="pino-multistream"></a>
+
+### `pino.multistream(options) => Stream`
+
+Create a stream composed by multiple destination streams:
+
+```js
+var fs = require('fs')
+var pino = require('pino')
+var streams = [
+  {stream: fs.createWriteStream('/tmp/info.stream.out')},
+  {level: 'debug', stream: fs.createWriteStream('/tmp/debug.stream.out')},
+  {level: 'fatal', stream: fs.createWriteStream('/tmp/fatal.stream.out')}
+]
+
+var log = pino({
+  level: 'debug' // this MUST be set at the lowest level of the
+                 // destinations
+}, pino.multistream(streams))
+
+log.debug('this will be written to /tmp/debug.stream.out')
+log.info('this will be written to /tmp/debug.stream.out and /tmp/info.stream.out')
+log.fatal('this will be written to /tmp/debug.stream.out, /tmp/info.stream.out and /tmp/fatal.stream.out')
+```
+
+In order for `multistream` to work, the log level _____must__ be set to the lowest level used in the streams array.
+
+#### Options
+
+* `levels`:  Pass custom log level definitions to the instance as an object.
+
++ `dedupe`: Set this to `true` to send logs only to the stream with the higher level. Default: `false`
+
+    `dedupe` flag can be useful for example when using pino-multi-stream to redirect `error` logs to `process.stderr` and others to `process.stdout`:
+
+    ```js
+    var pino = require('pino')
+    var multistream = require('pino-multi-stream').multistream
+    var streams = [
+      {stream: process.stdout},
+      {level: 'error', stream: process.stderr},
+    ]
+
+    var opts = {
+        levels: {
+            silent: Infinity,
+            fatal: 60,
+            error: 50,
+            warn: 50,
+            info: 30,
+            debug: 20,
+            trace: 10
+        },
+        dedupe: true,
+    }
+
+    var log = pino({
+      level: 'debug' // this MUST be set at the lowest level of the
+                    // destinations
+    }, multistream(streams, opts))
+
+    log.debug('this will be written ONLY to process.stdout')
+    log.info('this will be written ONLY to process.stdout')
+    log.error('this will be written ONLY to process.stderr')
+    log.fatal('this will be written ONLY to process.stderr')
+    ```
 
 <a id="pino-stdserializers"></a>
 ### `pino.stdSerializers` (Object)
