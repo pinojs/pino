@@ -37,7 +37,7 @@ test('pino.transport with file', async ({ same }) => {
   })
 })
 
-test('pino.transport with package', async ({ same }) => {
+test('pino.transport with package', { skip: process.platform === 'win32' }, async ({ same }) => {
   const dest = join(
     os.tmpdir(),
     '_' + Math.random().toString(36).substr(2, 9)
