@@ -223,6 +223,8 @@ module.exports.destination = (dest = process.stdout.fd) => {
   }
 }
 
+module.exports.transport = require('./lib/transport')
+
 module.exports.final = final
 module.exports.levels = mappings()
 module.exports.stdSerializers = serializers
