@@ -976,7 +976,7 @@ In order for `multistream` to work, the log level __must__ be set to the lowest 
 
     ```js
     var pino = require('pino')
-    var multistream = require('pino-multi-stream').multistream
+    var multistream = pino.multistream
     var streams = [
       {stream: process.stdout},
       {level: 'error', stream: process.stderr},
