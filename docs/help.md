@@ -166,7 +166,7 @@ var streams = [
 
 const logger = pino({
   name: 'my-app',
-  level: 'debug', // must be the lower level of all streams
+  level: 'debug', // must be the lowest level of all streams
 }, pino.multistream(streams))
 ```
 
