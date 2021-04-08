@@ -3,21 +3,13 @@
 const os = require('os')
 const { join } = require('path')
 const { readFile } = require('fs').promises
-const { test, teardown, comment } = require('tap')
-const { spawnSync } = require('child_process')
+const { test } = require('tap')
 const { watchFileCreated } = require('./helper')
 const pino = require('../')
 const url = require('url')
 
 const { pid } = process
 const hostname = os.hostname()
-
-comment('linkining commencing, might take a little while')
-spawnSync('npm', ['link', join(__dirname, 'fixtures', 'transport')])
-teardown(() => {
-  comment('teardown commencing, might take a little while')
-  spawnSync('npm', ['unlink', 'transport'])
-})
 
 test('pino.transport with file', async ({ same }) => {
   const dest = join(
@@ -37,7 +29,7 @@ test('pino.transport with file', async ({ same }) => {
   })
 })
 
-test('pino.transport with package', { skip: process.platform === 'win32' }, async ({ same }) => {
+test('pino.transport with package', async ({ same }) => {
   const dest = join(
     os.tmpdir(),
     '_' + Math.random().toString(36).substr(2, 9)
