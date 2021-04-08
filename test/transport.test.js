@@ -64,3 +64,12 @@ test('pino.transport with file URL', async ({ same }) => {
     msg: 'hello'
   })
 })
+
+test('pino.transport errors if file does not exists', ({ plan, pass }) => {
+  plan(1)
+  const instance = pino.transport(join(__dirname, 'fixtures', 'non-existent-file'))
+  instance.on('error', function (err) {
+    console.log(err)
+    pass('error received')
+  })
+})
