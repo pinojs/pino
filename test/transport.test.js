@@ -76,3 +76,21 @@ test('pino.transport errors if file does not exists', ({ plan, pass }) => {
     pass('error received')
   })
 })
+
+test('pino.transport with esm', async ({ same }) => {
+  const dest = join(
+    os.tmpdir(),
+    '_' + Math.random().toString(36).substr(2, 9)
+  )
+  const instance = pino(pino.transport(join(__dirname, 'fixtures', 'to-file-transport.mjs'), { dest }))
+  instance.info('hello')
+  await watchFileCreated(dest)
+  const result = JSON.parse(await readFile(dest))
+  delete result.time
+  same(result, {
+    pid,
+    hostname,
+    level: 30,
+    msg: 'hello'
+  })
+})
