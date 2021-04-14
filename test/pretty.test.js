@@ -66,6 +66,13 @@ test('throws when prettyPrint is true but pino-pretty module is not installed', 
   require.cache[require.resolve('pino-pretty')].exports = prettyFactory
 })
 
+test('throws when prettyPrint has invalid options', async ({ throws, equal }) => {
+  throws(() => pino({ prettyPrint: { ignore: ['hostname'] } }))
+  try { pino({ prettyPrint: { ignore: ['hostname'] } }) } catch ({ message }) {
+    equal(message, 'opts.ignore.split is not a function')
+  }
+})
+
 test('can send pretty print to custom stream', async ({ equal }) => {
   const dest = new Writable({
     objectMode: true,
