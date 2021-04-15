@@ -616,19 +616,12 @@ test('fast-safe-stringify must be used when interpolating', async (t) => {
   t.equal(msg, 'test {"a":{"b":{"c":"[Circular]"}}}')
 })
 
-test('throws when setting useOnlyCustomLevels without customLevels', async ({ equal, throws }) => {
+test('throws when setting useOnlyCustomLevels without customLevels', async ({ throws }) => {
   throws(() => {
     pino({
       useOnlyCustomLevels: true
     })
-  })
-  try {
-    pino({
-      useOnlyCustomLevels: true
-    })
-  } catch ({ message }) {
-    equal(message, 'customLevels is required if useOnlyCustomLevels is set true')
-  }
+  }, 'customLevels is required if useOnlyCustomLevels is set true')
 })
 
 test('correctly log Infinity', async (t) => {
