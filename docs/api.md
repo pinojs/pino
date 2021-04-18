@@ -840,6 +840,20 @@ logger.on('level-change', (lvl, val, prevLvl, prevVal) => {
 logger.level = 'trace' // trigger event
 ```
 
+Please note that due to a [known bug](https://github.com/pinojs/pino/issues/1006), every `logger.child()` call will
+fire a `level-change` event, with `levelLabel` equal to `previousLevelLabel` and `levelValue` equal to `previousLevelValue`.
+You might want to ignore these events, using something like:
+
+```js
+const logger = require('pino')()
+logger.on('level-change', (lvl, val, prevLvl, prevVal) => {
+  if (lvl !== prevLvl) {
+    console.log('%s (%d) was changed to %s (%d)', prevLvl, prevVal, lvl, val)
+  }
+})
+logger.child({}); // trigger an event by creating a child instance.
+```
+
 <a id="version"></a>
 ### `logger.version` (String)
 
