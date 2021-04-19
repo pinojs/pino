@@ -846,9 +846,10 @@ fire a `level-change` event. These events can be ignored by writing an event han
 ```js
 const logger = require('pino')()
 logger.on('level-change', function (lvl, val, prevLvl, prevVal) {
-  if (logger === this) {
-    console.log('%s (%d) was changed to %s (%d)', prevLvl, prevVal, lvl, val)
+  if (logger !== this) {
+    return
   }
+  console.log('%s (%d) was changed to %s (%d)', prevLvl, prevVal, lvl, val)
 })
 logger.child({}); // trigger an event by creating a child instance, notice no console.log
 logger.level = 'trace' // trigger event using actual value change, notice console.log
