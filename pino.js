@@ -225,7 +225,6 @@ module.exports.destination = (dest = process.stdout.fd) => {
 
 module.exports.transport = require('./lib/transport')
 module.exports.multistream = require('./lib/multistream')
-module.exports.multitransport = require('./lib/multitransport')
 
 module.exports.final = final
 module.exports.levels = mappings()
