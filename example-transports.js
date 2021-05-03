@@ -6,15 +6,13 @@ const { join } = require('path')
 
 const file = join(tmpdir(), `pino-${process.pid}-example`)
 
-const logger = pino(pino.multitransport({
-  transports: [{
-    level: 'warn',
-    destination: file
-  }, {
-    level: 'info',
-    prettyPrint: true
-  }]
-}))
+const logger = pino(pino.transport([{
+  level: 'warn',
+  destination: file
+}, {
+  level: 'info',
+  prettyPrint: true
+}]))
 
 logger.info({
   file
