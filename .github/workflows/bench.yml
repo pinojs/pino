@@ -1,7 +1,13 @@
 name: Benchmarks
 on:
-  - push
-  - pull_request
+  push:
+    paths-ignore:
+        - 'docs/**'
+        - '*.md'
+  pull_request:
+    paths-ignore:
+        - 'docs/**'
+        - '*.md'
 
 jobs:
   benchmark_current:
