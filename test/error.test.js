@@ -337,8 +337,11 @@ test('correctly adds error information when nestedKey is used', async ({ same })
     hostname,
     level: 60,
     obj: {
-      type: 'Error',
-      stack: err.stack
+      err: {
+        type: 'Error',
+        stack: err.stack,
+        message: err.message
+      }
     },
     msg: err.message
   })
@@ -360,8 +363,11 @@ test('correctly adds msg on error when nestedKey is used', async ({ same }) => {
     hostname,
     level: 60,
     obj: {
-      type: 'Error',
-      stack: err.stack
+      err: {
+        type: 'Error',
+        stack: err.stack,
+        message: err.message
+      }
     },
     msg: 'msg message'
   })
