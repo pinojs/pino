@@ -139,10 +139,19 @@ function pino (...args) {
     [stringifySym]: stringify,
     [formattersSym]: allFormatters
   })
-  const chindings = base === null ? '' : (name === undefined)
-    ? coreChindings(base) : coreChindings(Object.assign({}, base, { name }))
+
+  let chindings = ''
+  if (base !== null) {
+    if (name === undefined) {
+      chindings = coreChindings(base)
+    } else {
+      chindings = coreChindings(Object.assign({}, base, { name }))
+    }
+  }
+
   const time = (timestamp instanceof Function)
-    ? timestamp : (timestamp ? epochTime : nullTime)
+    ? timestamp
+    : (timestamp ? epochTime : nullTime)
   const timeSliceIndex = time().indexOf(':') + 1
 
   if (useOnlyCustomLevels && !customLevels) throw Error('customLevels is required if useOnlyCustomLevels is set true')
@@ -198,14 +207,17 @@ function levelNameLabelFormatter (name) {
   }
 }
 
-pino.extreme = (dest = process.stdout.fd) => {
+module.exports = pino
+
+module.exports.extreme = (dest = process.stdout.fd) => {
   process.emitWarning(
     'The pino.extreme() option is deprecated and will be removed in v7. Use pino.destination({ sync: false }) instead.',
     { code: 'extreme_deprecation' }
   )
   return buildSafeSonicBoom({ dest, minLength: 4096, sync: false })
 }
-pino.destination = (dest = process.stdout.fd) => {
+
+module.exports.destination = (dest = process.stdout.fd) => {
   if (typeof dest === 'object') {
     dest.dest = dest.dest || process.stdout.fd
     return buildSafeSonicBoom(dest)
@@ -214,11 +226,15 @@ pino.destination = (dest = process.stdout.fd) => {
   }
 }
 
-pino.final = final
-pino.levels = mappings()
-pino.stdSerializers = serializers
-pino.stdTimeFunctions = Object.assign({}, time)
-pino.symbols = symbols
-pino.version = version
+module.exports.multistream = require('./lib/multistream')
 
-module.exports = pino
+module.exports.final = final
+module.exports.levels = mappings()
+module.exports.stdSerializers = serializers
+module.exports.stdTimeFunctions = Object.assign({}, time)
+module.exports.symbols = symbols
+module.exports.version = version
+
+// Enables default and name export with TypeScript and Babel
+module.exports.default = pino
+module.exports.pino = pino

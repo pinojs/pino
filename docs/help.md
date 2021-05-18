@@ -118,20 +118,7 @@ Given a similar scenario as in the [Log rotation](#rotate) section a basic
 <a id="multiple"></a>
 ## Saving to multiple files
 
-Let's assume we want to store all error messages to a separate log file.
-
-Install [pino-tee](http://npm.im/pino-tee) with:
-
-```bash
-npm i pino-tee -g
-```
-
-The following writes the log output of `app.js` to `./all-logs`, while
-writing only warnings and errors to `./warn-log:
-
-```bash
-node app.js | pino-tee warn ./warn-logs > ./all-logs
-```
+See [`pino.multistream`](/doc/api.md#pino-multistream).
 
 <a id="filter-logs"></a>
 ## Log Filtering
@@ -164,14 +151,13 @@ ExecStart=/bin/sh -c '/path/to/node app.js | pino-transport'
 
 Pino's default log destination is the singular destination of `stdout`. While
 not recommended for performance reasons, multiple destinations can be targeted
-by using [`pino-multi-stream`](https://github.com/pinojs/pino-multi-stream).
+by using [`pino.multistream`](/doc/api.md#pino-multistream).
 
 In this example we use `stderr` for `error` level logs and `stdout` as default
 for all other levels (e.g. `debug`, `info`, and `warn`).
 
 ```js
 const pino = require('pino')
-const { multistream } = require('pino-multi-stream')
 var streams = [
   {level: 'debug', stream: process.stdout},
   {level: 'error', stream: process.stderr},
@@ -180,10 +166,9 @@ var streams = [
 
 const logger = pino({
   name: 'my-app',
-  level: 'info',
-}, multistream(streams))
+  level: 'debug', // must be the lowest level of all streams
+}, pino.multistream(streams))
 ```
-
 
 <a id="dupe-keys"></a>
 ## How Pino handles duplicate keys
@@ -209,15 +194,15 @@ the logs human friendly.
 <a id="debug"></a>
 ## Pino with `debug`
 
-The popular [`debug`](http://npm.im/debug) is used in many modules across the ecosystem.
+The popular [`debug`](https://npm.im/debug) is used in many modules across the ecosystem.
 
-The [`pino-debug`](http://github.com/pinojs/pino-debug) module
+The [`pino-debug`](https://github.com/pinojs/pino-debug) module
 can capture calls to `debug` loggers and run them
 through `pino` instead. This results in a 10x (20x in asynchronous mode)
 performance improvement - even though `pino-debug` is logging additional
 data and wrapping it in JSON.
 
-To quickly enable this install [`pino-debug`](http://github.com/pinojs/pino-debug)
+To quickly enable this install [`pino-debug`](https://github.com/pinojs/pino-debug)
 and preload it with the `-r` flag, enabling any `debug` logs with the
 `DEBUG` environment variable:
 
@@ -226,8 +211,8 @@ $ npm i pino-debug
 $ DEBUG=* node -r pino-debug app.js
 ```
 
-[`pino-debug`](http://github.com/pinojs/pino-debug) also offers fine grain control to map specific `debug`
-namespaces to `pino` log levels. See [`pino-debug`](http://github.com/pinojs/pino-debug)
+[`pino-debug`](https://github.com/pinojs/pino-debug) also offers fine grain control to map specific `debug`
+namespaces to `pino` log levels. See [`pino-debug`](https://github.com/pinojs/pino-debug)
 for more.
 
 <a id="windows"></a>
@@ -287,10 +272,10 @@ module.exports = function createLogger(options) {
 <a id="avoid-message-conflict"></a>
 ## Avoid Message Conflict
 
-As described in the [`message` documentation](./api.md#message), when a log
+As described in the [`message` documentation](/docs/api.md#message), when a log
 is written like `log.info({ msg: 'a message' }, 'another message')` then the
 final output JSON will have `"msg":"another message"` and the `'a message'`
-string will be lost. To overcome this, the [`logMethod` hook](./api.md#logmethod)
+string will be lost. To overcome this, the [`logMethod` hook](/docs/api.md#logmethod)
 can be used:
 
 ```js

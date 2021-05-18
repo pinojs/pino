@@ -31,7 +31,7 @@ require('bole').output({
   stream: dest
 }).setFastTime(true)
 
-var chill = winston.createLogger({
+const chill = winston.createLogger({
   transports: [
     new winston.transports.Stream({
       stream: fs.createWriteStream('/dev/null')
@@ -39,7 +39,7 @@ var chill = winston.createLogger({
   ]
 })
 
-var run = bench([
+const run = bench([
   function benchBunyan (cb) {
     for (var i = 0; i < max; i++) {
       blog.info(longStr)

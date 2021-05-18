@@ -3,7 +3,7 @@
 const http = require('http')
 const os = require('os')
 const semver = require('semver')
-const { test } = require('tap')
+const { test, skip } = require('tap')
 const { sink, once } = require('./helper')
 const pino = require('../')
 
@@ -11,7 +11,7 @@ const { pid } = process
 const hostname = os.hostname()
 
 test('http request support', async ({ ok, same, error, teardown }) => {
-  var originalReq
+  let originalReq
   const instance = pino(sink((chunk, enc) => {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
@@ -24,8 +24,8 @@ test('http request support', async ({ ok, same, error, teardown }) => {
         method: originalReq.method,
         url: originalReq.url,
         headers: originalReq.headers,
-        remoteAddress: originalReq.connection.remoteAddress,
-        remotePort: originalReq.connection.remotePort
+        remoteAddress: originalReq.socket.remoteAddress,
+        remotePort: originalReq.socket.remotePort
       }
     })
   }))
@@ -45,7 +45,7 @@ test('http request support', async ({ ok, same, error, teardown }) => {
 })
 
 test('http request support via serializer', async ({ ok, same, error, teardown }) => {
-  var originalReq
+  let originalReq
   const instance = pino({
     serializers: {
       req: pino.stdSerializers.req
@@ -62,8 +62,8 @@ test('http request support via serializer', async ({ ok, same, error, teardown }
         method: originalReq.method,
         url: originalReq.url,
         headers: originalReq.headers,
-        remoteAddress: originalReq.connection.remoteAddress,
-        remotePort: originalReq.connection.remotePort
+        remoteAddress: originalReq.socket.remoteAddress,
+        remotePort: originalReq.socket.remotePort
       }
     })
   }))
@@ -83,8 +83,9 @@ test('http request support via serializer', async ({ ok, same, error, teardown }
   server.close()
 })
 
-test('http request support via serializer without request connection', async ({ ok, same, error, teardown }) => {
-  var originalReq
+// skipped because request connection is deprecated since v13, and request socket is always available
+skip('http request support via serializer without request connection', async ({ ok, same, error, teardown }) => {
+  let originalReq
   const instance = pino({
     serializers: {
       req: pino.stdSerializers.req
@@ -104,8 +105,8 @@ test('http request support via serializer without request connection', async ({ 
       }
     }
     if (semver.gte(process.version, '13.0.0')) {
-      expected.req.remoteAddress = originalReq.connection.remoteAddress
-      expected.req.remotePort = originalReq.connection.remotePort
+      expected.req.remoteAddress = originalReq.socket.remoteAddress
+      expected.req.remotePort = originalReq.socket.remotePort
     }
     same(chunk, expected)
   }))
@@ -127,7 +128,7 @@ test('http request support via serializer without request connection', async ({ 
 })
 
 test('http response support', async ({ ok, same, error, teardown }) => {
-  var originalRes
+  let originalRes
   const instance = pino(sink((chunk, enc) => {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
@@ -200,7 +201,7 @@ test('http response support via a serializer', async ({ ok, same, error, teardow
 })
 
 test('http request support via serializer in a child', async ({ ok, same, error, teardown }) => {
-  var originalReq
+  let originalReq
   const instance = pino({
     serializers: {
       req: pino.stdSerializers.req
@@ -217,8 +218,8 @@ test('http request support via serializer in a child', async ({ ok, same, error,
         method: originalReq.method,
         url: originalReq.url,
         headers: originalReq.headers,
-        remoteAddress: originalReq.connection.remoteAddress,
-        remotePort: originalReq.connection.remotePort
+        remoteAddress: originalReq.socket.remoteAddress,
+        remotePort: originalReq.socket.remotePort
       }
     })
   }))

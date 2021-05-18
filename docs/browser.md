@@ -1,6 +1,6 @@
 # Browser API
 
-Pino is compatible with [`browserify`](http://npm.im/browserify) for browser side usage:
+Pino is compatible with [`browserify`](https://npm.im/browserify) for browser side usage:
 
 This can be useful with isomorphic/universal JavaScript code.
 

@@ -1,1 +1,8 @@
-{ "extends": "standard" }
+{
+    "extends": [
+        "standard"
+    ],
+    "rules": {
+        "no-var": "off"
+    }
+}

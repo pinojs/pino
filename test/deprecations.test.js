@@ -7,10 +7,10 @@ const pino = require('../')
 
 process.removeAllListeners('warning')
 
-test('useLevelLabels', async ({ match, is }) => {
+test('useLevelLabels', async ({ match, equal }) => {
   process.on('warning', onWarning)
   function onWarning (warn) {
-    is(warn.code, 'PINODEP001')
+    equal(warn.code, 'PINODEP001')
   }
 
   const stream = sink()
@@ -24,10 +24,10 @@ test('useLevelLabels', async ({ match, is }) => {
   process.removeListener('warning', onWarning)
 })
 
-test('changeLevelName', async ({ match, is }) => {
+test('changeLevelName', async ({ match, equal }) => {
   process.on('warning', onWarning)
   function onWarning (warn) {
-    is(warn.code, 'PINODEP002')
+    equal(warn.code, 'PINODEP002')
   }
 
   const stream = sink()
@@ -41,10 +41,10 @@ test('changeLevelName', async ({ match, is }) => {
   process.removeListener('warning', onWarning)
 })
 
-test('levelKey', async ({ match, is }) => {
+test('levelKey', async ({ match, equal }) => {
   process.on('warning', onWarning)
   function onWarning (warn) {
-    is(warn.code, 'PINODEP002')
+    equal(warn.code, 'PINODEP002')
   }
 
   const stream = sink()
@@ -58,11 +58,11 @@ test('levelKey', async ({ match, is }) => {
   process.removeListener('warning', onWarning)
 })
 
-test('useLevelLabels and changeLevelName', async ({ match, is }) => {
+test('useLevelLabels and changeLevelName', async ({ match, equal }) => {
   let count = 0
   process.on('warning', onWarning)
   function onWarning (warn) {
-    is(warn.code, count === 0 ? 'PINODEP001' : 'PINODEP002')
+    equal(warn.code, count === 0 ? 'PINODEP001' : 'PINODEP002')
     count += 1
   }
 
@@ -78,10 +78,10 @@ test('useLevelLabels and changeLevelName', async ({ match, is }) => {
   process.removeListener('warning', onWarning)
 })
 
-test('pino.* serializer', async ({ match, is, pass }) => {
+test('pino.* serializer', async ({ match, equal, pass }) => {
   process.on('warning', onWarning)
   function onWarning (warn) {
-    is(warn.code, 'PINODEP003')
+    equal(warn.code, 'PINODEP003')
   }
 
   const stream = sink()

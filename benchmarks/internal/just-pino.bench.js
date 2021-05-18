@@ -92,14 +92,14 @@ const run = bench([
     setImmediate(cb)
   },
   function benchPinoChildCreation (cb) {
-    var child = plog.child({ a: 'property' })
+    const child = plog.child({ a: 'property' })
     for (var i = 0; i < max; i++) {
       child.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
   function benchPinoDestChildCreation (cb) {
-    var child = plogDest.child({ a: 'property' })
+    const child = plogDest.child({ a: 'property' })
     for (var i = 0; i < max; i++) {
       child.info({ hello: 'world' })
     }

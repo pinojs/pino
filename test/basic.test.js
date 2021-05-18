@@ -1,44 +1,26 @@
 'use strict'
 const os = require('os')
 const { join } = require('path')
-const { readFileSync, existsSync, statSync } = require('fs')
+const { readFileSync } = require('fs')
 const { test } = require('tap')
-const { sink, check, once } = require('./helper')
+const { sink, check, once, watchFileCreated } = require('./helper')
 const pino = require('../')
 const { version } = require('../package.json')
 const { pid } = process
 const hostname = os.hostname()
-const watchFileCreated = (filename) => new Promise((resolve, reject) => {
-  const TIMEOUT = 800
-  const INTERVAL = 100
-  const threshold = TIMEOUT / INTERVAL
-  let counter = 0
-  const interval = setInterval(() => {
-    // On some CI runs file is created but not filled
-    if (existsSync(filename) && statSync(filename).size !== 0) {
-      clearInterval(interval)
-      resolve()
-    } else if (counter <= threshold) {
-      counter++
-    } else {
-      clearInterval(interval)
-      reject(new Error(`${filename} was not created.`))
-    }
-  }, INTERVAL)
+
+test('pino version is exposed on export', async ({ equal }) => {
+  equal(pino.version, version)
 })
 
-test('pino version is exposed on export', async ({ is }) => {
-  is(pino.version, version)
-})
-
-test('pino version is exposed on instance', async ({ is }) => {
+test('pino version is exposed on instance', async ({ equal }) => {
   const instance = pino()
-  is(instance.version, version)
+  equal(instance.version, version)
 })
 
-test('child instance exposes pino version', async ({ is }) => {
+test('child instance exposes pino version', async ({ equal }) => {
   const child = pino().child({ foo: 'bar' })
-  is(child.version, version)
+  equal(child.version, version)
 })
 
 test('bindings are exposed on every instance', async ({ same }) => {
@@ -85,15 +67,15 @@ test('child should not share bindings of parent set after child creation', async
 })
 
 function levelTest (name, level) {
-  test(`${name} logs as ${level}`, async ({ is }) => {
+  test(`${name} logs as ${level}`, async ({ equal }) => {
     const stream = sink()
     const instance = pino(stream)
     instance.level = name
     instance[name]('hello world')
-    check(is, await once(stream, 'data'), level, 'hello world')
+    check(equal, await once(stream, 'data'), level, 'hello world')
   })
 
-  test(`passing objects at level ${name}`, async ({ is, same }) => {
+  test(`passing objects at level ${name}`, async ({ equal, same }) => {
     const stream = sink()
     const instance = pino(stream)
     instance.level = name
@@ -101,22 +83,22 @@ function levelTest (name, level) {
     instance[name](obj)
 
     const result = await once(stream, 'data')
-    is(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
-    is(result.pid, pid)
-    is(result.hostname, hostname)
-    is(result.level, level)
-    is(result.hello, 'world')
+    equal(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
+    equal(result.pid, pid)
+    equal(result.hostname, hostname)
+    equal(result.level, level)
+    equal(result.hello, 'world')
     same(Object.keys(obj), ['hello'])
   })
 
-  test(`passing an object and a string at level ${name}`, async ({ is, same }) => {
+  test(`passing an object and a string at level ${name}`, async ({ equal, same }) => {
     const stream = sink()
     const instance = pino(stream)
     instance.level = name
     const obj = { hello: 'world' }
     instance[name](obj, 'a string')
     const result = await once(stream, 'data')
-    is(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
+    equal(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
     delete result.time
     same(result, {
       pid,
@@ -128,13 +110,13 @@ function levelTest (name, level) {
     same(Object.keys(obj), ['hello'])
   })
 
-  test(`overriding object key by string at level ${name}`, async ({ is, same }) => {
+  test(`overriding object key by string at level ${name}`, async ({ equal, same }) => {
     const stream = sink()
     const instance = pino(stream)
     instance.level = name
     instance[name]({ hello: 'world', msg: 'object' }, 'string')
     const result = await once(stream, 'data')
-    is(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
+    equal(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
     delete result.time
     same(result, {
       pid,
@@ -145,16 +127,16 @@ function levelTest (name, level) {
     })
   })
 
-  test(`formatting logs as ${name}`, async ({ is }) => {
+  test(`formatting logs as ${name}`, async ({ equal }) => {
     const stream = sink()
     const instance = pino(stream)
     instance.level = name
     instance[name]('hello %d', 42)
     const result = await once(stream, 'data')
-    check(is, result, level, 'hello 42')
+    check(equal, result, level, 'hello 42')
   })
 
-  test(`formatting a symbol at level ${name}`, async ({ is }) => {
+  test(`formatting a symbol at level ${name}`, async ({ equal }) => {
     const stream = sink()
     const instance = pino(stream)
     instance.level = name
@@ -164,10 +146,10 @@ function levelTest (name, level) {
 
     const result = await once(stream, 'data')
 
-    check(is, result, level, 'hello Symbol(foo)')
+    check(equal, result, level, 'hello Symbol(foo)')
   })
 
-  test(`passing error with a serializer at level ${name}`, async ({ is, same }) => {
+  test(`passing error with a serializer at level ${name}`, async ({ equal, same }) => {
     const stream = sink()
     const err = new Error('myerror')
     const instance = pino({
@@ -178,7 +160,7 @@ function levelTest (name, level) {
     instance.level = name
     instance[name]({ err })
     const result = await once(stream, 'data')
-    is(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
+    equal(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
     delete result.time
     same(result, {
       pid,
@@ -188,18 +170,19 @@ function levelTest (name, level) {
         type: 'Error',
         message: err.message,
         stack: err.stack
-      }
+      },
+      msg: err.message
     })
   })
 
-  test(`child logger for level ${name}`, async ({ is, same }) => {
+  test(`child logger for level ${name}`, async ({ equal, same }) => {
     const stream = sink()
     const instance = pino(stream)
     instance.level = name
     const child = instance.child({ hello: 'world' })
     child[name]('hello world')
     const result = await once(stream, 'data')
-    is(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
+    equal(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
     delete result.time
     same(result, {
       pid,
@@ -218,7 +201,7 @@ levelTest('info', 30)
 levelTest('debug', 20)
 levelTest('trace', 10)
 
-test('serializers can return undefined to strip field', async ({ is }) => {
+test('serializers can return undefined to strip field', async ({ equal }) => {
   const stream = sink()
   const instance = pino({
     serializers: {
@@ -228,7 +211,7 @@ test('serializers can return undefined to strip field', async ({ is }) => {
 
   instance.info({ test: 'sensitive info' })
   const result = await once(stream, 'data')
-  is('test' in result, false)
+  equal('test' in result, false)
 })
 
 test('does not explode with a circular ref', async ({ doesNotThrow }) => {
@@ -242,14 +225,14 @@ test('does not explode with a circular ref', async ({ doesNotThrow }) => {
   doesNotThrow(() => instance.info(a))
 })
 
-test('set the name', async ({ is, same }) => {
+test('set the name', async ({ equal, same }) => {
   const stream = sink()
   const instance = pino({
     name: 'hello'
   }, stream)
   instance.fatal('this is fatal')
   const result = await once(stream, 'data')
-  is(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
+  equal(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
   delete result.time
   same(result, {
     pid,
@@ -260,7 +243,7 @@ test('set the name', async ({ is, same }) => {
   })
 })
 
-test('set the messageKey', async ({ is, same }) => {
+test('set the messageKey', async ({ equal, same }) => {
   const stream = sink()
   const message = 'hello world'
   const messageKey = 'fooMessage'
@@ -269,7 +252,7 @@ test('set the messageKey', async ({ is, same }) => {
   }, stream)
   instance.info(message)
   const result = await once(stream, 'data')
-  is(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
+  equal(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
   delete result.time
   same(result, {
     pid,
@@ -279,7 +262,7 @@ test('set the messageKey', async ({ is, same }) => {
   })
 })
 
-test('set the nestedKey', async ({ is, same }) => {
+test('set the nestedKey', async ({ equal, same }) => {
   const stream = sink()
   const object = { hello: 'world' }
   const nestedKey = 'stuff'
@@ -288,7 +271,7 @@ test('set the nestedKey', async ({ is, same }) => {
   }, stream)
   instance.info(object)
   const result = await once(stream, 'data')
-  is(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
+  equal(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
   delete result.time
   same(result, {
     pid,
@@ -298,12 +281,12 @@ test('set the nestedKey', async ({ is, same }) => {
   })
 })
 
-test('set undefined properties', async ({ is, same }) => {
+test('set undefined properties', async ({ equal, same }) => {
   const stream = sink()
   const instance = pino(stream)
   instance.info({ hello: 'world', property: undefined })
   const result = await once(stream, 'data')
-  is(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
+  equal(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
   delete result.time
   same(result, {
     pid,
@@ -313,15 +296,15 @@ test('set undefined properties', async ({ is, same }) => {
   })
 })
 
-test('prototype properties are not logged', async ({ is }) => {
+test('prototype properties are not logged', async ({ equal }) => {
   const stream = sink()
   const instance = pino(stream)
   instance.info(Object.create({ hello: 'world' }))
   const { hello } = await once(stream, 'data')
-  is(hello, undefined)
+  equal(hello, undefined)
 })
 
-test('set the base', async ({ is, same }) => {
+test('set the base', async ({ equal, same }) => {
   const stream = sink()
   const instance = pino({
     base: {
@@ -331,7 +314,7 @@ test('set the base', async ({ is, same }) => {
 
   instance.fatal('this is fatal')
   const result = await once(stream, 'data')
-  is(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
+  equal(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
   delete result.time
   same(result, {
     a: 'b',
@@ -340,14 +323,14 @@ test('set the base', async ({ is, same }) => {
   })
 })
 
-test('set the base to null', async ({ is, same }) => {
+test('set the base to null', async ({ equal, same }) => {
   const stream = sink()
   const instance = pino({
     base: null
   }, stream)
   instance.fatal('this is fatal')
   const result = await once(stream, 'data')
-  is(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
+  equal(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
   delete result.time
   same(result, {
     level: 60,
@@ -355,7 +338,7 @@ test('set the base to null', async ({ is, same }) => {
   })
 })
 
-test('set the base to null and use a formatter', async ({ is, same }) => {
+test('set the base to null and use a formatter', async ({ equal, same }) => {
   const stream = sink()
   const instance = pino({
     base: null,
@@ -367,7 +350,7 @@ test('set the base to null and use a formatter', async ({ is, same }) => {
   }, stream)
   instance.fatal('this is fatal too')
   const result = await once(stream, 'data')
-  is(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
+  equal(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
   delete result.time
   same(result, {
     level: 60,
@@ -376,14 +359,14 @@ test('set the base to null and use a formatter', async ({ is, same }) => {
   })
 })
 
-test('throw if creating child without bindings', async ({ is, fail }) => {
+test('throw if creating child without bindings', async ({ equal, fail }) => {
   const stream = sink()
   const instance = pino(stream)
   try {
     instance.child()
     fail('it should throw')
   } catch (err) {
-    is(err.message, 'missing bindings for child Pino')
+    equal(err.message, 'missing bindings for child Pino')
   }
 })
 
@@ -453,14 +436,14 @@ test('object and format string property', async ({ same }) => {
   })
 })
 
-test('correctly strip undefined when returned from toJSON', async ({ is }) => {
+test('correctly strip undefined when returned from toJSON', async ({ equal }) => {
   const stream = sink()
   const instance = pino({
     test: 'this'
   }, stream)
   instance.fatal({ test: { toJSON () { return undefined } } })
   const result = await once(stream, 'data')
-  is('test' in result, false)
+  equal('test' in result, false)
 })
 
 test('correctly supports stderr', async ({ same }) => {
@@ -602,16 +585,16 @@ test('does not override opts with a string as second argument', async ({ same })
 })
 
 // https://github.com/pinojs/pino/issues/222
-test('children with same names render in correct order', async ({ is }) => {
+test('children with same names render in correct order', async ({ equal }) => {
   const stream = sink()
   const root = pino(stream)
   root.child({ a: 1 }).child({ a: 2 }).info({ a: 3 })
   const { a } = await once(stream, 'data')
-  is(a, 3, 'last logged object takes precedence')
+  equal(a, 3, 'last logged object takes precedence')
 })
 
 // https://github.com/pinojs/pino/pull/251 - use this.stringify
-test('use `fast-safe-stringify` to avoid circular dependencies', async ({ deepEqual }) => {
+test('use `fast-safe-stringify` to avoid circular dependencies', async ({ same }) => {
   const stream = sink()
   const root = pino(stream)
   // circular depth
@@ -619,7 +602,7 @@ test('use `fast-safe-stringify` to avoid circular dependencies', async ({ deepEq
   obj.a = obj
   root.info(obj)
   const { a } = await once(stream, 'data')
-  deepEqual(a, { a: '[Circular]' })
+  same(a, { a: '[Circular]' })
 })
 
 test('fast-safe-stringify must be used when interpolating', async (t) => {
@@ -631,10 +614,10 @@ test('fast-safe-stringify must be used when interpolating', async (t) => {
   instance.info('test %j', o)
 
   const { msg } = await once(stream, 'data')
-  t.is(msg, 'test {"a":{"b":{"c":"[Circular]"}}}')
+  t.equal(msg, 'test {"a":{"b":{"c":"[Circular]"}}}')
 })
 
-test('throws when setting useOnlyCustomLevels without customLevels', async ({ is, throws }) => {
+test('throws when setting useOnlyCustomLevels without customLevels', async ({ equal, throws }) => {
   throws(() => {
     pino({
       useOnlyCustomLevels: true
@@ -645,7 +628,7 @@ test('throws when setting useOnlyCustomLevels without customLevels', async ({ is
       useOnlyCustomLevels: true
     })
   } catch ({ message }) {
-    is(message, 'customLevels is required if useOnlyCustomLevels is set true')
+    equal(message, 'customLevels is required if useOnlyCustomLevels is set true')
   }
 })
 
@@ -657,7 +640,7 @@ test('correctly log Infinity', async (t) => {
   instance.info(o)
 
   const { num } = await once(stream, 'data')
-  t.is(num, null)
+  t.equal(num, null)
 })
 
 test('correctly log -Infinity', async (t) => {
@@ -668,7 +651,7 @@ test('correctly log -Infinity', async (t) => {
   instance.info(o)
 
   const { num } = await once(stream, 'data')
-  t.is(num, null)
+  t.equal(num, null)
 })
 
 test('correctly log NaN', async (t) => {
@@ -679,7 +662,16 @@ test('correctly log NaN', async (t) => {
   instance.info(o)
 
   const { num } = await once(stream, 'data')
-  t.is(num, null)
+  t.equal(num, null)
+})
+
+test('offers a .default() method to please typescript', async ({ equal }) => {
+  equal(pino.default, pino)
+
+  const stream = sink()
+  const instance = pino.default(stream)
+  instance.info('hello world')
+  check(equal, await once(stream, 'data'), 30, 'hello world')
 })
 
 test('correctly skip function', async (t) => {

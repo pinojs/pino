@@ -76,12 +76,12 @@ test('no bindings formatter', async ({ match, notOk }) => {
   match(log, { msg: 'hello world' })
 })
 
-test('log formatter', async ({ match, is }) => {
+test('log formatter', async ({ match, equal }) => {
   const stream = sink()
   const logger = pino({
     formatters: {
       log (obj) {
-        is(obj.hasOwnProperty('msg'), false)
+        equal(obj.hasOwnProperty('msg'), false)
         return { hello: 'world', ...obj }
       }
     }
