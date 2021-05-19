@@ -12,12 +12,14 @@ const strip = require('strip-ansi')
 const { pid } = process
 const hostname = os.hostname()
 
-test('pino.transport with file', async ({ same }) => {
+test('pino.transport with file', async ({ same, teardown }) => {
   const dest = join(
     os.tmpdir(),
     '_' + Math.random().toString(36).substr(2, 9)
   )
-  const instance = pino(pino.transport(join(__dirname, 'fixtures', 'to-file-transport.js'), { dest }))
+  const transport = pino.transport(join(__dirname, 'fixtures', 'to-file-transport.js'), { dest })
+  teardown(transport.end.bind(transport))
+  const instance = pino(transport)
   instance.info('hello')
   await watchFileCreated(dest)
   const result = JSON.parse(await readFile(dest))
@@ -30,12 +32,14 @@ test('pino.transport with file', async ({ same }) => {
   })
 })
 
-test('pino.transport with package', async ({ same }) => {
+test('pino.transport with package', async ({ same, teardown }) => {
   const dest = join(
     os.tmpdir(),
     '_' + Math.random().toString(36).substr(2, 9)
   )
-  const instance = pino(pino.transport('transport', { dest }))
+  const transport = pino.transport('transport', { dest })
+  teardown(transport.end.bind(transport))
+  const instance = pino(transport)
   instance.info('hello')
   await watchFileCreated(dest)
   const result = JSON.parse(await readFile(dest))
@@ -48,12 +52,14 @@ test('pino.transport with package', async ({ same }) => {
   })
 })
 
-test('pino.transport with file URL', async ({ same }) => {
+test('pino.transport with file URL', async ({ same, teardown }) => {
   const dest = join(
     os.tmpdir(),
     '_' + Math.random().toString(36).substr(2, 9)
   )
-  const instance = pino(pino.transport(url.pathToFileURL(join(__dirname, 'fixtures', 'to-file-transport.js')).href, { dest }))
+  const transport = pino.transport(url.pathToFileURL(join(__dirname, 'fixtures', 'to-file-transport.js')).href, { dest })
+  teardown(transport.end.bind(transport))
+  const instance = pino(transport)
   instance.info('hello')
   await watchFileCreated(dest)
   const result = JSON.parse(await readFile(dest))
@@ -78,12 +84,14 @@ test('pino.transport errors if file does not exists', ({ plan, pass }) => {
   })
 })
 
-test('pino.transport with esm', async ({ same }) => {
+test('pino.transport with esm', async ({ same, teardown }) => {
   const dest = join(
     os.tmpdir(),
     '_' + Math.random().toString(36).substr(2, 9)
   )
-  const instance = pino(pino.transport(join(__dirname, 'fixtures', 'to-file-transport.mjs'), { dest }))
+  const transport = pino.transport(join(__dirname, 'fixtures', 'to-file-transport.mjs'), { dest })
+  const instance = pino(transport)
+  teardown(transport.end.bind(transport))
   instance.info('hello')
   await watchFileCreated(dest)
   const result = JSON.parse(await readFile(dest))
@@ -96,7 +104,7 @@ test('pino.transport with esm', async ({ same }) => {
   })
 })
 
-test('pino.transport with two files', async ({ same }) => {
+test('pino.transport with two files', async ({ same, teardown }) => {
   const dest1 = join(
     os.tmpdir(),
     '_' + Math.random().toString(36).substr(2, 9)
@@ -114,6 +122,7 @@ test('pino.transport with two files', async ({ same }) => {
     module: join(__dirname, 'fixtures', 'to-file-transport.js'),
     opts: { dest: dest2 }
   }])
+  teardown(transport.end.bind(transport))
   const instance = pino(transport)
   instance.info('hello')
   await Promise.all([watchFileCreated(dest1), watchFileCreated(dest2)])
@@ -135,7 +144,7 @@ test('pino.transport with two files', async ({ same }) => {
   })
 })
 
-test('pino.transport with two files', async ({ same }) => {
+test('pino.transport with two files', async ({ same, teardown }) => {
   const dest1 = join(
     os.tmpdir(),
     '_' + Math.random().toString(36).substr(2, 9)
@@ -151,6 +160,7 @@ test('pino.transport with two files', async ({ same }) => {
     level: 'info',
     destination: dest2
   }])
+  teardown(transport.end.bind(transport))
   const instance = pino(transport)
   instance.info('hello')
   await Promise.all([watchFileCreated(dest1), watchFileCreated(dest2)])
@@ -172,7 +182,7 @@ test('pino.transport with two files', async ({ same }) => {
   })
 })
 
-test('pino.transport with an array including a prettyPrint destination', async ({ same, match }) => {
+test('pino.transport with an array including a prettyPrint destination', async ({ same, match, teardown }) => {
   const dest1 = join(
     os.tmpdir(),
     '_' + Math.random().toString(36).substr(2, 9)
@@ -189,6 +199,7 @@ test('pino.transport with an array including a prettyPrint destination', async (
     prettyPrint: true,
     destination: dest2
   }])
+  teardown(transport.end.bind(transport))
   const instance = pino(transport)
   instance.info('hello')
   await Promise.all([watchFileCreated(dest1), watchFileCreated(dest2)])
@@ -202,4 +213,47 @@ test('pino.transport with an array including a prettyPrint destination', async (
   })
   const actual = (await readFile(dest2)).toString()
   match(strip(actual), /\[.*\] INFO.*hello/)
+})
+
+test('no transport.end()', async ({ same, teardown }) => {
+  const dest = join(
+    os.tmpdir(),
+    '_' + Math.random().toString(36).substr(2, 9)
+  )
+  const transport = pino.transport(join(__dirname, 'fixtures', 'to-file-transport.js'), { dest })
+  const instance = pino(transport)
+  instance.info('hello')
+  await watchFileCreated(dest)
+  const result = JSON.parse(await readFile(dest))
+  delete result.time
+  same(result, {
+    pid,
+    hostname,
+    level: 30,
+    msg: 'hello'
+  })
+})
+
+test('autoEnd = false', async ({ equal, same, teardown }) => {
+  const dest = join(
+    os.tmpdir(),
+    '_' + Math.random().toString(36).substr(2, 9)
+  )
+  const count = process.listenerCount('exit')
+  const transport = pino.transport(join(__dirname, 'fixtures', 'to-file-transport.js'), { dest }, { autoEnd: false })
+  teardown(transport.end.bind(transport))
+  const instance = pino(transport)
+  instance.info('hello')
+  await watchFileCreated(dest)
+
+  equal(count, process.listenerCount('exit'))
+
+  const result = JSON.parse(await readFile(dest))
+  delete result.time
+  same(result, {
+    pid,
+    hostname,
+    level: 30,
+    msg: 'hello'
+  })
 })

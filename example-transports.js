@@ -6,13 +6,21 @@ const { join } = require('path')
 
 const file = join(tmpdir(), `pino-${process.pid}-example`)
 
-const logger = pino(pino.transport([{
+const transport = pino.transport([{
   level: 'warn',
   destination: file
 }, {
   level: 'info',
+  module: '/Users/matteo/repositories/pino-elasticsearch/lib.js',
+  opts: {
+    node: 'http://localhost:9200'
+  }
+}, {
+  level: 'info',
   prettyPrint: true
-}]))
+}])
+
+const logger = pino(transport)
 
 logger.info({
   file

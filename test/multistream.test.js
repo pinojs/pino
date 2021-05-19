@@ -474,3 +474,32 @@ test('flushSync', function (t) {
     })()
   })
 })
+
+test('ends all streams', function (t) {
+  t.plan(7)
+  const stream = writeStream(function (data, enc, cb) {
+    t.pass('message')
+    cb()
+  })
+  stream.flushSync = function () {
+    t.pass('flushSync')
+  }
+  // stream2 has no flushSync
+  const stream2 = writeStream(function (data, enc, cb) {
+    t.pass('message2')
+    cb()
+  })
+  const streams = [
+    { stream: stream },
+    { level: 'debug', stream: stream },
+    { level: 'trace', stream: stream2 },
+    { level: 'fatal', stream: stream },
+    { level: 'silent', stream: stream }
+  ]
+  const multi = multistream(streams)
+  const log = pino({
+    level: 'trace'
+  }, multi)
+  log.info('info stream')
+  multi.end()
+})
