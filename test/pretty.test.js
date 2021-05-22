@@ -50,7 +50,7 @@ test('does not throw error when enabled with stream specified', async ({ doesNot
   doesNotThrow(() => pino({ prettyPrint: true }, process.stdout))
 })
 
-test('throws when prettyPrint is true but pino-pretty module is not installed', async ({ throws, equal }) => {
+test('throws when prettyPrint is true but pino-pretty module is not installed', async ({ throws }) => {
   // pino pretty *is* installed, and probably also cached, so rather than
   // messing with the filesystem the simplest way to generate a not found
   // error is to simulate it:
@@ -58,12 +58,12 @@ test('throws when prettyPrint is true but pino-pretty module is not installed', 
   require.cache[require.resolve('pino-pretty')].exports = () => {
     throw Error('Cannot find module \'pino-pretty\'')
   }
-  throws(() => pino({ prettyPrint: true }))
-  try { pino({ prettyPrint: true }) } catch ({ message }) {
-    equal(message, 'Missing `pino-pretty` module: `pino-pretty` must be installed separately')
-  }
-
+  throws(() => pino({ prettyPrint: true }), 'Missing `pino-pretty` module: `pino-pretty` must be installed separately')
   require.cache[require.resolve('pino-pretty')].exports = prettyFactory
+})
+
+test('throws when prettyPrint has invalid options', async ({ throws }) => {
+  throws(() => pino({ prettyPrint: { ignore: ['hostname'] } }), 'opts.ignore.split is not a function')
 })
 
 test('can send pretty print to custom stream', async ({ equal }) => {

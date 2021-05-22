@@ -378,7 +378,7 @@ test('setting levelKey does not affect labels when told to', async ({ equal }) =
   instance.info('hello world')
 })
 
-test('throws when creating a default label that does not exist in logger levels', async ({ equal, throws }) => {
+test('throws when creating a default label that does not exist in logger levels', async ({ throws }) => {
   const defaultLevel = 'foo'
   throws(() => {
     pino({
@@ -387,17 +387,10 @@ test('throws when creating a default label that does not exist in logger levels'
       },
       level: defaultLevel
     })
-  })
-  try {
-    pino({
-      level: defaultLevel
-    })
-  } catch ({ message }) {
-    equal(message, `default level:${defaultLevel} must be included in custom levels`)
-  }
+  }, `default level:${defaultLevel} must be included in custom levels`)
 })
 
-test('throws when creating a default value that does not exist in logger levels', async ({ equal, throws }) => {
+test('throws when creating a default value that does not exist in logger levels', async ({ throws }) => {
   const defaultLevel = 15
   throws(() => {
     pino({
@@ -406,14 +399,7 @@ test('throws when creating a default value that does not exist in logger levels'
       },
       level: defaultLevel
     })
-  })
-  try {
-    pino({
-      level: defaultLevel
-    })
-  } catch ({ message }) {
-    equal(message, `default level:${defaultLevel} must be included in custom levels`)
-  }
+  }, `default level:${defaultLevel} must be included in custom levels`)
 })
 
 test('throws when creating a default value that does not exist in logger levels', async ({ equal, throws }) => {
@@ -424,17 +410,7 @@ test('throws when creating a default value that does not exist in logger levels'
       },
       useOnlyCustomLevels: true
     })
-  })
-  try {
-    pino({
-      customLevels: {
-        foo: 5
-      },
-      useOnlyCustomLevels: true
-    })
-  } catch ({ message }) {
-    equal(message, 'default level:info must be included in custom levels')
-  }
+  }, 'default level:info must be included in custom levels')
 })
 
 test('passes when creating a default value that exists in logger levels', async ({ equal, throws }) => {

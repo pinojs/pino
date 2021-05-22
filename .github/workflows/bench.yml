@@ -1,7 +1,13 @@
 name: Benchmarks
 on:
-  - push
-  - pull_request
+  push:
+    paths-ignore:
+        - 'docs/**'
+        - '*.md'
+  pull_request:
+    paths-ignore:
+        - 'docs/**'
+        - '*.md'
 
 jobs:
   benchmark_current:
@@ -9,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2.3.4
         with:
           ref: ${{ github.base_ref }}
       - name: Setup Node
@@ -31,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2.3.4
       - name: Setup Node
         uses: actions/setup-node@v2.1.5
         with:
