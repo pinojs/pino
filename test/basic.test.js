@@ -170,7 +170,8 @@ function levelTest (name, level) {
         type: 'Error',
         message: err.message,
         stack: err.stack
-      }
+      },
+      msg: err.message
     })
   })
 
@@ -664,4 +665,37 @@ test('offers a .default() method to please typescript', async ({ equal }) => {
   const instance = pino.default(stream)
   instance.info('hello world')
   check(equal, await once(stream, 'data'), 30, 'hello world')
+})
+
+test('correctly skip function', async (t) => {
+  const stream = sink()
+  const instance = pino(stream)
+
+  const o = { num: NaN }
+  instance.info(o, () => {})
+
+  const { msg } = await once(stream, 'data')
+  t.is(msg, undefined)
+})
+
+test('correctly skip Infinity', async (t) => {
+  const stream = sink()
+  const instance = pino(stream)
+
+  const o = { num: NaN }
+  instance.info(o, Infinity)
+
+  const { msg } = await once(stream, 'data')
+  t.is(msg, null)
+})
+
+test('correctly log number', async (t) => {
+  const stream = sink()
+  const instance = pino(stream)
+
+  const o = { num: NaN }
+  instance.info(o, 42)
+
+  const { msg } = await once(stream, 'data')
+  t.is(msg, 42)
 })

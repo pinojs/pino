@@ -24,6 +24,7 @@
 * [Statics](#statics)
   * [pino.destination()](#pino-destination)
   * [pino.final()](#pino-final)
+  * [pino.multistream()](#pino-multistream)
   * [pino.stdSerializers](#pino-stdserializers)
   * [pino.stdTimeFunctions](#pino-stdtimefunctions)
   * [pino.symbols](#pino-symbols)
@@ -257,6 +258,10 @@ These functions should return an JSONifiable object and they
 should never throw. When logging an object, each top-level property
 matching the exact key of a serializer will be serialized using the defined serializer.
 
+The serializers are applied when a property in the logged object matches a property
+in the serializers. The only exception is the `err` serializer as it is also applied in case
+the object is an instance of `Error`, e.g. `logger.info(new Error('kaboom'))`.
+
 * See [pino.stdSerializers](#pino-stdserializers)
 
 ##### `serializers[Symbol.for('pino.*')]` (Function) - DEPRECATED
@@ -478,6 +483,9 @@ logger.info({MIX: {IN: true}})
 // {"level":30,"time":1531254555820,"pid":55956,"hostname":"x","MIX":{"IN":true}}
 ```
 
+If the object is of type Error, it is wrapped in an object containing a property err (`{ err: mergingObject }`).
+This allows for a unified error handling flow.
+
 <a id="message"></a>
 #### `message` (String)
 
@@ -498,6 +506,9 @@ is supplied in addition, the `msg` property in the output log will be the value 
 the `message` parameter not the value of the `msg` property on the `mergedObject`.
 See [Avoid Message Conflict](/docs/help.md#avoid-message-conflict) for information
 on how to overcome this limitation.
+
+If no `message` parameter is provided, and the `mergedObject` is of type `Error` or it has a property named `err`, the 
+`message` parameter is set to the `message` value of the error.
 
 The `messageKey` option can be used at instantiation time to change the namespace
 from `msg` to another string as preferred.
@@ -942,6 +953,73 @@ finalLogger.info('exiting...')
 * See [Exit logging help](/docs/help.md#exit-logging)
 * See [Asynchronous logging ⇗](/docs/asynchronous.md)
 * See [Log loss prevention ⇗](/docs/asynchronous.md#log-loss-prevention)
+
+<a id="pino-multistream"></a>
+
+### `pino.multistream(options) => Stream`
+
+Create a stream composed by multiple destination streams:
+
+```js
+var fs = require('fs')
+var pino = require('pino')
+var streams = [
+  {stream: fs.createWriteStream('/tmp/info.stream.out')},
+  {level: 'debug', stream: fs.createWriteStream('/tmp/debug.stream.out')},
+  {level: 'fatal', stream: fs.createWriteStream('/tmp/fatal.stream.out')}
+]
+
+var log = pino({
+  level: 'debug' // this MUST be set at the lowest level of the
+                 // destinations
+}, pino.multistream(streams))
+
+log.debug('this will be written to /tmp/debug.stream.out')
+log.info('this will be written to /tmp/debug.stream.out and /tmp/info.stream.out')
+log.fatal('this will be written to /tmp/debug.stream.out, /tmp/info.stream.out and /tmp/fatal.stream.out')
+```
+
+In order for `multistream` to work, the log level __must__ be set to the lowest level used in the streams array.
+
+#### Options
+
+* `levels`:  Pass custom log level definitions to the instance as an object.
+
++ `dedupe`: Set this to `true` to send logs only to the stream with the higher level. Default: `false`
+
+    `dedupe` flag can be useful for example when using pino-multi-stream to redirect `error` logs to `process.stderr` and others to `process.stdout`:
+
+    ```js
+    var pino = require('pino')
+    var multistream = pino.multistream
+    var streams = [
+      {stream: process.stdout},
+      {level: 'error', stream: process.stderr},
+    ]
+
+    var opts = {
+        levels: {
+            silent: Infinity,
+            fatal: 60,
+            error: 50,
+            warn: 50,
+            info: 30,
+            debug: 20,
+            trace: 10
+        },
+        dedupe: true,
+    }
+
+    var log = pino({
+      level: 'debug' // this MUST be set at the lowest level of the
+                    // destinations
+    }, multistream(streams, opts))
+
+    log.debug('this will be written ONLY to process.stdout')
+    log.info('this will be written ONLY to process.stdout')
+    log.error('this will be written ONLY to process.stderr')
+    log.fatal('this will be written ONLY to process.stderr')
+    ```
 
 <a id="pino-stdserializers"></a>
 ### `pino.stdSerializers` (Object)

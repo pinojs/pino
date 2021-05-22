@@ -34,7 +34,8 @@ const {
   mixinSym,
   useOnlyCustomLevelsSym,
   formattersSym,
-  hooksSym
+  hooksSym,
+  nestedKeyStrSym
 } = symbols
 const { epochTime, nullTime } = time
 const { pid } = process
@@ -171,6 +172,8 @@ function pino (...args) {
     [formatOptsSym]: formatOpts,
     [messageKeySym]: messageKey,
     [nestedKeySym]: nestedKey,
+    // protect against injection
+    [nestedKeyStrSym]: nestedKey ? `,${JSON.stringify(nestedKey)}:{` : '',
     [serializersSym]: serializers,
     [mixinSym]: mixin,
     [chindingsSym]: chindings,
@@ -222,6 +225,8 @@ module.exports.destination = (dest = process.stdout.fd) => {
     return buildSafeSonicBoom({ dest, minLength: 0, sync: true })
   }
 }
+
+module.exports.multistream = require('./lib/multistream')
 
 module.exports.final = final
 module.exports.levels = mappings()
