@@ -3,11 +3,12 @@
 > Redaction is not supported in the browser [#670](https://github.com/pinojs/pino/issues/670)
 
 To redact sensitive information, supply paths to keys that hold sensitive data
-using the `redact` option:
+using the `redact` option. Note that paths which contain hypens need to use
+brackets in order to access the hyphenated property:
 
 ```js
 const logger = require('.')({
-  redact: ['key', 'path.to.key', 'stuff.thats[*].secret']
+  redact: ['key', 'path.to.key', 'stuff.thats[*].secret', 'path["with-hyphen"]']
 })
 
 logger.info({
@@ -103,6 +104,7 @@ in standard EcmaScript, with two additions:
 
 * paths may start with bracket notation
 * paths may contain the asterisk `*` to denote a wildcard
+* paths are **case sensitive**
 
 By way of example, the following are all valid paths:
 
@@ -114,7 +116,7 @@ By way of example, the following are all valid paths:
 
 ## Overhead
 
-Pino's redaction functionality is built on top of [`fast-redact`](http://github.com/davidmarkclements/fast-redact)
+Pino's redaction functionality is built on top of [`fast-redact`](https://github.com/davidmarkclements/fast-redact)
 which adds about 2% overhead to `JSON.stringify` when using paths without wildcards.
 
 When used with pino logger with a single redacted path, any overhead is within noise -

@@ -8,14 +8,14 @@ const pino = require('..')
 
 function test (file) {
   file = join('fixtures', 'broken-pipe', file)
-  t.test(file, { parallel: true }, async ({ is }) => {
+  t.test(file, { parallel: true }, async ({ equal }) => {
     const child = fork(join(__dirname, file), { silent: true })
     child.stdout.destroy()
 
     child.stderr.pipe(process.stdout)
 
     const res = await once(child, 'close')
-    is(res, 0) // process exits successfully
+    equal(res, 0) // process exits successfully
   })
 }
 
@@ -25,7 +25,7 @@ test('basic.js')
 test('destination.js')
 test('syncfalse.js')
 
-t.test('let error pass through', ({ is, plan }) => {
+t.test('let error pass through', ({ equal, plan }) => {
   plan(3)
   const stream = pino.destination()
 
@@ -37,6 +37,6 @@ t.test('let error pass through', ({ is, plan }) => {
   process.nextTick(() => stream.emit('error', new Error('kaboom')))
 
   stream.on('error', (err) => {
-    is(err.message, 'kaboom')
+    equal(err.message, 'kaboom')
   })
 })

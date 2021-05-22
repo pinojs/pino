@@ -123,9 +123,9 @@ test('an error with statusCode property is not confused for a http response', as
 
 test('stack is omitted if it is not set on err', t => {
   t.plan(2)
-  var err = new Error('myerror')
+  const err = new Error('myerror')
   delete err.stack
-  var instance = pino(sink(function (chunk, enc, cb) {
+  const instance = pino(sink(function (chunk, enc, cb) {
     t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     t.equal(chunk.hasOwnProperty('stack'), false)
@@ -138,9 +138,9 @@ test('stack is omitted if it is not set on err', t => {
 
 test('stack is rendered as any other property if it\'s not a string', t => {
   t.plan(3)
-  var err = new Error('myerror')
+  const err = new Error('myerror')
   err.stack = null
-  var instance = pino(sink(function (chunk, enc, cb) {
+  const instance = pino(sink(function (chunk, enc, cb) {
     t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     t.equal(chunk.hasOwnProperty('stack'), true)

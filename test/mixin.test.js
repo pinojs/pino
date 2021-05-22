@@ -101,3 +101,36 @@ test('mixin not a function', async ({ throws }) => {
     pino({ mixin: 'not a function' }, stream)
   })
 })
+
+test('mixin can use context', async ({ ok }) => {
+  const stream = sink()
+  const instance = pino({
+    mixin (context) {
+      ok(context !== null && context !== undefined, 'context should be defined')
+      return Object.assign({
+        error: context.message,
+        stack: context.stack
+      })
+    }
+  }, stream)
+  instance.level = name
+  instance[name]({
+    message: '123',
+    stack: 'stack'
+  }, 'test')
+})
+
+test('mixin works without context', async ({ ok }) => {
+  const stream = sink()
+  const instance = pino({
+    mixin (context) {
+      ok(context !== null && context !== undefined, 'context is still defined w/o passing mergeObject')
+
+      return {
+        something: true
+      }
+    }
+  }, stream)
+  instance.level = name
+  instance[name]('test')
+})

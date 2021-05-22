@@ -1,5 +1,2 @@
-esm: false
-ts: false
-jsx: false
 coverage: true
 timeout: 480

@@ -1,4 +1,5 @@
 // Type definitions for pino 6.3
+// Project: https://github.com/pinojs/pino.git, http://getpino.io
 // Definitions by: Peter Snider <https://github.com/psnider>
 //                 BendingBender <https://github.com/BendingBender>
 //                 Christian Rackerseder <https://github.com/screendriver>
@@ -12,21 +13,28 @@
 //                 Austin Beer <https://github.com/austin-beer>
 //                 Michel Nemnom <https://github.com/Pegase745>
 //                 Igor Savin <https://github.com/kibertoad>
-// TypeScript Version: 2.7
+// Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
+// TypeScript Version: 3.0
 
 /// <reference types="node"/>
 
-import { EventEmitter } from 'events';
-import * as pinoStdSerializers from 'pino-std-serializers';
+import { EventEmitter } from "events";
+import { SonicBoom } from "sonic-boom";
+import * as pinoStdSerializers from "pino-std-serializers";
 
-export default P
+export default P;
+export { P as pino }
+export type { P }
+
+type LogDescriptor = Record<string, any>;
+type MessageFormatFunc = (log: LogDescriptor, messageKey: string, levelLabel: string) => string;
 
 /**
  * @param [optionsOrStream]: an options object or a writable stream where the logs will be written. It can also receive some log-line metadata, if the
  * relative protocol is enabled. Default: process.stdout
  * @returns a new logger instance.
  */
-export function P(optionsOrStream?: P.LoggerOptions | P.DestinationStream): P.Logger;
+declare function P(optionsOrStream?: P.LoggerOptions | P.DestinationStream): P.Logger;
 
 /**
  * @param [options]: an options object
@@ -34,14 +42,42 @@ export function P(optionsOrStream?: P.LoggerOptions | P.DestinationStream): P.Lo
  * relative protocol is enabled. Default: process.stdout
  * @returns a new logger instance.
  */
-export function P(options: P.LoggerOptions, stream: P.DestinationStream): P.Logger;
+declare function P(options: P.LoggerOptions, stream: P.DestinationStream): P.Logger;
 
-export namespace P {
+declare namespace P {
     /**
      * Holds the current log format version (as output in the v property of each log record).
      */
     const LOG_VERSION: number;
     const levels: LevelMapping;
+    const symbols: {
+        readonly setLevelSym: unique symbol;
+        readonly getLevelSym: unique symbol;
+        readonly levelValSym: unique symbol;
+        readonly useLevelLabelsSym: unique symbol;
+        readonly mixinSym: unique symbol;
+        readonly lsCacheSym: unique symbol;
+        readonly chindingsSym: unique symbol;
+        readonly parsedChindingsSym: unique symbol;
+        readonly asJsonSym: unique symbol;
+        readonly writeSym: unique symbol;
+        readonly serializersSym: unique symbol;
+        readonly redactFmtSym: unique symbol;
+        readonly timeSym: unique symbol;
+        readonly timeSliceIndexSym: unique symbol;
+        readonly streamSym: unique symbol;
+        readonly stringifySym: unique symbol;
+        readonly stringifiersSym: unique symbol;
+        readonly endSym: unique symbol;
+        readonly formatOptsSym: unique symbol;
+        readonly messageKeySym: unique symbol;
+        readonly nestedKeySym: unique symbol;
+        readonly wildcardFirstSym: unique symbol;
+        readonly needsMetadataGsym: unique symbol;
+        readonly useOnlyCustomLevelsSym: unique symbol;
+        readonly formattersSym: unique symbol;
+        readonly hooksSym: unique symbol;
+    };
     /**
      * Exposes the Pino package version. Also available on the logger instance.
      */
@@ -54,7 +90,68 @@ export namespace P {
     /**
      * Provides functions for serializing objects common to many projects.
      */
-    const stdSerializers: typeof pinoStdSerializers;
+    const stdSerializers: {
+        /**
+         * Generates a JSONifiable object from the HTTP `request` object passed to the `createServer` callback of Node's HTTP server.
+         */
+        req: typeof pinoStdSerializers.req;
+        /**
+         * Generates a JSONifiable object from the HTTP `response` object passed to the `createServer` callback of Node's HTTP server.
+         */
+        res: typeof pinoStdSerializers.res;
+        /**
+         * Serializes an Error object.
+         */
+        err: typeof pinoStdSerializers.err;
+        /**
+         * Returns an object:
+         * ```
+         * {
+         *   req: {}
+         * }
+         * ```
+         * where req is the request as serialized by the standard request serializer.
+         * @param req The request to serialize
+         * @return An object
+         */
+        mapHttpRequest: typeof pinoStdSerializers.mapHttpRequest;
+        /**
+         * Returns an object:
+         * ```
+         * {
+         *   res: {}
+         * }
+         * ```
+         * where res is the response as serialized by the standard response serializer.
+         * @param res The response to serialize.
+         * @return An object.
+         */
+        mapHttpResponse: typeof pinoStdSerializers.mapHttpResponse;
+        /**
+         * A utility method for wrapping the default error serializer. Allows custom serializers to work with the
+         * already serialized object.
+         * @param customSerializer The custom error serializer. Accepts a single parameter: the newly serialized
+         * error object. Returns the new (or updated) error object.
+         * @return A new error serializer.
+         */
+        wrapErrorSerializer: typeof pinoStdSerializers.wrapErrorSerializer;
+        /**
+         * A utility method for wrapping the default request serializer. Allows custom serializers to work with the
+         * already serialized object.
+         * @param customSerializer The custom request serializer. Accepts a single parameter: the newly serialized
+         * request object. Returns the new (or updated) request object.
+         * @return A new error serializer.
+         */
+        wrapRequestSerializer: typeof pinoStdSerializers.wrapRequestSerializer;
+        /**
+         * A utility method for wrapping the default response serializer. Allows custom serializers to work with the
+         * already serialized object.
+         * @param customSerializer The custom response serializer. Accepts a single parameter: the newly serialized
+         * response object. Returns the new (or updated) response object.
+         * @return A new error serializer.
+         */
+        wrapResponseSerializer: typeof pinoStdSerializers.wrapResponseSerializer;
+    };
     /**
      * Provides functions for generating the timestamp property in the log output. You can set the `timestamp` option during
      * initialization to one of these functions to adjust the output format. Alternatively, you can specify your own time function.
@@ -83,7 +180,7 @@ export namespace P {
     /**
      * Equivalent of SonicBoom constructor options object
      */
-    // TODO: use SonicBoom constructor options interface when available
+        // TODO: use SonicBoom constructor options interface when available
     interface DestinationObjectOptions {
         fd?: string | number;
         dest?: string;
@@ -98,7 +195,9 @@ export namespace P {
      *                writing performance it is strongly recommended to use `pino.destination` to create the destination stream.
      * @returns A Sonic-Boom  stream to be used as destination for the pino function
      */
-    function destination(dest?: string | number | DestinationObjectOptions | DestinationStream | NodeJS.WritableStream): SonicBoom;
+    function destination(
+        dest?: string | number | DestinationObjectOptions | DestinationStream | NodeJS.WritableStream,
+    ): SonicBoom;
 
     /**
      * Create an extreme mode destination. This yields an additional 60% performance boost.
@@ -293,13 +392,13 @@ export namespace P {
             write?:
                 | WriteFn
                 | ({
-                      fatal?: WriteFn;
-                      error?: WriteFn;
-                      warn?: WriteFn;
-                      info?: WriteFn;
-                      debug?: WriteFn;
-                      trace?: WriteFn;
-                  } & { [logLevel: string]: WriteFn });
+                fatal?: WriteFn;
+                error?: WriteFn;
+                warn?: WriteFn;
+                info?: WriteFn;
+                debug?: WriteFn;
+                trace?: WriteFn;
+            } & { [logLevel: string]: WriteFn });
 
             /**
              * The serializers provided to `pino` are ignored by default in the browser, including the standard
@@ -409,26 +508,26 @@ export namespace P {
          * For example, they can be used to change the level key name or to enrich the default metadata.
          */
         formatters?: {
-          /**
-           * Changes the shape of the log level.
-           * The default shape is { level: number }.
-           * The function takes two arguments, the label of the level (e.g. 'info') and the numeric value (e.g. 30).
-           */
-          level?: (level: string, number: number) => object;
-          /**
-           * Changes the shape of the bindings.
-           * The default shape is { pid, hostname }.
-           * The function takes a single argument, the bindings object.
-           * It will be called every time a child logger is created.
-           */
-          bindings?: (bindings: Bindings) => object;
-          /**
-           * Changes the shape of the log object.
-           * This function will be called every time one of the log methods (such as .info) is called.
-           * All arguments passed to the log method, except the message, will be pass to this function.
-           * By default it does not change the shape of the log object.
-           */
-          log?: (object: object) => object;
+            /**
+             * Changes the shape of the log level.
+             * The default shape is { level: number }.
+             * The function takes two arguments, the label of the level (e.g. 'info') and the numeric value (e.g. 30).
+             */
+            level?: (label: string, number: number) => object;
+            /**
+             * Changes the shape of the bindings.
+             * The default shape is { pid, hostname }.
+             * The function takes a single argument, the bindings object.
+             * It will be called every time a child logger is created.
+             */
+            bindings?: (bindings: Bindings) => object;
+            /**
+             * Changes the shape of the log object.
+             * This function will be called every time one of the log methods (such as .info) is called.
+             * All arguments passed to the log method, except the message, will be pass to this function.
+             * By default it does not change the shape of the log object.
+             */
+            log?: (object: object) => object;
         };
 
         /**
@@ -438,53 +537,96 @@ export namespace P {
         hooks?: {
             /**
              * Allows for manipulating the parameters passed to logger methods. The signature for this hook is
-             * logMethod (args, method) {}, where args is an array of the arguments that were passed to the
-             * log method and method is the log method itself. This hook must invoke the method function by
+             * logMethod (args, method, level) {}, where args is an array of the arguments that were passed to the
+             * log method and method is the log method itself, and level is the log level. This hook must invoke the method function by
              * using apply, like so: method.apply(this, newArgumentsArray).
              */
-            logMethod?: (args: any[], method: LogFn) => void;
+            logMethod?: (args: any[], method: LogFn, level: number) => void;
         };
     }
 
-    interface PrettyOptions {
+    // Copied from "pino-pretty" types
+    type PrettyOptions = {
         /**
-         * Translate the epoch time value into a human readable date and time string.
-         * This flag also can set the format string to apply when translating the date to human readable format.
-         * The default format is yyyy-mm-dd HH:MM:ss.l o in UTC.
-         * For a list of available pattern letters see the {@link https://www.npmjs.com/package/dateformat|dateformat documentation}.
+         * Hide objects from output (but not error object).
+         * @default false
+         */
+        hideObject?: boolean;
+        /**
+         * Translate the epoch time value into a human readable date and time string. This flag also can set the format
+         * string to apply when translating the date to human readable format. For a list of available pattern letters
+         * see the {@link https://www.npmjs.com/package/dateformat|dateformat documentation}.
+         * - The default format is `yyyy-mm-dd HH:MM:ss.l o` in UTC.
+         * - Requires a `SYS:` prefix to translate time to the local system's timezone. Use the shortcut `SYS:standard`
+         *   to translate time to `yyyy-mm-dd HH:MM:ss.l o` in system timezone.
+         * @default false
          */
         translateTime?: boolean | string;
         /**
-         * If set to true, it will print the name of the log level as the first field in the log line. Default: `false`.
+         * If set to true, it will print the name of the log level as the first field in the log line.
+         * @default false
          */
         levelFirst?: boolean;
         /**
-         * The key in the JSON object to use as the highlighted message. Default: "msg".
+         * Define the key that contains the level of the log.
+         * @default "level"
+         */
+        levelKey?: string;
+        /**
+         * Output the log level using the specified label.
+         * @default "levelLabel"
+         */
+        levelLabel?: string;
+        /**
+         * The key in the JSON object to use as the highlighted message.
+         * @default "msg"
          */
         messageKey?: string;
         /**
-         * The key in the JSON object to use for timestamp display. Default: "time".
+         * Print each log message on a single line (errors will still be multi-line).
+         * @default false
+         */
+        singleLine?: boolean;
+        /**
+         * The key in the JSON object to use for timestamp display.
+         * @default "time"
          */
         timestampKey?: string;
         /**
-         * Format output of message, e.g. {level} - {pid} will output message: INFO - 1123 Default: `false`.
+         * Format output of message, e.g. {level} - {pid} will output message: INFO - 1123
+         * @default false
+         *
+         * @example
+         * ```typescript
+         * {
+         *   messageFormat: (log, messageKey) => {
+         *     const message = log[messageKey];
+         *     if (log.requestId) return `[${log.requestId}] ${message}`;
+         *     return message;
+         *   }
+         * }
+         * ```
          */
-        messageFormat?: false | string;
+        messageFormat?: false | string | MessageFormatFunc;
         /**
-         * If set to true, will add color information to the formatted output message. Default: `false`.
+         * If set to true, will add color information to the formatted output message.
+         * @default false
          */
         colorize?: boolean;
         /**
          * Appends carriage return and line feed, instead of just a line feed, to the formatted log line.
+         * @default false
          */
         crlf?: boolean;
         /**
-         * Define the log keys that are associated with error like objects. Default: ["err", "error"]
+         * Define the log keys that are associated with error like objects.
+         * @default ["err", "error"]
          */
         errorLikeObjectKeys?: string[];
         /**
          *  When formatting an error object, display this list of properties.
-         *  The list should be a comma separated list of properties. Default: ''
+         *  The list should be a comma separated list of properties.
+         * @default ""
          */
         errorProps?: string;
         /**
@@ -492,30 +634,22 @@ export namespace P {
          */
         search?: string;
         /**
-         * Ignore one or several keys. Example: "time,hostname"
+         * Ignore one or several keys.
+         * @example "time,hostname"
          */
         ignore?: string;
-        /**
-         * Suppress warning on first synchronous flushing.
-         */
-        suppressFlushSyncWarning?: boolean;
     }
 
-    type Level = 'fatal' | 'error' | 'warn' | 'info' | 'debug' | 'trace';
-    type LevelWithSilent = Level | 'silent';
+    type Level = "fatal" | "error" | "warn" | "info" | "debug" | "trace";
+    type LevelWithSilent = Level | "silent";
 
     type SerializerFn = (value: any) => any;
     type WriteFn = (o: object) => void;
 
-    interface LogDescriptor {
-        pid: number;
-        hostname: string;
-        level: number;
-        time: string;
-        msg: string;
-        v: number;
-        [key: string]: any;
-    }
+    /**
+     * Describes a log line.
+     */
+    type LogDescriptor = Record<string, any>; // TODO replace `any` with `unknown` when TypeScript version >= 3.0
 
     interface Bindings {
         level?: Level | string;
@@ -618,12 +752,12 @@ export namespace P {
          * @param event: only ever fires the `'level-change'` event
          * @param listener: The listener is passed four arguments: `levelLabel`, `levelValue`, `previousLevelLabel`, `previousLevelValue`.
          */
-        on(event: 'level-change', listener: LevelChangeEventListener): this;
-        addListener(event: 'level-change', listener: LevelChangeEventListener): this;
-        once(event: 'level-change', listener: LevelChangeEventListener): this;
-        prependListener(event: 'level-change', listener: LevelChangeEventListener): this;
-        prependOnceListener(event: 'level-change', listener: LevelChangeEventListener): this;
-        removeListener(event: 'level-change', listener: LevelChangeEventListener): this;
+        on(event: "level-change", listener: LevelChangeEventListener): this;
+        addListener(event: "level-change", listener: LevelChangeEventListener): this;
+        once(event: "level-change", listener: LevelChangeEventListener): this;
+        prependListener(event: "level-change", listener: LevelChangeEventListener): this;
+        prependOnceListener(event: "level-change", listener: LevelChangeEventListener): this;
+        removeListener(event: "level-change", listener: LevelChangeEventListener): this;
 
         /**
          * Creates a child logger, setting all key-value pairs in `bindings` as properties in the log lines. All serializers will be applied to the given pair.
@@ -640,6 +774,7 @@ export namespace P {
          * Log at `'fatal'` level the given msg. If the first argument is an object, all its properties will be included in the JSON line.
          * If more args follows `msg`, these will be used to format `msg` using `util.format`.
          *
+         * @typeParam T: the interface of the object being serialized. Default is object.
          * @param obj: object to be serialized
          * @param msg: the log message to write
          * @param ...args: format string values when `msg` is a format string
@@ -649,6 +784,7 @@ export namespace P {
          * Log at `'error'` level the given msg. If the first argument is an object, all its properties will be included in the JSON line.
          * If more args follows `msg`, these will be used to format `msg` using `util.format`.
          *
+         * @typeParam T: the interface of the object being serialized. Default is object.
          * @param obj: object to be serialized
          * @param msg: the log message to write
          * @param ...args: format string values when `msg` is a format string
@@ -658,6 +794,7 @@ export namespace P {
          * Log at `'warn'` level the given msg. If the first argument is an object, all its properties will be included in the JSON line.
          * If more args follows `msg`, these will be used to format `msg` using `util.format`.
          *
+         * @typeParam T: the interface of the object being serialized. Default is object.
          * @param obj: object to be serialized
          * @param msg: the log message to write
          * @param ...args: format string values when `msg` is a format string
@@ -667,6 +804,7 @@ export namespace P {
          * Log at `'info'` level the given msg. If the first argument is an object, all its properties will be included in the JSON line.
          * If more args follows `msg`, these will be used to format `msg` using `util.format`.
          *
+         * @typeParam T: the interface of the object being serialized. Default is object.
          * @param obj: object to be serialized
          * @param msg: the log message to write
          * @param ...args: format string values when `msg` is a format string
@@ -676,6 +814,7 @@ export namespace P {
          * Log at `'debug'` level the given msg. If the first argument is an object, all its properties will be included in the JSON line.
          * If more args follows `msg`, these will be used to format `msg` using `util.format`.
          *
+         * @typeParam T: the interface of the object being serialized. Default is object.
          * @param obj: object to be serialized
          * @param msg: the log message to write
          * @param ...args: format string values when `msg` is a format string
@@ -685,6 +824,7 @@ export namespace P {
          * Log at `'trace'` level the given msg. If the first argument is an object, all its properties will be included in the JSON line.
          * If more args follows `msg`, these will be used to format `msg` using `util.format`.
          *
+         * @typeParam T: the interface of the object being serialized. Default is object.
          * @param obj: object to be serialized
          * @param msg: the log message to write
          * @param ...args: format string values when `msg` is a format string
@@ -719,8 +859,9 @@ export namespace P {
     ) => void;
 
     interface LogFn {
+        /* tslint:disable:no-unnecessary-generics */
+        <T extends object>(obj: T, msg?: string, ...args: any[]): void;
         (msg: string, ...args: any[]): void;
-        (obj: object, msg?: string, ...args: any[]): void;
     }
 
     interface redactOptions {
@@ -728,44 +869,4 @@ export namespace P {
         censor?: string | ((v: any) => any);
         remove?: boolean;
     }
-}
-
-declare class SonicBoom extends EventEmitter {
-    /**
-     * @param [fileDescriptor] File path or numerical file descriptor
-     * relative protocol is enabled. Default: process.stdout
-     * @returns a new sonic-boom instance
-     */
-    constructor(fileDescriptor: string | number, minLength?: number, sync?: boolean)
-
-    /**
-     * Writes the string to the file. It will return false to signal the producer to slow down.
-     */
-    write(string: string): void;
-
-    /**
-     * Writes the current buffer to the file if a write was not in progress.
-     * Do nothing if minLength is zero or if it is already writing.
-     */
-    flush(): void;
-
-    /**
-     * Reopen the file in place, useful for log rotation.
-     */
-    reopen(fileDescriptor?: string | number): void;
-
-    /**
-     * Flushes the buffered data synchronously. This is a costly operation.
-     */
-    flushSync(): void;
-
-    /**
-     * Closes the stream, the data will be flushed down asynchronously
-     */
-    end(): void;
-
-    /**
-     * Closes the stream immediately, the data is not flushed.
-     */
-    destroy(): void;
 }

@@ -17,11 +17,11 @@ purposes with other CLI based prettifiers.
 
 Pino prettifier modules are extra modules that provide a CLI for parsing NDJSON
 log lines piped via `stdin` and expose an API which conforms to the Pino
-[metadata streams](api.md#metadata) API.
+[metadata streams](/docs/api.md#metadata) API.
 
 The API requires modules provide a factory function which returns a prettifier
 function. This prettifier function must accept either a string of NDJSON or
-a Pino log object. A psuedo-example of such a prettifier is:
+a Pino log object. A pseudo-example of such a prettifier is:
 
 The uninitialized Pino instance is passed as `this` into prettifier factory function,
 so it can be accessed via closure by the returned prettifier function.

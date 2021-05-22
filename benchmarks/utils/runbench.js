@@ -90,7 +90,7 @@ function runBenchmark (name, done) {
 }
 
 function sum (arr) {
-  var result = 0
+  let result = 0
   for (var i = 0; i < arr.length; i += 1) {
     result += Number.parseFloat(arr[i].time)
   }
@@ -105,8 +105,8 @@ function displayResults (results) {
     const benchmark = results[benchNames[i]]
     const loggers = Object.keys(benchmark)
     for (var j = 0; j < loggers.length; j += 1) {
-      var logger = benchmark[loggers[j]]
-      var average = sum(logger) / logger.length
+      const logger = benchmark[loggers[j]]
+      const average = sum(logger) / logger.length
       console.log(`${loggers[j]} average: ${average.toFixed(3)}ms`)
     }
   }

@@ -1,7 +1,13 @@
 name: Benchmarks
 on:
-  - push
-  - pull_request
+  push:
+    paths-ignore:
+        - 'docs/**'
+        - '*.md'
+  pull_request:
+    paths-ignore:
+        - 'docs/**'
+        - '*.md'
 
 jobs:
   benchmark_current:
@@ -9,11 +15,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2.3.4
         with:
           ref: ${{ github.base_ref }}
       - name: Setup Node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v2.1.5
         with:
           node-version: 12
       - name: Install Modules
@@ -21,7 +27,7 @@ jobs:
       - name: Run Benchmark
         run: npm run bench | tee current.txt
       - name: Upload Current Results
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2.2.3
         with:
           name: current
           path: current.txt
@@ -31,9 +37,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2.3.4
       - name: Setup Node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v2.1.5
         with:
           node-version: 12
       - name: Install Modules
@@ -41,7 +47,7 @@ jobs:
       - name: Run Benchmark
         run: npm run bench | tee branch.txt
       - name: Upload Branch Results
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2.2.3
         with:
           name: branch
           path: branch.txt
