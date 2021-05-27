@@ -215,7 +215,7 @@ declare namespace P {
         add: (dest: Record<string, any>) => MultiStreamRes,
         flushSync: () => void,
         minLevel: number,
-        streams: [],
+        streams: WriteStream[],
         clone(level: Level): MultiStreamRes,
     }
 
