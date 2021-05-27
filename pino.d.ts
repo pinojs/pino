@@ -21,6 +21,7 @@
 import { EventEmitter } from "events";
 import { SonicBoom } from "sonic-boom";
 import * as pinoStdSerializers from "pino-std-serializers";
+import {WriteStream} from "fs";
 
 export default P;
 export { P as pino }
@@ -198,6 +199,29 @@ declare namespace P {
     function destination(
         dest?: string | number | DestinationObjectOptions | DestinationStream | NodeJS.WritableStream,
     ): SonicBoom;
+
+    interface MultiStreamOptions {
+        levels?: Record<string, number>
+        dedupe?: boolean
+    }
+
+    interface StreamEntry {
+        stream: WriteStream
+        level: Level
+    }
+
+    interface MultiStreamRes {
+        write: (data: any) => void,
+        add: (dest: Record<string, any>) => MultiStreamRes,
+        flushSync: () => void,
+        minLevel: number,
+        streams: [],
+        clone(level: Level): MultiStreamRes,
+    }
+
+    function multistream(
+        streamsArray: StreamEntry[], opts: P.MultiStreamOptions
+    ): MultiStreamRes
 
     /**
      * Create an extreme mode destination. This yields an additional 60% performance boost.
