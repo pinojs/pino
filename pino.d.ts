@@ -224,14 +224,6 @@ declare namespace P {
     ): MultiStreamRes
 
     /**
-     * Create an extreme mode destination. This yields an additional 60% performance boost.
-     * There are trade-offs that should be understood before usage.
-     * @param [fileDescriptor]: File path or numerical file descriptor, by default 1
-     * @returns A Sonic-Boom  stream to be used as destination for the pino function
-     */
-    function extreme(fileDescriptor?: string | number): SonicBoom;
-
-    /**
      * The pino.final method can be used to create an exit listener function.
      * This listener function can be supplied to process exit events.
      * The exit listener function will call the handler with
@@ -361,13 +353,6 @@ declare namespace P {
          */
         // TODO: use type definitions from 'pino-pretty' when available.
         prettifier?: any;
-        /**
-         * This function will be invoked during process shutdown when `extreme` is set to `true`. If you do not specify
-         * a function, Pino will invoke `process.exit(0)` when no error has occurred, and `process.exit(1)` otherwise.
-         * If you do specify a function, it is up to you to terminate the process; you must perform only synchronous
-         * operations at this point. See http://getpino.io/#/docs/extreme for more detail.
-         */
-        onTerminated?(eventName: string, err: any): void;
         /**
          * Enables logging. Default: `true`.
          */
@@ -858,11 +843,6 @@ declare namespace P {
          * Noop function.
          */
         silent: LogFn;
-
-        /**
-         * Flushes the content of the buffer in extreme mode. It has no effect if extreme mode is not enabled.
-         */
-        flush(): void;
 
         /**
          * A utility method for determining if a given log level will write to the destination.
