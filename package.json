@@ -87,7 +87,6 @@
     "tap": "^15.0.1",
     "tape": "^5.0.0",
     "through2": "^4.0.0",
-    "transport": "./test/fixtures/transport",
     "winston": "^3.3.3"
   },
   "dependencies": {
