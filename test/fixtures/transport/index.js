@@ -4,7 +4,7 @@ const fs = require('fs')
 const { once } = require('events')
 
 async function run (opts) {
-  const stream = fs.createWriteStream(opts.dest)
+  const stream = fs.createWriteStream(opts.destination)
   await once(stream, 'open')
   return stream
 }
