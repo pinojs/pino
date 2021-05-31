@@ -133,17 +133,6 @@ log.info("lol");
 log.level === "info";
 const isEnabled: boolean = log.isLevelEnabled("info");
 
-const extremeDest = pino.extreme();
-const logExtreme = pino(extremeDest);
-
-const handler = pino.final(logExtreme, (err: Error, finalLogger: pino.BaseLogger) => {
-    if (err) {
-        finalLogger.error(err, "error caused exit");
-    }
-});
-
-handler(new Error("error"));
-
 const redacted = pino({
     redact: ["path"],
 });
