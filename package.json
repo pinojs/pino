@@ -3,12 +3,9 @@
   "version": "6.11.3",
   "description": "super fast, all natural json logger",
   "main": "pino.js",
-  "type": "commonjs",
-  "types": "pino.d.ts",
   "browser": "./browser.js",
   "files": [
     "pino.js",
-    "pino.d.ts",
     "bin.js",
     "browser.js",
     "pretty.js",
@@ -22,9 +19,8 @@
     "docs": "docsify serve",
     "browser-test": "airtap --local 8080 test/browser*test.js",
     "lint": "eslint .",
-    "test": "npm run lint && tap --100 test/*test.js test/*/*test.js && npm run test:types",
+    "test": "npm run lint && tap --100 test/*test.js test/*/*test.js",
     "test-ci": "npm run lint && tap test/*test.js test/*/*test.js --coverage-report=lcovonly",
-    "test-types": "tsc && tsd",
     "cov-ui": "tap --coverage-report=html test/*test.js test/*/*test.js",
     "bench": "node benchmarks/utils/runbench all",
     "bench-basic": "node benchmarks/utils/runbench basic",
@@ -64,7 +60,6 @@
   },
   "homepage": "http://getpino.io",
   "devDependencies": {
-    "@types/node": "^15.3.0",
     "airtap": "4.0.3",
     "benchmark": "^2.1.4",
     "bole": "^4.0.0",
@@ -81,7 +76,7 @@
     "import-fresh": "^3.2.1",
     "log": "^6.0.0",
     "loglevel": "^1.6.7",
-    "pino-pretty": "^5.0.0",
+    "pino-pretty": "^4.1.0",
     "pre-commit": "^1.2.2",
     "proxyquire": "^2.1.3",
     "pump": "^3.0.0",
@@ -92,18 +87,13 @@
     "tap": "^15.0.1",
     "tape": "^5.0.0",
     "through2": "^4.0.0",
-    "tsd": "^0.15.1",
-    "typescript": "^4.2.4",
     "winston": "^3.3.3"
   },
   "dependencies": {
     "fast-redact": "^3.0.0",
     "fast-safe-stringify": "^2.0.7",
-    "pino-std-serializers": "^4.0.0",
+    "pino-std-serializers": "^3.1.0",
     "quick-format-unescaped": "^4.0.3",
-    "sonic-boom": "^2.0.1"
-  },
-  "tsd": {
-    "directory": "test/types"
+    "sonic-boom": "^1.0.2"
   }
 }
