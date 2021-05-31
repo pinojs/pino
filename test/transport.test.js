@@ -2,7 +2,7 @@
 
 const os = require('os')
 const { join } = require('path')
-const { readFile } = require('fs').promises
+const { readFile, symlink, unlink } = require('fs').promises
 const { test } = require('tap')
 const { watchFileCreated } = require('./helper')
 const pino = require('../')
@@ -37,8 +37,17 @@ test('pino.transport with package', async ({ same, teardown }) => {
     os.tmpdir(),
     '_' + Math.random().toString(36).substr(2, 9)
   )
+
+  await symlink(
+    join(__dirname, 'fixtures', 'transport'),
+    join(__dirname, '..', 'node_modules', 'transport')
+  )
+
   const transport = pino.transport('transport', { dest })
-  teardown(transport.end.bind(transport))
+  teardown(async () => {
+    await unlink(join(__dirname, '..', 'node_modules', 'transport'))
+    transport.end()
+  })
   const instance = pino(transport)
   instance.info('hello')
   await watchFileCreated(dest)
