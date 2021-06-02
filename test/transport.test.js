@@ -42,6 +42,7 @@ test('pino.transport with file (no options + error handling)', async ({ equal })
 
 // TODO make this test pass on Windows
 test('pino.transport with package', { skip: isWin }, async ({ same, teardown }) => {
+  console.log(process.platform)
   const destination = join(
     os.tmpdir(),
     '_' + Math.random().toString(36).substr(2, 9)
