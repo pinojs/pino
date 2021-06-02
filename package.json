@@ -97,6 +97,6 @@
     "pino-std-serializers": "^4.0.0",
     "quick-format-unescaped": "^4.0.3",
     "sonic-boom": "^2.0.1",
-    "thread-stream": "^0.9.0"
+    "thread-stream": "^0.10.0"
   }
 }
