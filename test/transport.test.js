@@ -161,44 +161,6 @@ test('pino.transport with two files', async ({ same, teardown }) => {
   })
 })
 
-test('pino.transport with two files', async ({ same, teardown }) => {
-  const dest1 = join(
-    os.tmpdir(),
-    '_' + Math.random().toString(36).substr(2, 9)
-  )
-  const dest2 = join(
-    os.tmpdir(),
-    '_' + Math.random().toString(36).substr(2, 9)
-  )
-  const transport = pino.transport([{
-    level: 'info',
-    destination: dest1
-  }, {
-    level: 'info',
-    destination: dest2
-  }])
-  teardown(transport.end.bind(transport))
-  const instance = pino(transport)
-  instance.info('hello')
-  await Promise.all([watchFileCreated(dest1), watchFileCreated(dest2)])
-  const result1 = JSON.parse(await readFile(dest1))
-  delete result1.time
-  same(result1, {
-    pid,
-    hostname,
-    level: 30,
-    msg: 'hello'
-  })
-  const result2 = JSON.parse(await readFile(dest2))
-  delete result2.time
-  same(result2, {
-    pid,
-    hostname,
-    level: 30,
-    msg: 'hello'
-  })
-})
-
 test('pino.transport with an array including a prettyPrint destination', async ({ same, match, teardown }) => {
   const dest1 = join(
     os.tmpdir(),
