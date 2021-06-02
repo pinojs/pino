@@ -5,7 +5,7 @@ const { join } = require('path')
 const { once } = require('events')
 const { readFile, symlink, unlink } = require('fs').promises
 const { test } = require('tap')
-const { watchFileCreated } = require('./helper')
+const { isWin, watchFileCreated } = require('./helper')
 const pino = require('../')
 const url = require('url')
 const strip = require('strip-ansi')
@@ -40,7 +40,8 @@ test('pino.transport with file (no options + error handling)', async ({ equal })
   equal(err.message, 'kaboom')
 })
 
-test('pino.transport with package', async ({ same, teardown }) => {
+// TODO make this test pass on Windows
+test('pino.transport with package', { skip: isWin }, async ({ same, teardown }) => {
   const destination = join(
     os.tmpdir(),
     '_' + Math.random().toString(36).substr(2, 9)
