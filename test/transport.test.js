@@ -269,3 +269,43 @@ test('autoEnd = false', async ({ equal, same, teardown }) => {
     msg: 'hello'
   })
 })
+
+test('pino.transport with src and destinations', async ({ fail, equal }) => {
+  try {
+    pino.transport({
+      src: 'a/file',
+      destinations: [{
+        src: 'a/file'
+      }]
+    })
+    fail('must throw')
+  } catch (err) {
+    equal(err.message, 'Only one of src, destinations or module can be specified')
+  }
+})
+
+test('pino.transport with src and module', async ({ fail, equal }) => {
+  try {
+    pino.transport({
+      src: 'a/file',
+      module: 'transport'
+    })
+    fail('must throw')
+  } catch (err) {
+    equal(err.message, 'Only one of src, destinations or module can be specified')
+  }
+})
+
+test('pino.transport with destinations and module', async ({ fail, equal }) => {
+  try {
+    pino.transport({
+      destinations: [{
+        src: 'a/file'
+      }],
+      module: 'transport'
+    })
+    fail('must throw')
+  } catch (err) {
+    equal(err.message, 'Only one of src, destinations or module can be specified')
+  }
+})
