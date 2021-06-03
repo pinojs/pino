@@ -72,4 +72,4 @@ function watchFileCreated (filename) {
   })
 }
 
-module.exports = { getPathToNull, sink, check, once, sleep, watchFileCreated }
+module.exports = { getPathToNull, sink, check, once, sleep, watchFileCreated, isWin }
