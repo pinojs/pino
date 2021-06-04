@@ -309,3 +309,42 @@ test('pino.transport with destinations and module', async ({ fail, equal }) => {
     equal(err.message, 'Only one of src, destinations or module can be specified')
   }
 })
+
+// TODO make this test pass on Windows
+test('pino.transport with package as a destination', { skip: isWin }, async ({ same, teardown }) => {
+  const destination = join(
+    os.tmpdir(),
+    '_' + Math.random().toString(36).substr(2, 9)
+  )
+
+  try {
+    await unlink(join(__dirname, '..', 'node_modules', 'transport'))
+  } catch {}
+
+  await symlink(
+    join(__dirname, 'fixtures', 'transport'),
+    join(__dirname, '..', 'node_modules', 'transport')
+  )
+
+  const transport = pino.transport({
+    destinations: [{
+      module: 'transport',
+      opts: { destination }
+    }]
+  })
+  teardown(async () => {
+    await unlink(join(__dirname, '..', 'node_modules', 'transport'))
+    transport.end()
+  })
+  const instance = pino(transport)
+  instance.info('hello')
+  await watchFileCreated(destination)
+  const result = JSON.parse(await readFile(destination))
+  delete result.time
+  same(result, {
+    pid,
+    hostname,
+    level: 30,
+    msg: 'hello'
+  })
+})
