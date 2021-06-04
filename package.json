@@ -20,7 +20,7 @@
     "browser-test": "airtap --local 8080 test/browser*test.js",
     "lint": "eslint .",
     "test": "npm run lint && tap --100 test/*test.js test/*/*test.js",
-    "test-ci": "npm run lint && tap test/*test.js test/*/*test.js",
+    "test-ci": "npm run lint && tap test/*test.js test/*/*test.js --coverage-report=lcovonly",
     "cov-ui": "tap --coverage-report=html test/*test.js test/*/*test.js",
     "bench": "node benchmarks/utils/runbench all",
     "bench-basic": "node benchmarks/utils/runbench basic",
