@@ -19,8 +19,8 @@ test('pino.transport with file', async ({ same, teardown }) => {
     '_' + Math.random().toString(36).substr(2, 9)
   )
   const transport = pino.transport({
-    src: join(__dirname, 'fixtures', 'to-file-transport.js'),
-    opts: { destination }
+    source: join(__dirname, 'fixtures', 'to-file-transport.js'),
+    options: { destination }
   })
   teardown(transport.end.bind(transport))
   const instance = pino(transport)
@@ -38,7 +38,7 @@ test('pino.transport with file', async ({ same, teardown }) => {
 
 test('pino.transport with file (no options + error handling)', async ({ equal }) => {
   const transport = pino.transport({
-    src: join(__dirname, 'fixtures', 'to-file-transport.js')
+    source: join(__dirname, 'fixtures', 'to-file-transport.js')
   })
   // TODO: when thread stream passess error handling to main, mop up the console.error
   const [err] = await once(transport, 'error')
@@ -63,7 +63,7 @@ test('pino.transport with package', { skip: isWin }, async ({ same, teardown }) 
 
   const transport = pino.transport({
     module: 'transport',
-    opts: { destination }
+    options: { destination }
   })
   teardown(async () => {
     await unlink(join(__dirname, '..', 'node_modules', 'transport'))
@@ -88,8 +88,8 @@ test('pino.transport with file URL', async ({ same, teardown }) => {
     '_' + Math.random().toString(36).substr(2, 9)
   )
   const transport = pino.transport({
-    src: url.pathToFileURL(join(__dirname, 'fixtures', 'to-file-transport.js')).href,
-    opts: { destination }
+    source: url.pathToFileURL(join(__dirname, 'fixtures', 'to-file-transport.js')).href,
+    options: { destination }
   })
   teardown(transport.end.bind(transport))
   const instance = pino(transport)
@@ -108,8 +108,8 @@ test('pino.transport with file URL', async ({ same, teardown }) => {
 test('pino.transport errors if file does not exists', ({ plan, pass }) => {
   plan(1)
   const instance = pino.transport({
-    src: join(__dirname, 'fixtures', 'non-existent-file'),
-    workerOpts: {
+    source: join(__dirname, 'fixtures', 'non-existent-file'),
+    worker: {
       stdin: true,
       stdout: true,
       stderr: true
@@ -126,8 +126,8 @@ test('pino.transport with esm', async ({ same, teardown }) => {
     '_' + Math.random().toString(36).substr(2, 9)
   )
   const transport = pino.transport({
-    src: join(__dirname, 'fixtures', 'to-file-transport.mjs'),
-    opts: { destination }
+    source: join(__dirname, 'fixtures', 'to-file-transport.mjs'),
+    options: { destination }
   })
   const instance = pino(transport)
   teardown(transport.end.bind(transport))
@@ -155,12 +155,12 @@ test('pino.transport with two files', async ({ same, teardown }) => {
   const transport = pino.transport({
     destinations: [{
       level: 'info',
-      src: join(__dirname, 'fixtures', 'to-file-transport.js'),
-      opts: { destination: dest1 }
+      source: join(__dirname, 'fixtures', 'to-file-transport.js'),
+      options: { destination: dest1 }
     }, {
       level: 'info',
-      src: join(__dirname, 'fixtures', 'to-file-transport.js'),
-      opts: { destination: dest2 }
+      source: join(__dirname, 'fixtures', 'to-file-transport.js'),
+      options: { destination: dest2 }
     }]
   })
   teardown(transport.end.bind(transport))
@@ -226,8 +226,8 @@ test('no transport.end()', async ({ same, teardown }) => {
     '_' + Math.random().toString(36).substr(2, 9)
   )
   const transport = pino.transport({
-    src: join(__dirname, 'fixtures', 'to-file-transport.js'),
-    opts: { destination }
+    source: join(__dirname, 'fixtures', 'to-file-transport.js'),
+    options: { destination }
   })
   const instance = pino(transport)
   instance.info('hello')
@@ -249,9 +249,9 @@ test('autoEnd = false', async ({ equal, same, teardown }) => {
   )
   const count = process.listenerCount('exit')
   const transport = pino.transport({
-    src: join(__dirname, 'fixtures', 'to-file-transport.js'),
-    opts: { destination },
-    workerOpts: { autoEnd: false }
+    source: join(__dirname, 'fixtures', 'to-file-transport.js'),
+    options: { destination },
+    worker: { autoEnd: false }
   })
   teardown(transport.end.bind(transport))
   const instance = pino(transport)
@@ -270,29 +270,29 @@ test('autoEnd = false', async ({ equal, same, teardown }) => {
   })
 })
 
-test('pino.transport with src and destinations', async ({ fail, equal }) => {
+test('pino.transport with source and destinations', async ({ fail, equal }) => {
   try {
     pino.transport({
-      src: 'a/file',
+      source: 'a/file',
       destinations: [{
-        src: 'a/file'
+        source: 'a/file'
       }]
     })
     fail('must throw')
   } catch (err) {
-    equal(err.message, 'Only one of src, destinations or module can be specified')
+    equal(err.message, 'Only one of source, destinations or module can be specified')
   }
 })
 
-test('pino.transport with src and module', async ({ fail, equal }) => {
+test('pino.transport with source and module', async ({ fail, equal }) => {
   try {
     pino.transport({
-      src: 'a/file',
+      source: 'a/file',
       module: 'transport'
     })
     fail('must throw')
   } catch (err) {
-    equal(err.message, 'Only one of src, destinations or module can be specified')
+    equal(err.message, 'Only one of source, destinations or module can be specified')
   }
 })
 
@@ -300,13 +300,13 @@ test('pino.transport with destinations and module', async ({ fail, equal }) => {
   try {
     pino.transport({
       destinations: [{
-        src: 'a/file'
+        source: 'a/file'
       }],
       module: 'transport'
     })
     fail('must throw')
   } catch (err) {
-    equal(err.message, 'Only one of src, destinations or module can be specified')
+    equal(err.message, 'Only one of source, destinations or module can be specified')
   }
 })
 
@@ -329,7 +329,7 @@ test('pino.transport with package as a destination', { skip: isWin }, async ({ s
   const transport = pino.transport({
     destinations: [{
       module: 'transport',
-      opts: { destination }
+      options: { destination }
     }]
   })
   teardown(async () => {
