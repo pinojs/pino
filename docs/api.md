@@ -23,6 +23,7 @@
   * [logger.version](#version)
 * [Statics](#statics)
   * [pino.destination()](#pino-destination)
+  * [pino.transport()](#pino-transport)
   * [pino.final()](#pino-final)
   * [pino.multistream()](#pino-multistream)
   * [pino.stdSerializers](#pino-stdserializers)
@@ -889,6 +890,34 @@ A `pino.destination` instance can also be used to reopen closed files
 * See [`sonic-boom` ⇗](https://github.com/mcollina/sonic-boom)
 * See [Reopening log files](/docs/help.md#reopening)
 * See [Asynchronous Logging ⇗](/docs/asynchronous.md)
+
+<a id="pino-transport"></a>
+### `pino.transport(options) => ThreadStream`
+
+Create a a stream that routes logs to a worker thread that 
+wraps around a [Pino Transport](/docs/transports.md).
+
+```js
+const pino = require('pino')
+const transport = pino.transport({
+  target: 'some-transport',
+  options: { some: 'options for', the: 'transport' }
+})
+pino(transport)
+```
+
+* See [`Transports`](/docs/transports.md)
+* See [`thread-stream` ⇗](https://github.com/mcollina/thread-stream)
+
+#### Options
+
+* `target`:  The transport to pass logs through. This may be an installed module name, a path or a built-in transport (see next section)
+* `options`:  An options object which is serialized (see [Structured Clone Algorithm][https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm]), passed to the worker thread, parsed and then passed to the transport.
+* `destinations`: -==TODO==-
+
+#### Built in transports
+
+-==TODO==-
 
 <a id="pino-final"></a>
 
