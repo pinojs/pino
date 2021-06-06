@@ -1,24 +1,29 @@
 'use strict'
 
-const pino = require('./')
+const pino = require('..')
 const { tmpdir } = require('os')
 const { join } = require('path')
 
 const file = join(tmpdir(), `pino-${process.pid}-example`)
 
-const transport = pino.transport([{
-  level: 'warn',
-  destination: file
-}, {
-  level: 'info',
-  module: '/Users/matteo/repositories/pino-elasticsearch/lib.js',
-  opts: {
-    node: 'http://localhost:9200'
-  }
-}, {
-  level: 'info',
-  prettyPrint: true
-}])
+const transport = pino.transport({
+  targets: [{
+    level: 'warn',
+    target: '#pino/file',
+    options: {
+      destination: file
+    }
+  }, {
+    level: 'info',
+    target: 'pino-elasticsearch',
+    options: {
+      node: 'http://localhost:9200'
+    }
+  }, {
+    level: 'info',
+    target: '#pino/pretty'
+  }]
+})
 
 const logger = pino(transport)
 
