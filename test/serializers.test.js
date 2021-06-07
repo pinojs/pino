@@ -44,6 +44,29 @@ test('custom serializer overrides default err namespace error serializer', async
   equal(typeof o.err.s, 'string')
 })
 
+test('custom serializer overrides default err namespace error serializer when nestedKey is on', async ({ equal }) => {
+  const stream = sink()
+  const parent = pino({
+    nestedKey: 'obj',
+    serializers: {
+      err: (e) => {
+        return {
+          t: e.constructor.name,
+          m: e.message,
+          s: e.stack
+        }
+      }
+    }
+  }, stream)
+
+  parent.info({ err: ReferenceError('test') })
+  const o = await once(stream, 'data')
+  equal(typeof o.obj.err, 'object')
+  equal(o.obj.err.t, 'ReferenceError')
+  equal(o.obj.err.m, 'test')
+  equal(typeof o.obj.err.s, 'string')
+})
+
 test('null overrides default err namespace error serializer', async ({ equal }) => {
   const stream = sink()
   const parent = pino({ serializers: { err: null } }, stream)
@@ -213,4 +236,15 @@ test('non-overridden serializers are available in the children', async ({ equal 
   const o4 = once(stream, 'data')
   parent.fatal({ onlyChild: 'test' })
   equal((await o4).onlyChild, 'test')
+})
+
+test('custom serializer for messageKey', async (t) => {
+  const stream = sink()
+  const instance = pino({ serializers: { msg: () => '422' } }, stream)
+
+  const o = { num: NaN }
+  instance.info(o, 42)
+
+  const { msg } = await once(stream, 'data')
+  t.is(msg, '422')
 })

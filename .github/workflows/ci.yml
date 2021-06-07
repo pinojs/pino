@@ -2,12 +2,12 @@ name: CI
 on:
   push:
     paths-ignore:
-        - "docs/**"
-        - "*.md"
+        - 'docs/**'
+        - '*.md'
   pull_request:
     paths-ignore:
-        - "docs/**"
-        - "*.md"
+        - 'docs/**'
+        - '*.md'
 jobs:
   test:
     name: ${{ matrix.node-version }} ${{ matrix.os }}
@@ -18,7 +18,7 @@ jobs:
         os: [macOS-latest, windows-latest, ubuntu-latest]
         node-version: [12, 14, 16]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2.3.4
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v2.1.5
         with:
@@ -49,6 +49,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: fastify/github-action-merge-dependabot@v2.0.0
-        if: ${{ github.actor == 'dependabot[bot]' && github.event_name == 'pull_request' }}
         with:
-          github-token: ${{secrets.github_token}}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
