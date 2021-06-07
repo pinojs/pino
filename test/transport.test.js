@@ -40,7 +40,6 @@ test('pino.transport with file (no options + error handling)', async ({ equal })
   const transport = pino.transport({
     target: join(__dirname, 'fixtures', 'to-file-transport.js')
   })
-  // TODO: when thread stream passess error handling to main, mop up the console.error
   const [err] = await once(transport, 'error')
   equal(err.message, 'kaboom')
 })
