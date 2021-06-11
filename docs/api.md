@@ -921,18 +921,82 @@ const transport = pino.transport({
 pino(transport)
 ```
 
+Multiple transports may also be defined, and specific levels can be logged to each transport:
+
+```js
+const pino = require('pino')
+const transports = pino.transport([
+  {
+    level: 'info',
+    target: 'some-transport',
+    options: { some: 'options for', the: 'transport' }
+  },
+  {
+    level: 'trace',
+    target: '#pino/file',
+    options: { destination: '/path/to/store/logs' }
+  }
+])
+pino(transports)
+```
+
+
+For more on transports, how they work, and how to create them see the [`Transports documentation`](/docs/transports.md).
+
 * See [`Transports`](/docs/transports.md)
 * See [`thread-stream` ⇗](https://github.com/mcollina/thread-stream)
 
 #### Options
 
-* `target`:  The transport to pass logs through. This may be an installed module name, a path or a built-in transport (see next section)
-* `options`:  An options object which is serialized (see [Structured Clone Algorithm][https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm]), passed to the worker thread, parsed and then passed to the transport.
-* `destinations`: -==TODO==-
+* `target`:  The transport to pass logs through. This may be an installed module name, an absolute path or a built-in transport (see [Transport Builtins](#transport-builtins))
+* `options`:  An options object which is serialized (see [Structured Clone Algorithm][https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm]), passed to the worker thread, parsed and then passed to the exported transport function.
+* `worker`: [Worker thread](https://nodejs.org/api/worker_threads.html#worker_threads_new_worker_filename_options) configuration options. Additional, the `worker` option supports `worker.autoEnd`. If this is set to `false` logs will not be flushed on process exit, it is then up to the developer to call `transport.end()` to flush logs.
+* `targets`: May be specified instead of `target`, must be an array of transport configurations. Transport configurations include the aforementioned `options` and `target` options plus a `level` option which will send only logs above a specified level to a transport.
 
-#### Built in transports
+#### Transport Builtins
 
--==TODO==-
+The `target` option may be an absolute path, a module name or builtin. 
+
+A transport builtin takes the form `#pino/<name>`.
+
+The following transport builtins are supported:
+
+#####  `#pino/file`
+
+The `#pino/file` builtin routes logs to a file (or file descriptor).
+
+The `options.destination` property may be set to specify the desired file destination.
+
+```js
+const pino = require('pino')
+const transport = pino.transport({
+  target: '#pino/file',
+  options: { destination: '/path/to/file' }
+})
+pino(transport)
+```
+
+The `options.destination` property may also be a number to represent a file descriptor. Typically this would be `1` to write to STDOUT or `2` to write to STDERR. If `options.destination` is not set, it defaults to `1` which means logs will be written to STDOUT.
+
+The difference between using the `#pino/file` transport builtin and using `pino.destination` is that `pino.destination` runs in the main thread, whereas `#pino/file` sets up `pino.destination` in a worker thread.
+
+##### ``#pino/pretty`
+
+The `#pino/pretty` builtin prettifies logs.
+
+
+By default the `#pino/pretty` builtin logs to STDOUT.
+
+The `options.destination` property may be set to log pretty logs to a file descriptor or file. The following would send the prettified logs to STDERR:
+
+```js
+const pino = require('pino')
+const transport = pino.transport({
+  target: '#pino/pretty',
+  options: { destination: 2 }
+})
+pino(transport)
+```
 
 <a id="pino-final"></a>
 

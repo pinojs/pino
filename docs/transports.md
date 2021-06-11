@@ -46,14 +46,14 @@ and passing it to the `pino` function:
 ```js
 const pino = require('pino')
 const transport = pino.transport({
-  target: './my-transport.mjs'
+  target: '/absolute/path/to/my-transport.mjs'
 })
 pino(transport)
 ```
 
 The transport code will be executed in a separate worker thread. The main thread
 will write logs to the worker thread, which will write them to the stream returned
-from function exported from the transport file/module.
+from the function exported from the transport file/module.
 
 The exported function can also be async. Imagine the following transport:
 
@@ -89,13 +89,13 @@ This means that the options object can only contain types that are supported by 
 [Structured Clone Algorithm][sca] which is used to (de)serializing objects between threads.
 
 What if we wanted to use both transports, but send only error logs to `some-file-transport` while
-sending all logs to `./my-transport.mjs`. We can use the `pino.transport` function's `destinations` option:
+sending all logs to `my-transport.mjs`. We can use the `pino.transport` function's `destinations` option:
 
 ```js
 const pino = require('pino')
 const transport = pino.transport({
   destinations: [
-    { target: './my-transport.mjs', level: 'error' },
+    { target: '/absolute/path/to/my-transport.mjs', level: 'error' },
     { target: 'some-file-transport', options: { destination: '/dev/null' }
   ]
 })
