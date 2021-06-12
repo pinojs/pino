@@ -277,7 +277,7 @@ test('autoEnd = false', async ({ equal, same, teardown }) => {
 test('pino.transport with target and targets', async ({ fail, equal }) => {
   try {
     pino.transport({
-      target: 'a/file',
+      target: '/a/file',
       targets: [{
         target: '/a/file'
       }]
