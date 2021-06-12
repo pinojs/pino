@@ -279,7 +279,7 @@ test('pino.transport with target and targets', async ({ fail, equal }) => {
     pino.transport({
       target: 'a/file',
       targets: [{
-        target: 'a/file'
+        target: '/a/file'
       }]
     })
     fail('must throw')
