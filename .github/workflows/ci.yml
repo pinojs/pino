@@ -44,16 +44,18 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           parallel-finished: true
 
-  automerge:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: fastify/github-action-merge-dependabot@v2.1.1
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          exclude: [
-            'sonic-boom',
-            'pino-std-serializers',
-            'quick-format-unescaped',
-            'fast-redact'
-          ]
+## Disabled because the exclude parameter causes a syntax error
+## and I don't know how to fix it. ~ James Sumners 2021-06-20
+#   automerge:
+#     needs: test
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: fastify/github-action-merge-dependabot@v2.1.1
+#         with:
+#           github-token: ${{ secrets.GITHUB_TOKEN }}
+#           exclude: [
+#             'sonic-boom',
+#             'pino-std-serializers',
+#             'quick-format-unescaped',
+#             'fast-redact'
+#           ]
