@@ -269,7 +269,7 @@ Default: `{pid: process.pid, hostname: os.hostname}`
 
 Key-value object added as child logger to each log line.
 
-Set to `null` to avoid adding `pid`, `hostname` and `name` properties to each log.
+Set to `undefined` to avoid adding `pid`, `hostname` properties to each log.
 
 #### `enabled` (Boolean)
 
