@@ -950,7 +950,7 @@ For more on transports, how they work, and how to create them see the [`Transpor
 
 * `target`:  The transport to pass logs through. This may be an installed module name, an absolute path or a built-in transport (see [Transport Builtins](#transport-builtins))
 * `options`:  An options object which is serialized (see [Structured Clone Algorithm][https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm]), passed to the worker thread, parsed and then passed to the exported transport function.
-* `worker`: [Worker thread](https://nodejs.org/api/worker_threads.html#worker_threads_new_worker_filename_options) configuration options. Additional, the `worker` option supports `worker.autoEnd`. If this is set to `false` logs will not be flushed on process exit, it is then up to the developer to call `transport.end()` to flush logs.
+* `worker`: [Worker thread](https://nodejs.org/api/worker_threads.html#worker_threads_new_worker_filename_options) configuration options. Additionally, the `worker` option supports `worker.autoEnd`. If this is set to `false` logs will not be flushed on process exit. It is then up to the developer to call `transport.end()` to flush logs.
 * `targets`: May be specified instead of `target`, must be an array of transport configurations. Transport configurations include the aforementioned `options` and `target` options plus a `level` option which will send only logs above a specified level to a transport.
 
 #### Transport Builtins
