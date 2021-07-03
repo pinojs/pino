@@ -75,9 +75,10 @@ format logs during development:
 
 Due to Node's single-threaded event-loop, it's highly recommended that sending,
 alert triggering, reformatting and all forms of log processing
-is conducted in a separate process. In Pino parlance we call all log processors
-"transports", and recommend that the transports be run as separate
-processes, piping the stdout of the application to the stdin of the transport.
+be conducted in a separate process or thread. 
+
+In Pino terminology we call all log processors "transports", and recommend that the
+transports be run in a worker thread using our `pino.transport` API.
 
 For more details see our [Transports⇗](docs/transports.md) document.
 
