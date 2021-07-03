@@ -84,7 +84,7 @@ pino(transport)
 ```
 
 Note here we've specified a module by package rather than by relative path. The options object we provide
-is serialized and injected into the transport worker thread, then passed to the modules exported function.
+is serialized and injected into the transport worker thread, then passed to the module's exported function.
 This means that the options object can only contain types that are supported by the 
 [Structured Clone Algorithm][sca] which is used to (de)serializing objects between threads.
 
