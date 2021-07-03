@@ -89,7 +89,7 @@ This means that the options object can only contain types that are supported by 
 [Structured Clone Algorithm][sca] which is used to (de)serializing objects between threads.
 
 What if we wanted to use both transports, but send only error logs to `some-file-transport` while
-sending all logs to `my-transport.mjs`. We can use the `pino.transport` function's `destinations` option:
+sending all logs to `my-transport.mjs`? We can use the `pino.transport` function's `destinations` option:
 
 ```js
 const pino = require('pino')
