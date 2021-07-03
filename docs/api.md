@@ -980,7 +980,7 @@ The `options.destination` property may also be a number to represent a file desc
 
 The difference between using the `#pino/file` transport builtin and using `pino.destination` is that `pino.destination` runs in the main thread, whereas `#pino/file` sets up `pino.destination` in a worker thread.
 
-##### ``#pino/pretty`
+##### `#pino/pretty`
 
 The `#pino/pretty` builtin prettifies logs.
 
