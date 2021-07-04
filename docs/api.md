@@ -925,18 +925,17 @@ Multiple transports may also be defined, and specific levels can be logged to ea
 
 ```js
 const pino = require('pino')
-const transports = pino.transport([
-  {
+const transports = pino.transport({
+  targets: [{
     level: 'info',
     target: 'some-transport',
     options: { some: 'options for', the: 'transport' }
-  },
-  {
+  }, {
     level: 'trace',
     target: '#pino/file',
     options: { destination: '/path/to/store/logs' }
-  }
-])
+  }]
+})
 pino(transports)
 ```
 

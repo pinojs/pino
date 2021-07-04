@@ -94,7 +94,7 @@ sending all logs to `my-transport.mjs`? We can use the `pino.transport` function
 ```js
 const pino = require('pino')
 const transport = pino.transport({
-  destinations: [
+  targets: [
     { target: '/absolute/path/to/my-transport.mjs', level: 'error' },
     { target: 'some-file-transport', options: { destination: '/dev/null' }
   ]
