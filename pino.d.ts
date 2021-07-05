@@ -21,7 +21,8 @@
 import { EventEmitter } from "events";
 import { SonicBoom } from "sonic-boom";
 import * as pinoStdSerializers from "pino-std-serializers";
-import {WriteStream} from "fs";
+import { WriteStream } from "fs";
+import { WorkerOptions } from "worker_threads";
 
 export default P;
 export { P as pino }
@@ -199,6 +200,32 @@ declare namespace P {
     function destination(
         dest?: string | number | DestinationObjectOptions | DestinationStream | NodeJS.WritableStream,
     ): SonicBoom;
+
+    interface TransportTargetOptions<TransportOptions = Record<string, any>> {
+        target: string
+        options: TransportOptions
+        level: LevelWithSilent
+    }
+
+    interface TransportBaseOptions<TransportOptions = Record<string, any>> {
+        options?: TransportOptions
+        worker?: WorkerOptions & { autoEnd?: boolean}
+    }
+
+    interface TransportSingleOptions<TransportOptions = Record<string, any>> extends TransportBaseOptions<TransportOptions>{
+        target: string
+    }
+
+    interface TransportMultiOptions<TransportOptions = Record<string, any>> extends TransportBaseOptions<TransportOptions>{
+        targets: readonly TransportTargetOptions<TransportOptions>[]
+    }
+
+    // ToDo https://github.com/pinojs/thread-stream/issues/24
+    type ThreadStream = any
+
+    function transport<TransportOptions = Record<string, any>>(
+        options: TransportSingleOptions<TransportOptions> | TransportMultiOptions<TransportOptions>
+    ): ThreadStream
 
     interface MultiStreamOptions {
         levels?: Record<string, number>
