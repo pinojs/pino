@@ -939,6 +939,10 @@ const transports = pino.transport({
 pino(transports)
 ```
 
+If `WeakRef`, `WeakMap` and `FinalizationRegistry` are available in the current runtime (v14.5.0+), then the thread
+will be automatically terminated in case the stream or logger goes out of scope.
+The `transport()` function adds a listener to `process.on('exit')` to ensure the worker is flushed and all data synced
+before the process exits.
 
 For more on transports, how they work, and how to create them see the [`Transports documentation`](/docs/transports.md).
 
