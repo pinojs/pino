@@ -776,7 +776,7 @@ test('child bindings are redacted using wildcard and plain path keys', async ({ 
   equal(req.method, '[Redacted]')
 })
 
-test('redacts boolean at the top level', async ({ is }) => {
+test('redacts boolean at the top level', async ({ equal }) => {
   const stream = sink()
   const instance = pino({ redact: ['msg'] }, stream)
   const obj = {
@@ -784,6 +784,6 @@ test('redacts boolean at the top level', async ({ is }) => {
   }
   instance.info(obj, true)
   const o = await once(stream, 'data')
-  is(o.s, 's')
-  is(o.msg, '[Redacted]')
+  equal(o.s, 's')
+  equal(o.msg, '[Redacted]')
 })

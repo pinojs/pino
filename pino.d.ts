@@ -314,18 +314,7 @@ declare namespace P {
          * requires supplying a level value via `levelVal`. Default: 'info'.
          */
         level?: LevelWithSilent | string;
-        /**
-         * Outputs the level as a string instead of integer. Default: `false`.
-         */
-        useLevelLabels?: boolean;
-        /**
-         * Changes the property `level` to any string value you pass in. Default: 'level'
-         */
-        levelKey?: string;
-        /**
-         * (DEPRECATED, use `levelKey`) Changes the property `level` to any string value you pass in. Default: 'level'
-         */
-        changeLevelName?: string;
+
         /**
          * Use this option to define additional logging levels.
          * The keys of the object correspond the namespace of the log level, and the values should be the numerical value of the level.

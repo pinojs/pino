@@ -66,7 +66,6 @@ const defaultOptions = {
   name: undefined,
   redact: null,
   customLevels: null,
-  levelKey: undefined,
   useOnlyCustomLevels: false
 }
 
@@ -88,9 +87,6 @@ function pino (...args) {
     name,
     level,
     customLevels,
-    useLevelLabels,
-    changeLevelName,
-    levelKey,
     mixin,
     useOnlyCustomLevels,
     formatters,
@@ -102,23 +98,6 @@ function pino (...args) {
     formatters.bindings,
     formatters.log
   )
-
-  if (useLevelLabels && !(changeLevelName || levelKey)) {
-    process.emitWarning('useLevelLabels is deprecated, use the formatters.level option instead', 'Warning', 'PINODEP001')
-    allFormatters.level = labelsFormatter
-  } else if ((changeLevelName || levelKey) && !useLevelLabels) {
-    process.emitWarning('changeLevelName and levelKey are deprecated, use the formatters.level option instead', 'Warning', 'PINODEP002')
-    allFormatters.level = levelNameFormatter(changeLevelName || levelKey)
-  } else if ((changeLevelName || levelKey) && useLevelLabels) {
-    process.emitWarning('useLevelLabels is deprecated, use the formatters.level option instead', 'Warning', 'PINODEP001')
-    process.emitWarning('changeLevelName and levelKey are deprecated, use the formatters.level option instead', 'Warning', 'PINODEP002')
-    allFormatters.level = levelNameLabelFormatter(changeLevelName || levelKey)
-  }
-
-  if (serializers[Symbol.for('pino.*')]) {
-    process.emitWarning('The pino.* serializer is deprecated, use the formatters.log options instead', 'Warning', 'PINODEP003')
-    allFormatters.log = serializers[Symbol.for('pino.*')]
-  }
 
   if (!allFormatters.bindings) {
     allFormatters.bindings = defaultOptions.formatters.bindings
@@ -189,22 +168,6 @@ function pino (...args) {
   instance[setLevelSym](level)
 
   return instance
-}
-
-function labelsFormatter (label, number) {
-  return { level: label }
-}
-
-function levelNameFormatter (name) {
-  return function (label, number) {
-    return { [name]: number }
-  }
-}
-
-function levelNameLabelFormatter (name) {
-  return function (label, number) {
-    return { [name]: label }
-  }
 }
 
 module.exports = pino

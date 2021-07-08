@@ -155,7 +155,7 @@ test('children inherit parent serializers', async ({ equal }) => {
 test('children inherit parent Symbol serializers', async ({ equal, same, not }) => {
   const stream = sink()
   const symbolSerializers = {
-    [Symbol.for('pino.*')]: parentSerializers.test
+    [Symbol.for('b')]: b
   }
   const expected = Object.assign({
     err: stdSerializers.err
@@ -175,10 +175,13 @@ test('children inherit parent Symbol serializers', async ({ equal, same, not }) 
     return 'hello'
   }
 
-  not(child[Symbol.for('pino.serializers')], symbolSerializers)
+  function b () {
+    return 'world'
+  }
+
   same(child[Symbol.for('pino.serializers')].a, a)
+  same(child[Symbol.for('pino.serializers')][Symbol.for('b')], b)
   same(child[Symbol.for('pino.serializers')][Symbol.for('a')], a)
-  same(child[Symbol.for('pino.serializers')][Symbol.for('pino.*')], parentSerializers.test)
 })
 
 test('children serializers get called', async ({ equal }) => {
@@ -246,5 +249,5 @@ test('custom serializer for messageKey', async (t) => {
   instance.info(o, 42)
 
   const { msg } = await once(stream, 'data')
-  t.is(msg, '422')
+  t.equal(msg, '422')
 })

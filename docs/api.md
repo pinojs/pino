@@ -265,10 +265,6 @@ the object is an instance of `Error`, e.g. `logger.info(new Error('kaboom'))`.
 
 * See [pino.stdSerializers](#pino-stdserializers)
 
-##### `serializers[Symbol.for('pino.*')]` (Function) - DEPRECATED
-
-Use `formatters.log` instead.
-
 #### `base` (Object)
 
 Default: `{pid: process.pid, hostname: os.hostname}`
@@ -362,20 +358,6 @@ must be installed as a separate dependency:
 ```sh
 npm install pino-pretty
 ```
-
-<a id="useLevelLabels"></a>
-#### `useLevelLabels` (Boolean) - DEPRECATED
-
-Use `formatters.level` instead. This will be removed in v7.
-
-<a id="changeLevelName"></a>
-#### `changeLevelName` (String) - DEPRECATED
-Use `formatters.level` instead. This will be removed in v7.
-
-<a id="levelKey"></a>
-#### `levelKey` (String) - DEPRECATED
-
-Use `formatters.level` instead. This will be removed in v7.
 
 #### `browser` (Object)
 
