@@ -249,5 +249,5 @@ test('custom serializer for messageKey', async (t) => {
   instance.info(o, 42)
 
   const { msg } = await once(stream, 'data')
-  t.is(msg, '422')
+  t.equal(msg, '422')
 })

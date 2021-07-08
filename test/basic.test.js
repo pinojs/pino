@@ -675,7 +675,7 @@ test('correctly skip function', async (t) => {
   instance.info(o, () => {})
 
   const { msg } = await once(stream, 'data')
-  t.is(msg, undefined)
+  t.equal(msg, undefined)
 })
 
 test('correctly skip Infinity', async (t) => {
@@ -686,7 +686,7 @@ test('correctly skip Infinity', async (t) => {
   instance.info(o, Infinity)
 
   const { msg } = await once(stream, 'data')
-  t.is(msg, null)
+  t.equal(msg, null)
 })
 
 test('correctly log number', async (t) => {
@@ -697,5 +697,5 @@ test('correctly log number', async (t) => {
   instance.info(o, 42)
 
   const { msg } = await once(stream, 'data')
-  t.is(msg, 42)
+  t.equal(msg, 42)
 })
