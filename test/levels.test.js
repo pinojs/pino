@@ -269,15 +269,6 @@ test('resets levels from labels to numbers', async ({ equal }) => {
   instance.info('hello world')
 })
 
-test('aliases changeLevelName to levelKey', async ({ equal }) => {
-  const instance = pino({ changeLevelName: 'priority' }, sink((result, enc, cb) => {
-    equal(result.priority, 30)
-    cb()
-  }))
-
-  instance.info('hello world')
-})
-
 test('changes label naming when told to', async ({ equal }) => {
   const expected = [{
     priority: 30,
