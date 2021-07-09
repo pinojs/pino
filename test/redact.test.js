@@ -795,3 +795,22 @@ test('child can customize redact', async ({ equal }) => {
   equal(req.method, 'GET')
   equal(req.url, '[Redacted]')
 })
+
+test('child can remove parent redact by array', async ({ equal }) => {
+  const stream = sink()
+  const instance = pino({ redact: ['req.method', '*.headers.cookie'] }, stream)
+  instance.child({
+    req: {
+      method: 'GET',
+      url: '/',
+      headers: {
+        cookie: 'SESSID=298zf09hf012fh2; csrftoken=u32t4o3tb3gg43; _gat=1;'
+      }
+    }
+  }, {
+    redact: []
+  }).info('message completed')
+  const { req } = await once(stream, 'data')
+  equal(req.headers.cookie, 'SESSID=298zf09hf012fh2; csrftoken=u32t4o3tb3gg43; _gat=1;')
+  equal(req.method, 'GET')
+})
