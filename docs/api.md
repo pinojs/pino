@@ -141,7 +141,7 @@ logger.info('Message 2')
 If the `mixin` feature is being used merely to add static metadata to each log message,
 then a [child logger ⇗](/docs/child-loggers.md) should be used instead.
 
-<a id=opt-redact></a>
+<a id="opt-redact"></a>
 #### `redact` (Array | Object):
 
 Default: `undefined`
@@ -701,12 +701,11 @@ child.info({test: 'will be overwritten'})
 
 #### `options` (Object)
 
-Custom options for child logger, it will override the parent options if applied.
+Options for child logger. These options will override the parent logger options.
 
 ##### `options.redact` (Array | Object)
 
-Setting `options.redact` to array or object will override the parent `redact` options. If
-you want to remove `redact` inherited from parent logger, you should pass `[]`.
+Setting `options.redact` to an array or object will override the parent `redact` options. To remove `redact` options inherited from the parent logger set this value as an empty array (`[]`).
 
 ```js
 const logger = require('pino')({ redact: ['hello'] })
