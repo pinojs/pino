@@ -30,8 +30,8 @@ A "month" is defined as 30 consecutive days.
 > [release notes](https://github.com/pino/pino/releases).
 >
 > To avoid automatically receiving breaking security updates it is possible to use
-> the tilde (`~`) range qualifier. For example, to get patches for the 3.15
-> release, and avoid automatically updating to the 3.16 release, specify
+> the tilde (`~`) range qualifier. For example, to get patches for the 6.1
+> release, and avoid automatically updating to the 6.1 release, specify
 > the dependency as `"pino": "~6.1.x"`. This will leave your application vulnerable,
 > so please use with caution.
 
