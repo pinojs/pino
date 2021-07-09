@@ -17,7 +17,7 @@ out in this document:
 1. Major releases will be tested and verified against all Node.js
    release lines that are supported by the
    [Node.js LTS policy](https://github.com/nodejs/Release) within the
-   LTS period of that given Fastify release line. This implies that only
+   LTS period of that given Pino release line. This implies that only
    the latest Node.js release of a given line is supported.
 
 A "month" is defined as 30 consecutive days.
