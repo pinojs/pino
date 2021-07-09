@@ -10,6 +10,7 @@
 * [Ecosystem](/docs/ecosystem.md)
 * [Benchmarks](/docs/benchmarks.md)
 * [Legacy](/docs/legacy.md)
+* [Long Term Support](/docs/lts.md)
 * [Help](/docs/help.md)
   * [Exit logging](/docs/help.md#exit-logging)
   * [Log rotation](/docs/help.md#rotate)
