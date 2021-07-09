@@ -141,6 +141,7 @@ logger.info('Message 2')
 If the `mixin` feature is being used merely to add static metadata to each log message,
 then a [child logger ⇗](/docs/child-loggers.md) should be used instead.
 
+<a id=opt-redact></a>
 #### `redact` (Array | Object):
 
 Default: `undefined`
@@ -715,6 +716,8 @@ const child = logger.child({ foo: 'bar' }, { redact: ['foo'] })
 logger.info({ hello: 'world' })
 // {"level":30,"time":1625794553558,"pid":67930,"hostname":"x","hello":"world", "foo": "[Redacted]" }
 ```
+
+* See [`redact` option](#opt-redact)
 
 <a id="bindings"></a>
 ### `logger.bindings()`
