@@ -141,6 +141,7 @@ logger.info('Message 2')
 If the `mixin` feature is being used merely to add static metadata to each log message,
 then a [child logger ⇗](/docs/child-loggers.md) should be used instead.
 
+<a id="opt-redact"></a>
 #### `redact` (Array | Object):
 
 Default: `undefined`
@@ -639,7 +640,7 @@ the process crashes or exits.
 Noop function.
 
 <a id="child"></a>
-### `logger.child(bindings) => logger`
+### `logger.child(bindings, [options]) => logger`
 
 The `logger.child` method allows for the creation of stateful loggers,
 where key-value pairs can be pinned to a logger causing them to be output
@@ -697,6 +698,25 @@ child.info({test: 'will be overwritten'})
 
 * See [`serializers` option](#opt-serializers)
 * See [pino.stdSerializers](#pino-stdSerializers)
+
+#### `options` (Object)
+
+Options for child logger. These options will override the parent logger options.
+
+##### `options.redact` (Array | Object)
+
+Setting `options.redact` to an array or object will override the parent `redact` options. To remove `redact` options inherited from the parent logger set this value as an empty array (`[]`).
+
+```js
+const logger = require('pino')({ redact: ['hello'] })
+logger.info({ hello: 'world' })
+// {"level":30,"time":1625794363403,"pid":67930,"hostname":"x","hello":"[Redacted]"}
+const child = logger.child({ foo: 'bar' }, { redact: ['foo'] })
+logger.info({ hello: 'world' })
+// {"level":30,"time":1625794553558,"pid":67930,"hostname":"x","hello":"world", "foo": "[Redacted]" }
+```
+
+* See [`redact` option](#opt-redact)
 
 <a id="bindings"></a>
 ### `logger.bindings()`
