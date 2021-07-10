@@ -593,8 +593,7 @@ test('children with same names render in correct order', async ({ equal }) => {
   equal(a, 3, 'last logged object takes precedence')
 })
 
-// https://github.com/pinojs/pino/pull/251 - use this.stringify
-test('use `fast-safe-stringify` to avoid circular dependencies', async ({ same }) => {
+test('use `json-stringify-safe` to avoid circular dependencies', async ({ same }) => {
   const stream = sink()
   const root = pino(stream)
   // circular depth
@@ -602,10 +601,10 @@ test('use `fast-safe-stringify` to avoid circular dependencies', async ({ same }
   obj.a = obj
   root.info(obj)
   const { a } = await once(stream, 'data')
-  same(a, { a: '[Circular]' })
+  same(a, { a: '[Circular ~]' })
 })
 
-test('fast-safe-stringify must be used when interpolating', async (t) => {
+test('json-stringify-safe must be used when interpolating', async (t) => {
   const stream = sink()
   const instance = pino(stream)
 
@@ -614,7 +613,7 @@ test('fast-safe-stringify must be used when interpolating', async (t) => {
   instance.info('test %j', o)
 
   const { msg } = await once(stream, 'data')
-  t.equal(msg, 'test {"a":{"b":{"c":"[Circular]"}}}')
+  t.equal(msg, 'test {"a":{"b":{"c":"[Circular ~.a.b]"}}}')
 })
 
 test('throws when setting useOnlyCustomLevels without customLevels', async ({ throws }) => {
