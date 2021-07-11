@@ -28,7 +28,7 @@ jobs:
       - name: Tests
         run: npm run test-ci
       - name: Coveralls Parallel
-        uses: coverallsapp/github-action@v1.1.2
+        uses: coverallsapp/github-action@1.1.3
         with:
           github-token: ${{ secrets.github_token }}
           parallel: true
@@ -39,15 +39,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Coveralls Finished
-        uses: coverallsapp/github-action@v1.1.2
+        uses: coverallsapp/github-action@1.1.3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           parallel-finished: true
 
-  automerge:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: fastify/github-action-merge-dependabot@v2.0.0
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+## Disabled because the exclude parameter causes a syntax error
+## and I don't know how to fix it. ~ James Sumners 2021-06-20
+#   automerge:
+#     needs: test
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: fastify/github-action-merge-dependabot@v2.1.1
+#         with:
+#           github-token: ${{ secrets.GITHUB_TOKEN }}
+#           exclude: [
+#             'sonic-boom',
+#             'pino-std-serializers',
+#             'quick-format-unescaped',
+#             'fast-redact'
+#           ]
