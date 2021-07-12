@@ -680,24 +680,9 @@ const child = logger.child({foo: 'bar', level: 'debug'})
 child.debug('debug!') // will log as the `level` property set the level to debug
 ```
 
-##### `bindings.serializers` (Object)
+##### `bindings.serializers` (Object) - DEPRECATED
 
-Child loggers inherit the [serializers](#opt-serializers) from the parent logger.
-
-Setting the `serializers` key of the `bindings` object will override
-any configured parent serializers.
-
-```js
-const logger = require('pino')()
-logger.info({test: 'will appear'})
-// {"level":30,"time":1531259759482,"pid":67930,"hostname":"x","test":"will appear"}
-const child = logger.child({serializers: {test: () => `child-only serializer`}})
-child.info({test: 'will be overwritten'})
-// {"level":30,"time":1531259784008,"pid":67930,"hostname":"x","test":"child-only serializer"}
-```
-
-* See [`serializers` option](#opt-serializers)
-* See [pino.stdSerializers](#pino-stdSerializers)
+Use `options.serializers` instead.
 
 #### `options` (Object)
 
@@ -717,6 +702,25 @@ logger.info({ hello: 'world' })
 ```
 
 * See [`redact` option](#opt-redact)
+
+##### `options.serializers` (Object)
+
+Child loggers inherit the [serializers](#opt-serializers) from the parent logger.
+
+Setting the `serializers` key of the `options` object will override
+any configured parent serializers.
+
+```js
+const logger = require('pino')()
+logger.info({test: 'will appear'})
+// {"level":30,"time":1531259759482,"pid":67930,"hostname":"x","test":"will appear"}
+const child = logger.child({}, {serializers: {test: () => `child-only serializer`}})
+child.info({test: 'will be overwritten'})
+// {"level":30,"time":1531259784008,"pid":67930,"hostname":"x","test":"child-only serializer"}
+```
+
+* See [`serializers` option](#opt-serializers)
+* See [pino.stdSerializers](#pino-stdSerializers)
 
 <a id="bindings"></a>
 ### `logger.bindings()`

@@ -170,7 +170,8 @@ test('Formatters in child logger', async ({ match }) => {
 
   const child = logger.child({
     foo: 'bar',
-    nested: { object: true },
+    nested: { object: true }
+  }, {
     formatters: {
       bindings (bindings) {
         return { ...bindings, faz: 'baz' }
@@ -226,7 +227,8 @@ test('Formatters without bindings in child logger', async ({ match }) => {
 
   const child = logger.child({
     foo: 'bar',
-    nested: { object: true },
+    nested: { object: true }
+  }, {
     formatters: {
       log (obj) {
         return { other: 'stuff', ...obj }

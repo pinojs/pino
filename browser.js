@@ -113,13 +113,17 @@ function pino (opts) {
     set(setOpts, logger, 'trace', 'log')
   }
 
-  function child (bindings) {
+  function child (bindings, childOptions) {
     if (!bindings) {
       throw new Error('missing bindings for child Pino')
     }
-    const bindingsSerializers = bindings.serializers
-    if (serialize && bindingsSerializers) {
-      var childSerializers = Object.assign({}, serializers, bindingsSerializers)
+    childOptions = childOptions || {}
+    if (serialize && bindings.serializers) {
+      childOptions.serializers = bindings.serializers
+    }
+    const childOptionsSerializers = childOptions.serializers
+    if (serialize && childOptionsSerializers) {
+      var childSerializers = Object.assign({}, serializers, childOptionsSerializers)
       var childSerialize = opts.browser.serialize === true
         ? Object.keys(childSerializers)
         : serialize
