@@ -70,7 +70,7 @@ test('undefined overrides default err namespace error serializer', async ({ equa
 test('serializers override values', async ({ equal }) => {
   const stream = sink()
   const parent = pino({ serializers: parentSerializers }, stream)
-  parent.child({ serializers: childSerializers })
+  parent.child({}, { serializers: childSerializers })
 
   parent.fatal({ test: 'test' })
   const o = await once(stream, 'data')
@@ -80,7 +80,7 @@ test('serializers override values', async ({ equal }) => {
 test('child does not overwrite parent serializers', async ({ equal }) => {
   const stream = sink()
   const parent = pino({ serializers: parentSerializers }, stream)
-  const child = parent.child({ serializers: childSerializers })
+  const child = parent.child({}, { serializers: childSerializers })
 
   parent.fatal({ test: 'test' })
 
@@ -99,7 +99,7 @@ test('Symbol.for(\'pino.serializers\')', async ({ equal, not }) => {
   equal(parent[Symbol.for('pino.serializers')], parentSerializers)
   equal(child[Symbol.for('pino.serializers')], parentSerializers)
 
-  const child2 = parent.child({
+  const child2 = parent.child({}, {
     serializers: {
       a
     }
@@ -133,7 +133,7 @@ test('children inherit parent Symbol serializers', async ({ equal, not }) => {
 
   equal(parent[Symbol.for('pino.serializers')], symbolSerializers)
 
-  const child = parent.child({
+  const child = parent.child({}, {
     serializers: {
       [Symbol.for('a')]: a,
       a
@@ -156,7 +156,7 @@ test('children serializers get called', async ({ equal }) => {
     test: 'this'
   }, stream)
 
-  const child = parent.child({ a: 'property', serializers: childSerializers })
+  const child = parent.child({ a: 'property' }, { serializers: childSerializers })
 
   child.fatal({ test: 'test' })
   const o = await once(stream, 'data')
@@ -170,7 +170,7 @@ test('children serializers get called when inherited from parent', async ({ equa
     serializers: parentSerializers
   }, stream)
 
-  const child = parent.child({ serializers: { test: function () { return 'pass' } } })
+  const child = parent.child({}, { serializers: { test: function () { return 'pass' } } })
 
   child.fatal({ test: 'fail' })
   const o = await once(stream, 'data')
@@ -191,7 +191,7 @@ test('non-overridden serializers are available in the children', async ({ equal 
 
   const parent = pino({ serializers: pSerializers }, stream)
 
-  const child = parent.child({ serializers: cSerializers })
+  const child = parent.child({}, { serializers: cSerializers })
 
   const o = once(stream, 'data')
   child.fatal({ shared: 'test' })

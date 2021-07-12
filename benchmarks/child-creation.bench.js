@@ -60,6 +60,13 @@ const run = bench([
       child.info({ hello: 'world' })
     }
     setImmediate(cb)
+  },
+  function benchPinoCreationWithOption (cb) {
+    const child = plogDest.child({ a: 'property' }, { redact: [] })
+    for (var i = 0; i < max; i++) {
+      child.info({ hello: 'world' })
+    }
+    setImmediate(cb)
   }
 ], 10000)
 

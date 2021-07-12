@@ -98,10 +98,11 @@ test('custom levels are inherited by children', async ({ equal }) => {
 test('custom levels can be specified on child bindings', async ({ equal }) => {
   const stream = sink()
   const logger = pino(stream).child({
+    childMsg: 'ok'
+  }, {
     customLevels: {
       foo: 35
-    },
-    childMsg: 'ok'
+    }
   })
 
   logger.foo('test')
@@ -114,10 +115,11 @@ test('custom levels can be specified on child bindings', async ({ equal }) => {
 test('customLevels property child bindings does not get logged', async ({ equal }) => {
   const stream = sink()
   const logger = pino(stream).child({
+    childMsg: 'ok'
+  }, {
     customLevels: {
       foo: 35
-    },
-    childMsg: 'ok'
+    }
   })
 
   logger.foo('test')
@@ -131,7 +133,7 @@ test('throws when specifying pre-existing parent labels via child bindings', asy
     customLevels: {
       foo: 35
     }
-  }, stream).child({
+  }, stream).child({}, {
     customLevels: {
       foo: 45
     }
@@ -144,7 +146,7 @@ test('throws when specifying pre-existing parent values via child bindings', asy
     customLevels: {
       foo: 35
     }
-  }, stream).child({
+  }, stream).child({}, {
     customLevels: {
       bar: 35
     }
@@ -153,7 +155,7 @@ test('throws when specifying pre-existing parent values via child bindings', asy
 
 test('throws when specifying core values via child bindings', async ({ throws }) => {
   const stream = sink()
-  throws(() => pino(stream).child({
+  throws(() => pino(stream).child({}, {
     customLevels: {
       foo: 30
     }
@@ -199,11 +201,11 @@ test('custom level below level threshold will not log', async ({ equal }) => {
 test('does not share custom level state across siblings', async ({ doesNotThrow }) => {
   const stream = sink()
   const logger = pino(stream)
-  logger.child({
+  logger.child({}, {
     customLevels: { foo: 35 }
   })
   doesNotThrow(() => {
-    logger.child({
+    logger.child({}, {
       customLevels: { foo: 35 }
     })
   })

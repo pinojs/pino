@@ -166,6 +166,32 @@ if (process.title !== 'browser') {
     console.error = consoleError
 
     logger.child({
+      aBinding: 'test'
+    }, {
+      serializers: {
+        key: () => 'serialized',
+        key2: () => 'serialized2',
+        key3: () => 'serialized3'
+      }
+    }).fatal({ key: 'test' }, { key2: 'test' }, 'str should skip', [{ foo: 'array should skip' }], { key3: 'test' })
+    end()
+  })
+
+  test('serialize filter applies to child loggers through bindings', ({ end, is }) => {
+    const consoleError = console.error
+    console.error = function (binding, test, test2, test3, test4, test5) {
+      is(test.key, 'test')
+      is(test2.key2, 'serialized2')
+      is(test5.key3, 'test')
+    }
+
+    const logger = fresh('../browser', require)({
+      browser: { serialize: ['key2'] }
+    })
+
+    console.error = consoleError
+
+    logger.child({
       aBinding: 'test',
       serializers: {
         key: () => 'serialized',
@@ -208,7 +234,8 @@ if (process.title !== 'browser') {
     console.error = consoleError
 
     logger.child({
-      key: 'test',
+      key: 'test'
+    }, {
       serializers: {
         key: () => 'serialized'
       }
@@ -233,7 +260,7 @@ test('child does not overwrite parent serializers', ({ end, is }) => {
       }
     }
   })
-  const child = parent.child({ serializers: childSerializers })
+  const child = parent.child({}, { serializers: childSerializers })
 
   parent.fatal({ test: 'test' })
   child.fatal({ test: 'test' })
@@ -266,7 +293,7 @@ test('children serializers get called', ({ end, is }) => {
     }
   })
 
-  const child = parent.child({ a: 'property', serializers: childSerializers })
+  const child = parent.child({ a: 'property' }, { serializers: childSerializers })
 
   child.fatal({ test: 'test' })
   end()
@@ -284,7 +311,7 @@ test('children serializers get called when inherited from parent', ({ end, is })
     }
   })
 
-  const child = parent.child({ serializers: { test: () => 'pass' } })
+  const child = parent.child({}, { serializers: { test: () => 'pass' } })
 
   child.fatal({ test: 'fail' })
   end()
@@ -317,7 +344,7 @@ test('non overridden serializers are available in the children', ({ end, is }) =
     }
   })
 
-  const child = parent.child({ serializers: cSerializers })
+  const child = parent.child({}, { serializers: cSerializers })
 
   child.fatal({ shared: 'test' })
   child.fatal({ onlyParent: 'test' })
