@@ -219,3 +219,24 @@ test('child(bindings.customLevels)', async ({ match, equal, pass }) => {
   })
   process.removeListener('warning', onWarning)
 })
+
+test('child(bindings.level)', async ({ equal, pass }) => {
+  process.on('warning', onWarning)
+  function onWarning (warn) {
+    equal(warn.code, 'PINODEP007')
+  }
+
+  const stream = sink()
+  const logger = pino({
+    level: 'info'
+  }, stream).child({
+    level: 'trace'
+  })
+
+  const o = once(stream, 'data')
+  logger.info('test')
+  if (await o === null) {
+    pass('child can overrid parent level')
+  }
+  process.removeListener('warning', onWarning)
+})
