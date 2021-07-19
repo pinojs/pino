@@ -6,7 +6,7 @@ out in this document:
 1. Major releases, "X" release of [semantic versioning][semver] X.Y.Z release
    versions, are supported for a minimum period of six months from their release
    date. The release date of any specific version can be found at
-   [https://github.com/pino/pino/releases](https://github.com/pino/pino/releases).
+   [https://github.com/pinojs/pino/releases](https://github.com/pinojs/pino/releases).
 
 1. Major releases will receive security updates for an additional six months
    from the release of the next major release. After this period
@@ -27,7 +27,7 @@ A "month" is defined as 30 consecutive days.
 > As a consequence of providing long-term support for major releases, there
 > are occasions where we need to release breaking changes as a _minor_
 > version release. Such changes will _always_ be noted in the
-> [release notes](https://github.com/pino/pino/releases).
+> [release notes](https://github.com/pinojs/pino/releases).
 >
 > To avoid automatically receiving breaking security updates it is possible to use
 > the tilde (`~`) range qualifier. For example, to get patches for the 6.1
