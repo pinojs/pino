@@ -23,7 +23,9 @@
   * [logger.version](#version)
 * [Statics](#statics)
   * [pino.destination()](#pino-destination)
+  * [pino.transport()](#pino-transport)
   * [pino.final()](#pino-final)
+  * [pino.multistream()](#pino-multistream)
   * [pino.stdSerializers](#pino-stdserializers)
   * [pino.stdTimeFunctions](#pino-stdtimefunctions)
   * [pino.symbols](#pino-symbols)
@@ -258,11 +260,11 @@ These functions should return an JSONifiable object and they
 should never throw. When logging an object, each top-level property
 matching the exact key of a serializer will be serialized using the defined serializer.
 
+The serializers are applied when a property in the logged object matches a property
+in the serializers. The only exception is the `err` serializer as it is also applied in case
+the object is an instance of `Error`, e.g. `logger.info(new Error('kaboom'))`.
+
 * See [pino.stdSerializers](#pino-stdserializers)
-
-##### `serializers[Symbol.for('pino.*')]` (Function) - DEPRECATED
-
-Use `formatters.log` instead.
 
 #### `base` (Object)
 
@@ -357,20 +359,6 @@ must be installed as a separate dependency:
 ```sh
 npm install pino-pretty
 ```
-
-<a id="useLevelLabels"></a>
-#### `useLevelLabels` (Boolean) - DEPRECATED
-
-Use `formatters.level` instead. This will be removed in v7.
-
-<a id="changeLevelName"></a>
-#### `changeLevelName` (String) - DEPRECATED
-Use `formatters.level` instead. This will be removed in v7.
-
-<a id="levelKey"></a>
-#### `levelKey` (String) - DEPRECATED
-
-Use `formatters.level` instead. This will be removed in v7.
 
 #### `browser` (Object)
 
@@ -479,6 +467,9 @@ logger.info({MIX: {IN: true}})
 // {"level":30,"time":1531254555820,"pid":55956,"hostname":"x","MIX":{"IN":true}}
 ```
 
+If the object is of type Error, it is wrapped in an object containing a property err (`{ err: mergingObject }`).
+This allows for a unified error handling flow.
+
 <a id="message"></a>
 #### `message` (String)
 
@@ -499,6 +490,9 @@ is supplied in addition, the `msg` property in the output log will be the value 
 the `message` parameter not the value of the `msg` property on the `mergedObject`.
 See [Avoid Message Conflict](/docs/help.md#avoid-message-conflict) for information
 on how to overcome this limitation.
+
+If no `message` parameter is provided, and the `mergedObject` is of type `Error` or it has a property named `err`, the 
+`message` parameter is set to the `message` value of the error.
 
 The `messageKey` option can be used at instantiation time to change the namespace
 from `msg` to another string as preferred.
@@ -918,6 +912,101 @@ A `pino.destination` instance can also be used to reopen closed files
 * See [Reopening log files](/docs/help.md#reopening)
 * See [Asynchronous Logging ⇗](/docs/asynchronous.md)
 
+<a id="pino-transport"></a>
+### `pino.transport(options) => ThreadStream`
+
+Create a a stream that routes logs to a worker thread that 
+wraps around a [Pino Transport](/docs/transports.md).
+
+```js
+const pino = require('pino')
+const transport = pino.transport({
+  target: 'some-transport',
+  options: { some: 'options for', the: 'transport' }
+})
+pino(transport)
+```
+
+Multiple transports may also be defined, and specific levels can be logged to each transport:
+
+```js
+const pino = require('pino')
+const transports = pino.transport({
+  targets: [{
+    level: 'info',
+    target: 'some-transport',
+    options: { some: 'options for', the: 'transport' }
+  }, {
+    level: 'trace',
+    target: '#pino/file',
+    options: { destination: '/path/to/store/logs' }
+  }]
+})
+pino(transports)
+```
+
+If `WeakRef`, `WeakMap` and `FinalizationRegistry` are available in the current runtime (v14.5.0+), then the thread
+will be automatically terminated in case the stream or logger goes out of scope.
+The `transport()` function adds a listener to `process.on('exit')` to ensure the worker is flushed and all data synced
+before the process exits.
+
+For more on transports, how they work, and how to create them see the [`Transports documentation`](/docs/transports.md).
+
+* See [`Transports`](/docs/transports.md)
+* See [`thread-stream` ⇗](https://github.com/mcollina/thread-stream)
+
+#### Options
+
+* `target`:  The transport to pass logs through. This may be an installed module name, an absolute path or a built-in transport (see [Transport Builtins](#transport-builtins))
+* `options`:  An options object which is serialized (see [Structured Clone Algorithm][https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm]), passed to the worker thread, parsed and then passed to the exported transport function.
+* `worker`: [Worker thread](https://nodejs.org/api/worker_threads.html#worker_threads_new_worker_filename_options) configuration options. Additionally, the `worker` option supports `worker.autoEnd`. If this is set to `false` logs will not be flushed on process exit. It is then up to the developer to call `transport.end()` to flush logs.
+* `targets`: May be specified instead of `target`. Must be an array of transport configurations. Transport configurations include the aforementioned `options` and `target` options plus a `level` option which will send only logs above a specified level to a transport.
+
+#### Transport Builtins
+
+The `target` option may be an absolute path, a module name or builtin. 
+
+A transport builtin takes the form `#pino/<name>`.
+
+The following transport builtins are supported:
+
+#####  `#pino/file`
+
+The `#pino/file` builtin routes logs to a file (or file descriptor).
+
+The `options.destination` property may be set to specify the desired file destination.
+
+```js
+const pino = require('pino')
+const transport = pino.transport({
+  target: '#pino/file',
+  options: { destination: '/path/to/file' }
+})
+pino(transport)
+```
+
+The `options.destination` property may also be a number to represent a file descriptor. Typically this would be `1` to write to STDOUT or `2` to write to STDERR. If `options.destination` is not set, it defaults to `1` which means logs will be written to STDOUT.
+
+The difference between using the `#pino/file` transport builtin and using `pino.destination` is that `pino.destination` runs in the main thread, whereas `#pino/file` sets up `pino.destination` in a worker thread.
+
+##### `#pino/pretty`
+
+The `#pino/pretty` builtin prettifies logs.
+
+
+By default the `#pino/pretty` builtin logs to STDOUT.
+
+The `options.destination` property may be set to log pretty logs to a file descriptor or file. The following would send the prettified logs to STDERR:
+
+```js
+const pino = require('pino')
+const transport = pino.transport({
+  target: '#pino/pretty',
+  options: { destination: 2 }
+})
+pino(transport)
+```
+
 <a id="pino-final"></a>
 
 ### `pino.final(logger, [handler]) => Function | FinalLogger`
@@ -966,6 +1055,73 @@ finalLogger.info('exiting...')
 * See [Exit logging help](/docs/help.md#exit-logging)
 * See [Asynchronous logging ⇗](/docs/asynchronous.md)
 * See [Log loss prevention ⇗](/docs/asynchronous.md#log-loss-prevention)
+
+<a id="pino-multistream"></a>
+
+### `pino.multistream(options) => Stream`
+
+Create a stream composed by multiple destination streams:
+
+```js
+var fs = require('fs')
+var pino = require('pino')
+var streams = [
+  {stream: fs.createWriteStream('/tmp/info.stream.out')},
+  {level: 'debug', stream: fs.createWriteStream('/tmp/debug.stream.out')},
+  {level: 'fatal', stream: fs.createWriteStream('/tmp/fatal.stream.out')}
+]
+
+var log = pino({
+  level: 'debug' // this MUST be set at the lowest level of the
+                 // destinations
+}, pino.multistream(streams))
+
+log.debug('this will be written to /tmp/debug.stream.out')
+log.info('this will be written to /tmp/debug.stream.out and /tmp/info.stream.out')
+log.fatal('this will be written to /tmp/debug.stream.out, /tmp/info.stream.out and /tmp/fatal.stream.out')
+```
+
+In order for `multistream` to work, the log level __must__ be set to the lowest level used in the streams array.
+
+#### Options
+
+* `levels`:  Pass custom log level definitions to the instance as an object.
+
++ `dedupe`: Set this to `true` to send logs only to the stream with the higher level. Default: `false`
+
+    `dedupe` flag can be useful for example when using pino-multi-stream to redirect `error` logs to `process.stderr` and others to `process.stdout`:
+
+    ```js
+    var pino = require('pino')
+    var multistream = pino.multistream
+    var streams = [
+      {stream: process.stdout},
+      {level: 'error', stream: process.stderr},
+    ]
+
+    var opts = {
+        levels: {
+            silent: Infinity,
+            fatal: 60,
+            error: 50,
+            warn: 50,
+            info: 30,
+            debug: 20,
+            trace: 10
+        },
+        dedupe: true,
+    }
+
+    var log = pino({
+      level: 'debug' // this MUST be set at the lowest level of the
+                    // destinations
+    }, multistream(streams, opts))
+
+    log.debug('this will be written ONLY to process.stdout')
+    log.info('this will be written ONLY to process.stdout')
+    log.error('this will be written ONLY to process.stderr')
+    log.fatal('this will be written ONLY to process.stderr')
+    ```
 
 <a id="pino-stdserializers"></a>
 ### `pino.stdSerializers` (Object)

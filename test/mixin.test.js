@@ -106,7 +106,8 @@ test('mixin can use context', async ({ ok }) => {
   const stream = sink()
   const instance = pino({
     mixin (context) {
-      ok(context !== null && context !== undefined, 'context should be defined')
+      ok(context !== null, 'context should be defined')
+      ok(context !== undefined, 'context should be defined')
       return Object.assign({
         error: context.message,
         stack: context.stack
@@ -124,8 +125,8 @@ test('mixin works without context', async ({ ok }) => {
   const stream = sink()
   const instance = pino({
     mixin (context) {
-      ok(context !== null && context !== undefined, 'context is still defined w/o passing mergeObject')
-
+      ok(context !== null, 'context is still defined w/o passing mergeObject')
+      ok(context !== undefined, 'context is still defined w/o passing mergeObject')
       return {
         something: true
       }

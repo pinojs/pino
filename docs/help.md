@@ -118,20 +118,7 @@ Given a similar scenario as in the [Log rotation](#rotate) section a basic
 <a id="multiple"></a>
 ## Saving to multiple files
 
-Let's assume we want to store all error messages to a separate log file.
-
-Install [pino-tee](https://npm.im/pino-tee) with:
-
-```bash
-npm i pino-tee -g
-```
-
-The following writes the log output of `app.js` to `./all-logs`, while
-writing only warnings and errors to `./warn-log:
-
-```bash
-node app.js | pino-tee warn ./warn-logs > ./all-logs
-```
+See [`pino.multistream`](/doc/api.md#pino-multistream).
 
 <a id="filter-logs"></a>
 ## Log Filtering
@@ -164,14 +151,13 @@ ExecStart=/bin/sh -c '/path/to/node app.js | pino-transport'
 
 Pino's default log destination is the singular destination of `stdout`. While
 not recommended for performance reasons, multiple destinations can be targeted
-by using [`pino-multi-stream`](https://github.com/pinojs/pino-multi-stream).
+by using [`pino.multistream`](/doc/api.md#pino-multistream).
 
 In this example we use `stderr` for `error` level logs and `stdout` as default
 for all other levels (e.g. `debug`, `info`, and `warn`).
 
 ```js
 const pino = require('pino')
-const { multistream } = require('pino-multi-stream')
 var streams = [
   {level: 'debug', stream: process.stdout},
   {level: 'error', stream: process.stderr},
@@ -180,10 +166,9 @@ var streams = [
 
 const logger = pino({
   name: 'my-app',
-  level: 'info',
-}, multistream(streams))
+  level: 'debug', // must be the lowest level of all streams
+}, pino.multistream(streams))
 ```
-
 
 <a id="dupe-keys"></a>
 ## How Pino handles duplicate keys

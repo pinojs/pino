@@ -1,6 +1,7 @@
 'use strict'
 const { test } = require('tap')
 const { sink, once } = require('./helper')
+const stdSerializers = require('pino-std-serializers')
 const pino = require('../')
 
 const parentSerializers = {
@@ -41,6 +42,29 @@ test('custom serializer overrides default err namespace error serializer', async
   equal(o.err.t, 'ReferenceError')
   equal(o.err.m, 'test')
   equal(typeof o.err.s, 'string')
+})
+
+test('custom serializer overrides default err namespace error serializer when nestedKey is on', async ({ equal }) => {
+  const stream = sink()
+  const parent = pino({
+    nestedKey: 'obj',
+    serializers: {
+      err: (e) => {
+        return {
+          t: e.constructor.name,
+          m: e.message,
+          s: e.stack
+        }
+      }
+    }
+  }, stream)
+
+  parent.info({ err: ReferenceError('test') })
+  const o = await once(stream, 'data')
+  equal(typeof o.obj.err, 'object')
+  equal(o.obj.err.t, 'ReferenceError')
+  equal(o.obj.err.m, 'test')
+  equal(typeof o.obj.err.s, 'string')
 })
 
 test('null overrides default err namespace error serializer', async ({ equal }) => {
@@ -91,13 +115,17 @@ test('child does not overwrite parent serializers', async ({ equal }) => {
   equal((await o2).test, 'child')
 })
 
-test('Symbol.for(\'pino.serializers\')', async ({ equal, not }) => {
+test('Symbol.for(\'pino.serializers\')', async ({ equal, same, not }) => {
   const stream = sink()
+  const expected = Object.assign({
+    err: stdSerializers.err
+  }, parentSerializers)
   const parent = pino({ serializers: parentSerializers }, stream)
   const child = parent.child({ a: 'property' })
 
-  equal(parent[Symbol.for('pino.serializers')], parentSerializers)
-  equal(child[Symbol.for('pino.serializers')], parentSerializers)
+  same(parent[Symbol.for('pino.serializers')], expected)
+  same(child[Symbol.for('pino.serializers')], expected)
+  equal(parent[Symbol.for('pino.serializers')], child[Symbol.for('pino.serializers')])
 
   const child2 = parent.child({}, {
     serializers: {
@@ -124,14 +152,17 @@ test('children inherit parent serializers', async ({ equal }) => {
   equal(o.test, 'parent')
 })
 
-test('children inherit parent Symbol serializers', async ({ equal, not }) => {
+test('children inherit parent Symbol serializers', async ({ equal, same, not }) => {
   const stream = sink()
   const symbolSerializers = {
-    [Symbol.for('pino.*')]: parentSerializers.test
+    [Symbol.for('b')]: b
   }
+  const expected = Object.assign({
+    err: stdSerializers.err
+  }, symbolSerializers)
   const parent = pino({ serializers: symbolSerializers }, stream)
 
-  equal(parent[Symbol.for('pino.serializers')], symbolSerializers)
+  same(parent[Symbol.for('pino.serializers')], expected)
 
   const child = parent.child({}, {
     serializers: {
@@ -144,10 +175,13 @@ test('children inherit parent Symbol serializers', async ({ equal, not }) => {
     return 'hello'
   }
 
-  not(child[Symbol.for('pino.serializers')], symbolSerializers)
-  equal(child[Symbol.for('pino.serializers')].a, a)
-  equal(child[Symbol.for('pino.serializers')][Symbol.for('a')], a)
-  equal(child[Symbol.for('pino.serializers')][Symbol.for('pino.*')], parentSerializers.test)
+  function b () {
+    return 'world'
+  }
+
+  same(child[Symbol.for('pino.serializers')].a, a)
+  same(child[Symbol.for('pino.serializers')][Symbol.for('b')], b)
+  same(child[Symbol.for('pino.serializers')][Symbol.for('a')], a)
 })
 
 test('children serializers get called', async ({ equal }) => {
@@ -205,4 +239,15 @@ test('non-overridden serializers are available in the children', async ({ equal 
   const o4 = once(stream, 'data')
   parent.fatal({ onlyChild: 'test' })
   equal((await o4).onlyChild, 'test')
+})
+
+test('custom serializer for messageKey', async (t) => {
+  const stream = sink()
+  const instance = pino({ serializers: { msg: () => '422' } }, stream)
+
+  const o = { num: NaN }
+  instance.info(o, 42)
+
+  const { msg } = await once(stream, 'data')
+  t.equal(msg, '422')
 })

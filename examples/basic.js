@@ -1,6 +1,6 @@
 'use strict'
 
-const pino = require('./')()
+const pino = require('..')()
 
 pino.info('hello world')
 pino.error('this is at error level')

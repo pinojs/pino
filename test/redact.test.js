@@ -776,6 +776,18 @@ test('child bindings are redacted using wildcard and plain path keys', async ({ 
   equal(req.method, '[Redacted]')
 })
 
+test('redacts boolean at the top level', async ({ equal }) => {
+  const stream = sink()
+  const instance = pino({ redact: ['msg'] }, stream)
+  const obj = {
+    s: 's'
+  }
+  instance.info(obj, true)
+  const o = await once(stream, 'data')
+  equal(o.s, 's')
+  equal(o.msg, '[Redacted]')
+})
+
 test('child can customize redact', async ({ equal }) => {
   const stream = sink()
   const instance = pino({ redact: ['req.method', '*.headers.cookie'] }, stream)

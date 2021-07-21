@@ -53,7 +53,7 @@ function sleep (ms) {
 
 function watchFileCreated (filename) {
   return new Promise((resolve, reject) => {
-    const TIMEOUT = 800
+    const TIMEOUT = 2000
     const INTERVAL = 100
     const threshold = TIMEOUT / INTERVAL
     let counter = 0
@@ -72,4 +72,4 @@ function watchFileCreated (filename) {
   })
 }
 
-module.exports = { getPathToNull, sink, check, once, sleep, watchFileCreated }
+module.exports = { getPathToNull, sink, check, once, sleep, watchFileCreated, isWin }

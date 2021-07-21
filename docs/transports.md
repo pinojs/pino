@@ -1,21 +1,134 @@
 # Transports
 
-A "transport" for Pino is a supplementary tool which consumes Pino logs.
+Pino transports can be used for both transmitting and transforming log output.
 
-Consider the following example:
+The way Pino generates logs:
+
+1. Reduces the impact of logging on an application to the absolute minimum.
+2. Gives greater flexibility in how logs are processed and stored.
+
+It is recommended that any log transformation or transmission is performed either
+in a seperate thread or a seperate process. 
+
+Prior to Pino v7 transports would ideally operate in a seperate process - these are
+now referred to as [Legacy Transports](#legacy-transports).
+
+From Pino v7 and upwards transports can also operate inside a [Worker Thread][worker-thread],
+and can be used or configured via the options object passed to `pino` on initialization.
+
+
+[worker-thread]: https://nodejs.org/dist/latest-v14.x/docs/api/worker_threads.html
+
+## v7+ Transports
+
+A transport is a module that exports a default function which returns a writable stream:
 
 ```js
-const split = require('split2')
-const pump = require('pump')
-const through = require('through2')
+import { Writable } from 'stream'
+export default (options) => {
+  const myTransportStream = new Writable({
+    write (chunk, enc, cb) {
+    // apply a transform and send to stdout
+    console.log(chunk.toString().toUpperCase())
+    cb()
+    }
+  })
+  return myTransportStream
+}
+```
 
-const myTransport = through.obj(function (chunk, enc, cb) {
-  // do the necessary
-  console.log(chunk)
+Let's imagine the above defines our "transport" as the file `my-transport.mjs` 
+(ESM files are supported even if the project is written in CJS).
+
+We would set up our transport by creating a transport stream with `pino.transport`
+and passing it to the `pino` function:
+
+```js
+const pino = require('pino')
+const transport = pino.transport({
+  target: '/absolute/path/to/my-transport.mjs'
+})
+pino(transport)
+```
+
+The transport code will be executed in a separate worker thread. The main thread
+will write logs to the worker thread, which will write them to the stream returned
+from the function exported from the transport file/module.
+
+The exported function can also be async. Imagine the following transport:
+
+```js
+import fs from 'fs'
+import { once } from('events')
+export default async (options) => {
+  const stream = fs.createWriteStream(opts.destination)
+  await once(stream, 'open')
+  return stream
+}
+```
+
+While initializing the stream we're able to use `await` to perform asynchronous operations. In this 
+case waiting for the write streams `open` event. 
+
+Let's imagine the above was published to npm with the module name `some-file-transport`.
+
+The `options.destination` value can be set when the creating the transport stream with `pino.transport` like so:
+
+```js
+const pino = require('pino')
+const transport = pino.transport({
+  target: 'some-file-transport',
+  options: { destination: '/dev/null' }
+})
+pino(transport)
+```
+
+Note here we've specified a module by package rather than by relative path. The options object we provide
+is serialized and injected into the transport worker thread, then passed to the module's exported function.
+This means that the options object can only contain types that are supported by the 
+[Structured Clone Algorithm][sca] which is used to (de)serializing objects between threads.
+
+What if we wanted to use both transports, but send only error logs to `some-file-transport` while
+sending all logs to `my-transport.mjs`? We can use the `pino.transport` function's `destinations` option:
+
+```js
+const pino = require('pino')
+const transport = pino.transport({
+  targets: [
+    { target: '/absolute/path/to/my-transport.mjs', level: 'error' },
+    { target: 'some-file-transport', options: { destination: '/dev/null' }
+  ]
+})
+pino(transport)
+```
+
+For more details on `pino.transport` see the [API docs for `pino.transport`][pino-transport].
+
+
+[pino-transport]: /docs/api.md#pino-transport
+[sca]: https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm
+
+
+
+## Legacy Transports
+
+A legacy Pino "transport" is a supplementary tool which consumes Pino logs.
+
+Consider the following example for creating a transport:
+
+```js
+const { pipeline, Writable } = require('stream')
+const split = require('split2')
+
+const myTransportStream = new Writable({
+  write (chunk, enc, cb) {
+  // apply a transform and send to stdout
+  console.log(chunk.toString().toUpperCase())
   cb()
+  }
 })
 
-pump(process.stdin, split(JSON.parse), myTransport)
+pipeline(process.stdin, split(JSON.parse), myTransportStream)
 ```
 
 The above defines our "transport" as the file `my-transport-process.js`.
@@ -30,50 +143,21 @@ Ideally, a transport should consume logs in a separate process to the applicatio
 Using transports in the same process causes unnecessary load and slows down
 Node's single threaded event loop.
 
-## In-process transports
-
-> **Pino *does not* natively support in-process transports.**
-
-Pino does not support in-process transports because Node processes are
-single threaded processes (ignoring some technical details). Given this
-restriction, one of the methods Pino employs to achieve its speed is to
-purposefully offload the handling of logs, and their ultimate destination, to
-external processes so that the threading capabilities of the OS can be
-used (or other CPUs).
-
-One consequence of this methodology is that "error" logs do not get written to
-`stderr`. However, since Pino logs are in a parsable format, it is possible to
-use tools like [pino-tee][pino-tee] or [jq][jq] to work with the logs. For
-example, to view only logs marked as "error" logs:
-
-```
-$ node an-app.js | jq 'select(.level == 50)'
-```
-
-In short, the way Pino generates logs:
-
-1. Reduces the impact of logging on an application to the absolute minimum.
-2. Gives greater flexibility in how logs are processed and stored.
-
-Given all of the above, Pino recommends out-of-process log processing.
-
-However, it is possible to wrap Pino and perform processing in-process.
-For an example of this, see [pino-multi-stream][pinoms].
-
-[pino-tee]: https://npm.im/pino-tee
-[jq]: https://stedolan.github.io/jq/
-[pinoms]: https://npm.im/pino-multi-stream
-
 ## Known Transports
 
 PR's to this document are welcome for any new transports!
+
+### Pino v7+ Compatible
+
++ [pino-elasticsearch](#pino-elasticsearch)
+
+### Legacy
 
 + [pino-applicationinsights](#pino-applicationinsights)
 + [pino-azuretable](#pino-azuretable)
 + [pino-cloudwatch](#pino-cloudwatch)
 + [pino-couch](#pino-couch)
 + [pino-datadog](#pino-datadog)
-+ [pino-elasticsearch](#pino-elasticsearch)
 + [pino-gelf](#pino-gelf)
 + [pino-http-send](#pino-http-send)
 + [pino-kafka](#pino-kafka)

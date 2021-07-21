@@ -170,7 +170,8 @@ function levelTest (name, level) {
         type: 'Error',
         message: err.message,
         stack: err.stack
-      }
+      },
+      msg: err.message
     })
   })
 
@@ -592,8 +593,7 @@ test('children with same names render in correct order', async ({ equal }) => {
   equal(a, 3, 'last logged object takes precedence')
 })
 
-// https://github.com/pinojs/pino/pull/251 - use this.stringify
-test('use `fast-safe-stringify` to avoid circular dependencies', async ({ same }) => {
+test('use `json-stringify-safe` to avoid circular dependencies', async ({ same }) => {
   const stream = sink()
   const root = pino(stream)
   // circular depth
@@ -601,10 +601,10 @@ test('use `fast-safe-stringify` to avoid circular dependencies', async ({ same }
   obj.a = obj
   root.info(obj)
   const { a } = await once(stream, 'data')
-  same(a, { a: '[Circular]' })
+  same(a, { a: '[Circular ~]' })
 })
 
-test('fast-safe-stringify must be used when interpolating', async (t) => {
+test('json-stringify-safe must be used when interpolating', async (t) => {
   const stream = sink()
   const instance = pino(stream)
 
@@ -613,7 +613,7 @@ test('fast-safe-stringify must be used when interpolating', async (t) => {
   instance.info('test %j', o)
 
   const { msg } = await once(stream, 'data')
-  t.equal(msg, 'test {"a":{"b":{"c":"[Circular]"}}}')
+  t.equal(msg, 'test {"a":{"b":{"c":"[Circular ~.a.b]"}}}')
 })
 
 test('throws when setting useOnlyCustomLevels without customLevels', async ({ throws }) => {
@@ -664,4 +664,37 @@ test('offers a .default() method to please typescript', async ({ equal }) => {
   const instance = pino.default(stream)
   instance.info('hello world')
   check(equal, await once(stream, 'data'), 30, 'hello world')
+})
+
+test('correctly skip function', async (t) => {
+  const stream = sink()
+  const instance = pino(stream)
+
+  const o = { num: NaN }
+  instance.info(o, () => {})
+
+  const { msg } = await once(stream, 'data')
+  t.equal(msg, undefined)
+})
+
+test('correctly skip Infinity', async (t) => {
+  const stream = sink()
+  const instance = pino(stream)
+
+  const o = { num: NaN }
+  instance.info(o, Infinity)
+
+  const { msg } = await once(stream, 'data')
+  t.equal(msg, null)
+})
+
+test('correctly log number', async (t) => {
+  const stream = sink()
+  const instance = pino(stream)
+
+  const o = { num: NaN }
+  instance.info(o, 42)
+
+  const { msg } = await once(stream, 'data')
+  t.equal(msg, 42)
 })
