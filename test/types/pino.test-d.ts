@@ -91,14 +91,14 @@ child.info("nope again");
 child.level = "info";
 child.info("hooray");
 log.info("nope nope nope");
-log.child({ foo: "bar", level: "debug" }).debug("debug!");
+log.child({ foo: "bar" }, { level: "debug" }).debug("debug!");
 child.bindings();
 const customSerializers = {
     test() {
         return "this is my serializer";
     },
 };
-pino().child({ serializers: customSerializers }).info({ test: "should not show up" });
+pino().child({}, { serializers: customSerializers }).info({ test: "should not show up" });
 const child2 = log.child({ father: true });
 const childChild = child2.child({ baby: true });
 

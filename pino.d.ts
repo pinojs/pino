@@ -677,9 +677,12 @@ declare namespace P {
     type LogDescriptor = Record<string, any>; // TODO replace `any` with `unknown` when TypeScript version >= 3.0
 
     interface Bindings {
+        [key: string]: any;
+    }
+
+    interface ChildLoggerOptions {
         level?: Level | string;
         serializers?: { [key: string]: SerializerFn };
-        [key: string]: any;
     }
 
     /**
@@ -791,9 +794,10 @@ declare namespace P {
          * If a `level` property is present in the object passed to `child` it will override the child logger level.
          *
          * @param bindings: an object of key-value pairs to include in log lines as properties.
+         * @param options: an options object that will override child logger inherited options.
          * @returns a child logger instance.
          */
-        child(bindings: Bindings): Logger;
+        child(bindings: Bindings, options?: ChildLoggerOptions): Logger;
 
         /**
          * Log at `'fatal'` level the given msg. If the first argument is an object, all its properties will be included in the JSON line.
