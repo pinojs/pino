@@ -683,6 +683,13 @@ declare namespace P {
     interface ChildLoggerOptions {
         level?: Level | string;
         serializers?: { [key: string]: SerializerFn };
+        customLevels?: { [key: string]: number };
+        formatters?: {
+            level?: (label: string, number: number) => object;
+            bindings?: (bindings: Bindings) => object;
+            log?: (object: object) => object;
+        };
+        redact?: string[] | redactOptions;
     }
 
     /**
