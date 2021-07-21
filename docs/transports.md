@@ -59,9 +59,9 @@ The exported function can also be async. Imagine the following transport:
 
 ```js
 import fs from 'fs'
-import { once } from('events')
+import { once } from 'events'
 export default async (options) => {
-  const stream = fs.createWriteStream(opts.destination)
+  const stream = fs.createWriteStream(options.destination)
   await once(stream, 'open')
   return stream
 }
