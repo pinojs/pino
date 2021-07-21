@@ -10,6 +10,9 @@
 
 [Very low overhead](#low-overhead) Node.js logger.
 
+This README and linked documentation covers pino v6.x,
+you can find all related docs in: https://github.com/pinojs/pino/tree/v6.x.
+
 ## Documentation
 
 * [Benchmarks ⇗](/docs/benchmarks.md)
@@ -29,7 +32,7 @@
 ## Install
 
 ```
-$ npm install pino
+$ npm install pino@six
 ```
 
 ## Usage
