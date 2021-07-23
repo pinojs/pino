@@ -9,6 +9,8 @@ const { isWin, watchFileCreated } = require('./helper')
 const pino = require('../')
 const url = require('url')
 const strip = require('strip-ansi')
+const execa = require('execa')
+const writer = require('flush-write-stream')
 
 const { pid } = process
 const hostname = os.hostname()
@@ -365,4 +367,16 @@ test('pino.transport with target #pino/pretty', async ({ match, teardown }) => {
   await watchFileCreated(destination)
   const actual = await readFile(destination, 'utf8')
   match(strip(actual), /\[.*\] INFO.*hello/)
+})
+
+test('stdout in worker', async ({ not }) => {
+  let actual = ''
+  const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'transport-main.js')])
+
+  child.stdout.pipe(writer((s, enc, cb) => {
+    actual += s
+    cb()
+  }))
+  await once(child, 'close')
+  not(strip(actual).match(/Hello/), null)
 })
