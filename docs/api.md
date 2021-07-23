@@ -947,8 +947,11 @@ pino(transports)
 
 If `WeakRef`, `WeakMap` and `FinalizationRegistry` are available in the current runtime (v14.5.0+), then the thread
 will be automatically terminated in case the stream or logger goes out of scope.
-The `transport()` function adds a listener to `process.on('exit')` to ensure the worker is flushed and all data synced
-before the process exits.
+The `transport()` function adds a listener to `process.on('beforeExit')` and `process.on('exit')` to ensure the worker
+is flushed and all data synced before the process exits.
+
+Note that calling `process.exit()` on the main thread will stop the event loop on the main thread from turning. As a result,
+using `console.log` and `process.stdout` after the main thread called `process.exit()` will not produce any output.
 
 For more on transports, how they work, and how to create them see the [`Transports documentation`](/docs/transports.md).
 
