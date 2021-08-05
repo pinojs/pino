@@ -8,9 +8,9 @@ The way Pino generates logs:
 2. Gives greater flexibility in how logs are processed and stored.
 
 It is recommended that any log transformation or transmission is performed either
-in a seperate thread or a seperate process. 
+in a separate thread or a separate process. 
 
-Prior to Pino v7 transports would ideally operate in a seperate process - these are
+Prior to Pino v7 transports would ideally operate in a separate process - these are
 now referred to as [Legacy Transports](#legacy-transports).
 
 From Pino v7 and upwards transports can also operate inside a [Worker Thread][worker-thread],
