@@ -112,31 +112,7 @@ test('sync false with child', async ({ equal, teardown }) => {
   })
 })
 
-test('throw an error if extreme is passed', async ({ throws }) => {
-  const pino = require('..')
-  throws(() => {
-    pino({ extreme: true })
-  })
-})
-
 test('flush does nothing with sync true (default)', async () => {
   const instance = require('..')()
   instance.flush()
-})
-
-test('pino.extreme() emits a warning', async ({ equal }) => {
-  const pino = require('..')
-  process.removeAllListeners('warning')
-  process.nextTick(() => pino.extreme(0))
-  const warning = await once(process, 'warning')
-  const expected = 'The pino.extreme() option is deprecated and will be removed in v7. Use pino.destination({ sync: false }) instead.'
-  equal(expected, warning.message)
-  equal('extreme_deprecation', warning.code)
-})
-
-test('pino.extreme() defaults to stdout', async ({ equal }) => {
-  const pino = require('..')
-  process.removeAllListeners('warning')
-  const dest = pino.extreme()
-  equal(dest.fd, process.stdout.fd)
 })
