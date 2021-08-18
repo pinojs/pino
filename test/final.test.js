@@ -4,6 +4,8 @@ const fs = require('fs')
 const { test } = require('tap')
 const { sleep, getPathToNull } = require('./helper')
 
+process.setMaxListeners(100)
+
 test('replaces onTerminated option', async ({ throws }) => {
   throws(() => {
     pino({
@@ -48,6 +50,7 @@ test('listener function immediately sync flushes when fired (sync false)', async
   dest.flushSync = () => {
     passed = true
     pass('flushSync called')
+    dest.flushSync = () => {}
   }
   pino.final(pino(dest), () => {})()
   await sleep(10)
@@ -60,6 +63,7 @@ test('listener function immediately sync flushes when fired (sync true)', async 
   dest.flushSync = () => {
     passed = true
     pass('flushSync called')
+    dest.flushSync = () => {}
   }
   pino.final(pino(dest), () => {})()
   await sleep(10)
