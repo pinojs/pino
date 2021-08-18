@@ -4,6 +4,8 @@ const fs = require('fs')
 const { test } = require('tap')
 const { sleep, getPathToNull } = require('./helper')
 
+// This test is too fast for the GC to trigger the removal, so a leak warning
+// will be emitted. Let's raise this so we do not scare everybody.
 process.setMaxListeners(100)
 
 test('replaces onTerminated option', async ({ throws }) => {
