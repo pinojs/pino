@@ -172,14 +172,6 @@ function pino (...args) {
 
 module.exports = pino
 
-module.exports.extreme = (dest = process.stdout.fd) => {
-  process.emitWarning(
-    'The pino.extreme() option is deprecated and will be removed in v7. Use pino.destination({ sync: false }) instead.',
-    { code: 'extreme_deprecation' }
-  )
-  return buildSafeSonicBoom({ dest, minLength: 4096, sync: false })
-}
-
 module.exports.destination = (dest = process.stdout.fd) => {
   if (typeof dest === 'object') {
     dest.dest = dest.dest || process.stdout.fd
