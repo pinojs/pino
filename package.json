@@ -100,6 +100,7 @@
   "dependencies": {
     "fast-redact": "^3.0.0",
     "fast-safe-stringify": "^2.0.8",
+    "fastify-warning": "^0.2.0",
     "get-caller-file": "^2.0.5",
     "on-exit-leak-free": "^0.2.0",
     "pino-abstract-transport": "^0.2.0",
