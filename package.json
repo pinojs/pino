@@ -92,6 +92,7 @@
   "dependencies": {
     "fast-redact": "^3.0.0",
     "fast-safe-stringify": "^2.0.8",
+    "fastify-warning": "^0.2.0",
     "flatstr": "^1.0.12",
     "pino-std-serializers": "^3.1.0",
     "quick-format-unescaped": "^4.0.3",
