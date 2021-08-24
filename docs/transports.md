@@ -104,11 +104,33 @@ pino(transport)
 
 For more details on `pino.transport` see the [API docs for `pino.transport`][pino-transport].
 
-
 [pino-transport]: /docs/api.md#pino-transport
 [sca]: https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm
 
 
+### Asynchronous startup
+
+The new transports boot asynchronously and calling `process.exit()` before the transport
+started will cause logs to not be delivered.
+
+```js
+const pino = require('pino')
+const transport = pino.transport({
+  targets: [
+    { target: '/absolute/path/to/my-transport.mjs', level: 'error' },
+    { target: 'some-file-transport', options: { destination: '/dev/null' }
+  ]
+})
+const logger = pino(transport)
+
+logger.info('hello')
+
+// If logs are printed before the transport is ready when process.exit(0) is called,
+// they will be lost.
+transport.on('ready', function () {
+  process.exit(0)
+})
+```
 
 ## Legacy Transports
 
