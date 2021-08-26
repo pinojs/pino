@@ -93,7 +93,7 @@ child.level = "info";
 child.info("hooray");
 log.info("nope nope nope");
 log.child({ foo: "bar" }, { level: "debug" }).debug("debug!");
-(child as Logger).bindings();
+child.bindings();
 const customSerializers = {
     test() {
         return "this is my serializer";

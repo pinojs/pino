@@ -731,18 +731,6 @@ declare namespace P {
 
     interface BaseLogger {
         /**
-         * Creates a child logger, setting all key-value pairs in `bindings` as properties in the log lines. All serializers will be applied to the given pair.
-         * Child loggers use the same output stream as the parent and inherit the current log level of the parent at the time they are spawned.
-         * From v2.x.x the log level of a child is mutable (whereas in v1.x.x it was immutable), and can be set independently of the parent.
-         * If a `level` property is present in the object passed to `child` it will override the child logger level.
-         *
-         * @param bindings: an object of key-value pairs to include in log lines as properties.
-         * @param options: an options object that will override child logger inherited options.
-         * @returns a child logger instance.
-         */
-        child(bindings: Bindings, options?: ChildLoggerOptions): BaseLogger;
-
-        /**
          * Set this property to the desired logging level. In order of priority, available levels are:
          *
          * - 'fatal'
@@ -849,6 +837,18 @@ declare namespace P {
          * Returns the integer value for the logger instance's logging level.
          */
         levelVal: number;
+
+        /**
+         * Creates a child logger, setting all key-value pairs in `bindings` as properties in the log lines. All serializers will be applied to the given pair.
+         * Child loggers use the same output stream as the parent and inherit the current log level of the parent at the time they are spawned.
+         * From v2.x.x the log level of a child is mutable (whereas in v1.x.x it was immutable), and can be set independently of the parent.
+         * If a `level` property is present in the object passed to `child` it will override the child logger level.
+         *
+         * @param bindings: an object of key-value pairs to include in log lines as properties.
+         * @param options: an options object that will override child logger inherited options.
+         * @returns a child logger instance.
+         */
+        child(bindings: Bindings, options?: ChildLoggerOptions): Logger;
 
         /**
          * Registers a listener function that is triggered when the level is changed.
