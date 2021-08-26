@@ -730,6 +730,11 @@ declare namespace P {
     type Logger = BaseLogger & Record<string, any>;
 
     interface BaseLogger extends EventEmitter {
+        /**
+         * Exposes the Pino package version. Also available on the exported pino function.
+         */
+        readonly version: string;
+
         levels: LevelMapping;
 
         /**
