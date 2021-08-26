@@ -106,7 +106,7 @@ childRedacted.info({
   msg: "logged with redacted properties",
   path: "Not shown",
 });
-const childAnotherRedacted = pino().child({}, { 
+const childAnotherRedacted = pino().child({}, {
     redact: {
         paths: ["anotherPath"],
         censor: "Not the log you\re looking for",
@@ -267,3 +267,7 @@ const logLine: pino.LogDescriptor = {
     time: new Date().getTime(),
     aCustomProperty: true,
 };
+
+interface CustomLogger extends pino.Logger {
+    customMethod(msg: string, ...args: unknown[]): void;
+}

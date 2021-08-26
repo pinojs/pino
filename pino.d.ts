@@ -50,7 +50,6 @@ declare namespace P {
     /**
      * Holds the current log format version (as output in the v property of each log record).
      */
-    const LOG_VERSION: number;
     const levels: LevelMapping;
     const symbols: {
         readonly setLevelSym: unique symbol;
@@ -728,22 +727,9 @@ declare namespace P {
         };
     }
 
-    type Logger = BaseLogger & { [key: string]: LogFn };
+    type Logger = BaseLogger & Record<string, any>;
 
     interface BaseLogger extends EventEmitter {
-        /**
-         * Exposes the current version of Pino.
-         */
-        readonly pino: string;
-        /**
-         * Holds the current log format version (as output in the v property of each log record).
-         */
-        readonly LOG_VERSION: number;
-        /**
-         * Exposes the Pino package version. Also available on the exported pino function.
-         */
-        readonly version: string;
-
         levels: LevelMapping;
 
         /**
