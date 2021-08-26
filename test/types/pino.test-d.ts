@@ -1,6 +1,7 @@
 import P, { pino } from "../../";
 import { IncomingMessage, ServerResponse } from "http";
 import { Socket } from "net";
+import Logger = P.Logger;
 
 const log = pino();
 const info = log.info;
@@ -92,7 +93,7 @@ child.level = "info";
 child.info("hooray");
 log.info("nope nope nope");
 log.child({ foo: "bar" }, { level: "debug" }).debug("debug!");
-child.bindings();
+(child as Logger).bindings();
 const customSerializers = {
     test() {
         return "this is my serializer";
