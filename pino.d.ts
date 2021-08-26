@@ -740,7 +740,7 @@ declare namespace P {
          * @param options: an options object that will override child logger inherited options.
          * @returns a child logger instance.
          */
-        child<T extends BaseLogger = BaseLogger>(bindings: Bindings, options?: ChildLoggerOptions): T;
+        child(bindings: Bindings, options?: ChildLoggerOptions): BaseLogger;
 
         /**
          * Log at `'fatal'` level the given msg. If the first argument is an object, all its properties will be included in the JSON line.
