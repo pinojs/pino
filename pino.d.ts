@@ -727,64 +727,9 @@ declare namespace P {
         };
     }
 
-    type Logger = BaseLogger & Record<string, any>;
+    type Logger = BaseLogger & LoggerExtras & Record<string, any>;
 
-    interface BaseLogger extends EventEmitter {
-        /**
-         * Exposes the Pino package version. Also available on the exported pino function.
-         */
-        readonly version: string;
-
-        levels: LevelMapping;
-
-        /**
-         * Set this property to the desired logging level. In order of priority, available levels are:
-         *
-         * - 'fatal'
-         * - 'error'
-         * - 'warn'
-         * - 'info'
-         * - 'debug'
-         * - 'trace'
-         *
-         * The logging level is a __minimum__ level. For instance if `logger.level` is `'info'` then all `'fatal'`, `'error'`, `'warn'`,
-         * and `'info'` logs will be enabled.
-         *
-         * You can pass `'silent'` to disable logging.
-         */
-        level: LevelWithSilent | string;
-        /**
-         * Outputs the level as a string instead of integer.
-         */
-        useLevelLabels: boolean;
-        /**
-         * Define additional logging levels.
-         */
-        customLevels: { [key: string]: number };
-        /**
-         * Use only defined `customLevels` and omit Pino's levels.
-         */
-        useOnlyCustomLevels: boolean;
-        /**
-         * Returns the integer value for the logger instance's logging level.
-         */
-        levelVal: number;
-
-        /**
-         * Registers a listener function that is triggered when the level is changed.
-         * Note: When browserified, this functionality will only be available if the `events` module has been required elsewhere
-         * (e.g. if you're using streams in the browser). This allows for a trade-off between bundle size and functionality.
-         *
-         * @param event: only ever fires the `'level-change'` event
-         * @param listener: The listener is passed four arguments: `levelLabel`, `levelValue`, `previousLevelLabel`, `previousLevelValue`.
-         */
-        on(event: "level-change", listener: LevelChangeEventListener): this;
-        addListener(event: "level-change", listener: LevelChangeEventListener): this;
-        once(event: "level-change", listener: LevelChangeEventListener): this;
-        prependListener(event: "level-change", listener: LevelChangeEventListener): this;
-        prependOnceListener(event: "level-change", listener: LevelChangeEventListener): this;
-        removeListener(event: "level-change", listener: LevelChangeEventListener): this;
-
+    interface BaseLogger {
         /**
          * Creates a child logger, setting all key-value pairs in `bindings` as properties in the log lines. All serializers will be applied to the given pair.
          * Child loggers use the same output stream as the parent and inherit the current log level of the parent at the time they are spawned.
@@ -795,7 +740,7 @@ declare namespace P {
          * @param options: an options object that will override child logger inherited options.
          * @returns a child logger instance.
          */
-        child(bindings: Bindings, options?: ChildLoggerOptions): Logger;
+        child<T extends BaseLogger = BaseLogger>(bindings: Bindings, options?: ChildLoggerOptions): T;
 
         /**
          * Log at `'fatal'` level the given msg. If the first argument is an object, all its properties will be included in the JSON line.
@@ -861,6 +806,63 @@ declare namespace P {
          * Noop function.
          */
         silent: LogFn;
+    }
+
+    interface LoggerExtras extends EventEmitter {
+        /**
+         * Exposes the Pino package version. Also available on the exported pino function.
+         */
+        readonly version: string;
+
+        levels: LevelMapping;
+
+        /**
+         * Set this property to the desired logging level. In order of priority, available levels are:
+         *
+         * - 'fatal'
+         * - 'error'
+         * - 'warn'
+         * - 'info'
+         * - 'debug'
+         * - 'trace'
+         *
+         * The logging level is a __minimum__ level. For instance if `logger.level` is `'info'` then all `'fatal'`, `'error'`, `'warn'`,
+         * and `'info'` logs will be enabled.
+         *
+         * You can pass `'silent'` to disable logging.
+         */
+        level: LevelWithSilent | string;
+        /**
+         * Outputs the level as a string instead of integer.
+         */
+        useLevelLabels: boolean;
+        /**
+         * Define additional logging levels.
+         */
+        customLevels: { [key: string]: number };
+        /**
+         * Use only defined `customLevels` and omit Pino's levels.
+         */
+        useOnlyCustomLevels: boolean;
+        /**
+         * Returns the integer value for the logger instance's logging level.
+         */
+        levelVal: number;
+
+        /**
+         * Registers a listener function that is triggered when the level is changed.
+         * Note: When browserified, this functionality will only be available if the `events` module has been required elsewhere
+         * (e.g. if you're using streams in the browser). This allows for a trade-off between bundle size and functionality.
+         *
+         * @param event: only ever fires the `'level-change'` event
+         * @param listener: The listener is passed four arguments: `levelLabel`, `levelValue`, `previousLevelLabel`, `previousLevelValue`.
+         */
+        on(event: "level-change", listener: LevelChangeEventListener): this;
+        addListener(event: "level-change", listener: LevelChangeEventListener): this;
+        once(event: "level-change", listener: LevelChangeEventListener): this;
+        prependListener(event: "level-change", listener: LevelChangeEventListener): this;
+        prependOnceListener(event: "level-change", listener: LevelChangeEventListener): this;
+        removeListener(event: "level-change", listener: LevelChangeEventListener): this;
 
         /**
          * A utility method for determining if a given log level will write to the destination.
