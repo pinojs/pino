@@ -75,7 +75,7 @@ test('can send pretty print to custom stream', async ({ equal }) => {
   })
 
   const log = pino({
-    prettifier: require('pino-pretty'),
+    prettifier: require('pino-pretty').prettyFactory,
     prettyPrint: {
       levelFirst: true,
       colorize: false
