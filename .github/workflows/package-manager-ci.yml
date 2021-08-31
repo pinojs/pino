@@ -1,0 +1,52 @@
+name: package-manager-ci
+on:
+  push:
+    paths-ignore:
+        - 'docs/**'
+        - '*.md'
+  pull_request:
+    paths-ignore:
+        - 'docs/**'
+        - '*.md'
+jobs:
+  pnpm:
+    name: pnpm package manager on ${{ matrix.node-version }} ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macOS-latest, windows-latest]
+        node-version: [12, 14, 16]
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2.4.0
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Use pnpm
+        uses: pnpm/action-setup@v2.0.1
+        with:
+          version: ^6.0.0
+      - name: Tests
+        run: pnpm run test-ci
+
+  yarn:
+    name: yarn package manager on ${{ matrix.node-version }} ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macOS-latest]
+        node-version: [12, 14, 16]
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2.4.0
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Use yarn
+        run: |
+          curl -o- -L https://yarnpkg.com/install.sh | bash
+          yarn install --ignore-engines
+      - name: Tests
+        run: yarn run test-ci
