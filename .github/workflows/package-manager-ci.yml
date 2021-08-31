@@ -46,7 +46,32 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: Use yarn
         run: |
-          curl -o- -L https://yarnpkg.com/install.sh | bash
-          yarn install --ignore-engines
+          npm install -g yarn
+          yarn set version berry
+          yarn install
+      - name: Tests
+        run: yarn run test-ci
+
+  yarn-pnp:
+    name: yarn-pnp package manager on ${{ matrix.node-version }} ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macOS-latest]
+        node-version: [12, 14, 16]
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2.4.0
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Use yarn
+        run: |
+          npm install -g yarn
+          yarn set version berry
+          echo "nodeLinker: pnp" >> .yarnrc.yml 
+          echo "pnpMode: loose" >> .yarnrc.yml 
+          yarn install
       - name: Tests
         run: yarn run test-ci
