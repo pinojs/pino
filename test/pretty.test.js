@@ -54,12 +54,12 @@ test('throws when prettyPrint is true but pino-pretty module is not installed', 
   // pino pretty *is* installed, and probably also cached, so rather than
   // messing with the filesystem the simplest way to generate a not found
   // error is to simulate it:
-  const prettyFactory = require('pino-pretty')
-  require.cache[require.resolve('pino-pretty')].exports = () => {
+  const prettyFactory = require('pino-pretty').prettyFactory
+  require('pino-pretty').prettyFactory = () => {
     throw Error('Cannot find module \'pino-pretty\'')
   }
   throws(() => pino({ prettyPrint: true }), 'Missing `pino-pretty` module: `pino-pretty` must be installed separately')
-  require.cache[require.resolve('pino-pretty')].exports = prettyFactory
+  require('pino-pretty').prettyFactory = prettyFactory
 })
 
 test('throws when prettyPrint has invalid options', async ({ throws }) => {
