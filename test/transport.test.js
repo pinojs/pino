@@ -380,3 +380,83 @@ test('stdout in worker', async ({ not }) => {
   await once(child, 'close')
   not(strip(actual).match(/Hello/), null)
 })
+
+test('pino transports options with target', async ({ teardown, same }) => {
+  const destination = join(
+    os.tmpdir(),
+    '_' + Math.random().toString(36).substr(2, 9)
+  )
+  const instance = pino({
+    transports: {
+      target: '#pino/file',
+      options: { destination }
+    }
+  })
+  const transportStream = instance[pino.symbols.streamSym]
+  teardown(transportStream.end.bind(transportStream))
+  instance.info('transport option test')
+  await watchFileCreated(destination)
+  const result = JSON.parse(await readFile(destination))
+  delete result.time
+  same(result, {
+    pid,
+    hostname,
+    level: 30,
+    msg: 'transport option test'
+  })
+})
+
+test('pino transports options with targets', async ({ teardown, same }) => {
+  const dest1 = join(
+    os.tmpdir(),
+    '_' + Math.random().toString(36).substr(2, 9)
+  )
+  const dest2 = join(
+    os.tmpdir(),
+    '_' + Math.random().toString(36).substr(2, 9)
+  )
+  const instance = pino({
+    transports: {
+      targets: [
+        { target: '#pino/file', options: { destination: dest1 } },
+        { target: '#pino/file', options: { destination: dest2 } }
+      ]
+    }
+  })
+  const transportStream = instance[pino.symbols.streamSym]
+  teardown(transportStream.end.bind(transportStream))
+  instance.info('transport option test')
+
+  await Promise.all([watchFileCreated(dest1), watchFileCreated(dest2)])
+  const result1 = JSON.parse(await readFile(dest1))
+  delete result1.time
+  same(result1, {
+    pid,
+    hostname,
+    level: 30,
+    msg: 'transport option test'
+  })
+  const result2 = JSON.parse(await readFile(dest2))
+  delete result2.time
+  same(result2, {
+    pid,
+    hostname,
+    level: 30,
+    msg: 'transport option test'
+  })
+})
+
+test('transports options with target and targets', async ({ fail, equal }) => {
+  try {
+    const instance = pino({
+      transports: {
+        target: {},
+        targets: {}
+      }
+    })
+    instance.info('hello')
+    fail('must throw')
+  } catch (err) {
+    equal(err.message, 'Only one of target or targets can be specified')
+  }
+})
