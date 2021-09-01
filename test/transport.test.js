@@ -381,7 +381,7 @@ test('stdout in worker', async ({ not }) => {
   not(strip(actual).match(/Hello/), null)
 })
 
-test('pino transports options with target', async ({ teardown, same }) => {
+test('pino transport options with target', async ({ teardown, same }) => {
   const destination = join(
     os.tmpdir(),
     '_' + Math.random().toString(36).substr(2, 9)
@@ -406,7 +406,7 @@ test('pino transports options with target', async ({ teardown, same }) => {
   })
 })
 
-test('pino transports options with targets', async ({ teardown, same }) => {
+test('pino transport options with targets', async ({ teardown, same }) => {
   const dest1 = join(
     os.tmpdir(),
     '_' + Math.random().toString(36).substr(2, 9)
