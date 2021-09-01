@@ -387,7 +387,7 @@ test('pino transports options with target', async ({ teardown, same }) => {
     '_' + Math.random().toString(36).substr(2, 9)
   )
   const instance = pino({
-    transports: {
+    transport: {
       target: '#pino/file',
       options: { destination }
     }
@@ -416,7 +416,7 @@ test('pino transports options with targets', async ({ teardown, same }) => {
     '_' + Math.random().toString(36).substr(2, 9)
   )
   const instance = pino({
-    transports: {
+    transport: {
       targets: [
         { target: '#pino/file', options: { destination: dest1 } },
         { target: '#pino/file', options: { destination: dest2 } }
@@ -446,17 +446,29 @@ test('pino transports options with targets', async ({ teardown, same }) => {
   })
 })
 
-test('transports options with target and targets', async ({ fail, equal }) => {
+test('transport options with target and targets', async ({ fail, equal }) => {
   try {
-    const instance = pino({
-      transports: {
+    pino({
+      transport: {
         target: {},
         targets: {}
       }
     })
-    instance.info('hello')
     fail('must throw')
   } catch (err) {
     equal(err.message, 'Only one of target or targets can be specified')
+  }
+})
+
+test('transport options with target and stream', async ({ fail, equal }) => {
+  try {
+    pino({
+      transport: {
+        target: {}
+      }
+    }, '/log/null')
+    fail('must throw')
+  } catch (err) {
+    equal(err.message, 'Only one of option.transport or stream can be specified')
   }
 })
