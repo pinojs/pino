@@ -367,6 +367,23 @@ documented in the [Browser API ⇗](/docs/browser.md) documentation.
 
 * See [Browser API ⇗](/docs/browser.md)
 
+#### `transport` (Object)
+
+The `transport` option is a shortcut to the [pino.transport()](#pino-transport) function.
+It support the same input options.
+```js
+require('pino')({
+  transport: {
+    target: '/absolute/path/to/my-transport.mjs'
+  }
+})
+```
+
+It is not possible to provide an additional [`destination`](#destination) argument
+when using the `transport` option. In this case an `Error` will be thrown.
+
+* See [pino.transport()](#pino-transport)
+
 <a id="destination"></a>
 ### `destination` (SonicBoom | WritableStream | String | Object)
 
