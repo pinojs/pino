@@ -51,6 +51,9 @@ jobs:
           npm install -g yarn
           yarn set version berry
           yarn install
+        env:
+          # needed due the yarn.lock file in pino's .gitignore
+          YARN_ENABLE_IMMUTABLE_INSTALLS: false
       - name: Tests
         run: yarn run test-ci
 
@@ -75,5 +78,8 @@ jobs:
           echo "nodeLinker: pnp" >> .yarnrc.yml 
           echo "pnpMode: loose" >> .yarnrc.yml 
           yarn install
+        env:
+          # needed due the yarn.lock file in pino's .gitignore
+          YARN_ENABLE_IMMUTABLE_INSTALLS: false
       - name: Tests
         run: yarn run test-ci
