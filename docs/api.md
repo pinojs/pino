@@ -370,11 +370,21 @@ documented in the [Browser API ⇗](/docs/browser.md) documentation.
 #### `transport` (Object)
 
 The `transport` option is a shortcut to the [pino.transport()](#pino-transport) function.
-It support the same input options.
+It support the same input options:
 ```js
 require('pino')({
   transport: {
     target: '/absolute/path/to/my-transport.mjs'
+  }
+})
+
+// or multiple transports
+require('pino')({
+  transport: {
+    targets: [
+      { target: '/absolute/path/to/my-transport.mjs', level: 'error' },
+      { target: 'some-file-transport', options: { destination: '/dev/null' }
+    ]
   }
 })
 ```
