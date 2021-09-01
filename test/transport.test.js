@@ -83,6 +83,29 @@ test('pino.transport with package', { skip: isWin }, async ({ same, teardown }) 
   })
 })
 
+test('pino.transport loads the pino-elasticsearch package', ({ plan, ok, fail, equal, pass }) => {
+  plan(3)
+  const transport = pino.transport({
+    target: 'pino-elasticsearch',
+    options: {
+      node: null // triggers the error if the module is loaded correctly
+    }
+  })
+
+  const instance = pino(transport)
+  instance.info('hello')
+
+  transport.on('ready', function () {
+    fail('ready event should not be emitted')
+  })
+  transport.on('error', function (err) {
+    ok(err)
+    equal(err.message, 'Missing node(s) option', 'pino-elastisearch trigger an error')
+  })
+
+  pass('pino instance created')
+})
+
 test('pino.transport with file URL', async ({ same, teardown }) => {
   const destination = join(
     os.tmpdir(),
