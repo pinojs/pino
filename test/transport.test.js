@@ -15,6 +15,8 @@ const writer = require('flush-write-stream')
 const { pid } = process
 const hostname = os.hostname()
 
+const isYarnPnp = process.versions.pnp !== undefined
+
 test('pino.transport with file', async ({ same, teardown }) => {
   const destination = join(
     os.tmpdir(),
@@ -47,7 +49,7 @@ test('pino.transport with file (no options + error handling)', async ({ equal })
 })
 
 // TODO make this test pass on Windows
-test('pino.transport with package', { skip: isWin }, async ({ same, teardown }) => {
+test('pino.transport with package', { skip: isWin || isYarnPnp }, async ({ same, teardown }) => {
   const destination = join(
     os.tmpdir(),
     '_' + Math.random().toString(36).substr(2, 9)
@@ -100,7 +102,7 @@ test('pino.transport loads the pino-elasticsearch package', ({ plan, ok, fail, e
   })
   transport.on('error', function (err) {
     ok(err)
-    equal(err.message, 'Missing node(s) option', 'pino-elastisearch trigger an error')
+    equal(err.message, 'Missing node(s) option', 'pino-elastisearch trigger a valid error', { skip: isYarnPnp })
   })
 
   pass('pino instance created')
@@ -314,7 +316,7 @@ test('pino.transport with target and targets', async ({ fail, equal }) => {
 })
 
 // TODO make this test pass on Windows
-test('pino.transport with package as a target', { skip: isWin }, async ({ same, teardown }) => {
+test('pino.transport with package as a target', { skip: isWin || isYarnPnp }, async ({ same, teardown }) => {
   const destination = join(
     os.tmpdir(),
     '_' + Math.random().toString(36).substr(2, 9)
