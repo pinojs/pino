@@ -79,6 +79,7 @@ jobs:
           echo "nodeLinker: pnp" >> .yarnrc.yml 
           echo "pnpMode: loose" >> .yarnrc.yml 
           yarn install
+          yarn add --dev transport@link:./test/fixtures/transport
         env:
           # needed due the yarn.lock file in pino's .gitignore
           YARN_ENABLE_IMMUTABLE_INSTALLS: false

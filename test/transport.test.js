@@ -5,7 +5,7 @@ const { join } = require('path')
 const { once } = require('events')
 const { readFile, symlink, unlink } = require('fs').promises
 const { test } = require('tap')
-const { isWin, watchFileCreated } = require('./helper')
+const { isWin, isYarnPnp, watchFileCreated } = require('./helper')
 const pino = require('../')
 const url = require('url')
 const strip = require('strip-ansi')
@@ -15,7 +15,31 @@ const writer = require('flush-write-stream')
 const { pid } = process
 const hostname = os.hostname()
 
-const isYarnPnp = process.versions.pnp !== undefined
+async function installTransportModule () {
+  try {
+    await uninstallTransportModule()
+  } catch {}
+  try {
+    await symlink(
+      join(__dirname, 'fixtures', 'transport'),
+      join(__dirname, '..', 'node_modules', 'transport')
+    )
+  } catch (err) {
+    if (!isYarnPnp) {
+      throw err
+    }
+  }
+}
+
+async function uninstallTransportModule () {
+  try {
+    await unlink(join(__dirname, '..', 'node_modules', 'transport'))
+  } catch (err) {
+    if (!isYarnPnp) {
+      throw err
+    }
+  }
+}
 
 test('pino.transport with file', async ({ same, teardown }) => {
   const destination = join(
@@ -49,27 +73,20 @@ test('pino.transport with file (no options + error handling)', async ({ equal })
 })
 
 // TODO make this test pass on Windows
-test('pino.transport with package', { skip: isWin || isYarnPnp }, async ({ same, teardown }) => {
+test('pino.transport with package', { skip: isWin }, async ({ same, teardown }) => {
   const destination = join(
     os.tmpdir(),
     '_' + Math.random().toString(36).substr(2, 9)
   )
 
-  try {
-    await unlink(join(__dirname, '..', 'node_modules', 'transport'))
-  } catch {}
-
-  await symlink(
-    join(__dirname, 'fixtures', 'transport'),
-    join(__dirname, '..', 'node_modules', 'transport')
-  )
+  await installTransportModule()
 
   const transport = pino.transport({
     target: 'transport',
     options: { destination }
   })
   teardown(async () => {
-    await unlink(join(__dirname, '..', 'node_modules', 'transport'))
+    await uninstallTransportModule()
     transport.end()
   })
   const instance = pino(transport)
@@ -316,20 +333,13 @@ test('pino.transport with target and targets', async ({ fail, equal }) => {
 })
 
 // TODO make this test pass on Windows
-test('pino.transport with package as a target', { skip: isWin || isYarnPnp }, async ({ same, teardown }) => {
+test('pino.transport with package as a target', { skip: isWin }, async ({ same, teardown }) => {
   const destination = join(
     os.tmpdir(),
     '_' + Math.random().toString(36).substr(2, 9)
   )
 
-  try {
-    await unlink(join(__dirname, '..', 'node_modules', 'transport'))
-  } catch {}
-
-  await symlink(
-    join(__dirname, 'fixtures', 'transport'),
-    join(__dirname, '..', 'node_modules', 'transport')
-  )
+  await installTransportModule()
 
   const transport = pino.transport({
     targets: [{
@@ -338,7 +348,7 @@ test('pino.transport with package as a target', { skip: isWin || isYarnPnp }, as
     }]
   })
   teardown(async () => {
-    await unlink(join(__dirname, '..', 'node_modules', 'transport'))
+    await uninstallTransportModule()
     transport.end()
   })
   const instance = pino(transport)
