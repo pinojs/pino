@@ -456,7 +456,7 @@ test('transport options with target and targets', async ({ fail, equal }) => {
     })
     fail('must throw')
   } catch (err) {
-    equal(err.message, 'Only one of target or targets can be specified')
+    equal(err.message, 'only one of target or targets can be specified')
   }
 })
 
@@ -469,6 +469,6 @@ test('transport options with target and stream', async ({ fail, equal }) => {
     }, '/log/null')
     fail('must throw')
   } catch (err) {
-    equal(err.message, 'Only one of option.transport or stream can be specified')
+    equal(err.message, 'only one of option.transport or stream can be specified')
   }
 })
