@@ -51,6 +51,8 @@ jobs:
           npm install -g yarn
           yarn set version berry && yarn set version 2.4.2
           echo "nodeLinker: node-modules" >> .yarnrc.yml
+          # see https://github.com/yarnpkg/berry/issues/2935#issuecomment-911299992
+          yarn add --dev typescript@~4.3.2
           yarn install
         env:
           # needed due the yarn.lock file in pino's .gitignore
