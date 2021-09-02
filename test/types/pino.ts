@@ -32,7 +32,7 @@ const transports = pino.transport({targets: [
     },
     {
         level: 'trace',
-        target: '#pino/file',
+        target: 'pino/file',
         options: { destination }
     }
 ]})

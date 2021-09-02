@@ -198,7 +198,7 @@ test('pino.transport with an array including a pino-pretty destination', async (
   const transport = pino.transport({
     targets: [{
       level: 'info',
-      target: '#pino/file',
+      target: 'pino/file',
       options: {
         destination: dest1
       }
@@ -329,13 +329,13 @@ test('pino.transport with package as a target', { skip: isWin }, async ({ same, 
   })
 })
 
-test('pino.transport with target #pino/file', async ({ same, teardown }) => {
+test('pino.transport with target pino/file', async ({ same, teardown }) => {
   const destination = join(
     os.tmpdir(),
     '_' + Math.random().toString(36).substr(2, 9)
   )
   const transport = pino.transport({
-    target: '#pino/file',
+    target: 'pino/file',
     options: { destination }
   })
   teardown(transport.end.bind(transport))
