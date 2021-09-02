@@ -369,7 +369,7 @@ documented in the [Browser API ⇗](/docs/browser.md) documentation.
 
 #### `transport` (Object)
 
-The `transport` option is a shortcut to the [pino.transport()](#pino-transport) function.
+The `transport` option is a shorthand for the [pino.transport()](#pino-transport) function.
 It supports the same input options:
 ```js
 require('pino')({
@@ -389,7 +389,11 @@ require('pino')({
 })
 ```
 
-It is not possible to provide an additional [`destination`](#destination) argument
+If the transport option is supplied to `pino`, a [`destination`](#destination) parameter may not also be passed as a separate argument to `pino`:
+
+```js
+pino({ transport: {}}, '/path/to/somewhere') // THIS WILL NOT WORK, DO NOT DO THIS
+pino({ transport: {}}, process.stderr) // THIS WILL NOT WORK, DO NOT DO THIS
 when using the `transport` option. In this case an `Error` will be thrown.
 
 * See [pino.transport()](#pino-transport)
