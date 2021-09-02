@@ -370,7 +370,7 @@ documented in the [Browser API ⇗](/docs/browser.md) documentation.
 #### `transport` (Object)
 
 The `transport` option is a shortcut to the [pino.transport()](#pino-transport) function.
-It support the same input options:
+It supports the same input options:
 ```js
 require('pino')({
   transport: {
