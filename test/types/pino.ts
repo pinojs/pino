@@ -9,14 +9,14 @@ const destination = join(
 
 // Single
 const transport = pino.transport({
-    target: '#pino/pretty',
+    target: 'pino-pretty',
     options: { some: 'options for', the: 'transport' }
 })
 const logger = pino(transport)
 logger.info('test2')
 
 const transport2 = pino.transport({
-    target: '#pino/pretty',
+    target: 'pino-pretty',
 })
 const logger2 = pino(transport2)
 logger2.info('test2')
@@ -27,7 +27,7 @@ logger2.info('test2')
 const transports = pino.transport({targets: [
     {
         level: 'info',
-        target: '#pino/pretty',
+        target: 'pino-pretty',
         options: { some: 'options for', the: 'transport' }
     },
     {
