@@ -286,7 +286,7 @@ test('pino.transport with target and targets', async ({ fail, equal }) => {
     })
     fail('must throw')
   } catch (err) {
-    equal(err.message, 'Only one of target or targets can be specified')
+    equal(err.message, 'only one of target or targets can be specified')
   }
 })
 
