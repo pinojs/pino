@@ -253,6 +253,12 @@ pino({ name: "my-logger" }, destinationViaStream);
 pino(destinationViaOptionsObject);
 pino({ name: "my-logger" }, destinationViaOptionsObject);
 
+try {
+    throw new Error('Some error')
+} catch (err) {
+    log.error(err)
+}
+
 interface StrictShape {
     activity: string;
     err?: unknown;
