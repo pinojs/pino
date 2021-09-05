@@ -16,7 +16,6 @@ now referred to as [Legacy Transports](#legacy-transports).
 From Pino v7 and upwards transports can also operate inside a [Worker Thread][worker-thread],
 and can be used or configured via the options object passed to `pino` on initialization.
 
-
 [worker-thread]: https://nodejs.org/dist/latest-v14.x/docs/api/worker_threads.html
 
 ## v7+ Transports
@@ -107,6 +106,80 @@ For more details on `pino.transport` see the [API docs for `pino.transport`][pin
 [pino-transport]: /docs/api.md#pino-transport
 [sca]: https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm
 
+### Writing a Transport
+
+The module [pino-abstract-transport](https://github.com/pinojs/pino-abstract-transport) provides
+a simple utility to parse each line.  Its usage is highly recommended.
+
+You can see an example using a async iterator with ESM:
+
+```js
+import build from 'pino-abstract-stream'
+
+exports default async function (opts) {
+  return build(async function (source) {
+    for await (let obj of source) {
+      console.log(obj)
+    }
+  })
+}
+```
+
+or using Node.js streams and CommonJS:
+
+```js
+'use strict'
+
+const build = require('pino-abstract-stream')
+
+module.exports = function (opts) {
+  return build(function (source) {
+    source.on('data', function (obj) {
+      console.log(obj)
+    })
+  })
+}
+```
+
+(It is possible to use the async iterators with CommonJS and streams with ESM.)
+
+### Notable transports
+
+#### `pino/file`
+
+The `pino/file` transport routes logs to a file (or file descriptor).
+
+The `options.destination` property may be set to specify the desired file destination.
+
+```js
+const pino = require('pino')
+const transport = pino.transport({
+  target: '#pino/file',
+  options: { destination: '/path/to/file' }
+})
+pino(transport)
+```
+
+The `options.destination` property may also be a number to represent a file descriptor. Typically this would be `1` to write to STDOUT or `2` to write to STDERR. If `options.destination` is not set, it defaults to `1` which means logs will be written to STDOUT.
+
+The difference between using the `#pino/file` transport builtin and using `pino.destination` is that `pino.destination` runs in the main thread, whereas `#pino/file` sets up `pino.destination` in a worker thread.
+
+#### `pino/pretty`
+
+The [`pino-pretty`][pino-pretty] transport prettifies logs.
+
+By default the `pino-pretty` builtin logs to STDOUT.
+
+The `options.destination` property may be set to log pretty logs to a file descriptor or file. The following would send the prettified logs to STDERR:
+
+```js
+const pino = require('pino')
+const transport = pino.transport({
+  target: 'pino-pretty',
+  options: { destination: 1 } // use 2 for stderr
+})
+pino(transport)
+```
 
 ### Asynchronous startup
 
@@ -172,6 +245,7 @@ PR's to this document are welcome for any new transports!
 ### Pino v7+ Compatible
 
 + [pino-elasticsearch](#pino-elasticsearch)
++ [pino-pretty](#pino-pretty)
 
 ### Legacy
 
@@ -559,3 +633,5 @@ $ node app.js | pino-websocket -a my-websocket-server.example.com -p 3004
 ```
 
 For full documentation of command line switches read the [README](https://github.com/abeai/pino-websocket#readme).
+
+[pino-pretty]: https://github.com/pinojs/pino-pretty
