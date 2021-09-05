@@ -119,7 +119,7 @@ test('pino.transport loads the pino-elasticsearch package', ({ plan, ok, fail, e
   })
   transport.on('error', function (err) {
     ok(err)
-    equal(err.message, 'Missing node(s) option', 'pino-elastisearch trigger a valid error', { skip: isYarnPnp })
+    equal(err.message, 'Missing node(s) option', 'pino-elastisearch trigger a valid error')
   })
 
   pass('pino instance created')
