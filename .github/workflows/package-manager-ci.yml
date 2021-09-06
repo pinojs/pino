@@ -58,7 +58,10 @@ jobs:
           # needed due the yarn.lock file in pino's .gitignore
           YARN_ENABLE_IMMUTABLE_INSTALLS: false
       - name: Tests
-        run: yarn run test-ci
+        run: |
+          # yarn doesn't support ESM yet
+          mv ./test/esm/index.test.js ./test/esm/index.test.skip.js
+          yarn run test-ci
 
   yarn-pnp:
     name: yarn-pnp package manager on ${{ matrix.node-version }} ${{ matrix.os }}
