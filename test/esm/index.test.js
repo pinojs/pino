@@ -3,7 +3,9 @@
 const t = require('tap')
 const semver = require('semver')
 
-if (!semver.satisfies(process.versions.node, '^13.3.0 || ^12.10.0 || >= 14.0.0')) {
+const { isYarnPnp } = require('../helper')
+
+if (!semver.satisfies(process.versions.node, '^13.3.0 || ^12.10.0 || >= 14.0.0') || isYarnPnp) {
   t.skip('Skip esm because not supported by Node')
 } else {
   // Node v8 throw a `SyntaxError: Unexpected token import`
@@ -17,7 +19,7 @@ if (!semver.satisfies(process.versions.node, '^13.3.0 || ^12.10.0 || >= 14.0.0')
   })
 }
 
-if (!semver.satisfies(process.versions.node, '>= 14.13.0 || ^12.20.0')) {
+if (!semver.satisfies(process.versions.node, '>= 14.13.0 || ^12.20.0') || isYarnPnp) {
   t.skip('Skip named exports because not supported by Node')
 } else {
   // Node v8 throw a `SyntaxError: Unexpected token import`
