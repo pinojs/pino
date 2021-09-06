@@ -50,7 +50,7 @@ jobs:
         run: |
           npm install -g yarn
           yarn set version berry && yarn set version 2.4.2
-          echo 'nodeLinker: node_modules >> .yarnrc.yml
+          echo "nodeLinker: node-modules" >> .yarnrc.yml
           # see https://github.com/yarnpkg/berry/issues/2935#issuecomment-911299992
           yarn add --dev typescript@~4.3.2
           yarn install
@@ -85,6 +85,7 @@ jobs:
               dependencies:
                 supports-color: "*"
           ' >> .yarnrc.yml
+          yarn add --dev typescript@~4.3.2
           yarn install
           yarn add --dev transport@link:./test/fixtures/transport
         env:
