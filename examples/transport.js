@@ -9,19 +9,21 @@ const file = join(tmpdir(), `pino-${process.pid}-example`)
 const transport = pino.transport({
   targets: [{
     level: 'warn',
-    target: '#pino/file',
+    target: 'pino/file',
     options: {
       destination: file
     }
+    /*
   }, {
     level: 'info',
     target: 'pino-elasticsearch',
     options: {
       node: 'http://localhost:9200'
     }
+    */
   }, {
     level: 'info',
-    target: '#pino/pretty'
+    target: 'pino-pretty'
   }]
 })
 

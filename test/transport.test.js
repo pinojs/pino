@@ -228,7 +228,7 @@ test('pino.transport with two files', async ({ same, teardown }) => {
   })
 })
 
-test('pino.transport with an array including a prettyPrint destination', async ({ same, match, teardown }) => {
+test('pino.transport with an array including a pino-pretty destination', async ({ same, match, teardown }) => {
   const dest1 = join(
     os.tmpdir(),
     '_' + Math.random().toString(36).substr(2, 9)
@@ -240,13 +240,13 @@ test('pino.transport with an array including a prettyPrint destination', async (
   const transport = pino.transport({
     targets: [{
       level: 'info',
-      target: '#pino/file',
+      target: 'pino/file',
       options: {
         destination: dest1
       }
     }, {
       level: 'info',
-      target: '#pino/pretty',
+      target: 'pino-pretty',
       options: {
         destination: dest2
       }
@@ -364,13 +364,13 @@ test('pino.transport with package as a target', { skip: isWin }, async ({ same, 
   })
 })
 
-test('pino.transport with target #pino/file', async ({ same, teardown }) => {
+test('pino.transport with target pino/file', async ({ same, teardown }) => {
   const destination = join(
     os.tmpdir(),
     '_' + Math.random().toString(36).substr(2, 9)
   )
   const transport = pino.transport({
-    target: '#pino/file',
+    target: 'pino/file',
     options: { destination }
   })
   teardown(transport.end.bind(transport))
@@ -387,13 +387,13 @@ test('pino.transport with target #pino/file', async ({ same, teardown }) => {
   })
 })
 
-test('pino.transport with target #pino/pretty', async ({ match, teardown }) => {
+test('pino.transport with target pino-pretty', async ({ match, teardown }) => {
   const destination = join(
     os.tmpdir(),
     '_' + Math.random().toString(36).substr(2, 9)
   )
   const transport = pino.transport({
-    target: '#pino/pretty',
+    target: 'pino-pretty',
     options: { destination }
   })
   teardown(transport.end.bind(transport))
