@@ -30,7 +30,7 @@ jobs:
       - name: Install dependancies
         run: pnpm install
       - name: Tests
-        run: pnpm run test-ci
+        run: pnpm run test-ci-pnpm
 
   yarn:
     name: yarn package manager on ${{ matrix.node-version }} ${{ matrix.os }}
