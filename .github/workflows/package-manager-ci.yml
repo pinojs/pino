@@ -1,0 +1,91 @@
+name: package-manager-ci
+on:
+  push:
+    branches:
+      - main
+      - package-manager-load
+jobs:
+  pnpm:
+    name: pnpm package manager on ${{ matrix.node-version }} ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+        node-version: [14]
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2.4.0
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Use pnpm
+        uses: pnpm/action-setup@v2.0.1
+        with:
+          version: ^6.0.0
+      - name: Install dependancies
+        run: pnpm install
+      - name: Tests
+        run: pnpm run test-ci-pnpm
+
+  yarn:
+    name: yarn package manager on ${{ matrix.node-version }} ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+        node-version: [14]
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2.4.0
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Use yarn
+        run: |
+          yarn set version berry && yarn set version 2
+          echo "nodeLinker: node-modules" >> .yarnrc.yml
+          # see https://github.com/yarnpkg/berry/issues/2935#issuecomment-911299992
+          yarn add --dev typescript@~4.3.2
+          yarn install
+        env:
+          # needed due the yarn.lock file in pino's .gitignore
+          YARN_ENABLE_IMMUTABLE_INSTALLS: false
+      - name: Tests
+        run: yarn run test-ci
+
+  yarn-pnp:
+    name: yarn-pnp package manager on ${{ matrix.node-version }} ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+        node-version: [14]
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2.4.0
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Use yarn
+        run: |
+          yarn set version berry
+          echo 'nodeLinker: pnp
+          packageExtensions:
+            debug@*:
+              dependencies:
+                supports-color: "*"
+            treport@*:
+              dependencies:
+                tap-yaml: "*"
+          ' >> .yarnrc.yml
+          yarn add --dev typescript@~4.3.2
+          yarn install
+          yarn add --dev transport@link:./test/fixtures/transport
+        env:
+          # needed due the yarn.lock file in pino's .gitignore
+          YARN_ENABLE_IMMUTABLE_INSTALLS: false
+      - name: Tests
+        run: yarn run test-ci-yarn-pnp

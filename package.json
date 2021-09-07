@@ -24,6 +24,8 @@
     "lint": "eslint .",
     "test": "npm run lint && tap test/*test.js test/*/*test.js && npm run test-types",
     "test-ci": "npm run lint && tap --no-check-coverage test/*test.js test/*/*test.js --coverage-report=lcovonly && npm run test-types",
+    "test-ci-pnpm": "pnpm run lint && tap --no-coverage --no-check-coverage test/*test.js test/*/*test.js && pnpm run test-types",
+    "test-ci-yarn-pnp": "yarn run lint && tap --no-check-coverage test/*test.js test/*/*test.js --coverage-report=lcovonly",
     "test-types": "tsc && tsd && ts-node test/types/pino.ts",
     "cov-ui": "tap --coverage-report=html test/*test.js test/*/*test.js",
     "bench": "node benchmarks/utils/runbench all",
@@ -108,7 +110,7 @@
     "pino-std-serializers": "^4.0.0",
     "quick-format-unescaped": "^4.0.3",
     "sonic-boom": "^2.2.1",
-    "thread-stream": "^0.11.0"
+    "thread-stream": "^0.11.1"
   },
   "tsd": {
     "directory": "test/types"

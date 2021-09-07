@@ -8,6 +8,7 @@ const pid = process.pid
 const hostname = os.hostname()
 
 const isWin = process.platform === 'win32'
+const isYarnPnp = process.versions.pnp !== undefined
 
 function getPathToNull () {
   return isWin ? '\\\\.\\NUL' : '/dev/null'
@@ -72,4 +73,4 @@ function watchFileCreated (filename) {
   })
 }
 
-module.exports = { getPathToNull, sink, check, once, sleep, watchFileCreated, isWin }
+module.exports = { getPathToNull, sink, check, once, sleep, watchFileCreated, isWin, isYarnPnp }
