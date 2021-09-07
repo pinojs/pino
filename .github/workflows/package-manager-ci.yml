@@ -1,13 +1,8 @@
 name: package-manager-ci
 on:
   push:
-    paths-ignore:
-        - 'docs/**'
-        - '*.md'
-  pull_request:
-    paths-ignore:
-        - 'docs/**'
-        - '*.md'
+    branches:
+      - main
 jobs:
   pnpm:
     name: pnpm package manager on ${{ matrix.node-version }} ${{ matrix.os }}
@@ -15,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macOS-latest, windows-latest]
+        os: [windows-latest, ubuntu-latest]
         node-version: [12, 14, 16]
     steps:
       - uses: actions/checkout@v2.3.4
@@ -38,7 +33,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macOS-latest]
+        os: [windows-latest, ubuntu-latest]
         node-version: [12, 14, 16]
     steps:
       - uses: actions/checkout@v2.3.4
@@ -65,7 +60,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macOS-latest]
+        os: [windows-latest, ubuntu-latest]
         node-version: [12, 14, 16]
     steps:
       - uses: actions/checkout@v2.3.4
