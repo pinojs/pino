@@ -79,11 +79,13 @@ jobs:
           npm install -g yarn
           yarn set version berry
           echo 'nodeLinker: pnp
-          pnpMode: loose
           packageExtensions:
             debug@*:
               dependencies:
                 supports-color: "*"
+            treport@*:
+              dependencies:
+                tap-yaml: "*"
           ' >> .yarnrc.yml
           yarn add --dev typescript@~4.3.2
           yarn install
@@ -92,4 +94,4 @@ jobs:
           # needed due the yarn.lock file in pino's .gitignore
           YARN_ENABLE_IMMUTABLE_INSTALLS: false
       - name: Tests
-        run: yarn run test-ci
+        run: yarn run test-ci-yarn-pnp

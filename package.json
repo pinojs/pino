@@ -24,6 +24,7 @@
     "lint": "eslint .",
     "test": "npm run lint && tap test/*test.js test/*/*test.js && npm run test-types",
     "test-ci": "npm run lint && tap --no-check-coverage test/*test.js test/*/*test.js --coverage-report=lcovonly && npm run test-types",
+    "test-ci-yarn-pnp": "npm run lint && tap --no-check-coverage test/*test.js test/*/*test.js --coverage-report=lcovonly",
     "test-types": "tsc && tsd && ts-node test/types/pino.ts",
     "cov-ui": "tap --coverage-report=html test/*test.js test/*/*test.js",
     "bench": "node benchmarks/utils/runbench all",
