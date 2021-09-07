@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - main
+      - package-manager-load
 jobs:
   pnpm:
     name: pnpm package manager on ${{ matrix.node-version }} ${{ matrix.os }}

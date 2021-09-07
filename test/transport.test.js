@@ -16,29 +16,23 @@ const { pid } = process
 const hostname = os.hostname()
 
 async function installTransportModule () {
+  if (isYarnPnp) {
+    return
+  }
   try {
     await uninstallTransportModule()
   } catch {}
-  try {
-    await symlink(
-      join(__dirname, 'fixtures', 'transport'),
-      join(__dirname, '..', 'node_modules', 'transport')
-    )
-  } catch (err) {
-    if (!isYarnPnp) {
-      throw err
-    }
-  }
+  await symlink(
+    join(__dirname, 'fixtures', 'transport'),
+    join(__dirname, '..', 'node_modules', 'transport')
+  )
 }
 
 async function uninstallTransportModule () {
-  try {
-    await unlink(join(__dirname, '..', 'node_modules', 'transport'))
-  } catch (err) {
-    if (!isYarnPnp) {
-      throw err
-    }
+  if (isYarnPnp) {
+    return
   }
+  await unlink(join(__dirname, '..', 'node_modules', 'transport'))
 }
 
 test('pino.transport with file', async ({ same, teardown }) => {
@@ -100,29 +94,6 @@ test('pino.transport with package', { skip: isWin }, async ({ same, teardown }) 
     level: 30,
     msg: 'hello'
   })
-})
-
-test('pino.transport loads the pino-elasticsearch package', ({ plan, ok, fail, equal, pass }) => {
-  plan(3)
-  const transport = pino.transport({
-    target: 'pino-elasticsearch',
-    options: {
-      node: null // triggers the error if the module is loaded correctly
-    }
-  })
-
-  const instance = pino(transport)
-  instance.info('hello')
-
-  transport.on('ready', function () {
-    fail('ready event should not be emitted')
-  })
-  transport.on('error', function (err) {
-    ok(err)
-    equal(err.message, 'Missing node(s) option', 'pino-elastisearch trigger a valid error')
-  })
-
-  pass('pino instance created')
 })
 
 test('pino.transport with file URL', async ({ same, teardown }) => {
