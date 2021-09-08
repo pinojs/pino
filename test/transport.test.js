@@ -394,7 +394,7 @@ test('pino transport options with target', async ({ teardown, same }) => {
   )
   const instance = pino({
     transport: {
-      target: '#pino/file',
+      target: 'pino/file',
       options: { destination }
     }
   })
@@ -424,8 +424,8 @@ test('pino transport options with targets', async ({ teardown, same }) => {
   const instance = pino({
     transport: {
       targets: [
-        { target: '#pino/file', options: { destination: dest1 } },
-        { target: '#pino/file', options: { destination: dest2 } }
+        { target: 'pino/file', options: { destination: dest1 } },
+        { target: 'pino/file', options: { destination: dest2 } }
       ]
     }
   })
