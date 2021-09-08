@@ -9,6 +9,22 @@ const { once } = require('./helper')
 const pino = require('../')
 const strip = require('strip-ansi')
 
+// silence warnings
+process.removeAllListeners('warning')
+
+// This test MUST be the first
+test('deprecation', ({ equal, plan }) => {
+  plan(1)
+
+  process.once('warning', function (warning) {
+    equal(warning.code, 'PINODEP008')
+  })
+
+  pino({
+    prettyPrint: true
+  })
+})
+
 test('can be enabled via exported pino function', async ({ not }) => {
   let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'basic.js')])
