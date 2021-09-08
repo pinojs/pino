@@ -299,7 +299,7 @@ test('pino.transport with target and targets', async ({ fail, equal }) => {
     })
     fail('must throw')
   } catch (err) {
-    equal(err.message, 'Only one of target or targets can be specified')
+    equal(err.message, 'only one of target or targets can be specified')
   }
 })
 
@@ -385,4 +385,96 @@ test('stdout in worker', async ({ not }) => {
   }))
   await once(child, 'close')
   not(strip(actual).match(/Hello/), null)
+})
+
+test('pino transport options with target', async ({ teardown, same }) => {
+  const destination = join(
+    os.tmpdir(),
+    '_' + Math.random().toString(36).substr(2, 9)
+  )
+  const instance = pino({
+    transport: {
+      target: '#pino/file',
+      options: { destination }
+    }
+  })
+  const transportStream = instance[pino.symbols.streamSym]
+  teardown(transportStream.end.bind(transportStream))
+  instance.info('transport option test')
+  await watchFileCreated(destination)
+  const result = JSON.parse(await readFile(destination))
+  delete result.time
+  same(result, {
+    pid,
+    hostname,
+    level: 30,
+    msg: 'transport option test'
+  })
+})
+
+test('pino transport options with targets', async ({ teardown, same }) => {
+  const dest1 = join(
+    os.tmpdir(),
+    '_' + Math.random().toString(36).substr(2, 9)
+  )
+  const dest2 = join(
+    os.tmpdir(),
+    '_' + Math.random().toString(36).substr(2, 9)
+  )
+  const instance = pino({
+    transport: {
+      targets: [
+        { target: '#pino/file', options: { destination: dest1 } },
+        { target: '#pino/file', options: { destination: dest2 } }
+      ]
+    }
+  })
+  const transportStream = instance[pino.symbols.streamSym]
+  teardown(transportStream.end.bind(transportStream))
+  instance.info('transport option test')
+
+  await Promise.all([watchFileCreated(dest1), watchFileCreated(dest2)])
+  const result1 = JSON.parse(await readFile(dest1))
+  delete result1.time
+  same(result1, {
+    pid,
+    hostname,
+    level: 30,
+    msg: 'transport option test'
+  })
+  const result2 = JSON.parse(await readFile(dest2))
+  delete result2.time
+  same(result2, {
+    pid,
+    hostname,
+    level: 30,
+    msg: 'transport option test'
+  })
+})
+
+test('transport options with target and targets', async ({ fail, equal }) => {
+  try {
+    pino({
+      transport: {
+        target: {},
+        targets: {}
+      }
+    })
+    fail('must throw')
+  } catch (err) {
+    equal(err.message, 'only one of target or targets can be specified')
+  }
+})
+
+test('transport options with target and stream', async ({ fail, equal }) => {
+  try {
+    pino({
+      transport: {
+        target: {}
+      }
+    }, '/log/null')
+    fail('must throw')
+  } catch (err) {
+    equal(err.message, 'only one of option.transport or stream can be specified')
+  }
 })
