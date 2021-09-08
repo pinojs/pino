@@ -347,6 +347,8 @@ and searching for logged objects can start from a consistent path.
 
 Default: `false`
 
+__DEPRECATED: use [`transport`](#transport) instead.
+
 Enables pretty printing log logs. This is intended for non-production
 configurations. This may be set to a configuration object as outlined in the
 [`pino-pretty` documentation](https://github.com/pinojs/pino-pretty).
@@ -934,11 +936,7 @@ const pino = require('pino')
 const transports = pino.transport({
   targets: [{
     level: 'info',
-    target: 'some-transport',
-    options: { some: 'options for', the: 'transport' }
-  }, {
-    level: 'info',
-    target: 'pino-pretty'
+    target: 'pino-pretty' // must be installed separately
   }, {
     level: 'trace',
     target: 'pino/file',
