@@ -678,7 +678,7 @@ the current log level of the parent at the time they are spawned.
 
 The log level of a child is mutable. It can be set independently
 of the parent either by setting the [`level`](#level) accessor after creating
-the child logger or using the reserved [`bindings.level`](#bindingslevel-string) key.
+the child logger or using the [`options.level`](#optionslevel-string) key.
 
 #### `bindings` (Object)
 
@@ -695,18 +695,6 @@ child.info('child!')
 
 The `bindings` object may contain any key except for reserved configuration keys `level` and `serializers`.
 
-##### `bindings.level` (String)
-
-If a `level` property is present in the `bindings` object passed to `logger.child`
-it will override the child logger level.
-
-```js
-const logger = pino()
-logger.debug('nope') // will not log, since default level is info
-const child = logger.child({foo: 'bar', level: 'debug'})
-child.debug('debug!') // will log as the `level` property set the level to debug
-```
-
 ##### `bindings.serializers` (Object) - DEPRECATED
 
 Use `options.serializers` instead.
@@ -714,6 +702,19 @@ Use `options.serializers` instead.
 #### `options` (Object)
 
 Options for child logger. These options will override the parent logger options.
+
+##### `options.level` (String)
+
+The `level` property overrides the log level of the child logger.
+By default the parent log level is inherited.
+After the creation of the child logger, it is also accessible using the [`logger.level`](#logger-level) key.
+
+```js
+const logger = pino()
+logger.debug('nope') // will not log, since default level is info
+const child = logger.child({foo: 'bar'}, {level: 'debug')
+child.debug('debug!') // will log as the `level` property set the level to debug
+```
 
 ##### `options.redact` (Array | Object)
 
