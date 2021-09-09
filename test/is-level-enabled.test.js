@@ -26,7 +26,7 @@ test('can check if lower level is disabled', async ({ equal }) => {
 })
 
 test('can check if child has current level enabled', async ({ equal }) => {
-  const log = pino().child({ level: 'debug' })
+  const log = pino().child({}, { level: 'debug' })
   equal(true, log.isLevelEnabled('debug'))
   equal(true, log.isLevelEnabled('error'))
   equal(false, log.isLevelEnabled('trace'))
