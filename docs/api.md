@@ -453,9 +453,6 @@ set on the `destination` object after each log line is written:
 * the last logger instance as `destination.lastLogger` (to support child
   loggers)
 
-For a full reference for using `Symbol.for('pino.metadata')`, see the [`pino-multi-stream` ⇗](https://github.com/pinojs/pino-multi-stream)
-module.
-
 The following is a succinct usage example:
 
 ```js
@@ -469,8 +466,6 @@ console.log(
   lastMsg, lastLevel, lastObj, lastTime
 ) // Logged message "hi" at level 30 with object { a: 1 } at time 1531590545089
 ```
-
-* See [`pino-multi-stream` ⇗](https://github.com/pinojs/pino-multi-stream)
 
 <a id="logger"></a>
 ## Logger Instance
@@ -1055,8 +1050,10 @@ Create a stream composed by multiple destination streams:
 ```js
 var fs = require('fs')
 var pino = require('pino')
+var pretty = require('pino-pretty')
 var streams = [
   {stream: fs.createWriteStream('/tmp/info.stream.out')},
+  {stream: pretty() },
   {level: 'debug', stream: fs.createWriteStream('/tmp/debug.stream.out')},
   {level: 'fatal', stream: fs.createWriteStream('/tmp/fatal.stream.out')}
 ]
@@ -1079,7 +1076,7 @@ In order for `multistream` to work, the log level __must__ be set to the lowest 
 
 + `dedupe`: Set this to `true` to send logs only to the stream with the higher level. Default: `false`
 
-    `dedupe` flag can be useful for example when using pino-multi-stream to redirect `error` logs to `process.stderr` and others to `process.stdout`:
+    `dedupe` flag can be useful for example when using pino.multistream to redirect `error` logs to `process.stderr` and others to `process.stdout`:
 
     ```js
     var pino = require('pino')
