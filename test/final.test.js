@@ -72,6 +72,32 @@ test('listener function immediately sync flushes when fired (sync true)', async 
   if (passed === false) fail('flushSync not called')
 })
 
+test('immediately sync flushes when no handler is provided (sync false)', async ({ pass, fail }) => {
+  const dest = pino.destination({ dest: getPathToNull(), sync: false })
+  let passed = false
+  dest.flushSync = () => {
+    passed = true
+    pass('flushSync called')
+    dest.flushSync = () => {}
+  }
+  pino.final(pino(dest))
+  await sleep(10)
+  if (passed === false) fail('flushSync not called')
+})
+
+test('immediately sync flushes when no handler is provided (sync true)', async ({ pass, fail }) => {
+  const dest = pino.destination({ dest: getPathToNull(), sync: true })
+  let passed = false
+  dest.flushSync = () => {
+    passed = true
+    pass('flushSync called')
+    dest.flushSync = () => {}
+  }
+  pino.final(pino(dest))
+  await sleep(10)
+  if (passed === false) fail('flushSync not called')
+})
+
 test('swallows the non-ready error', async ({ doesNotThrow }) => {
   const dest = pino.destination({ dest: getPathToNull(), sync: false })
   doesNotThrow(() => {
