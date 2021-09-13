@@ -7,6 +7,8 @@ const os = require('os')
 const test = require('tap').test
 const pino = require('../')
 const multistream = pino.multistream
+const proxyquire = require('proxyquire')
+const strip = require('strip-ansi')
 
 test('sends to multiple streams using string levels', function (t) {
   let messageCount = 0
@@ -213,23 +215,24 @@ test('supports custom levels', function (t) {
 })
 
 test('supports pretty print', function (t) {
+  t.plan(2)
   const stream = writeStream(function (data, enc, cb) {
-    t.not(data.toString().match(/INFO.*: pretty print/), null)
-    t.end()
+    t.not(strip(data.toString()).match(/INFO.*: pretty print/), null)
     cb()
   })
-  const outStream = pino({
-    prettyPrint: {
-      levelFirst: true,
-      colorize: false
+
+  const pretty = proxyquire('pino-pretty', {
+    'sonic-boom': function () {
+      t.pass('sonic created')
+      return stream
     }
-  }, stream)
+  })
 
   const log = pino({
     level: 'debug',
     name: 'helloName'
   }, multistream([
-    { stream: outStream[pino.symbols.streamSym] }
+    { stream: pretty() }
   ]))
 
   log.info('pretty print')
