@@ -1076,7 +1076,7 @@ In order for `multistream` to work, the log level __must__ be set to the lowest 
 
 + `dedupe`: Set this to `true` to send logs only to the stream with the higher level. Default: `false`
 
-    `dedupe` flag can be useful for example when using pino.multistream to redirect `error` logs to `process.stderr` and others to `process.stdout`:
+    `dedupe` flag can be useful for example when using `pino.multistream` to redirect `error` logs to `process.stderr` and others to `process.stdout`:
 
     ```js
     var pino = require('pino')
