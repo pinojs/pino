@@ -8,7 +8,7 @@ The way Pino generates logs:
 2. Gives greater flexibility in how logs are processed and stored.
 
 It is recommended that any log transformation or transmission is performed either
-in a separate thread or a separate process. 
+in a separate thread or a separate process.
 
 Prior to Pino v7 transports would ideally operate in a separate process - these are
 now referred to as [Legacy Transports](#legacy-transports).
@@ -36,7 +36,7 @@ export default (options) => {
 }
 ```
 
-Let's imagine the above defines our "transport" as the file `my-transport.mjs` 
+Let's imagine the above defines our "transport" as the file `my-transport.mjs`
 (ESM files are supported even if the project is written in CJS).
 
 We would set up our transport by creating a transport stream with `pino.transport`
@@ -66,8 +66,8 @@ export default async (options) => {
 }
 ```
 
-While initializing the stream we're able to use `await` to perform asynchronous operations. In this 
-case waiting for the write streams `open` event. 
+While initializing the stream we're able to use `await` to perform asynchronous operations. In this
+case waiting for the write streams `open` event.
 
 Let's imagine the above was published to npm with the module name `some-file-transport`.
 
@@ -84,7 +84,7 @@ pino(transport)
 
 Note here we've specified a module by package rather than by relative path. The options object we provide
 is serialized and injected into the transport worker thread, then passed to the module's exported function.
-This means that the options object can only contain types that are supported by the 
+This means that the options object can only contain types that are supported by the
 [Structured Clone Algorithm][sca] which is used to (de)serializing objects between threads.
 
 What if we wanted to use both transports, but send only error logs to `some-file-transport` while

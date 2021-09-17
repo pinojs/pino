@@ -84,7 +84,7 @@ will be written to the destination stream.
   ```
   See the [`pino-pretty` documentation][pp] for more information on the options
   that can be passed via `prettyPrint`.
-   
+
 The default prettifier write stream does not guarantee final log writes.
 Correspondingly, a warning is written to logs on first synchronous flushing.
 This warning may be suppressed by passing `suppressFlushSyncWarning : true` to

@@ -519,7 +519,7 @@ the `message` parameter not the value of the `msg` property on the `mergedObject
 See [Avoid Message Conflict](/docs/help.md#avoid-message-conflict) for information
 on how to overcome this limitation.
 
-If no `message` parameter is provided, and the `mergedObject` is of type `Error` or it has a property named `err`, the 
+If no `message` parameter is provided, and the `mergedObject` is of type `Error` or it has a property named `err`, the
 `message` parameter is set to the `message` value of the error.
 
 The `messageKey` option can be used at instantiation time to change the namespace
@@ -944,7 +944,7 @@ A `pino.destination` instance can also be used to reopen closed files
 <a id="pino-transport"></a>
 ### `pino.transport(options) => ThreadStream`
 
-Create a a stream that routes logs to a worker thread that 
+Create a a stream that routes logs to a worker thread that
 wraps around a [Pino Transport](/docs/transports.md).
 
 ```js
