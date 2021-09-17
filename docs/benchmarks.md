@@ -1,6 +1,6 @@
 # Benchmarks
 
-The following values show the time spent to call each function 100000 times. 
+The following values show the time spent to call each function 100000 times.
 
 `pino.info('hello world')`:
 
