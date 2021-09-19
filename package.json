@@ -8,6 +8,7 @@
   "browser": "./browser.js",
   "files": [
     "pino.js",
+    "file.js",
     "pino.d.ts",
     "bin.js",
     "browser.js",
