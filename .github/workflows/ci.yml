@@ -27,22 +27,6 @@ jobs:
         run: npm i
       - name: Tests
         run: npm run test-ci
-      - name: Coveralls Parallel
-        uses: coverallsapp/github-action@1.1.3
-        with:
-          github-token: ${{ secrets.github_token }}
-          parallel: true
-          flag-name: run-${{ matrix.node-version }}-${{ matrix.os }}
-
-  coverage:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Coveralls Finished
-        uses: coverallsapp/github-action@1.1.3
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          parallel-finished: true
 
 ## Disabled because the exclude parameter causes a syntax error
 ## and I don't know how to fix it. ~ James Sumners 2021-06-20
