@@ -44,16 +44,16 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           parallel-finished: true
 
-   automerge:
-     needs: test
-     runs-on: ubuntu-latest
-     steps:
-       - uses: fastify/github-action-merge-dependabot@v2.4.0
-         with:
-           github-token: ${{ secrets.GITHUB_TOKEN }}
-           exclude: [
-             'sonic-boom',
-             'pino-std-serializers',
-             'quick-format-unescaped',
-             'fast-redact'
-           ]
+  automerge:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: fastify/github-action-merge-dependabot@v2.4.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          exclude: [
+            'sonic-boom',
+            'pino-std-serializers',
+            'quick-format-unescaped',
+            'fast-redact'
+          ]
