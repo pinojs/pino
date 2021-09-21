@@ -1,7 +1,7 @@
 'use strict'
 
 const { Transform, pipeline } = require('stream')
-const pino = require('../pino')
+const pino = require('./pino')
 const { once } = require('events')
 
 module.exports = async function (opts = {}) {
