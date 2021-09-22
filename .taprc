@@ -1,2 +1,3 @@
 coverage: true
+check-coverage: false
 timeout: 480
