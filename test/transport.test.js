@@ -11,6 +11,13 @@ const url = require('url')
 const strip = require('strip-ansi')
 const execa = require('execa')
 const writer = require('flush-write-stream')
+const { promisify } = require('util')
+const stream = require('stream')
+const { createReadStream } = require('fs')
+const split = require('split2')
+
+const pipeline = promisify(stream.pipeline)
+const { Writable } = stream
 
 const { pid } = process
 const hostname = os.hostname()
@@ -477,4 +484,26 @@ test('transport options with target and stream', async ({ fail, equal }) => {
   } catch (err) {
     equal(err.message, 'only one of option.transport or stream can be specified')
   }
+})
+
+test('eight million lines', async ({ equal, comment }) => {
+  const destination = join(
+    os.tmpdir(),
+    '_' + Math.random().toString(36).substr(2, 9)
+  )
+  const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'transport-many-lines.js'), destination])
+
+  await once(child, 'exit')
+  const toWrite = 8 * 1000000
+  let count = 0
+  await pipeline(createReadStream(destination), split(), new Writable({
+    write (chunk, enc, cb) {
+      if (count % (toWrite / 10) === 0) {
+        comment(`read ${count}`)
+      }
+      count++
+      cb()
+    }
+  }))
+  equal(count, toWrite)
 })
