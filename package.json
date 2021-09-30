@@ -104,11 +104,11 @@
     "fast-redact": "^3.0.0",
     "fastify-warning": "^0.2.0",
     "get-caller-file": "^2.0.5",
-    "json-stringify-safe": "^5.0.1",
     "on-exit-leak-free": "^0.2.0",
     "pino-abstract-transport": "^0.3.0",
     "pino-std-serializers": "^4.0.0",
     "quick-format-unescaped": "^4.0.3",
+    "safe-stable-stringify": "^2.0.0",
     "sonic-boom": "^2.2.1",
     "thread-stream": "^0.11.1"
   },
