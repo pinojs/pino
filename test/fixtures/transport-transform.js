@@ -16,6 +16,6 @@ module.exports = (options) => {
     pipeline(source, myTransportStream, () => {})
     return myTransportStream
   }, {
-    transform: true
+    enablePipelining: true
   })
 }
