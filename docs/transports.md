@@ -143,6 +143,64 @@ module.exports = function (opts) {
 
 (It is possible to use the async iterators with CommonJS and streams with ESM.)
 
+### Creating a transport pipeline
+
+As an example, the following transport returns a `Transform` stream:
+
+```js
+import build from 'pino-abstract-transport'
+import { pipeline, Transform } from 'stream'
+exports default async function (options) {
+  return build(function (source) {
+    const myTransportStream = new Transform({
+      // Make sue autoDestroy is set,
+      // this is needed in Node v12 or when using the 
+      // readable-stream module.
+      autoDestroy: true,
+
+      objectMode: true,
+      transform (chunk, enc, cb) {
+
+        // modifies the payload somehow
+        chunk.service = 'pino'
+
+        // stringify the payload again
+        this.push(JSON.stringify(chunk))
+        cb()
+      }
+    })
+    pipeline(source, myTransportStream, () => {})
+    return myTransportStream
+  }, {
+    // This is needed to be able to pipeline transports.
+    enablePipelining: true
+  })
+}
+```
+
+Then you can pipeline them with:
+
+```js
+import pino from 'pino'
+
+const logger = pino({
+  transport: {
+    pipeline: [{
+      target: './my-transform.js'
+    }, {
+      // Use target: 'pino/file' to write to stdout
+      // without any change.
+      target: 'pino-pretty
+    }]
+  }
+})
+
+logger.info('hello world')
+```
+
+__NOTE: there is no "default" destination for a pipeline but
+a terminating target, i.e. a `Writable` stream.__
+
 ### Notable transports
 
 #### `pino/file`
@@ -164,7 +222,7 @@ The `options.destination` property may also be a number to represent a file desc
 
 The difference between using the `#pino/file` transport builtin and using `pino.destination` is that `pino.destination` runs in the main thread, whereas `#pino/file` sets up `pino.destination` in a worker thread.
 
-#### `pino/pretty`
+#### `pino-pretty`
 
 The [`pino-pretty`][pino-pretty] transport prettifies logs.
 

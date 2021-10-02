@@ -7,7 +7,7 @@ const Writable = require('stream').Writable
 test('file-target mocked', async function ({ equal, same, plan, pass }) {
   plan(1)
   let ret
-  const fileTarget = proxyquire('../file', {
+  const fileTarget = proxyquire('../../file', {
     './pino': {
       destination (opts) {
         same(opts, { dest: 1, sync: false })

@@ -3,44 +3,17 @@
 const os = require('os')
 const { join } = require('path')
 const { once } = require('events')
-const { readFile, symlink, unlink } = require('fs').promises
+const { readFile } = require('fs').promises
+const { watchFileCreated } = require('../helper')
 const { test } = require('tap')
-const { isWin, isYarnPnp, watchFileCreated } = require('./helper')
-const pino = require('../')
+const pino = require('../../')
 const url = require('url')
 const strip = require('strip-ansi')
 const execa = require('execa')
 const writer = require('flush-write-stream')
-const { promisify } = require('util')
-const stream = require('stream')
-const { createReadStream } = require('fs')
-const split = require('split2')
-
-const pipeline = promisify(stream.pipeline)
-const { Writable } = stream
 
 const { pid } = process
 const hostname = os.hostname()
-
-async function installTransportModule () {
-  if (isYarnPnp) {
-    return
-  }
-  try {
-    await uninstallTransportModule()
-  } catch {}
-  await symlink(
-    join(__dirname, 'fixtures', 'transport'),
-    join(__dirname, '..', 'node_modules', 'transport')
-  )
-}
-
-async function uninstallTransportModule () {
-  if (isYarnPnp) {
-    return
-  }
-  await unlink(join(__dirname, '..', 'node_modules', 'transport'))
-}
 
 test('pino.transport with file', async ({ same, teardown }) => {
   const destination = join(
@@ -48,7 +21,7 @@ test('pino.transport with file', async ({ same, teardown }) => {
     '_' + Math.random().toString(36).substr(2, 9)
   )
   const transport = pino.transport({
-    target: join(__dirname, 'fixtures', 'to-file-transport.js'),
+    target: join(__dirname, '..', 'fixtures', 'to-file-transport.js'),
     options: { destination }
   })
   teardown(transport.end.bind(transport))
@@ -67,40 +40,10 @@ test('pino.transport with file', async ({ same, teardown }) => {
 
 test('pino.transport with file (no options + error handling)', async ({ equal }) => {
   const transport = pino.transport({
-    target: join(__dirname, 'fixtures', 'to-file-transport.js')
+    target: join(__dirname, '..', 'fixtures', 'to-file-transport.js')
   })
   const [err] = await once(transport, 'error')
   equal(err.message, 'kaboom')
-})
-
-// TODO make this test pass on Windows
-test('pino.transport with package', { skip: isWin }, async ({ same, teardown }) => {
-  const destination = join(
-    os.tmpdir(),
-    '_' + Math.random().toString(36).substr(2, 9)
-  )
-
-  await installTransportModule()
-
-  const transport = pino.transport({
-    target: 'transport',
-    options: { destination }
-  })
-  teardown(async () => {
-    await uninstallTransportModule()
-    transport.end()
-  })
-  const instance = pino(transport)
-  instance.info('hello')
-  await watchFileCreated(destination)
-  const result = JSON.parse(await readFile(destination))
-  delete result.time
-  same(result, {
-    pid,
-    hostname,
-    level: 30,
-    msg: 'hello'
-  })
 })
 
 test('pino.transport with file URL', async ({ same, teardown }) => {
@@ -109,7 +52,7 @@ test('pino.transport with file URL', async ({ same, teardown }) => {
     '_' + Math.random().toString(36).substr(2, 9)
   )
   const transport = pino.transport({
-    target: url.pathToFileURL(join(__dirname, 'fixtures', 'to-file-transport.js')).href,
+    target: url.pathToFileURL(join(__dirname, '..', 'fixtures', 'to-file-transport.js')).href,
     options: { destination }
   })
   teardown(transport.end.bind(transport))
@@ -129,7 +72,7 @@ test('pino.transport with file URL', async ({ same, teardown }) => {
 test('pino.transport errors if file does not exists', ({ plan, pass }) => {
   plan(1)
   const instance = pino.transport({
-    target: join(__dirname, 'fixtures', 'non-existent-file'),
+    target: join(__dirname, '..', 'fixtures', 'non-existent-file'),
     worker: {
       stdin: true,
       stdout: true,
@@ -147,7 +90,7 @@ test('pino.transport with esm', async ({ same, teardown }) => {
     '_' + Math.random().toString(36).substr(2, 9)
   )
   const transport = pino.transport({
-    target: join(__dirname, 'fixtures', 'to-file-transport.mjs'),
+    target: join(__dirname, '..', 'fixtures', 'to-file-transport.mjs'),
     options: { destination }
   })
   const instance = pino(transport)
@@ -176,11 +119,11 @@ test('pino.transport with two files', async ({ same, teardown }) => {
   const transport = pino.transport({
     targets: [{
       level: 'info',
-      target: join(__dirname, 'fixtures', 'to-file-transport.js'),
+      target: join(__dirname, '..', 'fixtures', 'to-file-transport.js'),
       options: { destination: dest1 }
     }, {
       level: 'info',
-      target: join(__dirname, 'fixtures', 'to-file-transport.js'),
+      target: join(__dirname, '..', 'fixtures', 'to-file-transport.js'),
       options: { destination: dest2 }
     }]
   })
@@ -252,7 +195,7 @@ test('no transport.end()', async ({ same, teardown }) => {
     '_' + Math.random().toString(36).substr(2, 9)
   )
   const transport = pino.transport({
-    target: join(__dirname, 'fixtures', 'to-file-transport.js'),
+    target: join(__dirname, '..', 'fixtures', 'to-file-transport.js'),
     options: { destination }
   })
   const instance = pino(transport)
@@ -275,7 +218,7 @@ test('autoEnd = false', async ({ equal, same, teardown }) => {
   )
   const count = process.listenerCount('exit')
   const transport = pino.transport({
-    target: join(__dirname, 'fixtures', 'to-file-transport.js'),
+    target: join(__dirname, '..', 'fixtures', 'to-file-transport.js'),
     options: { destination },
     worker: { autoEnd: false }
   })
@@ -308,38 +251,6 @@ test('pino.transport with target and targets', async ({ fail, equal }) => {
   } catch (err) {
     equal(err.message, 'only one of target or targets can be specified')
   }
-})
-
-// TODO make this test pass on Windows
-test('pino.transport with package as a target', { skip: isWin }, async ({ same, teardown }) => {
-  const destination = join(
-    os.tmpdir(),
-    '_' + Math.random().toString(36).substr(2, 9)
-  )
-
-  await installTransportModule()
-
-  const transport = pino.transport({
-    targets: [{
-      target: 'transport',
-      options: { destination }
-    }]
-  })
-  teardown(async () => {
-    await uninstallTransportModule()
-    transport.end()
-  })
-  const instance = pino(transport)
-  instance.info('hello')
-  await watchFileCreated(destination)
-  const result = JSON.parse(await readFile(destination))
-  delete result.time
-  same(result, {
-    pid,
-    hostname,
-    level: 30,
-    msg: 'hello'
-  })
 })
 
 test('pino.transport with target pino/file', async ({ same, teardown }) => {
@@ -384,7 +295,7 @@ test('pino.transport with target pino-pretty', async ({ match, teardown }) => {
 
 test('stdout in worker', async ({ not }) => {
   let actual = ''
-  const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'transport-main.js')])
+  const child = execa(process.argv[0], [join(__dirname, '..', 'fixtures', 'transport-main.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
     actual += s
@@ -484,26 +395,4 @@ test('transport options with target and stream', async ({ fail, equal }) => {
   } catch (err) {
     equal(err.message, 'only one of option.transport or stream can be specified')
   }
-})
-
-test('eight million lines', async ({ equal, comment }) => {
-  const destination = join(
-    os.tmpdir(),
-    '_' + Math.random().toString(36).substr(2, 9)
-  )
-  const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'transport-many-lines.js'), destination])
-
-  await once(child, 'exit')
-  const toWrite = 8 * 1000000
-  let count = 0
-  await pipeline(createReadStream(destination), split(), new Writable({
-    write (chunk, enc, cb) {
-      if (count % (toWrite / 10) === 0) {
-        comment(`read ${count}`)
-      }
-      count++
-      cb()
-    }
-  }))
-  equal(count, toWrite)
 })
