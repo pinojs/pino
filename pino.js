@@ -2,6 +2,7 @@
 /* eslint no-prototype-builtins: 0 */
 const os = require('os')
 const stdSerializers = require('pino-std-serializers')
+const caller = require('get-caller-file')
 const redaction = require('./lib/redaction')
 const time = require('./lib/time')
 const proto = require('./lib/proto')
@@ -75,7 +76,7 @@ const serializers = Object.assign(Object.create(null), stdSerializers)
 
 function pino (...args) {
   const instance = {}
-  const { opts, stream } = normalize(instance, ...args)
+  const { opts, stream } = normalize(instance, caller(), ...args)
   const {
     redact,
     crlf,
