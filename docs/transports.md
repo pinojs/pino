@@ -188,6 +188,8 @@ const logger = pino({
     pipeline: [{
       target: './my-transform.js'
     }, {
+      // Use target: 'pino/file' to write to stdout
+      // without any change.
       target: 'pino-pretty
     }]
   }
