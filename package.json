@@ -106,7 +106,7 @@
     "get-caller-file": "^2.0.5",
     "json-stringify-safe": "^5.0.1",
     "on-exit-leak-free": "^0.2.0",
-    "pino-abstract-transport": "pinojs/pino-abstract-transport#transform",
+    "pino-abstract-transport": "v0.4.0",
     "pino-std-serializers": "^4.0.0",
     "quick-format-unescaped": "^4.0.3",
     "sonic-boom": "^2.2.1",
