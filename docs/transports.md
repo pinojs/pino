@@ -196,7 +196,7 @@ const logger = pino({
 logger.info('hello world')
 ```
 
-__NOTE: there is no "default" destinations for a pipeline but
+__NOTE: there is no "default" destination for a pipeline but
 a terminating target, i.e. a `Writable` stream.__
 
 ### Notable transports
