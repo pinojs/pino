@@ -154,7 +154,7 @@ exports default async function (options) {
   return build(function (source) {
     const myTransportStream = new Transform({
       // Make sue autoDestroy is set,
-      // this is needed in Node v12 or when using the 
+      // this is needed in Node v12 or when using the
       // readable-stream module.
       autoDestroy: true,
 
@@ -190,7 +190,7 @@ const logger = pino({
     }, {
       // Use target: 'pino/file' to write to stdout
       // without any change.
-      target: 'pino-pretty
+      target: 'pino-pretty'
     }]
   }
 })
