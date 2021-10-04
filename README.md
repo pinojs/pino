@@ -127,6 +127,10 @@ See the [Benchmarks](docs/benchmarks.md) document for comparisons.
 
 <https://twitter.com/wa7son>
 
+### Manuel Ochoa
+
+<https://github.com/mgochoa>
+
 ## Contributing
 
 Pino is an **OPEN Open Source Project**. This means that:
