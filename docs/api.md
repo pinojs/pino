@@ -396,6 +396,8 @@ If the transport option is supplied to `pino`, a [`destination`](#destination) p
 ```js
 pino({ transport: {}}, '/path/to/somewhere') // THIS WILL NOT WORK, DO NOT DO THIS
 pino({ transport: {}}, process.stderr) // THIS WILL NOT WORK, DO NOT DO THIS
+```
+
 when using the `transport` option. In this case an `Error` will be thrown.
 
 * See [pino.transport()](#pino-transport)
