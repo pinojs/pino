@@ -232,8 +232,8 @@ declare namespace P {
     }
 
     interface StreamEntry {
-        stream: WriteStream
-        level: Level
+        stream: DestinationStream
+        level?: Level
     }
 
     interface MultiStreamRes {
@@ -241,12 +241,12 @@ declare namespace P {
         add: (dest: Record<string, any>) => MultiStreamRes,
         flushSync: () => void,
         minLevel: number,
-        streams: WriteStream[],
+        streams: ({ stream: DestinationStream, level: number, id: number })[],
         clone(level: Level): MultiStreamRes,
     }
 
     function multistream(
-        streamsArray: StreamEntry[], opts: P.MultiStreamOptions
+        streamsArray: StreamEntry[], opts?: P.MultiStreamOptions
     ): MultiStreamRes
 
     /**
