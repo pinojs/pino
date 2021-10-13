@@ -997,6 +997,25 @@ is flushed and all data synced before the process exits.
 Note that calling `process.exit()` on the main thread will stop the event loop on the main thread from turning. As a result,
 using `console.log` and `process.stdout` after the main thread called `process.exit()` will not produce any output.
 
+If you are embedding/integrating pino within your framework, you will need to make pino aware of the script that is calling it, 
+like so:
+
+```js
+const pino = require('pino')
+const getCaller = require('get-caller-file')
+
+module.exports = function build () {
+  const logger = pino({
+    transport: {
+      caller: getCaller(),
+      target: 'transport',
+      options: { destination: './destination' }
+    }
+  })
+  return logger
+}
+```
+
 For more on transports, how they work, and how to create them see the [`Transports documentation`](/docs/transports.md).
 
 * See [`Transports`](/docs/transports.md)

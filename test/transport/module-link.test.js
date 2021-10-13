@@ -50,6 +50,7 @@ test('pino.transport with package', { skip: isWin }, async ({ same, teardown }) 
     target: 'transport',
     options: { destination }
   })
+
   teardown(async () => {
     await uninstallTransportModule()
     transport.end()
@@ -128,6 +129,92 @@ test('pino({ transport })', { skip: isWin || isYarnPnp }, async ({ same, teardow
         options: { destination: '${destination}' }
       }
     })
+    logger.info('hello')
+  `
+
+  await writeFile(toRun, toRunContent)
+
+  const child = execa(process.argv[0], [toRun])
+
+  await once(child, 'close')
+
+  const result = JSON.parse(await readFile(destination))
+  delete result.time
+  same(result, {
+    pid: child.pid,
+    hostname,
+    level: 30,
+    msg: 'hello'
+  })
+})
+
+// TODO make this test pass on Windows
+test('pino({ transport }) from a wrapped dependency', { skip: isWin || isYarnPnp, only: true }, async ({ same, teardown }) => {
+  const folder = join(
+    os.tmpdir(),
+    '_' + Math.random().toString(36).substr(2, 9)
+  )
+
+  const wrappedFolder = join(
+    os.tmpdir(),
+    '_' + Math.random().toString(36).substr(2, 9)
+  )
+
+  const destination = join(folder, 'output')
+
+  await mkdir(join(folder, 'node_modules'), { recursive: true })
+  await mkdir(join(wrappedFolder, 'node_modules'), { recursive: true })
+
+  // Link pino
+  await symlink(
+    join(__dirname, '..', '..'),
+    join(wrappedFolder, 'node_modules', 'pino')
+  )
+
+  // Link get-caller-file
+  await symlink(
+    join(__dirname, '..', '..', 'node_modules', 'get-caller-file'),
+    join(wrappedFolder, 'node_modules', 'get-caller-file')
+  )
+
+  // Link wrapped
+  await symlink(
+    wrappedFolder,
+    join(folder, 'node_modules', 'wrapped')
+  )
+
+  await installTransportModule(folder)
+
+  const pkgjsonContent = {
+    name: 'pino'
+  }
+
+  await writeFile(join(wrappedFolder, 'package.json'), JSON.stringify(pkgjsonContent))
+
+  const wrapped = join(wrappedFolder, 'index.js')
+
+  const wrappedContent = `
+    const pino = require('pino')
+    const getCaller = require('get-caller-file')
+
+    module.exports = function build () {
+      const logger = pino({
+        transport: {
+          caller: getCaller(),
+          target: 'transport',
+          options: { destination: '${destination}' }
+        }
+      })
+      return logger
+    }
+  `
+
+  await writeFile(wrapped, wrappedContent)
+
+  const toRun = join(folder, 'index.js')
+
+  const toRunContent = `
+    const logger = require('wrapped')()
     logger.info('hello')
   `
 
