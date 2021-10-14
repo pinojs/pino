@@ -1,4 +1,5 @@
 import { pino } from '../../pino'
+import { expectType } from "tsd";
 
 // Single
 const transport = pino.transport({
@@ -6,6 +7,12 @@ const transport = pino.transport({
     options: { some: 'options for', the: 'transport' }
 })
 pino(transport)
+
+expectType<pino.Logger>(pino({
+    transport: {
+        target: 'pino-pretty'
+    },
+}))
 
 // Multiple
 const transports = pino.transport({targets: [
