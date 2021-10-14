@@ -246,7 +246,8 @@ declare namespace P {
     }
 
     function multistream(
-        streamsArray: StreamEntry[], opts?: P.MultiStreamOptions
+        streamsArray: (DestinationStream | StreamEntry)[] | DestinationStream | StreamEntry,
+        opts?: P.MultiStreamOptions
     ): MultiStreamRes
 
     /**
