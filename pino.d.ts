@@ -288,7 +288,7 @@ declare namespace P {
     }
 
     interface LoggerOptions {
-        transport?: TransportSingleOptions
+        transport?: TransportSingleOptions | TransportMultiOptions
         /**
          * Avoid error causes by circular references in the object tree. Default: `true`.
          */

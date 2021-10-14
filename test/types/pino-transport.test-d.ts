@@ -29,6 +29,21 @@ const transports = pino.transport({targets: [
 ]})
 pino(transports)
 
+expectType<pino.Logger>(pino({
+    transport: {targets: [
+            {
+                level: 'info',
+                target: '#pino/pretty',
+                options: { some: 'options for', the: 'transport' }
+            },
+            {
+                level: 'trace',
+                target: '#pino/file',
+                options: { destination: './test.log' }
+            }
+        ]},
+}))
+
 type TransportConfig = {
     id: string
 }
