@@ -1,4 +1,5 @@
 import { pino } from '../../pino'
+import { expectType } from "tsd";
 
 // Single
 const transport = pino.transport({
@@ -6,6 +7,12 @@ const transport = pino.transport({
     options: { some: 'options for', the: 'transport' }
 })
 pino(transport)
+
+expectType<pino.Logger>(pino({
+    transport: {
+        target: 'pino-pretty'
+    },
+}))
 
 // Multiple
 const transports = pino.transport({targets: [
@@ -21,6 +28,33 @@ const transports = pino.transport({targets: [
     }
 ]})
 pino(transports)
+
+expectType<pino.Logger>(pino({
+    transport: {targets: [
+            {
+                level: 'info',
+                target: '#pino/pretty',
+                options: { some: 'options for', the: 'transport' }
+            },
+            {
+                level: 'trace',
+                target: '#pino/file',
+                options: { destination: './test.log' }
+            }
+        ]},
+}))
+
+expectType<pino.Logger>(pino({
+    transport: {
+        pipeline: [{
+            target: './my-transform.js'
+        }, {
+            // Use target: 'pino/file' to write to stdout
+            // without any change.
+            target: 'pino-pretty'
+        }]
+    }
+}))
 
 type TransportConfig = {
     id: string

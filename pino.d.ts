@@ -215,6 +215,10 @@ declare namespace P {
         target: string
     }
 
+    interface TransportPipelineOptions{
+        pipeline: TransportSingleOptions[]
+    }
+
     interface TransportMultiOptions<TransportOptions = Record<string, any>> extends TransportBaseOptions<TransportOptions>{
         targets: readonly TransportTargetOptions<TransportOptions>[]
     }
@@ -288,6 +292,7 @@ declare namespace P {
     }
 
     interface LoggerOptions {
+        transport?: TransportSingleOptions | TransportMultiOptions | TransportPipelineOptions
         /**
          * Avoid error causes by circular references in the object tree. Default: `true`.
          */
