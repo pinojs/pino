@@ -1,0 +1,17 @@
+{
+  "name": "test-rollup",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^21.0.0",
+    "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-node-resolve": "^13.0.5",
+    "rollup": "^2.58.0",
+    "rollup-plugin-web-worker-loader": "^1.6.1"
+  },
+  "scripts": {
+    "build": "rollup -c",
+    "test": "npm run build && node build/index.js && node build/logger-transport.js"
+  }
+}
