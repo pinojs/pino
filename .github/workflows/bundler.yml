@@ -1,0 +1,31 @@
+name: Bundler test
+on:
+  push:
+    paths-ignore:
+        - 'docs/**'
+        - '*.md'
+  pull_request:
+    paths-ignore:
+        - 'docs/**'
+        - '*.md'
+jobs:
+  bundler:
+    name: Bundler test
+    needs: test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        node-version: [16]
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2.4.1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install pino
+        run: npm i
+      - name: Install bundler
+        run: cd test/bundlers/rollup && npm i
+      - name: Tests
+        run: cd test/bundlers/rollup && npm run test
