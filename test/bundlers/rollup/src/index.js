@@ -1,4 +1,4 @@
-const logger = require('../../pino')()
+const logger = require('../../../../pino')()
 
 logger.info('hello world')
 

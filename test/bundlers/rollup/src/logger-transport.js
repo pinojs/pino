@@ -1,4 +1,4 @@
-const pino = require('../../pino')
+const pino = require('../../../../pino')
 
 // The destination of the log file. Can be `undefined`.
 const destFile = process.env.LOG_FILE
