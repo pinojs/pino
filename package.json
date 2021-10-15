@@ -67,7 +67,7 @@
   },
   "homepage": "http://getpino.io",
   "devDependencies": {
-    "@types/node": "^16.9.4",
+    "@types/node": "^16.11.0",
     "airtap": "4.0.3",
     "benchmark": "^2.1.4",
     "bole": "^4.0.0",
@@ -95,9 +95,9 @@
     "tap": "^15.0.1",
     "tape": "^5.0.0",
     "through2": "^4.0.0",
-    "ts-node": "^10.2.1",
+    "ts-node": "^10.3.0",
     "tsd": "^0.18.0",
-    "typescript": "^4.4.2",
+    "typescript": "^4.4.4",
     "winston": "^3.3.3"
   },
   "dependencies": {

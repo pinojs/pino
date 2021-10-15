@@ -44,6 +44,18 @@ expectType<pino.Logger>(pino({
         ]},
 }))
 
+expectType<pino.Logger>(pino({
+    transport: {
+        pipeline: [{
+            target: './my-transform.js'
+        }, {
+            // Use target: 'pino/file' to write to stdout
+            // without any change.
+            target: 'pino-pretty'
+        }]
+    }
+}))
+
 type TransportConfig = {
     id: string
 }
