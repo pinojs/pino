@@ -1,9 +1,12 @@
 'use strict'
 /* eslint no-prototype-builtins: 0 */
 
+const os = require('os')
 const { hostname } = require('os')
+const { join } = require('path')
+const { readFile } = require('fs').promises
 const { test } = require('tap')
-const { sink, once } = require('./helper')
+const { sink, once, watchFileCreated } = require('./helper')
 const pino = require('../')
 
 test('level formatter', async ({ match }) => {
@@ -297,5 +300,38 @@ test('elastic common schema format', async ({ match, type }) => {
     ecs: { version: '1.4.0' },
     foo: 'bar',
     message: 'hello world'
+  })
+})
+
+test('formatter with transport', async ({ match, equal }) => {
+  const destination = join(
+    os.tmpdir(),
+    '_' + Math.random().toString(36).substr(2, 9)
+  )
+  const logger = pino({
+    formatters: {
+      log (obj) {
+        equal(obj.hasOwnProperty('msg'), false)
+        return { hello: 'world', ...obj }
+      }
+    },
+    transport: {
+      targets: [
+        {
+          target: join(__dirname, 'fixtures', 'to-file-transport.js'),
+          options: { destination }
+        }
+      ]
+    }
+  })
+
+  logger.info({ foo: 'bar', nested: { object: true } }, 'hello world')
+  await watchFileCreated(destination)
+  const result = JSON.parse(await readFile(destination))
+  delete result.time
+  match(result, {
+    hello: 'world',
+    foo: 'bar',
+    nested: { object: true }
   })
 })
