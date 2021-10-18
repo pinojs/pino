@@ -35,9 +35,11 @@ const logger = pino(dest)
 ```
 
 <a id='log-loss-prevention'></a>
-## Log loss prevention
+## Prevent log loss in Node v12
 
-The following strategy can be used to minimize log loss:
+In Node.js v14+, streams created by `pino.destination()` are automatically 
+flushed whenever the process exits.
+In Node v12, `pino.final()` can be used to prevent log loss. Here is an example:
 
 ```js
 const pino = require('pino')
@@ -66,45 +68,35 @@ process.on('SIGQUIT', () => handler(null, 'SIGQUIT'))
 process.on('SIGTERM', () => handler(null, 'SIGTERM'))
 ```
 
-Note that the use of `pino.final` is not strictly required when using Node v14+.
+The above code will register handlers for the following process events/signals so that
+pino can flush the asynchronous logger buffer:
+
++ `beforeExit`
++ `exit`
++ `uncaughtException`
++ `SIGINT`
++ `SIGQUIT`
++ `SIGTERM`
+
+In all of these cases, except `SIGHUP`, the process is in a state that it
+*must* terminate. Note that the handler has a `process.exit(1)` at the end.
+
+
+* See also [`pino.final` api](/docs/api.md#pino-final)
 
 ## Caveats
 
-This has a couple of important caveats:
+Asynchronous logging has a couple of important caveats:
 
-* 4KB of spare RAM will be needed for logging
 * As opposed to the default mode, there is not a one-to-one relationship between
   calls to logging methods (e.g. `logger.info`) and writes to a log file
 * There is a possibility of the most recently buffered log messages being lost
-  (up to 4KB of logs)
-  * For instance, a power cut will mean up to 4KB of buffered logs will be lost
+  in case of a system failure, e.g. a power cut.
+* In Node v14+, Pino will register handlers for the `exit` and `beforeExit` handler so that
+  the stream is flushed automatically. This is implemented with the usage of
+  [`on-exit-leak-free`](https://github.com/mcollina/on-exit-leak-free).
 
-So in summary, use asynchronous logging only when performing an extreme amount of
-logging, and it is acceptable to potentially lose the most recent logs.
+See also:
 
-* Pino will register handlers for the following process events/signals so that
-  Pino can flush the asynchronous logger buffer:
-
-  + `beforeExit`
-  + `exit`
-  + `uncaughtException`
-  + `SIGHUP`
-  + `SIGINT`
-  + `SIGQUIT`
-  + `SIGTERM`
-
-  In all of these cases, except `SIGHUP`, the process is in a state that it
-  *must* terminate. Thus, if an `onTerminated` function isn't registered when
-  constructing a Pino instance (see [pino#constructor](api.md#constructor)),
-  then Pino will invoke `process.exit(0)` when no error has occurred, or
-  `process.exit(1)` otherwise. If an `onTerminated` function is supplied, it
-  is the responsibility of the `onTerminated` function to manually exit the process.
-
-  In the case of `SIGHUP`, we will look to see if any other handlers are
-  registered for the event. If not, we will proceed as we do with all other
-  signals. If there are more handlers registered than just our own, we will
-  simply flush the asynchronous logging buffer.
-
-* See [`pino.destination` api](/docs/api.md#pino-destination)
-* See [`pino.final` api](/docs/api.md#pino-final)
-* See [`destination` parameter](/docs/api.md#destination)
+* [`pino.destination` api](/docs/api.md#pino-destination)
+* [`destination` parameter](/docs/api.md#destination)
