@@ -15,7 +15,8 @@ const {
   stringify,
   buildSafeSonicBoom,
   buildFormatters,
-  noop
+  noop,
+  setLimits
 } = require('./lib/tools')
 const { version } = require('./lib/meta')
 const {
@@ -67,7 +68,9 @@ const defaultOptions = {
   name: undefined,
   redact: null,
   customLevels: null,
-  useOnlyCustomLevels: false
+  useOnlyCustomLevels: false,
+  depthLimit: 5,
+  edgeLimit: 100
 }
 
 const normalize = createArgsNormalizer(defaultOptions)
@@ -91,8 +94,12 @@ function pino (...args) {
     mixin,
     useOnlyCustomLevels,
     formatters,
-    hooks
+    hooks,
+    depthLimit,
+    edgeLimit
   } = opts
+
+  setLimits(depthLimit, edgeLimit)
 
   const allFormatters = buildFormatters(
     formatters.level,
