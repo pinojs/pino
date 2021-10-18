@@ -101,6 +101,8 @@
     "winston": "^3.3.3"
   },
   "dependencies": {
+    "@types/estree": "^0.0.50",
+    "@types/json-schema": "^7.0.9",
     "fast-redact": "^3.0.0",
     "fastify-warning": "^0.2.0",
     "get-caller-file": "^2.0.5",

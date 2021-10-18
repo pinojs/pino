@@ -7,16 +7,16 @@ const redaction = require('./lib/redaction')
 const time = require('./lib/time')
 const proto = require('./lib/proto')
 const symbols = require('./lib/symbols')
+const { configure } = require('safe-stable-stringify')
 const { assertDefaultLevelFound, mappings, genLsCache } = require('./lib/levels')
 const {
   createArgsNormalizer,
   asChindings,
   final,
-  stringify,
   buildSafeSonicBoom,
   buildFormatters,
   noop,
-  setLimits
+  stringify
 } = require('./lib/tools')
 const { version } = require('./lib/meta')
 const {
@@ -27,6 +27,7 @@ const {
   timeSliceIndexSym,
   streamSym,
   stringifySym,
+  stringifySafeSym,
   stringifiersSym,
   setLevelSym,
   endSym,
@@ -99,7 +100,10 @@ function pino (...args) {
     edgeLimit
   } = opts
 
-  setLimits(depthLimit, edgeLimit)
+  const stringifySafe = configure({
+    maximumDepth: depthLimit,
+    maximumBreadth: edgeLimit
+  })
 
   const allFormatters = buildFormatters(
     formatters.level,
@@ -115,15 +119,19 @@ function pino (...args) {
   }
 
   const stringifiers = redact ? redaction(redact, stringify) : {}
+  const stringifyFn = stringify.bind({
+    [stringifySafeSym]: stringifySafe
+  })
   const formatOpts = redact
     ? { stringify: stringifiers[redactFmtSym] }
-    : { stringify }
+    : { stringify: stringifyFn }
   const end = '}' + (crlf ? '\r\n' : '\n')
   const coreChindings = asChindings.bind(null, {
     [chindingsSym]: '',
     [serializersSym]: serializers,
     [stringifiersSym]: stringifiers,
     [stringifySym]: stringify,
+    [stringifySafeSym]: stringifySafe,
     [formattersSym]: allFormatters
   })
 
@@ -154,6 +162,7 @@ function pino (...args) {
     [timeSym]: time,
     [timeSliceIndexSym]: timeSliceIndex,
     [stringifySym]: stringify,
+    [stringifySafeSym]: stringifySafe,
     [stringifiersSym]: stringifiers,
     [endSym]: end,
     [formatOptsSym]: formatOpts,
