@@ -116,7 +116,7 @@ You can see an example using a async iterator with ESM:
 ```js
 import build from 'pino-abstract-stream'
 
-exports default async function (opts) {
+export default async function (opts) {
   return build(async function (source) {
     for await (let obj of source) {
       console.log(obj)
@@ -150,7 +150,7 @@ As an example, the following transport returns a `Transform` stream:
 ```js
 import build from 'pino-abstract-transport'
 import { pipeline, Transform } from 'stream'
-exports default async function (options) {
+export default async function (options) {
   return build(function (source) {
     const myTransportStream = new Transform({
       // Make sue autoDestroy is set,
