@@ -347,7 +347,7 @@ and searching for logged objects can start from a consistent path.
 
 Default: `false`
 
-__DEPRECATED: use [`transport`](#transport) instead.
+__DEPRECATED: use [`transport`](#transport) instead.__
 
 Enables pretty printing log logs. This is intended for non-production
 configurations. This may be set to a configuration object as outlined in the
@@ -1033,8 +1033,12 @@ For more on transports, how they work, and how to create them see the [`Transpor
 
 ### `pino.final(logger, [handler]) => Function | FinalLogger`
 
+__The use of `pino.final` is discouraged in Node.js v14+ and not required.
+It will be removed in the next major version.__
+
 The `pino.final` method can be used to acquire a final logger instance
-or create an exit listener function.
+or create an exit listener function. This is _not_ needed in Node.js v14+
+as pino automatically can handle those.
 
 The `finalLogger` is a specialist logger that synchronously flushes
 on every write. This is important to guarantee final log writes,
