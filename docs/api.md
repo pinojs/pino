@@ -95,6 +95,17 @@ const logger = pino({
 logger.foo('hi')
 logger.info('hello') // Will throw an error saying info in not found in logger object
 ```
+#### `depthLimit` (Number)
+
+Default: `5`
+
+Option to limit stringification at a specific nesting depth
+
+#### `edgeLimit` (Number)
+
+Default: `100`
+
+Option to limit stringification of properties for a specific object
 
 #### `mixin` (Function):
 
