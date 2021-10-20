@@ -114,7 +114,7 @@ a simple utility to parse each line.  Its usage is highly recommended.
 You can see an example using a async iterator with ESM:
 
 ```js
-import build from 'pino-abstract-stream'
+import build from 'pino-abstract-transport'
 
 export default async function (opts) {
   return build(async function (source) {
@@ -130,7 +130,7 @@ or using Node.js streams and CommonJS:
 ```js
 'use strict'
 
-const build = require('pino-abstract-stream')
+const build = require('pino-abstract-transport')
 
 module.exports = function (opts) {
   return build(function (source) {
@@ -142,6 +142,8 @@ module.exports = function (opts) {
 ```
 
 (It is possible to use the async iterators with CommonJS and streams with ESM.)
+
+To consume async iterators in batches, consider using the [hwp](https://github.com/mcollina/hwp) library.
 
 ### Creating a transport pipeline
 
