@@ -604,6 +604,20 @@ test('use `safe-stable-stringify` to avoid circular dependencies', async ({ same
   same(a, { a: '[Circular]' })
 })
 
+test('correctly log non circular objects', async ({ same }) => {
+  const stream = sink()
+  const root = pino(stream)
+  const obj = {}
+  let parent = obj
+  for (let i = 0; i < 10; i++) {
+    parent.node = {}
+    parent = parent.node
+  }
+  root.info(obj)
+  const { node } = await once(stream, 'data')
+  same(node, { node: { node: { node: { node: { node: { node: { node: { node: { node: {} } } } } } } } } })
+})
+
 test('safe-stable-stringify must be used when interpolating', async (t) => {
   const stream = sink()
   const instance = pino(stream)
