@@ -99,13 +99,13 @@ logger.info('hello') // Will throw an error saying info in not found in logger o
 
 Default: `5`
 
-Option to limit stringification at a specific nesting depth
+Option to limit stringification at a specific nesting depth when logging circular object.
 
 #### `edgeLimit` (Number)
 
 Default: `100`
 
-Option to limit stringification of properties for a specific object
+Option to limit stringification of properties for a specific object when logging circular object.
 
 #### `mixin` (Function):
 
