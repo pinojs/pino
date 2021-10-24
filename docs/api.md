@@ -105,7 +105,7 @@ Option to limit stringification at a specific nesting depth when logging circula
 
 Default: `100`
 
-Option to limit stringification of properties for a specific object when logging circular object.
+Option to limit stringification of properties/elements when logging a specific object/array with circular references.
 
 #### `mixin` (Function):
 
