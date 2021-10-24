@@ -15,8 +15,9 @@ const {
   final,
   buildSafeSonicBoom,
   buildFormatters,
-  noop,
-  stringify
+  stringify,
+  normalizeDestFileDescriptor,
+  noop
 } = require('./lib/tools')
 const { version } = require('./lib/meta')
 const {
@@ -191,10 +192,10 @@ module.exports = pino
 
 module.exports.destination = (dest = process.stdout.fd) => {
   if (typeof dest === 'object') {
-    dest.dest = dest.dest || process.stdout.fd
+    dest.dest = normalizeDestFileDescriptor(dest.dest || process.stdout.fd)
     return buildSafeSonicBoom(dest)
   } else {
-    return buildSafeSonicBoom({ dest, minLength: 0, sync: true })
+    return buildSafeSonicBoom({ dest: normalizeDestFileDescriptor(dest), minLength: 0, sync: true })
   }
 }
 
