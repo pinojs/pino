@@ -223,8 +223,11 @@ test('autoEnd = false', async ({ equal, same, teardown }) => {
     worker: { autoEnd: false }
   })
   teardown(transport.end.bind(transport))
+  await once(transport, 'ready')
+
   const instance = pino(transport)
   instance.info('hello')
+
   await watchFileCreated(destination)
 
   equal(count, process.listenerCount('exit'))
