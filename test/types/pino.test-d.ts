@@ -102,7 +102,7 @@ const customSerializers = {
 pino().child({}, { serializers: customSerializers }).info({ test: "should not show up" });
 const child2 = log.child({ father: true });
 const childChild = child2.child({ baby: true });
-const childRedacted = pino().child({}, { redact: ["path"] })
+const childRedacted = pino().child({}, { redact: ["path"] });
 childRedacted.info({
   msg: "logged with redacted properties",
   path: "Not shown",
@@ -112,7 +112,7 @@ const childAnotherRedacted = pino().child({}, {
         paths: ["anotherPath"],
         censor: "Not the log you\re looking for",
     }
-})
+});
 childAnotherRedacted.info({
     msg: "another logged with redacted properties",
     anotherPath: "Not shown",
@@ -254,9 +254,9 @@ pino(destinationViaOptionsObject);
 pino({ name: "my-logger" }, destinationViaOptionsObject);
 
 try {
-    throw new Error('Some error')
+    throw new Error('Some error');
 } catch (err) {
-    log.error(err)
+    log.error(err);
 }
 
 interface StrictShape {
