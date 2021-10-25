@@ -26,6 +26,7 @@ A transport is a module that exports a default function which returns a writable
 import { Writable } from 'stream'
 export default (options) => {
   const myTransportStream = new Writable({
+    autoDestroy: true, // Needed for Node v12+
     write (chunk, enc, cb) {
     // apply a transform and send to stdout
     console.log(chunk.toString().toUpperCase())

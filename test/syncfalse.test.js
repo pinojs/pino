@@ -116,13 +116,3 @@ test('flush does nothing with sync true (default)', async () => {
   const instance = require('..')()
   instance.flush()
 })
-
-test('thread-stream async flush', async () => {
-  const pino = require('..')
-  const transport = pino.transport({
-    target: join(__dirname, 'fixtures', 'console-transport.js')
-  })
-  const instance = pino(transport)
-  instance.info('hello')
-  instance.flush()
-})
