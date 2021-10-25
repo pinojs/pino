@@ -305,6 +305,19 @@ test('stdout in worker', async ({ not }) => {
   not(strip(actual).match(/Hello/), null)
 })
 
+test('log and exit', async ({ not }) => {
+  let actual = ''
+  const child = execa(process.argv[0], [join(__dirname, '..', 'fixtures', 'transport-exit-on-ready.js')])
+
+  child.stdout.pipe(writer((s, enc, cb) => {
+    actual += s
+    cb()
+  }))
+  await once(child, 'close')
+  console.log(actual)
+  not(strip(actual).match(/Hello/), null)
+})
+
 test('pino transport options with target', async ({ teardown, same }) => {
   const destination = join(
     os.tmpdir(),
