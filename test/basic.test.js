@@ -593,7 +593,7 @@ test('children with same names render in correct order', async ({ equal }) => {
   equal(a, 3, 'last logged object takes precedence')
 })
 
-test('use `json-stringify-safe` to avoid circular dependencies', async ({ same }) => {
+test('use `safe-stable-stringify` to avoid circular dependencies', async ({ same }) => {
   const stream = sink()
   const root = pino(stream)
   // circular depth
@@ -601,10 +601,24 @@ test('use `json-stringify-safe` to avoid circular dependencies', async ({ same }
   obj.a = obj
   root.info(obj)
   const { a } = await once(stream, 'data')
-  same(a, { a: '[Circular ~]' })
+  same(a, { a: '[Circular]' })
 })
 
-test('json-stringify-safe must be used when interpolating', async (t) => {
+test('correctly log non circular objects', async ({ same }) => {
+  const stream = sink()
+  const root = pino(stream)
+  const obj = {}
+  let parent = obj
+  for (let i = 0; i < 10; i++) {
+    parent.node = {}
+    parent = parent.node
+  }
+  root.info(obj)
+  const { node } = await once(stream, 'data')
+  same(node, { node: { node: { node: { node: { node: { node: { node: { node: { node: {} } } } } } } } } })
+})
+
+test('safe-stable-stringify must be used when interpolating', async (t) => {
   const stream = sink()
   const instance = pino(stream)
 
@@ -613,7 +627,7 @@ test('json-stringify-safe must be used when interpolating', async (t) => {
   instance.info('test %j', o)
 
   const { msg } = await once(stream, 'data')
-  t.equal(msg, 'test {"a":{"b":{"c":"[Circular ~.a.b]"}}}')
+  t.equal(msg, 'test {"a":{"b":{"c":"[Circular]"}}}')
 })
 
 test('throws when setting useOnlyCustomLevels without customLevels', async ({ throws }) => {

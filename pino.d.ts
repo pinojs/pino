@@ -68,6 +68,7 @@ declare namespace P {
         readonly timeSliceIndexSym: unique symbol;
         readonly streamSym: unique symbol;
         readonly stringifySym: unique symbol;
+        readonly stringifySafeSym: unique symbol;
         readonly stringifiersSym: unique symbol;
         readonly endSym: unique symbol;
         readonly formatOptsSym: unique symbol;
