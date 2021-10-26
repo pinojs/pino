@@ -421,7 +421,8 @@ Default: `pino.destination(1)` (STDOUT)
 The `destination` parameter, at a minimum must be an object with a `write` method.
 An ordinary Node.js `stream` can be passed as the destination (such as the result
 of `fs.createWriteStream`) but for peak log writing performance it is strongly
-recommended to use `pino.destination` to create the destination stream.
+recommended to use `pino.destination` to create the destination stream. 
+Note that the `destination` parameter can be the result of `pino.transport()`.
 
 ```js
 // pino.destination(1) by default
