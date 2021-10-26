@@ -118,7 +118,7 @@ Given a similar scenario as in the [Log rotation](#rotate) section a basic
 <a id="multiple"></a>
 ## Saving to multiple files
 
-See [`pino.multistream`](/doc/api.md#pino-multistream).
+See [`pino.multistream`](https://github.com/pinojs/pino/blob/f16c98d7d758fa96155996bbc7604e4eee600d79/docs/api.md#pinomultistreamoptions--stream).
 
 <a id="filter-logs"></a>
 ## Log Filtering
