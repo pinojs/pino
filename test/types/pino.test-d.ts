@@ -1,7 +1,6 @@
-import P, { pino } from "../../";
+import P, { pino, stdSerializers } from "../../";
 import { IncomingMessage, ServerResponse } from "http";
 import { Socket } from "net";
-import Logger = P.Logger;
 
 const log = pino();
 const info = log.info;
@@ -180,7 +179,8 @@ const pretty = pino({
         messageKey: "msg",
         timestampKey: "timestamp",
         translateTime: "UTC:h:MM:ss TT Z",
-        search: "foo == `bar`",
+        // Not actually a valid prettyPrint option(!)
+        // search: "foo == `bar`",
     },
 });
 
