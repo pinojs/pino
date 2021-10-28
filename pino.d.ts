@@ -615,71 +615,71 @@ declare namespace pino {
     /**
      * Provides functions for serializing objects common to many projects.
      */
-     export const stdSerializers: typeof pinoStdSerializers;
+    export const stdSerializers: typeof pinoStdSerializers;
 
-     /**
-      * Holds the current log format version (as output in the v property of each log record).
-      */
-     export const levels: LevelMapping;
-     export const symbols: {
-         readonly setLevelSym: unique symbol;
-         readonly getLevelSym: unique symbol;
-         readonly levelValSym: unique symbol;
-         readonly useLevelLabelsSym: unique symbol;
-         readonly mixinSym: unique symbol;
-         readonly lsCacheSym: unique symbol;
-         readonly chindingsSym: unique symbol;
-         readonly parsedChindingsSym: unique symbol;
-         readonly asJsonSym: unique symbol;
-         readonly writeSym: unique symbol;
-         readonly serializersSym: unique symbol;
-         readonly redactFmtSym: unique symbol;
-         readonly timeSym: unique symbol;
-         readonly timeSliceIndexSym: unique symbol;
-         readonly streamSym: unique symbol;
-         readonly stringifySym: unique symbol;
-         readonly stringifySafeSym: unique symbol;
-         readonly stringifiersSym: unique symbol;
-         readonly endSym: unique symbol;
-         readonly formatOptsSym: unique symbol;
-         readonly messageKeySym: unique symbol;
-         readonly nestedKeySym: unique symbol;
-         readonly wildcardFirstSym: unique symbol;
-         readonly needsMetadataGsym: unique symbol;
-         readonly useOnlyCustomLevelsSym: unique symbol;
-         readonly formattersSym: unique symbol;
-         readonly hooksSym: unique symbol;
-     };
+    /**
+     * Holds the current log format version (as output in the v property of each log record).
+     */
+    export const levels: LevelMapping;
+    export const symbols: {
+        readonly setLevelSym: unique symbol;
+        readonly getLevelSym: unique symbol;
+        readonly levelValSym: unique symbol;
+        readonly useLevelLabelsSym: unique symbol;
+        readonly mixinSym: unique symbol;
+        readonly lsCacheSym: unique symbol;
+        readonly chindingsSym: unique symbol;
+        readonly parsedChindingsSym: unique symbol;
+        readonly asJsonSym: unique symbol;
+        readonly writeSym: unique symbol;
+        readonly serializersSym: unique symbol;
+        readonly redactFmtSym: unique symbol;
+        readonly timeSym: unique symbol;
+        readonly timeSliceIndexSym: unique symbol;
+        readonly streamSym: unique symbol;
+        readonly stringifySym: unique symbol;
+        readonly stringifySafeSym: unique symbol;
+        readonly stringifiersSym: unique symbol;
+        readonly endSym: unique symbol;
+        readonly formatOptsSym: unique symbol;
+        readonly messageKeySym: unique symbol;
+        readonly nestedKeySym: unique symbol;
+        readonly wildcardFirstSym: unique symbol;
+        readonly needsMetadataGsym: unique symbol;
+        readonly useOnlyCustomLevelsSym: unique symbol;
+        readonly formattersSym: unique symbol;
+        readonly hooksSym: unique symbol;
+    };
  
-     /**
-      * Exposes the Pino package version. Also available on the logger instance.
-      */
-     export const version: string;
+    /**
+     * Exposes the Pino package version. Also available on the logger instance.
+     */
+    export const version: string;
  
-     /**
-      * Provides functions for generating the timestamp property in the log output. You can set the `timestamp` option during
-      * initialization to one of these functions to adjust the output format. Alternatively, you can specify your own time function.
-      * A time function must synchronously return a string that would be a valid component of a JSON string. For example,
-      * the default function returns a string like `,"time":1493426328206`.
-      */
-     export const stdTimeFunctions: {
-         /**
-          * The default time function for Pino. Returns a string like `,"time":1493426328206`.
-          */
-         epochTime: TimeFn;
-         /*
-             * Returns the seconds since Unix epoch
-             */
-         unixTime: TimeFn;
-         /**
-          * Returns an empty string. This function is used when the `timestamp` option is set to `false`.
-          */
-         nullTime: TimeFn;
-         /*
-             * Returns ISO 8601-formatted time in UTC
-             */
-         isoTime: TimeFn;
-     };
+    /**
+     * Provides functions for generating the timestamp property in the log output. You can set the `timestamp` option during
+     * initialization to one of these functions to adjust the output format. Alternatively, you can specify your own time function.
+     * A time function must synchronously return a string that would be a valid component of a JSON string. For example,
+     * the default function returns a string like `,"time":1493426328206`.
+     */
+    export const stdTimeFunctions: {
+        /**
+         * The default time function for Pino. Returns a string like `,"time":1493426328206`.
+         */
+        epochTime: TimeFn;
+        /*
+            * Returns the seconds since Unix epoch
+            */
+        unixTime: TimeFn;
+        /**
+         * Returns an empty string. This function is used when the `timestamp` option is set to `false`.
+         */
+        nullTime: TimeFn;
+        /*
+            * Returns ISO 8601-formatted time in UTC
+            */
+        isoTime: TimeFn;
+    };
  
     //// Exported functions
 
@@ -758,7 +758,7 @@ export type SerializedError = pino.SerializedError;
 export type SerializedRequest = pino.SerializedRequest;
 export type SerializedResponse = pino.SerializedResponse;
 
-// // Interfaces
+// Interfaces
 export interface ChildLoggerOptions extends pino.ChildLoggerOptions {}
 export interface DestinationStream extends pino.DestinationStream {}
 export interface LevelMapping extends pino.LevelMapping {}

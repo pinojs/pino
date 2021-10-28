@@ -3,6 +3,7 @@ import { expectType } from 'tsd'
 import { createWriteStream } from 'fs'
 
 import pino from '../../pino'
+import { multistream } from "../../pino";
 
 const streams = [
   { stream: process.stdout },
@@ -20,3 +21,5 @@ expectType<pino.MultiStreamRes>(pino.multistream(streams))
 expectType<pino.MultiStreamRes>(pino.multistream(streams, {}))
 expectType<pino.MultiStreamRes>(pino.multistream(streams, { levels: { 'info': 30 } }))
 expectType<pino.MultiStreamRes>(pino.multistream(streams, { dedupe: true }))
+
+expectType<pino.MultiStreamRes>(multistream(process.stdout));
