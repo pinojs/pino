@@ -1,6 +1,7 @@
-import P, { pino, stdSerializers } from "../../";
+import P, { pino } from "../../";
 import { IncomingMessage, ServerResponse } from "http";
 import { Socket } from "net";
+import Logger = P.Logger;
 
 const log = pino();
 const info = log.info;
