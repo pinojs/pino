@@ -223,8 +223,11 @@ test('autoEnd = false', async ({ equal, same, teardown }) => {
     worker: { autoEnd: false }
   })
   teardown(transport.end.bind(transport))
+  await once(transport, 'ready')
+
   const instance = pino(transport)
   instance.info('hello')
+
   await watchFileCreated(destination)
 
   equal(count, process.listenerCount('exit'))
@@ -296,6 +299,30 @@ test('pino.transport with target pino-pretty', async ({ match, teardown }) => {
 test('stdout in worker', async ({ not }) => {
   let actual = ''
   const child = execa(process.argv[0], [join(__dirname, '..', 'fixtures', 'transport-main.js')])
+
+  child.stdout.pipe(writer((s, enc, cb) => {
+    actual += s
+    cb()
+  }))
+  await once(child, 'close')
+  not(strip(actual).match(/Hello/), null)
+})
+
+test('log and exit on ready', async ({ not }) => {
+  let actual = ''
+  const child = execa(process.argv[0], [join(__dirname, '..', 'fixtures', 'transport-exit-on-ready.js')])
+
+  child.stdout.pipe(writer((s, enc, cb) => {
+    actual += s
+    cb()
+  }))
+  await once(child, 'close')
+  not(strip(actual).match(/Hello/), null)
+})
+
+test('log and exit before ready', async ({ not }) => {
+  let actual = ''
+  const child = execa(process.argv[0], [join(__dirname, '..', 'fixtures', 'transport-exit-immediately.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
     actual += s

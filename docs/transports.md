@@ -26,6 +26,7 @@ A transport is a module that exports a default function which returns a writable
 import { Writable } from 'stream'
 export default (options) => {
   const myTransportStream = new Writable({
+    autoDestroy: true, // Needed for Node v12+
     write (chunk, enc, cb) {
     // apply a transform and send to stdout
     console.log(chunk.toString().toUpperCase())
@@ -114,9 +115,9 @@ a simple utility to parse each line.  Its usage is highly recommended.
 You can see an example using a async iterator with ESM:
 
 ```js
-import build from 'pino-abstract-stream'
+import build from 'pino-abstract-transport'
 
-exports default async function (opts) {
+export default async function (opts) {
   return build(async function (source) {
     for await (let obj of source) {
       console.log(obj)
@@ -130,7 +131,7 @@ or using Node.js streams and CommonJS:
 ```js
 'use strict'
 
-const build = require('pino-abstract-stream')
+const build = require('pino-abstract-transport')
 
 module.exports = function (opts) {
   return build(function (source) {
@@ -143,6 +144,8 @@ module.exports = function (opts) {
 
 (It is possible to use the async iterators with CommonJS and streams with ESM.)
 
+To consume async iterators in batches, consider using the [hwp](https://github.com/mcollina/hwp) library.
+
 ### Creating a transport pipeline
 
 As an example, the following transport returns a `Transform` stream:
@@ -150,7 +153,7 @@ As an example, the following transport returns a `Transform` stream:
 ```js
 import build from 'pino-abstract-transport'
 import { pipeline, Transform } from 'stream'
-exports default async function (options) {
+export default async function (options) {
   return build(function (source) {
     const myTransportStream = new Transform({
       // Make sue autoDestroy is set,

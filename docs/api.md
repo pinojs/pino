@@ -95,6 +95,17 @@ const logger = pino({
 logger.foo('hi')
 logger.info('hello') // Will throw an error saying info in not found in logger object
 ```
+#### `depthLimit` (Number)
+
+Default: `5`
+
+Option to limit stringification at a specific nesting depth when logging circular object.
+
+#### `edgeLimit` (Number)
+
+Default: `100`
+
+Option to limit stringification of properties/elements when logging a specific object/array with circular references.
 
 #### `mixin` (Function):
 
@@ -347,7 +358,7 @@ and searching for logged objects can start from a consistent path.
 
 Default: `false`
 
-__DEPRECATED: use [`transport`](#transport) instead.
+__DEPRECATED: use [`transport`](#transport) instead.__
 
 Enables pretty printing log logs. This is intended for non-production
 configurations. This may be set to a configuration object as outlined in the
@@ -410,7 +421,8 @@ Default: `pino.destination(1)` (STDOUT)
 The `destination` parameter, at a minimum must be an object with a `write` method.
 An ordinary Node.js `stream` can be passed as the destination (such as the result
 of `fs.createWriteStream`) but for peak log writing performance it is strongly
-recommended to use `pino.destination` to create the destination stream.
+recommended to use `pino.destination` to create the destination stream. 
+Note that the `destination` parameter can be the result of `pino.transport()`.
 
 ```js
 // pino.destination(1) by default
@@ -1033,8 +1045,12 @@ For more on transports, how they work, and how to create them see the [`Transpor
 
 ### `pino.final(logger, [handler]) => Function | FinalLogger`
 
+__The use of `pino.final` is discouraged in Node.js v14+ and not required.
+It will be removed in the next major version.__
+
 The `pino.final` method can be used to acquire a final logger instance
-or create an exit listener function.
+or create an exit listener function. This is _not_ needed in Node.js v14+
+as pino automatically can handle those.
 
 The `finalLogger` is a specialist logger that synchronously flushes
 on every write. This is important to guarantee final log writes,
