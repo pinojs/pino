@@ -712,3 +712,21 @@ test('correctly log number', async (t) => {
   const { msg } = await once(stream, 'data')
   t.equal(msg, 42)
 })
+
+test('nestedKey should not be used for non-objects', async ({ strictSame }) => {
+  const stream = sink()
+  const message = 'hello'
+  const nestedKey = 'stuff'
+  const instance = pino({
+    nestedKey
+  }, stream)
+  instance.info(message)
+  const result = await once(stream, 'data')
+  delete result.time
+  strictSame(result, {
+    pid,
+    hostname,
+    level: 30,
+    msg: message
+  })
+})
