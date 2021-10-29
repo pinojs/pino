@@ -7,6 +7,7 @@ const redaction = require('./lib/redaction')
 const time = require('./lib/time')
 const proto = require('./lib/proto')
 const symbols = require('./lib/symbols')
+const warning = require('./lib/deprecations')
 const { assertDefaultLevelFound, mappings, genLsCache } = require('./lib/levels')
 const {
   createArgsNormalizer,
@@ -93,6 +94,10 @@ function pino (...args) {
     formatters,
     hooks
   } = opts
+
+  const major = Number(process.versions.node.split('.')[0])
+  if (major >= 14) warning.emit('PINODEP009')
+  if (major === 12) warning.emit('PINODEP010')
 
   const allFormatters = buildFormatters(
     formatters.level,
