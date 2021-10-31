@@ -5,6 +5,7 @@ const pino = require(require.resolve('./../../../'))
 const log = pino({
   prettyPrint: {
     translateTime: true
-  }
+  },
+  prettifier: require('pino-pretty')
 })
 log.info('h')

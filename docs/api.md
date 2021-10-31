@@ -358,7 +358,10 @@ and searching for logged objects can start from a consistent path.
 
 Default: `false`
 
-__DEPRECATED: use [`transport`](#transport) instead.__
+__DEPRECATED: automatically requiring of `pino-pretty` is deprecated__. 
+There are two alternatives:
+1. [`transport`](#transport) instead.__
+2. pass `prettyPrint: require('pino-pretty')`.
 
 Enables pretty printing log logs. This is intended for non-production
 configurations. This may be set to a configuration object as outlined in the

@@ -1,6 +1,9 @@
 'use strict'
 
-const pino = require('..')()
+const pino = require('..')({
+  // Uncomment to enable pretty printing
+  // prettyPrint: require('pino-pretty')
+})
 
 pino.info('hello world')
 pino.error('this is at error level')

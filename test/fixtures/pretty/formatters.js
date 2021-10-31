@@ -3,7 +3,7 @@ Date.now = function () { return 1459875739796 }
 require('os').hostname = function () { return 'abcdefghijklmnopqr' }
 const pino = require(require.resolve('./../../../'))
 const log = pino({
-  prettyPrint: true,
+  prettyPrint: require('pino-pretty'),
   formatters: {
     log (obj) {
       return { foo: 'formatted_' + obj.foo }

@@ -4,6 +4,6 @@ require('os').hostname = function () { return 'abcdefghijklmnopqr' }
 const pino = require(require.resolve('./../../../'))
 const log = pino({
   timestamp: () => ',"time":"test"',
-  prettyPrint: true
+  prettyPrint: require('pino-pretty')
 })
 log.info('h')
