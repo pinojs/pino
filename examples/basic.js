@@ -1,5 +1,6 @@
 'use strict'
 
+// const pino = require('..')(require('pino-pretty')())
 const pino = require('..')()
 
 pino.info('hello world')

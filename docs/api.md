@@ -358,7 +358,8 @@ and searching for logged objects can start from a consistent path.
 
 Default: `false`
 
-__DEPRECATED: use [`transport`](#transport) instead.__
+__DEPRECATED: look at [pino-pretty documentation](https://github.com/pinojs/pino-pretty)
+for alternatives__. Using a [`transport`](#transport) is also an option.__
 
 Enables pretty printing log logs. This is intended for non-production
 configurations. This may be set to a configuration object as outlined in the
