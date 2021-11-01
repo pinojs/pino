@@ -25,7 +25,11 @@ test('should show warning for pino.final on node 14+', async ({ equal }) => {
   instance.info('hello')
   await once(stream, 'data')
 
-  equal(isWarningEmitted, true)
+  if (major >= 14) {
+    equal(isWarningEmitted, true)
+  } else {
+    equal(isWarningEmitted, false)
+  }
 })
 
 test('pino version is exposed on export', async ({ equal }) => {
