@@ -8,6 +8,35 @@ const { sleep, getPathToNull } = require('./helper')
 // will be emitted. Let's raise this so we do not scare everybody.
 process.setMaxListeners(100)
 
+test('should show warning for pino.final on node 14+', async ({ equal }) => {
+  const dest = pino.destination({ dest: getPathToNull(), sync: false })
+  dest.flushSync = () => {}
+  const instance = pino(dest)
+
+  pino.final(instance, (_, finalLogger) => {
+    finalLogger.info('hello')
+  })()
+
+  const major = Number(process.versions.node.split('.')[0])
+  let isWarningEmitted = false
+
+  function onWarning (warning) {
+    isWarningEmitted = true
+    equal(warning.code, 'PINODEP009')
+  }
+
+  if (major >= 14) process.on('warning', onWarning)
+
+  instance.info('hello')
+  await sleep(10)
+
+  if (major >= 14) {
+    equal(isWarningEmitted, true)
+  } else {
+    equal(isWarningEmitted, false)
+  }
+})
+
 test('replaces onTerminated option', async ({ throws }) => {
   throws(() => {
     pino({

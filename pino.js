@@ -7,7 +7,6 @@ const redaction = require('./lib/redaction')
 const time = require('./lib/time')
 const proto = require('./lib/proto')
 const symbols = require('./lib/symbols')
-const warning = require('./lib/deprecations')
 const { configure } = require('safe-stable-stringify')
 const { assertDefaultLevelFound, mappings, genLsCache } = require('./lib/levels')
 const {
@@ -100,9 +99,6 @@ function pino (...args) {
     depthLimit,
     edgeLimit
   } = opts
-
-  const major = Number(process.versions.node.split('.')[0])
-  if (major >= 14) warning.emit('PINODEP009')
 
   const stringifySafe = configure({
     maximumDepth: depthLimit,

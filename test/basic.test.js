@@ -9,29 +9,6 @@ const { version } = require('../package.json')
 const { pid } = process
 const hostname = os.hostname()
 
-test('should show warning for pino.final on node 14+', async ({ equal }) => {
-  const stream = sink()
-  const instance = pino(stream)
-  const major = Number(process.versions.node.split('.')[0])
-  let isWarningEmitted = false
-
-  function onWarning (warning) {
-    isWarningEmitted = true
-    equal(warning.code, 'PINODEP009')
-  }
-
-  if (major >= 14) process.once('warning', onWarning)
-
-  instance.info('hello')
-  await once(stream, 'data')
-
-  if (major >= 14) {
-    equal(isWarningEmitted, true)
-  } else {
-    equal(isWarningEmitted, false)
-  }
-})
-
 test('pino version is exposed on export', async ({ equal }) => {
   equal(pino.version, version)
 })
