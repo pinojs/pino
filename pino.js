@@ -103,7 +103,6 @@ function pino (...args) {
 
   const major = Number(process.versions.node.split('.')[0])
   if (major >= 14) warning.emit('PINODEP009')
-  if (major === 12) warning.emit('PINODEP010')
 
   const stringifySafe = configure({
     maximumDepth: depthLimit,
