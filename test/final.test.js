@@ -8,10 +8,11 @@ const { sleep, getPathToNull } = require('./helper')
 // will be emitted. Let's raise this so we do not scare everybody.
 process.setMaxListeners(100)
 
-test('should show warning for pino.final on node 14+', async ({ equal, end }) => {
+test('should show warning for pino.final on node 14+', async ({ equal, end, plan }) => {
   const major = Number(process.versions.node.split('.')[0])
   if (major < 14) end()
 
+  plan(1)
   const dest = pino.destination({ dest: getPathToNull(), sync: false })
   dest.flushSync = () => {}
   const instance = pino(dest)
