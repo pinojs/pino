@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2.3.5
+        uses: actions/checkout@v2.4.0
         with:
           ref: ${{ github.base_ref }}
       - name: Setup Node
@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2.3.5
+        uses: actions/checkout@v2.4.0
       - name: Setup Node
         uses: actions/setup-node@v2.4.1
         with:
