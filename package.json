@@ -109,6 +109,7 @@
     "pino-abstract-transport": "v0.4.0",
     "pino-std-serializers": "^4.0.0",
     "quick-format-unescaped": "^4.0.3",
+    "real-require": "^0.1.0",
     "safe-stable-stringify": "^2.1.0",
     "sonic-boom": "^2.2.1",
     "thread-stream": "^0.11.1"
