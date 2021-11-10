@@ -92,6 +92,12 @@ In many cases, Pino is over 5x faster than alternatives.
 
 See the [Benchmarks](docs/benchmarks.md) document for comparisons.
 
+### Bundling support
+
+Pino supports to being bundled using tools like webpack or esbuild. 
+
+See [Bundling](docs/bundling.md) document for more informations.
+
 <a name="team"></a>
 ## The Team
 
