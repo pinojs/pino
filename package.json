@@ -111,7 +111,7 @@
     "quick-format-unescaped": "^4.0.3",
     "safe-stable-stringify": "^2.1.0",
     "sonic-boom": "^2.2.1",
-    "thread-stream": "^0.12.0"
+    "thread-stream": "^0.13.0"
   },
   "tsd": {
     "directory": "test/types"
