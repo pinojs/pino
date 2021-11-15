@@ -1,6 +1,8 @@
 name: Benchmarks
 on:
   push:
+    branches:
+      - main
     paths-ignore:
         - 'docs/**'
         - '*.md'
