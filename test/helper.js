@@ -59,15 +59,19 @@ function watchFileCreated (filename) {
     const threshold = TIMEOUT / INTERVAL
     let counter = 0
     const interval = setInterval(() => {
+      const exists = existsSync(filename)
       // On some CI runs file is created but not filled
-      if (existsSync(filename) && statSync(filename).size !== 0) {
+      if (exists && statSync(filename).size !== 0) {
         clearInterval(interval)
         resolve()
       } else if (counter <= threshold) {
         counter++
       } else {
         clearInterval(interval)
-        reject(new Error(`${filename} was not created.`))
+        reject(new Error(
+          `${filename} hasn't been created within ${TIMEOUT} ms. ` +
+          (exists ? 'File exist, but still empty.' : 'File not yet created.')
+        ))
       }
     }, INTERVAL)
   })
