@@ -4,7 +4,9 @@ const pino = require('./pino')
 const { once } = require('events')
 
 module.exports = async function (opts = {}) {
-  const destination = pino.destination({ dest: opts.destination || 1, sync: false })
+  const destOpts = { dest: opts.destination || 1, sync: false }
+  if (opts.mkdir) destOpts.mkdir = true
+  const destination = pino.destination(destOpts)
   await once(destination, 'ready')
   return destination
 }
