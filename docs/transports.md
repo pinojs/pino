@@ -251,6 +251,17 @@ const transport = pino.transport({
 pino(transport)
 ```
 
+By default, the `pino/file` transport appends to the destination file if it exists. The `append` option may be set to `false` to configure the transport to truncate the file upon opening it for writing.
+
+```js
+const pino = require('pino')
+const transport = pino.transport({
+  target: 'pino/file',
+  options: { destination: '/path/to/file', append: false }
+})
+pino(transport)
+```
+
 The `options.destination` property may also be a number to represent a file descriptor. Typically this would be `1` to write to STDOUT or `2` to write to STDERR. If `options.destination` is not set, it defaults to `1` which means logs will be written to STDOUT.
 
 The difference between using the `pino/file` transport builtin and using `pino.destination` is that `pino.destination` runs in the main thread, whereas `pino/file` sets up `pino.destination` in a worker thread.
