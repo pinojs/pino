@@ -3,7 +3,7 @@
 const os = require('os')
 const writer = require('flush-write-stream')
 const split = require('split2')
-const { existsSync, statSync } = require('fs')
+const { existsSync, readFileSync, statSync } = require('fs')
 const pid = process.pid
 const hostname = os.hostname()
 
@@ -77,4 +77,24 @@ function watchFileCreated (filename) {
   })
 }
 
-module.exports = { getPathToNull, sink, check, once, sleep, watchFileCreated, isWin, isYarnPnp }
+function watchForWrite (filename, testString) {
+  return new Promise((resolve, reject) => {
+    const TIMEOUT = 2000
+    const INTERVAL = 100
+    const threshold = TIMEOUT / INTERVAL
+    let counter = 0
+    const interval = setInterval(() => {
+      if (readFileSync(filename).includes(testString)) {
+        clearInterval(interval)
+        resolve()
+      } else if (counter <= threshold) {
+        counter++
+      } else {
+        clearInterval(interval)
+        reject(new Error(`'${testString}' hasn't been written to ${filename} within ${TIMEOUT} ms.`))
+      }
+    }, INTERVAL)
+  })
+}
+
+module.exports = { getPathToNull, sink, check, once, sleep, watchFileCreated, watchForWrite, isWin, isYarnPnp }
