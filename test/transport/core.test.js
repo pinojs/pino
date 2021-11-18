@@ -279,6 +279,27 @@ test('pino.transport with target pino/file', async ({ same, teardown }) => {
   })
 })
 
+test('pino.transport with target pino/file and mkdir option', async ({ same, teardown }) => {
+  const folder = '_' + Math.random().toString(36).substr(2, 9)
+  const destination = join(os.tmpdir(), folder, folder)
+  const transport = pino.transport({
+    target: 'pino/file',
+    options: { destination, mkdir: true }
+  })
+  teardown(transport.end.bind(transport))
+  const instance = pino(transport)
+  instance.info('hello')
+  await watchFileCreated(destination)
+  const result = JSON.parse(await readFile(destination))
+  delete result.time
+  same(result, {
+    pid,
+    hostname,
+    level: 30,
+    msg: 'hello'
+  })
+})
+
 test('pino.transport with target pino-pretty', async ({ match, teardown }) => {
   const destination = join(
     os.tmpdir(),
