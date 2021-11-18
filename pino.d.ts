@@ -21,7 +21,6 @@
 import { EventEmitter } from "events";
 import { SonicBoom } from "sonic-boom";
 import * as pinoStdSerializers from "pino-std-serializers";
-import { WriteStream } from "fs";
 import { WorkerOptions } from "worker_threads";
 
 export default P;
@@ -286,7 +285,7 @@ declare namespace P {
         labels: { [level: number]: string };
     }
     type TimeFn = () => string;
-    type MixinFn = () => object;
+    type MixinFn = () => {[key: string]: unknown};
 
     interface DestinationStream {
         write(msg: string): void;
@@ -544,21 +543,21 @@ declare namespace P {
              * The default shape is { level: number }.
              * The function takes two arguments, the label of the level (e.g. 'info') and the numeric value (e.g. 30).
              */
-            level?: (label: string, number: number) => object;
+            level?: (label: string, number: number) => {[key: string]: unknown};
             /**
              * Changes the shape of the bindings.
              * The default shape is { pid, hostname }.
              * The function takes a single argument, the bindings object.
              * It will be called every time a child logger is created.
              */
-            bindings?: (bindings: Bindings) => object;
+            bindings?: (bindings: Bindings) => {[key: string]: unknown};
             /**
              * Changes the shape of the log object.
              * This function will be called every time one of the log methods (such as .info) is called.
              * All arguments passed to the log method, except the message, will be pass to this function.
              * By default it does not change the shape of the log object.
              */
-            log?: (object: object) => object;
+            log?: (object: {[key: string]: unknown}) => {[key: string]: unknown};
         };
 
         /**
@@ -675,7 +674,7 @@ declare namespace P {
     type LevelWithSilent = Level | "silent";
 
     type SerializerFn = (value: any) => any;
-    type WriteFn = (o: object) => void;
+    type WriteFn = (o: {[key: string]: unknown}) => void;
 
     /**
      * Describes a log line.
@@ -691,9 +690,9 @@ declare namespace P {
         serializers?: { [key: string]: SerializerFn };
         customLevels?: { [key: string]: number };
         formatters?: {
-            level?: (label: string, number: number) => object;
-            bindings?: (bindings: Bindings) => object;
-            log?: (object: object) => object;
+            level?: (label: string, number: number) => {[key: string]: unknown};
+            bindings?: (bindings: Bindings) => {[key: string]: unknown};
+            log?: (object: {[key: string]: unknown}) => {[key: string]: unknown};
         };
         redact?: string[] | redactOptions;
     }
