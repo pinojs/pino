@@ -43,7 +43,8 @@ A "month" is defined as 30 consecutive days.
 
 | Version | Release Date | End Of LTS Date | Node.js              |
 | :------ | :----------- | :-------------- | :------------------- |
-| 6.x     | 2020-03-07   | TBD             | 10, 12, 14, 16       |
+| 7.x     | 2021-10-14   | TBD             | 12, 14, 16           |
+| 6.x     | 2020-03-07   | 2022-04-14      | 10, 12, 14, 16       |
 
 <a name="supported-os"></a>
 
