@@ -2,6 +2,12 @@
 
 Due to its internal architecture based on Worker Threads, it is not possible to bundle Pino *without* generating additional files.
 
+## Webpack
+
+If you are a Webpack user, you can achieve this with [pino-webpack-plugin](https://github.com/pinojs/pino-webpack-plugin) without manual configuration of `__bundlerPathsOverrides`; however, if you are using other bundlers, you would need to configure it manually. 
+
+## Manual Configuration
+
 In particular, a bundler must ensure that the following files are also bundle separately:
 
 * `lib/worker.js` from the `thread-stream` dependency
