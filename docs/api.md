@@ -527,14 +527,14 @@ logger.info('hello world')
 // {"level":30,"time":1531257112193,"msg":"hello world","pid":55956,"hostname":"x"}
 ```
 
-The `message` parameter takes precedence over the `mergedObject`.
-That is, if a `mergedObject` contains a `msg` property, and a `message` parameter
+The `message` parameter takes precedence over the `mergingObject`.
+That is, if a `mergingObject` contains a `msg` property, and a `message` parameter
 is supplied in addition, the `msg` property in the output log will be the value of
-the `message` parameter not the value of the `msg` property on the `mergedObject`.
+the `message` parameter not the value of the `msg` property on the `mergingObject`.
 See [Avoid Message Conflict](/docs/help.md#avoid-message-conflict) for information
 on how to overcome this limitation.
 
-If no `message` parameter is provided, and the `mergedObject` is of type `Error` or it has a property named `err`, the
+If no `message` parameter is provided, and the `mergingObject` is of type `Error` or it has a property named `err`, the
 `message` parameter is set to the `message` value of the error.
 
 The `messageKey` option can be used at instantiation time to change the namespace
