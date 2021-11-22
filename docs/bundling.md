@@ -28,3 +28,7 @@ globalThis.__bundlerPathsOverrides = {
 ```
 
 Note that `pino/file`, `pino-worker`, `pino-pipeline-worker` and `thread-stream-worker` are required identifiers. Other identifiers are possible based on the user configuration.
+
+## Webpack Plugin
+
+If you are a Webpack user, you can achieve this with [pino-webpack-plugin](https://github.com/pinojs/pino-webpack-plugin) without manual configuration of `__bundlerPathsOverrides`; however, you still need to configure it manually if you are using other bundlers. 
