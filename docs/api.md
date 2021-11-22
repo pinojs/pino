@@ -422,7 +422,7 @@ Default: `pino.destination(1)` (STDOUT)
 The `destination` parameter, at a minimum must be an object with a `write` method.
 An ordinary Node.js `stream` can be passed as the destination (such as the result
 of `fs.createWriteStream`) but for peak log writing performance it is strongly
-recommended to use `pino.destination` to create the destination stream. 
+recommended to use `pino.destination` to create the destination stream.
 Note that the `destination` parameter can be the result of `pino.transport()`.
 
 ```js
@@ -448,6 +448,10 @@ However, there are some special instances where `pino.destination` is not used a
 + When something, e.g a process manager, has monkey-patched `process.stdout.write`.
 
 In these cases `process.stdout` is used instead.
+
+Note: If the parameter is a string integer, e.g. `'1'`, it will be coerced to
+a number and used as a file descriptor. If this is not desired, provide a full
+path, e.g. `/tmp/1`.
 
 * See [`pino.destination`](#pino-destination)
 
@@ -1010,7 +1014,7 @@ is flushed and all data synced before the process exits.
 Note that calling `process.exit()` on the main thread will stop the event loop on the main thread from turning. As a result,
 using `console.log` and `process.stdout` after the main thread called `process.exit()` will not produce any output.
 
-If you are embedding/integrating pino within your framework, you will need to make pino aware of the script that is calling it, 
+If you are embedding/integrating pino within your framework, you will need to make pino aware of the script that is calling it,
 like so:
 
 ```js
