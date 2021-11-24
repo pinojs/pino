@@ -54,7 +54,7 @@ function sleep (ms) {
 
 function watchFileCreated (filename) {
   return new Promise((resolve, reject) => {
-    const TIMEOUT = 2000
+    const TIMEOUT = process.env.PINO_TEST_WAIT_WATCHFILE_TIMEOUT || 10000
     const INTERVAL = 100
     const threshold = TIMEOUT / INTERVAL
     let counter = 0
@@ -79,7 +79,7 @@ function watchFileCreated (filename) {
 
 function watchForWrite (filename, testString) {
   return new Promise((resolve, reject) => {
-    const TIMEOUT = 2000
+    const TIMEOUT = process.env.PINO_TEST_WAIT_WRITE_TIMEOUT || 10000
     const INTERVAL = 100
     const threshold = TIMEOUT / INTERVAL
     let counter = 0
