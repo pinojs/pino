@@ -17,6 +17,7 @@
 // TypeScript Version: 4.4
 
 import type { EventEmitter } from "events";
+// @ts-ignore -- gracefully falls back to `any` if not installed
 import type { PrettyOptions } from "pino-pretty";
 import type { SonicBoom, SonicBoomOpts } from "sonic-boom";
 import type { WorkerOptions } from "worker_threads";

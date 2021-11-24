@@ -180,8 +180,6 @@ const pretty = pino({
         messageKey: "msg",
         timestampKey: "timestamp",
         translateTime: "UTC:h:MM:ss TT Z",
-        // Not actually a valid prettyPrint option(!)
-        // search: "foo == `bar`",
     },
 });
 
