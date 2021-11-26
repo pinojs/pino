@@ -1,6 +1,5 @@
 # Help
 
-* [Exit logging](#exit-logging)
 * [Log rotation](#rotate)
 * [Reopening log files](#reopening)
 * [Saving to multiple files](#multiple)
@@ -13,34 +12,7 @@
 * [Unicode and Windows terminal](#windows)
 * [Mapping Pino Log Levels to Google Cloud Logging (Stackdriver) Serverity Levels](#stackdriver)
 * [Avoid Message Conflict](#avoid-message-conflict)
-
-<a id="exit-logging"></a>
-## Exit logging
-
-When a Node process crashes from uncaught exception, exits due to a signal,
-or exits of it's own accord we may want to write some final logs – particularly
-in cases of error.
-
-Writing to a Node.js stream on exit is not necessarily guaranteed, and naively writing
-to an asynchronous logger on exit will definitely lead to lost logs.
-
-To write logs in an exit handler, create the handler with [`pino.final`](/docs/api.md#pino-final):
-
-```js
-process.on('uncaughtException', pino.final(logger, (err, finalLogger) => {
-  finalLogger.error(err, 'uncaughtException')
-  process.exit(1)
-}))
-
-process.on('unhandledRejection', pino.final(logger, (err, finalLogger) => {
-  finalLogger.error(err, 'unhandledRejection')
-  process.exit(1)
-}))
-```
-
-The `finalLogger` is a special logger instance that will synchronously and reliably
-flush every log line. This is important in exit handlers, since no more asynchronous
-activity may be scheduled.
+* [Exit logging](#exit-logging)
 
 <a id="rotate"></a>
 ## Log rotation
@@ -299,3 +271,35 @@ log.info({ msg: 'mapped to originalMsg' }, 'a message')
 // {"level":30,"time":1596313323106,"pid":63739,"hostname":"foo","msg":"no original message"}
 // {"level":30,"time":1596313323107,"pid":63739,"hostname":"foo","msg":"a message","originalMsg":"mapped to originalMsg"}
 ```
+
+<a id="exit-logging"></a>
+## Exit logging (deprecated for Node v14+)
+
+__In pino v7, The following piece of documentation is not needed in Node v14+ and it will
+emit a deprecation notice.__
+
+When a Node process crashes from uncaught exception, exits due to a signal,
+or exits of it's own accord we may want to write some final logs – particularly
+in cases of error.
+
+Writing to a Node.js stream on exit is not necessarily guaranteed, and naively writing
+to an asynchronous logger on exit will definitely lead to lost logs.
+
+To write logs in an exit handler, create the handler with [`pino.final`](/docs/api.md#pino-final):
+
+```js
+process.on('uncaughtException', pino.final(logger, (err, finalLogger) => {
+  finalLogger.error(err, 'uncaughtException')
+  process.exit(1)
+}))
+
+process.on('unhandledRejection', pino.final(logger, (err, finalLogger) => {
+  finalLogger.error(err, 'unhandledRejection')
+  process.exit(1)
+}))
+```
+
+The `finalLogger` is a special logger instance that will synchronously and reliably
+flush every log line. This is important in exit handlers, since no more asynchronous
+activity may be scheduled.
+
