@@ -180,7 +180,6 @@ const pretty = pino({
         messageKey: "msg",
         timestampKey: "timestamp",
         translateTime: "UTC:h:MM:ss TT Z",
-        search: "foo == `bar`",
     },
 });
 
