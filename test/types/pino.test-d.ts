@@ -1,7 +1,8 @@
-import P, { pino } from "../../";
+import P, { pino, SerializerFn } from "../../";
 import { IncomingMessage, ServerResponse } from "http";
 import { Socket } from "net";
 import Logger = P.Logger;
+import { expectType } from "tsd";
 
 const log = pino();
 const info = log.info;
@@ -277,3 +278,22 @@ const logLine: pino.LogDescriptor = {
 interface CustomLogger extends pino.Logger {
     customMethod(msg: string, ...args: unknown[]): void;
 }
+
+expectType<pino.SerializerFn>(() => {})
+expectType<pino.WriteFn>(() => {})
+
+interface CustomBaseLogger extends pino.BaseLogger {
+  child(): CustomBaseLogger
+}
+
+expectType<CustomBaseLogger>({
+  level: 'info',
+  fatal() {},
+  error() {},
+  warn() {},
+  info() {},
+  debug() {},
+  trace() {},
+  silent() {},
+  child() { return this }
+})
