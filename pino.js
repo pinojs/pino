@@ -12,7 +12,6 @@ const { assertDefaultLevelFound, mappings, genLsCache } = require('./lib/levels'
 const {
   createArgsNormalizer,
   asChindings,
-  final,
   buildSafeSonicBoom,
   buildFormatters,
   stringify,
@@ -201,7 +200,6 @@ module.exports.destination = (dest = process.stdout.fd) => {
 module.exports.transport = require('./lib/transport')
 module.exports.multistream = require('./lib/multistream')
 
-module.exports.final = final
 module.exports.levels = mappings()
 module.exports.stdSerializers = serializers
 module.exports.stdTimeFunctions = Object.assign({}, time)
