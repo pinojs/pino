@@ -1,4 +1,4 @@
-import P, { pino, SerializerFn } from "../../";
+import P, { pino } from "../../";
 import { IncomingMessage, ServerResponse } from "http";
 import { Socket } from "net";
 import Logger = P.Logger;
