@@ -1,6 +1,6 @@
 import { pino } from '../../pino'
 import { join } from 'path'
-import { tmpdir } from'os'
+import { tmpdir } from 'os'
 
 const destination = join(
     tmpdir(),
