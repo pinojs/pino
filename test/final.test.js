@@ -31,14 +31,6 @@ test('should show warning for pino.final on node 14+', ({ equal, end, plan }) =>
   instance.info('hello')
 })
 
-test('replaces onTerminated option', async ({ throws }) => {
-  throws(() => {
-    pino({
-      onTerminated: () => {}
-    })
-  }, Error('The onTerminated option has been removed, use pino.final instead'))
-})
-
 test('throws if not supplied a logger instance', async ({ throws }) => {
   throws(() => {
     pino.final()

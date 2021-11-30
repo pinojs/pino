@@ -50,7 +50,6 @@ const defaultOptions = {
   messageKey: 'msg',
   nestedKey: null,
   enabled: true,
-  prettyPrint: false,
   base: { pid, hostname },
   serializers: Object.assign(Object.create(null), {
     err: defaultErrorSerializer
