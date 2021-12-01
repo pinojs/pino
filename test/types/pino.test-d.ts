@@ -2,7 +2,6 @@ import P, { pino } from "../../";
 import { IncomingMessage, ServerResponse } from "http";
 import { Socket } from "net";
 import Logger = P.Logger;
-import { expectType } from "tsd";
 
 const log = pino();
 const info = log.info;
@@ -279,14 +278,14 @@ interface CustomLogger extends pino.Logger {
     customMethod(msg: string, ...args: unknown[]): void;
 }
 
-expectType<pino.SerializerFn>(() => {})
-expectType<pino.WriteFn>(() => {})
+const serializerFunc: pino.SerializerFn = () => {}
+const writeFunc: pino.WriteFn = () => {}
 
 interface CustomBaseLogger extends pino.BaseLogger {
   child(): CustomBaseLogger
 }
 
-expectType<CustomBaseLogger>({
+const customBaseLogger: CustomBaseLogger = {
   level: 'info',
   fatal() {},
   error() {},
@@ -296,4 +295,4 @@ expectType<CustomBaseLogger>({
   trace() {},
   silent() {},
   child() { return this }
-})
+}
