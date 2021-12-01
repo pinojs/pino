@@ -277,3 +277,22 @@ const logLine: pino.LogDescriptor = {
 interface CustomLogger extends pino.Logger {
     customMethod(msg: string, ...args: unknown[]): void;
 }
+
+const serializerFunc: pino.SerializerFn = () => {}
+const writeFunc: pino.WriteFn = () => {}
+
+interface CustomBaseLogger extends pino.BaseLogger {
+  child(): CustomBaseLogger
+}
+
+const customBaseLogger: CustomBaseLogger = {
+  level: 'info',
+  fatal() {},
+  error() {},
+  warn() {},
+  info() {},
+  debug() {},
+  trace() {},
+  silent() {},
+  child() { return this }
+}
