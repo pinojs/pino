@@ -3,8 +3,8 @@
 const os = require('os')
 const { join } = require('path')
 const { once } = require('events')
-const { readFile } = require('fs').promises
-const { watchFileCreated } = require('../helper')
+const { readFile, writeFile } = require('fs').promises
+const { watchFileCreated, watchForWrite } = require('../helper')
 const { test } = require('tap')
 const pino = require('../../')
 const url = require('url')
@@ -279,6 +279,51 @@ test('pino.transport with target pino/file', async ({ same, teardown }) => {
   })
 })
 
+test('pino.transport with target pino/file and mkdir option', async ({ same, teardown }) => {
+  const folder = '_' + Math.random().toString(36).substr(2, 9)
+  const destination = join(os.tmpdir(), folder, folder)
+  const transport = pino.transport({
+    target: 'pino/file',
+    options: { destination, mkdir: true }
+  })
+  teardown(transport.end.bind(transport))
+  const instance = pino(transport)
+  instance.info('hello')
+  await watchFileCreated(destination)
+  const result = JSON.parse(await readFile(destination))
+  delete result.time
+  same(result, {
+    pid,
+    hostname,
+    level: 30,
+    msg: 'hello'
+  })
+})
+
+test('pino.transport with target pino/file and append option', async ({ same, teardown }) => {
+  const destination = join(
+    os.tmpdir(),
+    '_' + Math.random().toString(36).substr(2, 9)
+  )
+  await writeFile(destination, JSON.stringify({ pid, hostname, time: Date.now(), level: 30, msg: 'hello' }))
+  const transport = pino.transport({
+    target: 'pino/file',
+    options: { destination, append: false }
+  })
+  teardown(transport.end.bind(transport))
+  const instance = pino(transport)
+  instance.info('goodbye')
+  await watchForWrite(destination, '"goodbye"')
+  const result = JSON.parse(await readFile(destination))
+  delete result.time
+  same(result, {
+    pid,
+    hostname,
+    level: 30,
+    msg: 'goodbye'
+  })
+})
+
 test('pino.transport with target pino-pretty', async ({ match, teardown }) => {
   const destination = join(
     os.tmpdir(),
@@ -323,6 +368,18 @@ test('log and exit on ready', async ({ not }) => {
 test('log and exit before ready', async ({ not }) => {
   let actual = ''
   const child = execa(process.argv[0], [join(__dirname, '..', 'fixtures', 'transport-exit-immediately.js')])
+
+  child.stdout.pipe(writer((s, enc, cb) => {
+    actual += s
+    cb()
+  }))
+  await once(child, 'close')
+  not(strip(actual).match(/Hello/), null)
+})
+
+test('string integer destination', async ({ not }) => {
+  let actual = ''
+  const child = execa(process.argv[0], [join(__dirname, '..', 'fixtures', 'transport-string-stdout.js')])
 
   child.stdout.pipe(writer((s, enc, cb) => {
     actual += s

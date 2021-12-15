@@ -23,17 +23,10 @@ and can be used or configured via the options object passed to `pino` on initial
 A transport is a module that exports a default function which returns a writable stream:
 
 ```js
-import { Writable } from 'stream'
+import { createWriteStream } from 'fs'
+
 export default (options) => {
-  const myTransportStream = new Writable({
-    autoDestroy: true, // Needed for Node v12+
-    write (chunk, enc, cb) {
-    // apply a transform and send to stdout
-    console.log(chunk.toString().toUpperCase())
-    cb()
-    }
-  })
-  return myTransportStream
+  return createWriteStream(options.destination)
 }
 ```
 
@@ -55,7 +48,8 @@ The transport code will be executed in a separate worker thread. The main thread
 will write logs to the worker thread, which will write them to the stream returned
 from the function exported from the transport file/module.
 
-The exported function can also be async. Imagine the following transport:
+The exported function can also be async. If we use an async function we can throw early
+if the transform could not be opened. As an example:
 
 ```js
 import fs from 'fs'
@@ -107,6 +101,7 @@ For more details on `pino.transport` see the [API docs for `pino.transport`][pin
 [pino-transport]: /docs/api.md#pino-transport
 [sca]: https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm
 
+<a id="writing"></a>
 ### Writing a Transport
 
 The module [pino-abstract-transport](https://github.com/pinojs/pino-abstract-transport) provides
@@ -116,11 +111,27 @@ You can see an example using a async iterator with ESM:
 
 ```js
 import build from 'pino-abstract-transport'
+import SonicBoom from 'sonic-boom'
+import { once } from 'events'
 
 export default async function (opts) {
+  // SonicBoom is necessary to avoid loops with the main thread.
+  // It is the same of pino.destination().
+  const destination = new SonicBoom({ dest: opts.destination || 1, sync: false })
+  await once(destination, 'ready')
+
   return build(async function (source) {
     for await (let obj of source) {
-      console.log(obj)
+      const toDrain = !destination.write(obj.message.toUpperCase() + '\n')
+      // This block will handle backpressure
+      if (toDrain) {
+        await once(destination, 'drain')
+      }
+    }
+  }, {
+    async close (err) {
+      destination.end()
+      await once(destination, 'close')
     }
   })
 }
@@ -132,12 +143,17 @@ or using Node.js streams and CommonJS:
 'use strict'
 
 const build = require('pino-abstract-transport')
+const SonicBoom = require('sonic-boom')
 
 module.exports = function (opts) {
+  const destination = new SonicBoom({ dest: opts.destination || 1, sync: false })
   return build(function (source) {
-    source.on('data', function (obj) {
-      console.log(obj)
-    })
+    source.pipe(destination)
+  }, {
+    close (err, cb) {
+      destination.end()
+      destination.on('close', cb.bind(null, err))
+    }
   })
 }
 ```
@@ -145,6 +161,9 @@ module.exports = function (opts) {
 (It is possible to use the async iterators with CommonJS and streams with ESM.)
 
 To consume async iterators in batches, consider using the [hwp](https://github.com/mcollina/hwp) library.
+
+The `close()` function is needed to make sure that the stream is closed and flushed when its
+callback is called or the returned promise resolved. Otherwise log lines will be lost.
 
 ### Creating a transport pipeline
 
@@ -221,7 +240,29 @@ const transport = pino.transport({
 pino(transport)
 ```
 
-The `options.destination` property may also be a number to represent a file descriptor. Typically this would be `1` to write to STDOUT or `2` to write to STDERR. If `options.destination` is not set, it defaults to `1` which means logs will be written to STDOUT.
+By default, the `pino/file` transport assumes the directory of the destination file exists. If it does not exist, the transport will throw an error when it attempts to open the file for writing. The `mkdir` option may be set to `true` to configure the transport to create the directory, if it does not exist, before opening the file for writing.
+
+```js
+const pino = require('pino')
+const transport = pino.transport({
+  target: 'pino/file',
+  options: { destination: '/path/to/file', mkdir: true }
+})
+pino(transport)
+```
+
+By default, the `pino/file` transport appends to the destination file if it exists. The `append` option may be set to `false` to configure the transport to truncate the file upon opening it for writing.
+
+```js
+const pino = require('pino')
+const transport = pino.transport({
+  target: 'pino/file',
+  options: { destination: '/path/to/file', append: false }
+})
+pino(transport)
+```
+
+The `options.destination` property may also be a number to represent a filedescriptor. Typically this would be `1` to write to STDOUT or `2` to write to STDERR. If `options.destination` is not set, it defaults to `1` which means logs will be written to STDOUT. If `options.destination` is a string integer, e.g. `'1'`, it will be coerced to a number and used as a file descriptor. If this is not desired, provide a full path, e.g. `/tmp/1`.
 
 The difference between using the `pino/file` transport builtin and using `pino.destination` is that `pino.destination` runs in the main thread, whereas `pino/file` sets up `pino.destination` in a worker thread.
 

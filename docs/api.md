@@ -358,7 +358,8 @@ and searching for logged objects can start from a consistent path.
 
 Default: `false`
 
-__DEPRECATED: use [`transport`](#transport) instead.__
+__DEPRECATED: look at [pino-pretty documentation](https://github.com/pinojs/pino-pretty)
+for alternatives__. Using a [`transport`](#transport) is also an option.__
 
 Enables pretty printing log logs. This is intended for non-production
 configurations. This may be set to a configuration object as outlined in the
@@ -421,7 +422,7 @@ Default: `pino.destination(1)` (STDOUT)
 The `destination` parameter, at a minimum must be an object with a `write` method.
 An ordinary Node.js `stream` can be passed as the destination (such as the result
 of `fs.createWriteStream`) but for peak log writing performance it is strongly
-recommended to use `pino.destination` to create the destination stream. 
+recommended to use `pino.destination` to create the destination stream.
 Note that the `destination` parameter can be the result of `pino.transport()`.
 
 ```js
@@ -447,6 +448,10 @@ However, there are some special instances where `pino.destination` is not used a
 + When something, e.g a process manager, has monkey-patched `process.stdout.write`.
 
 In these cases `process.stdout` is used instead.
+
+Note: If the parameter is a string integer, e.g. `'1'`, it will be coerced to
+a number and used as a file descriptor. If this is not desired, provide a full
+path, e.g. `/tmp/1`.
 
 * See [`pino.destination`](#pino-destination)
 
@@ -526,14 +531,14 @@ logger.info('hello world')
 // {"level":30,"time":1531257112193,"msg":"hello world","pid":55956,"hostname":"x"}
 ```
 
-The `message` parameter takes precedence over the `mergedObject`.
-That is, if a `mergedObject` contains a `msg` property, and a `message` parameter
+The `message` parameter takes precedence over the `mergingObject`.
+That is, if a `mergingObject` contains a `msg` property, and a `message` parameter
 is supplied in addition, the `msg` property in the output log will be the value of
-the `message` parameter not the value of the `msg` property on the `mergedObject`.
+the `message` parameter not the value of the `msg` property on the `mergingObject`.
 See [Avoid Message Conflict](/docs/help.md#avoid-message-conflict) for information
 on how to overcome this limitation.
 
-If no `message` parameter is provided, and the `mergedObject` is of type `Error` or it has a property named `err`, the
+If no `message` parameter is provided, and the `mergingObject` is of type `Error` or it has a property named `err`, the
 `message` parameter is set to the `message` value of the error.
 
 The `messageKey` option can be used at instantiation time to change the namespace
@@ -1009,7 +1014,7 @@ is flushed and all data synced before the process exits.
 Note that calling `process.exit()` on the main thread will stop the event loop on the main thread from turning. As a result,
 using `console.log` and `process.stdout` after the main thread called `process.exit()` will not produce any output.
 
-If you are embedding/integrating pino within your framework, you will need to make pino aware of the script that is calling it, 
+If you are embedding/integrating pino within your framework, you will need to make pino aware of the script that is calling it,
 like so:
 
 ```js

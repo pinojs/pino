@@ -1,6 +1,8 @@
 name: CI
 on:
   push:
+    branches:
+      - main
     paths-ignore:
         - 'docs/**'
         - '*.md'
@@ -16,11 +18,11 @@ jobs:
       fail-fast: false
       matrix:
         os: [macOS-latest, windows-latest, ubuntu-latest]
-        node-version: [12, 14, 16]
+        node-version: [12, 14, 16, 17]
     steps:
-      - uses: actions/checkout@v2.3.5
+      - uses: actions/checkout@v2
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v2.4.1
+        uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
       - name: Install
@@ -32,7 +34,7 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     steps:
-      - uses: fastify/github-action-merge-dependabot@v2.5.0
+      - uses: fastify/github-action-merge-dependabot@v2.7.1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           exclude: 'sonic-boom,pino-std-serializers,quick-format-unescaped,fast-redact'
