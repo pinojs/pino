@@ -106,7 +106,7 @@
     "fastify-warning": "^0.2.0",
     "on-exit-leak-free": "^0.2.0",
     "pino-abstract-transport": "v0.5.0",
-    "pino-std-serializers": "^4.0.0",
+    "pino-std-serializers": "^5.0.0",
     "quick-format-unescaped": "^4.0.3",
     "real-require": "^0.1.0",
     "safe-stable-stringify": "^2.1.0",
