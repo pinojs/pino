@@ -3,6 +3,9 @@
   "private": true,
   "version": "0.0.1",
   "main": "./index.js",
+  "scripts": {
+    "postinstall": "rm *.log"
+  },
   "dependencies": {
     "pino": "file:../../.."
   }
