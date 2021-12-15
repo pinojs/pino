@@ -2,7 +2,7 @@
 /* eslint no-prototype-builtins: 0 */
 const os = require('os')
 const stdSerializers = require('pino-std-serializers')
-const caller = require('get-caller-file')
+const caller = require('./lib/caller')
 const redaction = require('./lib/redaction')
 const time = require('./lib/time')
 const proto = require('./lib/proto')
