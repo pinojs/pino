@@ -67,7 +67,7 @@
   },
   "homepage": "http://getpino.io",
   "devDependencies": {
-    "@types/node": "^16.11.0",
+    "@types/node": "^17.0.0",
     "airtap": "4.0.3",
     "benchmark": "^2.1.4",
     "bole": "^4.0.0",
