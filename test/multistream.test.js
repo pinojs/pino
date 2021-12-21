@@ -549,3 +549,36 @@ test('ends all streams', function (t) {
   log.info('info stream')
   multi.end()
 })
+
+test('dynamic stream destination', function (t) {
+  let messageCount = 0
+  const stream1 = writeStream(function (data, enc, cb) {
+    messageCount += 1
+    cb()
+  })
+
+  const stream2 = writeStream(function (data, enc, cb) {
+    messageCount -= 1
+    cb()
+  })
+
+  const streams = [
+    {
+      stream: (level) => {
+        if (level >= 50) { // log level 50 (error) and above goes to stream1
+          return stream1
+        }
+        return stream2
+      },
+      level: 'info'
+    }
+  ]
+
+  const log = pino({
+    level: 'trace'
+  }, multistream(streams))
+  log.info('info stream')
+  log.error('error stream')
+  t.equal(messageCount, 0)
+  t.end()
+})
