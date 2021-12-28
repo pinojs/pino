@@ -249,6 +249,7 @@ declare namespace pino {
     interface StreamEntry {
         stream: DestinationStream
         level?: Level
+        maxLevel?: Level
     }
 
     interface MultiStreamRes {

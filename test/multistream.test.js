@@ -471,6 +471,42 @@ test('dedupe when some streams has the same level', function (t) {
   t.end()
 })
 
+test('maxLevel', function (t) {
+  let messageCount = 0
+  const stdout = writeStream(function (data, enc, cb) {
+    messageCount += 1
+    cb()
+  })
+
+  const stderr = writeStream(function (data, enc, cb) {
+    messageCount -= 1
+    cb()
+  })
+
+  const streams = [
+    {
+      stream: stdout,
+      level: 'debug',
+      maxLevel: 'error'
+    },
+    {
+      stream: stderr,
+      level: 'error'
+    }
+  ]
+
+  const log = pino({
+    level: 'debug'
+  }, multistream(streams))
+  log.debug('stdout stream')
+  log.info('stdout stream')
+  log.warn('stdout stream')
+  log.error('stderr stream')
+  log.error('stderr stream')
+  t.equal(messageCount, 1)
+  t.end()
+})
+
 test('no stream', function (t) {
   const log = pino({
     level: 'trace'
