@@ -247,7 +247,7 @@ declare namespace pino {
     }
 
     interface StreamEntry {
-        stream: DestinationStream | ((level: Level) => DestinationStream)
+        stream: DestinationStream
         level?: Level
     }
 
