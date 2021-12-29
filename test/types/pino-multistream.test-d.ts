@@ -8,6 +8,7 @@ import { multistream } from "../../pino";
 const streams = [
   { stream: process.stdout },
   { stream: createWriteStream('') },
+  { stream: createWriteStream(''), maxLevel: 'error' as const },
   { level: 'error' as const, stream: process.stderr },
   { level: 'fatal' as const, stream: createWriteStream('') }
 ]

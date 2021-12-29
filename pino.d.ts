@@ -257,7 +257,7 @@ declare namespace pino {
         add: (dest: Record<string, any>) => MultiStreamRes,
         flushSync: () => void,
         minLevel: number,
-        streams: ({ stream: DestinationStream, level: number, id: number })[],
+        streams: ({ stream: DestinationStream, level: number, maxLevel?: number, id: number })[],
         clone(level: Level): MultiStreamRes,
     }
 
