@@ -248,6 +248,7 @@ declare namespace pino {
 
     interface StreamEntry {
         stream: DestinationStream
+        minLevel?: Level
         level?: Level
         maxLevel?: Level
     }
@@ -257,7 +258,7 @@ declare namespace pino {
         add: (dest: Record<string, any>) => MultiStreamRes,
         flushSync: () => void,
         minLevel: number,
-        streams: ({ stream: DestinationStream, level: number, maxLevel?: number, id: number })[],
+        streams: ({ stream: DestinationStream, minLevel: number, maxLevel?: number, id: number })[],
         clone(level: Level): MultiStreamRes,
     }
 

@@ -10,7 +10,7 @@ const multistream = pino.multistream
 const proxyquire = require('proxyquire')
 const strip = require('strip-ansi')
 
-test('sends to multiple streams using string levels', function (t) {
+function testLevelProp (levelProp, t) {
   let messageCount = 0
   const stream = writeStream(function (data, enc, cb) {
     messageCount += 1
@@ -18,10 +18,10 @@ test('sends to multiple streams using string levels', function (t) {
   })
   const streams = [
     { stream: stream },
-    { level: 'debug', stream: stream },
-    { level: 'trace', stream: stream },
-    { level: 'fatal', stream: stream },
-    { level: 'silent', stream: stream }
+    { [levelProp]: 'debug', stream: stream },
+    { [levelProp]: 'trace', stream: stream },
+    { [levelProp]: 'fatal', stream: stream },
+    { [levelProp]: 'silent', stream: stream }
   ]
   const log = pino({
     level: 'trace'
@@ -31,30 +31,11 @@ test('sends to multiple streams using string levels', function (t) {
   log.fatal('fatal stream')
   t.equal(messageCount, 9)
   t.end()
-})
+}
 
-test('sends to multiple streams using custom levels', function (t) {
-  let messageCount = 0
-  const stream = writeStream(function (data, enc, cb) {
-    messageCount += 1
-    cb()
-  })
-  const streams = [
-    { stream: stream },
-    { level: 'debug', stream: stream },
-    { level: 'trace', stream: stream },
-    { level: 'fatal', stream: stream },
-    { level: 'silent', stream: stream }
-  ]
-  const log = pino({
-    level: 'trace'
-  }, multistream(streams))
-  log.info('info stream')
-  log.debug('debug stream')
-  log.fatal('fatal stream')
-  t.equal(messageCount, 9)
-  t.end()
-})
+test('sends to multiple streams using string levels (back compatibility)', testLevelProp.bind({}, 'level'))
+
+test('sends to multiple streams using string levels', testLevelProp.bind({}, 'minLevel'))
 
 test('sends to multiple streams using optionally predefined levels', function (t) {
   let messageCount = 0
@@ -75,13 +56,13 @@ test('sends to multiple streams using optionally predefined levels', function (t
   }
   const streams = [
     { stream: stream },
-    { level: 'trace', stream: stream },
-    { level: 'debug', stream: stream },
-    { level: 'info', stream: stream },
-    { level: 'warn', stream: stream },
-    { level: 'error', stream: stream },
-    { level: 'fatal', stream: stream },
-    { level: 'silent', stream: stream }
+    { minLevel: 'trace', stream: stream },
+    { minLevel: 'debug', stream: stream },
+    { minLevel: 'info', stream: stream },
+    { minLevel: 'warn', stream: stream },
+    { minLevel: 'error', stream: stream },
+    { minLevel: 'fatal', stream: stream },
+    { minLevel: 'silent', stream: stream }
   ]
   const mstream = multistream(streams, opts)
   const log = pino({
@@ -106,8 +87,8 @@ test('sends to multiple streams using number levels', function (t) {
   })
   const streams = [
     { stream: stream },
-    { level: 20, stream: stream },
-    { level: 60, stream: stream }
+    { minLevel: 20, stream: stream },
+    { minLevel: 60, stream: stream }
   ]
   const log = pino({
     level: 'debug'
@@ -125,7 +106,7 @@ test('level include higher levels', function (t) {
     messageCount += 1
     cb()
   })
-  const log = pino({}, multistream([{ level: 'info', stream: stream }]))
+  const log = pino({}, multistream([{ minLevel: 'info', stream: stream }]))
   log.fatal('message')
   t.equal(messageCount, 1)
   t.end()
@@ -192,7 +173,7 @@ test('supports grandchildren', function (t) {
   })
   const streams = [
     { stream: stream },
-    { level: 'debug', stream: stream }
+    { minLevel: 'debug', stream: stream }
   ]
   const log = pino({
     level: 'debug'
@@ -210,7 +191,7 @@ test('supports custom levels', function (t) {
     customLevels: {
       foo: 35
     }
-  }, multistream([{ level: 35, stream: stream }]))
+  }, multistream([{ minLevel: 35, stream: stream }]))
   log.foo('bar')
 })
 
@@ -247,7 +228,7 @@ test('children support custom levels', function (t) {
     customLevels: {
       foo: 35
     }
-  }, multistream([{ level: 35, stream: stream }]))
+  }, multistream([{ minLevel: 35, stream: stream }]))
   const child = parent.child({ child: 'yes' })
   child.foo('bar')
 })
@@ -260,8 +241,8 @@ test('levelVal ovverides level', function (t) {
   })
   const streams = [
     { stream: stream },
-    { level: 'blabla', levelVal: 15, stream: stream },
-    { level: 60, stream: stream }
+    { minLevel: 'blabla', levelVal: 15, stream: stream },
+    { minLevel: 60, stream: stream }
   ]
   const log = pino({
     level: 'debug'
@@ -353,9 +334,9 @@ test('clone generates a new multistream with all stream at the same level', func
   })
   const streams = [
     { stream: stream },
-    { level: 'debug', stream: stream },
-    { level: 'trace', stream: stream },
-    { level: 'fatal', stream: stream }
+    { minLevel: 'debug', stream: stream },
+    { minLevel: 'trace', stream: stream },
+    { minLevel: 'fatal', stream: stream, maxLevel: 100 }
   ]
   const ms = multistream(streams)
   const clone = ms.clone(30)
@@ -365,7 +346,8 @@ test('clone generates a new multistream with all stream at the same level', func
   clone.streams.forEach((s, i) => {
     t.not(s, streams[i])
     t.equal(s.stream, streams[i].stream)
-    t.equal(s.level, 30)
+    t.equal(s.minLevel, 30)
+    t.equal(s.maxLevel, streams[i].maxLevel)
   })
 
   const log = pino({
@@ -388,7 +370,7 @@ test('one stream', function (t) {
   })
   const log = pino({
     level: 'trace'
-  }, multistream({ stream, level: 'fatal' }))
+  }, multistream({ stream, minLevel: 'fatal' }))
   log.info('info stream')
   log.debug('debug stream')
   log.fatal('fatal stream')
@@ -411,11 +393,11 @@ test('dedupe', function (t) {
   const streams = [
     {
       stream: stream1,
-      level: 'info'
+      minLevel: 'info'
     },
     {
       stream: stream2,
-      level: 'fatal'
+      minLevel: 'fatal'
     }
   ]
 
@@ -449,15 +431,15 @@ test('dedupe when some streams has the same level', function (t) {
   const streams = [
     {
       stream: stream1,
-      level: 'info'
+      minLevel: 'info'
     },
     {
       stream: stream2,
-      level: 'fatal'
+      minLevel: 'fatal'
     },
     {
       stream: stream3,
-      level: 'fatal'
+      minLevel: 'fatal'
     }
   ]
 
@@ -486,12 +468,12 @@ test('maxLevel', function (t) {
   const streams = [
     {
       stream: stdout,
-      level: 'debug',
+      minLevel: 'debug',
       maxLevel: 'error'
     },
     {
       stream: stderr,
-      level: 'error'
+      minLevel: 'error'
     }
   ]
 
@@ -539,7 +521,7 @@ test('flushSync', function (t) {
     '_' + Math.random().toString(36).substr(2, 9)
   )
   const destination = pino.destination({ dest: tmp, sync: false, minLength: 4096 })
-  const log = pino({ level: 'info' }, multistream([{ level: 'info', stream: destination }]))
+  const log = pino({ level: 'info' }, multistream([{ minLevel: 'info', stream: destination }]))
   destination.on('ready', () => {
     log.info('foo')
     log.info('bar')
@@ -573,10 +555,10 @@ test('ends all streams', function (t) {
   })
   const streams = [
     { stream: stream },
-    { level: 'debug', stream: stream },
-    { level: 'trace', stream: stream2 },
-    { level: 'fatal', stream: stream },
-    { level: 'silent', stream: stream }
+    { minLevel: 'debug', stream: stream },
+    { minLevel: 'trace', stream: stream2 },
+    { minLevel: 'fatal', stream: stream },
+    { minLevel: 'silent', stream: stream }
   ]
   const multi = multistream(streams)
   const log = pino({

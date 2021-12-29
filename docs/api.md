@@ -1112,9 +1112,9 @@ var pretty = require('pino-pretty')
 var streams = [
   {stream: fs.createWriteStream('/tmp/info.stream.out')},
   {stream: pretty(), maxLevel: 'error' }, // pretty print logs on stdout (excluded errors)
-  {stream: pretty({ destination: 2 }), level: 'error' }, // pretty print errors on stderr
-  {level: 'debug', stream: fs.createWriteStream('/tmp/debug.stream.out')},
-  {level: 'fatal', stream: fs.createWriteStream('/tmp/fatal.stream.out')}
+  {stream: pretty({ destination: 2 }), minLevel: 'error' }, // pretty print errors on stderr
+  {minLevel: 'debug', stream: fs.createWriteStream('/tmp/debug.stream.out')},
+  {minLevel: 'fatal', stream: fs.createWriteStream('/tmp/fatal.stream.out')}
 ]
 
 var log = pino({
@@ -1127,17 +1127,17 @@ log.info('this will be written to /tmp/debug.stream.out and /tmp/info.stream.out
 log.fatal('this will be written to /tmp/debug.stream.out, /tmp/info.stream.out and /tmp/fatal.stream.out')
 ```
 
-In order for `multistream` to work, the log `level` __must__ be set to the lowest `level` used in the streams array.
+In order for `multistream` to work, the log `level` __must__ be set to the lowest `minLevel` used in the streams array.
 
 #### Streams
 
 Stream or array of streams. Each stream may be a `stream` (`DestinationStream`) or `object` (`StreamEntry`) with the following properties:
 
 + `stream`: A Node.js stream (Default to `process.stdout`)
-+ `level`: The log level of the stream (Default to `'info'`)
++ `minLevel`: The log level of the stream (Default to `'info'`)
 + `maxLevel`: The max log level of the stream (Optional)
 
-`level` and `maxLevel` are used to filter the logs using the following rule: `stream.level <= log.level < stream.maxLevel`. If `maxLevel` is not specified it will not be used.
+`minLevel` and `maxLevel` are used to filter the logs using the following rule: `stream.minLevel <= log.level < stream.maxLevel`. If `maxLevel` is not specified it will not be used.
 
 #### Options
 
@@ -1152,7 +1152,7 @@ Stream or array of streams. Each stream may be a `stream` (`DestinationStream`) 
     var multistream = pino.multistream
     var streams = [
       {stream: process.stdout},
-      {level: 'error', stream: process.stderr},
+      {minLevel: 'error', stream: process.stderr},
     ]
 
     var opts = {
