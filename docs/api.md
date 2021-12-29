@@ -1111,8 +1111,8 @@ var pino = require('pino')
 var pretty = require('pino-pretty')
 var streams = [
   {stream: fs.createWriteStream('/tmp/info.stream.out')},
-  {stream: pretty(), dest: 1, maxLevel: 'error' }, // pretty print logs on stdout (excluded errors)
-  {stream: pretty(), dest: 2, level: 'error' }, // pretty print errors on stderr
+  {stream: pretty(), maxLevel: 'error' }, // pretty print logs on stdout (excluded errors)
+  {stream: pretty({ destination: 2 }), level: 'error' }, // pretty print errors on stderr
   {level: 'debug', stream: fs.createWriteStream('/tmp/debug.stream.out')},
   {level: 'fatal', stream: fs.createWriteStream('/tmp/fatal.stream.out')}
 ]
