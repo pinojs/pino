@@ -1101,7 +1101,7 @@ finalLogger.info('exiting...')
 
 <a id="pino-multistream"></a>
 
-### `pino.multistream(options) => Stream`
+### `pino.multistream(streams, options) => Stream`
 
 Create a stream composed by multiple destination streams:
 
@@ -1111,7 +1111,8 @@ var pino = require('pino')
 var pretty = require('pino-pretty')
 var streams = [
   {stream: fs.createWriteStream('/tmp/info.stream.out')},
-  {stream: pretty() },
+  {stream: pretty(), dest: 1, maxLevel: 'error' }, // pretty print logs on stdout (excluded errors)
+  {stream: pretty(), dest: 2, level: 'error' }, // pretty print errors on stderr
   {level: 'debug', stream: fs.createWriteStream('/tmp/debug.stream.out')},
   {level: 'fatal', stream: fs.createWriteStream('/tmp/fatal.stream.out')}
 ]
@@ -1126,7 +1127,17 @@ log.info('this will be written to /tmp/debug.stream.out and /tmp/info.stream.out
 log.fatal('this will be written to /tmp/debug.stream.out, /tmp/info.stream.out and /tmp/fatal.stream.out')
 ```
 
-In order for `multistream` to work, the log level __must__ be set to the lowest level used in the streams array.
+In order for `multistream` to work, the log `level` __must__ be set to the lowest `level` used in the streams array.
+
+#### Streams
+
+Stream or array of streams. Each stream may be a `stream` (`DestinationStream`) or `object` (`StreamEntry`) with the following properties:
+
++ `stream`: A Node.js stream (Default to `process.stdout`)
++ `level`: The log level of the stream (Default to `'info'`)
++ `maxLevel`: The max log level of the stream (Optional)
+
+`level` and `maxLevel` are used to filter the logs using the following rule: `stream.level <= log.level < stream.maxLevel`. If `maxLevel` is not specified it will not be used.
 
 #### Options
 
