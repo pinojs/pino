@@ -480,3 +480,20 @@ test('transport options with target and stream', async ({ fail, equal }) => {
     equal(err.message, 'only one of option.transport or stream can be specified')
   }
 })
+
+test('transport options with stream', async ({ fail, equal, teardown }) => {
+  try {
+    const dest1 = join(
+      os.tmpdir(),
+      '_' + Math.random().toString(36).substr(2, 9)
+    )
+    const transportStream = pino.transport({ target: 'pino/file', options: { destination: dest1 } })
+    teardown(transportStream.end.bind(transportStream))
+    pino({
+      transport: transportStream
+    })
+    fail('must throw')
+  } catch (err) {
+    equal(err.message, 'option.transport do not allow stream, please pass to option directly. e.g. pino(transport)')
+  }
+})
