@@ -229,8 +229,8 @@ declare namespace pino {
         target: string
     }
 
-    interface TransportPipelineOptions{
-        pipeline: TransportSingleOptions[]
+    interface TransportPipelineOptions<TransportOptions = Record<string, any>> extends TransportBaseOptions<TransportOptions>{
+        pipeline: TransportSingleOptions<TransportOptions>[]
     }
 
     interface TransportMultiOptions<TransportOptions = Record<string, any>> extends TransportBaseOptions<TransportOptions>{
@@ -699,7 +699,7 @@ declare namespace pino {
     ): SonicBoom;
 
     export function transport<TransportOptions = Record<string, any>>(
-        options: TransportSingleOptions<TransportOptions> | TransportMultiOptions<TransportOptions>
+        options: TransportSingleOptions<TransportOptions> | TransportMultiOptions<TransportOptions> | TransportPipelineOptions<TransportOptions>
     ): ThreadStream
 
     export function multistream(
