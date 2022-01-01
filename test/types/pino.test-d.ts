@@ -55,6 +55,14 @@ pino({
 });
 
 pino({
+    depthLimit: 1
+});
+
+pino({
+    edgeLimit: 1
+});
+
+pino({
     browser: {
         write(o) {},
     },
