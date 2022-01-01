@@ -562,6 +562,16 @@ declare namespace pino {
              */
             logMethod?: (args: any[], method: LogFn, level: number) => void;
         };
+
+        /**
+         * Stringification limit at a specific nesting depth when logging circular object. Default: `5`.
+         */
+         depthLimit?: number
+
+         /**
+          * Stringification limit of properties/elements when logging a specific object/array with circular references. Default: `100`.
+          */
+          edgeLimit?: number
     }
 
     interface ChildLoggerOptions {
