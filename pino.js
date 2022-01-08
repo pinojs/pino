@@ -112,13 +112,6 @@ function pino (...args) {
     formatters.log
   )
 
-  if (!allFormatters.bindings) {
-    allFormatters.bindings = defaultOptions.formatters.bindings
-  }
-  if (!allFormatters.level) {
-    allFormatters.level = defaultOptions.formatters.level
-  }
-
   const stringifiers = redact ? redaction(redact, stringify) : {}
   const stringifyFn = stringify.bind({
     [stringifySafeSym]: stringifySafe
