@@ -377,6 +377,20 @@ test('log and exit before ready', async ({ not }) => {
   not(strip(actual).match(/Hello/), null)
 })
 
+test('log and exit before ready with async dest', async ({ not }) => {
+  const destination = join(
+    os.tmpdir(),
+    '_' + Math.random().toString(36).substr(2, 9)
+  )
+  const child = execa(process.argv[0], [join(__dirname, '..', 'fixtures', 'transport-exit-immediately-with-async-dest.js'), destination])
+
+  await once(child, 'exit')
+
+  const actual = await readFile(destination, 'utf8')
+  not(strip(actual).match(/HELLO/), null)
+  not(strip(actual).match(/WORLD/), null)
+})
+
 test('string integer destination', async ({ not }) => {
   let actual = ''
   const child = execa(process.argv[0], [join(__dirname, '..', 'fixtures', 'transport-string-stdout.js')])
