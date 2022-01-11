@@ -6,7 +6,7 @@
     "noEmit": true,
     "strict": true,
   },
-  "include": [
+  "exclude": [
     "./test/types/*.test-d.ts",
     "./*.d.ts"
   ]

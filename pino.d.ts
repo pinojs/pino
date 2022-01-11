@@ -33,6 +33,8 @@ type ThreadStream = any
 type TimeFn = () => string;
 type MixinFn = () => object;
 
+type CustomLevelLogger<Options> = Options extends LoggerOptions ? Record<keyof Options["customLevels"], LogFn> : never
+
 interface redactOptions {
     paths: string[];
     censor?: string | ((v: any) => any);
@@ -207,7 +209,7 @@ declare namespace pino {
     
     type LogDescriptor = Record<string, any>;
 
-    type Logger = BaseLogger & LoggerExtras & Record<string, any>;
+    type Logger = BaseLogger & LoggerExtras;
 
     type SerializedError = pinoStdSerializers.SerializedError;
     type SerializedResponse = pinoStdSerializers.SerializedResponse;
@@ -739,7 +741,7 @@ declare namespace pino {
  * relative protocol is enabled. Default: process.stdout
  * @returns a new logger instance.
  */
-declare function pino(optionsOrStream?: LoggerOptions | DestinationStream): Logger;
+declare function pino<Options extends LoggerOptions | DestinationStream>(optionsOrStream?: Options): Logger & CustomLevelLogger<Options>;
 
 /**
  * @param [options]: an options object
@@ -747,7 +749,7 @@ declare function pino(optionsOrStream?: LoggerOptions | DestinationStream): Logg
  * relative protocol is enabled. Default: process.stdout
  * @returns a new logger instance.
  */
-declare function pino(options: LoggerOptions, stream: DestinationStream): Logger;
+declare function pino<Options extends LoggerOptions>(options: Options, stream: DestinationStream): Logger & Record<keyof Options["customLevels"], any>;
  
 
 // Pass through all the top-level exports, allows `import {version} from "pino"`

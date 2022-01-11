@@ -1,6 +1,7 @@
 import P, { pino } from "../../";
 import { IncomingMessage, ServerResponse } from "http";
 import { Socket } from "net";
+import { expectError } from 'tsd'
 import Logger = P.Logger;
 
 const log = pino();
@@ -90,6 +91,7 @@ pino({
 });
 
 pino({ base: null });
+// @ts-expect-error
 if ("pino" in log) console.log(`pino version: ${log.pino}`);
 
 log.child({ a: "property" }).info("hello child!");
@@ -130,9 +132,6 @@ log.level = "info";
 if (log.levelVal === 30) {
     console.log("logger level is `info`");
 }
-
-log.level = "myLevel";
-log.myLevel("a message");
 
 const listener = (lvl: any, val: any, prevLvl: any, prevVal: any) => {
     console.log(lvl, val, prevLvl, prevVal);
@@ -304,3 +303,9 @@ const customBaseLogger: CustomBaseLogger = {
   silent() {},
   child() { return this }
 }
+
+// custom levels
+const log3 = pino({ customLevels: { myLevel: 100 } })
+expectError(log3.log())
+log3.level = 'myLevel'
+log3.myLevel('')
