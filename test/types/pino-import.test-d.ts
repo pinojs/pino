@@ -11,12 +11,12 @@ const log = pino();
 expectType<P.LogFn>(log.info);
 expectType<P.LogFn>(log.error);
 
-expectType<pino.Logger & Record<never, P.LogFn>>(pinoNamed());
-expectType<P.Logger & Record<never, P.LogFn>>(pinoNamed());
-expectType<pino.Logger & Record<never, P.LogFn>>(pinoStar.default());
-expectType<pino.Logger & Record<never, P.LogFn>>(pinoStar.pino());
-expectType<pino.Logger & Record<never, P.LogFn>>(pinoCjsImport.default());
-expectType<pino.Logger & Record<never, P.LogFn>>(pinoCjsImport.pino());
+expectType<pino.Logger>(pinoNamed());
+expectType<P.Logger>(pinoNamed());
+expectType<pino.Logger>(pinoStar.default());
+expectType<pino.Logger>(pinoStar.pino());
+expectType<pino.Logger>(pinoCjsImport.default());
+expectType<pino.Logger>(pinoCjsImport.pino());
 expectType<any>(pinoCjsNamed());
 expectType<any>(pinoCjs());
 

@@ -8,7 +8,7 @@ const transport = pino.transport({
 })
 pino(transport)
 
-expectType<pino.Logger & Record<never, pino.LogFn>>(pino({
+expectType<pino.Logger>(pino({
     transport: {
         target: 'pino-pretty'
     },
@@ -29,7 +29,7 @@ const transports = pino.transport({targets: [
 ]})
 pino(transports)
 
-expectType<pino.Logger & Record<never, pino.LogFn>>(pino({
+expectType<pino.Logger>(pino({
     transport: {targets: [
             {
                 level: 'info',
@@ -56,7 +56,7 @@ const pipelineTransport = pino.transport({
 })
 pino(pipelineTransport)
 
-expectType<pino.Logger & Record<never, pino.LogFn>>(pino({
+expectType<pino.Logger>(pino({
     transport: {
         pipeline: [{
             target: './my-transform.js'

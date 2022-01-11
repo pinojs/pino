@@ -209,7 +209,7 @@ declare namespace pino {
     
     type LogDescriptor = Record<string, any>;
 
-    type Logger = BaseLogger & LoggerExtras;
+    type Logger<Options = LoggerOptions> = BaseLogger & LoggerExtras & CustomLevelLogger<Options>;
 
     type SerializedError = pinoStdSerializers.SerializedError;
     type SerializedResponse = pinoStdSerializers.SerializedResponse;
@@ -741,7 +741,7 @@ declare namespace pino {
  * relative protocol is enabled. Default: process.stdout
  * @returns a new logger instance.
  */
-declare function pino<Options extends LoggerOptions | DestinationStream>(optionsOrStream?: Options): Logger & CustomLevelLogger<Options>;
+declare function pino<Options extends LoggerOptions | DestinationStream>(optionsOrStream?: Options): Logger<Options>;
 
 /**
  * @param [options]: an options object
@@ -749,7 +749,7 @@ declare function pino<Options extends LoggerOptions | DestinationStream>(options
  * relative protocol is enabled. Default: process.stdout
  * @returns a new logger instance.
  */
-declare function pino<Options extends LoggerOptions>(options: Options, stream: DestinationStream): Logger & Record<keyof Options["customLevels"], any>;
+declare function pino<Options extends LoggerOptions>(options: Options, stream: DestinationStream): Logger<Options>;
  
 
 // Pass through all the top-level exports, allows `import {version} from "pino"`
@@ -769,7 +769,7 @@ export type Bindings = pino.Bindings;
 export type Level = pino.Level;
 export type LevelChangeEventListener = pino.LevelChangeEventListener;
 export type LogDescriptor = pino.LogDescriptor;
-export type Logger = pino.Logger;
+export type Logger<Options = LoggerOptions> = pino.Logger<Options>;
 export type SerializedError = pino.SerializedError;
 export type SerializerFn = pino.SerializerFn;
 export type SerializedRequest = pino.SerializedRequest;
