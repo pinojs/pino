@@ -1,7 +1,7 @@
 # Security Policy
 
 This document describes the management of vulnerabilities for the
-Pino project and its official plugins.
+Pino project and all modules within the Pino organization.
 
 ## Reporting vulnerabilities
 
