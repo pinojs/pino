@@ -324,6 +324,18 @@ test('pino.transport with target pino/file and append option', async ({ same, te
   })
 })
 
+test('pino.transport should error with unknown target', async ({ fail, equal }) => {
+  try {
+    pino.transport({
+      target: 'origin',
+      caller: 'unknown-file.js'
+    })
+    fail('must throw')
+  } catch (err) {
+    equal(err.message, 'unable to determine transport target for "origin"')
+  }
+})
+
 test('pino.transport with target pino-pretty', async ({ match, teardown }) => {
   const destination = join(
     os.tmpdir(),
