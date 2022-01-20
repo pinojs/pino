@@ -328,9 +328,7 @@ test('pino.transport should error with unknown target', async ({ fail, equal }) 
   try {
     pino.transport({
       target: 'origin',
-      callers: [
-        'unknown-file.js'
-      ]
+      caller: 'unknown-file.js'
     })
     fail('must throw')
   } catch (err) {
