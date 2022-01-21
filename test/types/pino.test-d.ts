@@ -310,10 +310,16 @@ expectError(log3.log())
 log3.level = 'myLevel'
 log3.myLevel('')
 log3.child({}).myLevel('')
+
 const clog3 = log3.child({}, { customLevels: { childLevel: 120 } })
+// child inherit parant
 clog3.myLevel('')
+// child itself
 clog3.childLevel('')
 const cclog3 = clog3.child({}, { customLevels: { childLevel2: 130 } })
+// child inherit root
 cclog3.myLevel('')
+// child inherit parant
 cclog3.childLevel('')
+// child itself
 cclog3.childLevel2('')

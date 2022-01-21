@@ -802,5 +802,3 @@ export { pino as default, pino };
 // `import {P} from "pino"; const log: P.Logger;`.
 // (Legacy support for early 7.x releases, remove in 8.x.)
 export type { pino as P };
-
-
