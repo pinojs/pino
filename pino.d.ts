@@ -19,10 +19,10 @@
 import type { EventEmitter } from "events";
 // @ts-ignore -- gracefully falls back to `any` if not installed
 import type { PrettyOptions as PinoPrettyOptions } from "pino-pretty";
+import * as pinoStdSerializers from "pino-std-serializers";
 import type { SonicBoom, SonicBoomOpts } from "sonic-boom";
 import type { WorkerOptions } from "worker_threads";
 
-import * as pinoStdSerializers from "pino-std-serializers";
 
 
 //// Non-exported types and interfaces
@@ -33,7 +33,7 @@ type ThreadStream = any
 type TimeFn = () => string;
 type MixinFn = () => object;
 
-type CustomLevelLogger<Options> = Options extends LoggerOptions ? Record<keyof Options["customLevels"], LogFn> : never
+type CustomLevelLogger<Options> = Options extends { customLevels: Record<string, number> } ? Record<keyof Options["customLevels"], LogFn> : Record<never, LogFn>
 
 interface redactOptions {
     paths: string[];
@@ -41,7 +41,7 @@ interface redactOptions {
     remove?: boolean;
 }
 
-interface LoggerExtras extends EventEmitter {
+interface LoggerExtras<Options = LoggerOptions> extends EventEmitter {
     /**
      * Exposes the Pino package version. Also available on the exported pino function.
      */
@@ -76,7 +76,7 @@ interface LoggerExtras extends EventEmitter {
      * @param options: an options object that will override child logger inherited options.
      * @returns a child logger instance.
      */
-    child(bindings: pino.Bindings, options?: pino.ChildLoggerOptions): pino.Logger;
+    child<ChildOptions extends pino.ChildLoggerOptions>(bindings: pino.Bindings, options?: ChildOptions): pino.Logger<Options & ChildOptions>;
 
     /**
      * Registers a listener function that is triggered when the level is changed.
@@ -209,7 +209,7 @@ declare namespace pino {
     
     type LogDescriptor = Record<string, any>;
 
-    type Logger<Options = LoggerOptions> = BaseLogger & LoggerExtras & CustomLevelLogger<Options>;
+    type Logger<Options = LoggerOptions> = BaseLogger & LoggerExtras<Options> & CustomLevelLogger<Options>;
 
     type SerializedError = pinoStdSerializers.SerializedError;
     type SerializedResponse = pinoStdSerializers.SerializedResponse;
@@ -798,8 +798,9 @@ export interface TransportTargetOptions extends pino.TransportTargetOptions {}
 // as default (`import pino from "pino"`) and named variable
 // (`import {pino} from "pino"`).
 export { pino as default, pino };
-
 // Export just the type side of the namespace as "P", allows
 // `import {P} from "pino"; const log: P.Logger;`.
 // (Legacy support for early 7.x releases, remove in 8.x.)
 export type { pino as P };
+
+
