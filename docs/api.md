@@ -726,7 +726,7 @@ After the creation of the child logger, it is also accessible using the [`logger
 ```js
 const logger = pino()
 logger.debug('nope') // will not log, since default level is info
-const child = logger.child({foo: 'bar'}, {level: 'debug')
+const child = logger.child({foo: 'bar'}, {level: 'debug'})
 child.debug('debug!') // will log as the `level` property set the level to debug
 ```
 
