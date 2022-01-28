@@ -701,13 +701,12 @@ declare namespace pino {
 
     /**
      * Create a Pino Destination instance: a stream-like object with significantly more throughput (over 30%) than a standard Node.js stream.
-     * @param [dest]: The `destination` parameter, at a minimum must be an object with a `write` method. An ordinary Node.js
-     *                `stream` can be passed as the destination (such as the result of `fs.createWriteStream`) but for peak log
+     * @param [dest]: An ordinary Node.js `stream` can be passed as the destination (such as the result of `fs.createWriteStream`) but for peak log
      *                writing performance it is strongly recommended to use `pino.destination` to create the destination stream.
      * @returns A Sonic-Boom  stream to be used as destination for the pino function
      */
     export function destination(
-        dest?: string | number | SonicBoomOpts | DestinationStream | NodeJS.WritableStream,
+        dest?: string | number | SonicBoomOpts | DestinationStream | {dest: string},
     ): SonicBoom;
 
     export function transport<TransportOptions = Record<string, any>>(
