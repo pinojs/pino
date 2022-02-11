@@ -102,6 +102,11 @@ interface LoggerExtras<Options = LoggerOptions> extends EventEmitter {
      * Returns an object containing all the current bindings, cloned from the ones passed in via logger.child().
      */
     bindings(): pino.Bindings;
+
+    /**
+     * Flushes the content of the buffer when using pino.destination({ sync: false }).
+     */
+    flush(): () => void;
 }
 
 
