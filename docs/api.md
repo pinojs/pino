@@ -107,6 +107,7 @@ Default: `100`
 
 Option to limit stringification of properties/elements when logging a specific object/array with circular references.
 
+<a id="opt-mixin"></a>
 #### `mixin` (Function):
 
 Default: `undefined`
@@ -130,7 +131,8 @@ logger.info('world')
 ```
 
 The result of `mixin()` is supposed to be a _new_ object. For performance reason, the object returned by `mixin()` will be mutated by pino.
-In the following example, passing `mergingObject` argument to the first `info` call will mutate the global `mixin` object:
+In the following example, passing `mergingObject` argument to the first `info` call will mutate the global `mixin` object by default
+(* See [`mixinMergeStrategy` option](#opt-mixin-merge-strategy)):
 ```js
 const mixin = {
     appName: 'My app'
@@ -153,6 +155,69 @@ logger.info('Message 2')
 
 If the `mixin` feature is being used merely to add static metadata to each log message,
 then a [child logger ⇗](/docs/child-loggers.md) should be used instead.
+
+
+<a id="opt-mixin-merge-strategy"></a>
+#### `mixinMergeStrategy` (Function):
+
+Default: `undefined`
+
+If provided, the `mixinMergeStrategy` function is called each time one of the active
+logging methods is called. The first parameter is the value `mergeObject` or an empty object,
+the second parameter is the value resulting from `mixin()` (* See [`mixin` option](#opt-mixin) or an empty object.
+The function must synchronously return an object.
+
+```js
+// Default strategy, `mergeObject` has priority
+const logger = pino({
+    mixin() {
+        return { tag: 'docker' }
+    },
+    // mixinMergeStrategy(mergeObject, mixinObject) {
+    //     return Object.assign(mixinMeta, mergeObject)
+    // }
+})
+
+logger.info({
+  tag: 'local'
+}, 'Message')
+// {"level":30,"time":1591195061437,"pid":16012,"hostname":"x","tag":"local","msg":"Message"}
+```
+
+```js
+// Custom mutable strategy, `mixin` has priority
+const logger = pino({
+    mixin() {
+        return { tag: 'k8s' }
+    },
+    mixinMergeStrategy(mergeObject, mixinObject) {
+        return Object.assign(mergeObject, mixinObject)
+    }
+})
+
+logger.info({
+    tag: 'local'
+}, 'Message')
+// {"level":30,"time":1591195061437,"pid":16012,"hostname":"x","tag":"k8s","msg":"Message"}
+```
+
+```js
+// Custom immutable strategy, `mixin` has priority
+const logger = pino({
+    mixin() {
+        return { tag: 'k8s' }
+    },
+    mixinMergeStrategy(mergeObject, mixinObject) {
+        return Object.assign({}, mergeObject, mixinObject)
+    }
+})
+
+logger.info({
+    tag: 'local'
+}, 'Message')
+// {"level":30,"time":1591195061437,"pid":16012,"hostname":"x","tag":"k8s","msg":"Message"}
+```
+
 
 <a id="opt-redact"></a>
 #### `redact` (Array | Object):
