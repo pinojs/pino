@@ -39,7 +39,8 @@ const {
   useOnlyCustomLevelsSym,
   formattersSym,
   hooksSym,
-  nestedKeyStrSym
+  nestedKeyStrSym,
+  mixinMergeStrategySym
 } = symbols
 const { epochTime, nullTime } = time
 const { pid } = process
@@ -94,6 +95,7 @@ function pino (...args) {
     level,
     customLevels,
     mixin,
+    mixinMergeStrategy,
     useOnlyCustomLevels,
     formatters,
     hooks,
@@ -166,6 +168,7 @@ function pino (...args) {
     [nestedKeyStrSym]: nestedKey ? `,${JSON.stringify(nestedKey)}:{` : '',
     [serializersSym]: serializers,
     [mixinSym]: mixin,
+    [mixinMergeStrategySym]: mixinMergeStrategy,
     [chindingsSym]: chindings,
     [formattersSym]: allFormatters,
     [hooksSym]: hooks,
