@@ -31,7 +31,8 @@ import type { WorkerOptions } from "worker_threads";
 type ThreadStream = any
 
 type TimeFn = () => string;
-type MixinFn = () => object;
+type MixinFn = (mergeObject: object) => object;
+type MixinMergeStrategyFn = (mergeObject: object, mixinObject: object) => object;
 
 type CustomLevelLogger<Options> = Options extends { customLevels: Record<string, number> } ? Record<keyof Options["customLevels"], LogFn> : Record<never, LogFn>
 
@@ -112,7 +113,7 @@ interface LoggerExtras<Options = LoggerOptions> extends EventEmitter {
 
 declare namespace pino {
     //// Exported types and interfaces
-    
+
     interface BaseLogger {
         /**
          * Set this property to the desired logging level. In order of priority, available levels are:
@@ -130,7 +131,7 @@ declare namespace pino {
          * You can pass `'silent'` to disable logging.
          */
         level: pino.LevelWithSilent | string;
-    
+
         /**
          * Log at `'fatal'` level the given msg. If the first argument is an object, all its properties will be included in the JSON line.
          * If more args follows `msg`, these will be used to format `msg` using `util.format`.
@@ -204,14 +205,14 @@ declare namespace pino {
 
     type SerializerFn = (value: any) => any;
     type WriteFn = (o: object) => void;
-    
+
     type LevelChangeEventListener = (
         lvl: LevelWithSilent | string,
         val: number,
         prevLvl: LevelWithSilent | string,
         prevVal: number,
     ) => void;
-    
+
     type LogDescriptor = Record<string, any>;
 
     type Logger<Options = LoggerOptions> = BaseLogger & LoggerExtras<Options> & CustomLevelLogger<Options>;
@@ -335,6 +336,14 @@ declare namespace pino {
          * returned object will be added to the logged JSON.
          */
         mixin?: MixinFn;
+
+        /**
+         * If provided, the `mixinMergeStrategy` function is called each time one of the active
+         * logging methods is called. The first parameter is the value `mergeObject` or an empty object,
+         * the second parameter is the value resulting from `mixin()` or an empty object.
+         * The function must synchronously return an object.
+         */
+        mixinMergeStrategy?: MixinMergeStrategyFn
 
         /**
          * As an array, the redact option specifies paths that should have their values redacted from any log output.
@@ -671,12 +680,12 @@ declare namespace pino {
         readonly formattersSym: unique symbol;
         readonly hooksSym: unique symbol;
     };
- 
+
     /**
      * Exposes the Pino package version. Also available on the logger instance.
      */
     export const version: string;
- 
+
     /**
      * Provides functions for generating the timestamp property in the log output. You can set the `timestamp` option during
      * initialization to one of these functions to adjust the output format. Alternatively, you can specify your own time function.
@@ -701,7 +710,7 @@ declare namespace pino {
             */
         isoTime: TimeFn;
     };
- 
+
     //// Exported functions
 
     /**
@@ -755,7 +764,7 @@ declare function pino<Options extends LoggerOptions | DestinationStream>(options
  * @returns a new logger instance.
  */
 declare function pino<Options extends LoggerOptions>(options: Options, stream: DestinationStream): Logger<Options>;
- 
+
 
 // Pass through all the top-level exports, allows `import {version} from "pino"`
 // Constants and functions
