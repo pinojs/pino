@@ -17,7 +17,6 @@ const {
   noop
 } = require('./lib/tools')
 const { version } = require('./lib/meta')
-const { mixinMergeStrategySym } = require('./lib/symbols')
 const {
   chindingsSym,
   redactFmtSym,
@@ -92,7 +91,6 @@ function pino (...args) {
     changeLevelName,
     levelKey,
     mixin,
-    mixinMergeStrategy,
     useOnlyCustomLevels,
     formatters,
     hooks
@@ -175,7 +173,6 @@ function pino (...args) {
     [nestedKeySym]: nestedKey,
     [serializersSym]: serializers,
     [mixinSym]: mixin,
-    [mixinMergeStrategySym]: mixinMergeStrategy,
     [chindingsSym]: chindings,
     [formattersSym]: allFormatters,
     [hooksSym]: hooks,
