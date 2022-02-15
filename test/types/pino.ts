@@ -1,6 +1,6 @@
 import { pino } from '../../pino'
 import { join } from 'path'
-import { tmpdir } from'os'
+import { tmpdir } from 'os'
 
 const destination = join(
     tmpdir(),
@@ -14,6 +14,7 @@ const transport = pino.transport({
 })
 const logger = pino(transport)
 logger.info('test2')
+logger.flush()
 
 const transport2 = pino.transport({
     target: 'pino-pretty',
