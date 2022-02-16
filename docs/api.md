@@ -30,6 +30,12 @@
   * [pino.stdTimeFunctions](#pino-stdtimefunctions)
   * [pino.symbols](#pino-symbols)
   * [pino.version](#pino-version)
+* [Interfaces](#interfaces)
+  * [MultiStreamRes](#multistreamres)
+  * [StreamEntry](#streamentry)
+  * [DestinationStream](#destinationstream)
+* [Types](#types)
+  * [Level](#level-1)
 
 <a id="export"></a>
 ## `pino([options], [destination]) => logger`
@@ -1164,9 +1170,10 @@ finalLogger.info('exiting...')
 
 <a id="pino-multistream"></a>
 
-### `pino.multistream(options) => Stream`
+### `pino.multistream(streamsArray, opts) => MultiStreamRes`
 
-Create a stream composed by multiple destination streams:
+Create a stream composed by multiple destination streams and returns an
+object implementing the [MultiStreamRes](#multistreamres) interface.
 
 ```js
 var fs = require('fs')
@@ -1272,3 +1279,56 @@ for general use.
 Exposes the Pino package version. Also available on the logger instance.
 
 * See [`logger.version`](#version)
+
+## Interfaces
+<a id="pino-multistreamres"></a>
+
+### `MultiStreamRes`
+  Properties:
+
+  * `write(data)`
+    - `data` Object | string
+    - Returns: void
+
+ Write `data` onto the streams held by the current instance.
+ *  `add(dest)`
+    - `dest` [StreamEntry](#streamentry) | [DestinationStream](#destinationstream)
+    - Returns: [MultiStreamRes](#multistreamres)
+
+ Add `dest` stream to the array of streams of the current instance.
+ * `flushSync()`
+   - Returns: `undefined`
+
+ Call `flushSync` on each stream held by the current instance.
+ * `minLevel`
+   - number
+
+ The minimum level amongst all the streams held by the current instance.
+ * `streams`
+    - Returns: [StreamEntry[]](#streamentry)
+
+ The array of streams currently held by the current instance.
+ * `clone(level)`
+    - `level` [Level](#level-1)
+    - Returns: [MultiStreamRes](#multistreamres)
+
+ Returns a cloned object of the current instance but with the the provided `level`.
+
+### `StreamEntry`
+  Properties:
+
+  * `stream`
+    - DestinationStream
+  * `level`
+    - Optional: [Level](#level-1)
+
+### `DestinationStream`
+  Properties:
+
+  * `write(msg)`
+    - `msg` string
+
+## Types
+### `Level`
+
+  * Values: `"fatal"` | `"error"` | `"warn"` | `"info"` | `"debug"` | `"trace"`

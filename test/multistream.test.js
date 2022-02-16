@@ -481,7 +481,7 @@ test('no stream', function (t) {
   t.end()
 })
 
-test('add a stream', function (t) {
+test('one stream', function (t) {
   let messageCount = 0
   const stream = writeStream(function (data, enc, cb) {
     messageCount += 1
@@ -495,6 +495,43 @@ test('add a stream', function (t) {
   log.fatal('fatal stream')
   t.equal(messageCount, 2)
   t.end()
+})
+
+test('add a stream', function (t) {
+  let messageCount = 0
+  const stream = writeStream(function (data, enc, cb) {
+    messageCount += 1
+    cb()
+  })
+
+  const log = pino({
+    level: 'trace'
+  }, multistream().add(stream))
+  log.info('info stream')
+  log.debug('debug stream')
+  log.fatal('fatal stream')
+  t.equal(messageCount, 2)
+  t.end()
+})
+
+test('multistream.add throws if not a stream', function (t) {
+  try {
+    pino({
+      level: 'trace'
+    }, multistream().add({}))
+  } catch (_) {
+    t.end()
+  }
+})
+
+test('multistream throws if not a stream', function (t) {
+  try {
+    pino({
+      level: 'trace'
+    }, multistream({}))
+  } catch (_) {
+    t.end()
+  }
 })
 
 test('flushSync', function (t) {

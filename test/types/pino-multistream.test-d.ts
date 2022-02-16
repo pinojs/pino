@@ -21,5 +21,6 @@ expectType<pino.MultiStreamRes>(pino.multistream(streams))
 expectType<pino.MultiStreamRes>(pino.multistream(streams, {}))
 expectType<pino.MultiStreamRes>(pino.multistream(streams, { levels: { 'info': 30 } }))
 expectType<pino.MultiStreamRes>(pino.multistream(streams, { dedupe: true }))
+expectType<pino.MultiStreamRes>(pino.multistream(streams[0]).add(streams[1]))
 
 expectType<pino.MultiStreamRes>(multistream(process.stdout));

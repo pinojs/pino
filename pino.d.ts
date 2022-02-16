@@ -261,10 +261,10 @@ declare namespace pino {
 
     interface MultiStreamRes {
         write: (data: any) => void,
-        add: (dest: Record<string, any>) => MultiStreamRes,
+        add: (dest: StreamEntry | DestinationStream) => MultiStreamRes,
         flushSync: () => void,
         minLevel: number,
-        streams: ({ stream: DestinationStream, level: number, id: number })[],
+        streams: StreamEntry[],
         clone(level: Level): MultiStreamRes,
     }
 
