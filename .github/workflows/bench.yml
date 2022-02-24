@@ -21,7 +21,7 @@ jobs:
         with:
           ref: ${{ github.base_ref }}
       - name: Setup Node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3.0.0
         with:
           node-version: 12
       - name: Install Modules
@@ -41,7 +41,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
       - name: Setup Node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3.0.0
         with:
           node-version: 12
       - name: Install Modules
