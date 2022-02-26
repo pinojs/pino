@@ -781,6 +781,7 @@ export const version: typeof pino.version;
 // Types
 export type Bindings = pino.Bindings;
 export type Level = pino.Level;
+export type LevelWithSilent = pino.LevelWithSilent;
 export type LevelChangeEventListener = pino.LevelChangeEventListener;
 export type LogDescriptor = pino.LogDescriptor;
 export type Logger<Options = LoggerOptions> = pino.Logger<Options>;
