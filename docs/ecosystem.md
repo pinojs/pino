@@ -71,3 +71,4 @@ prettifier inspired by the [logrus](https://github.com/sirupsen/logrus) logger.
 + [`cls-proxify`](https://github.com/keenondrums/cls-proxify): integration of pino and [CLS](https://github.com/jeff-lewis/cls-hooked). Useful for creating dynamically configured child loggers (e.g. with added trace ID) for each request.
 + [`pino-tiny`](https://github.com/holmok/pino-tiny): a tiny (and exentsible?) little log formatter for pino.
 + [`pino-dev`](https://github.com/dnjstrom/pino-dev): simple prettifier for pino with built-in support for common ecosystem packages.
++ [`@newrelic/pino-enricher`](https://github.com/newrelic/newrelic-node-log-extensions/blob/main/packages/pino-log-enricher): a log customization to add New Relic context to use [Logs In Context](https://docs.newrelic.com/docs/logs/logs-context/logs-in-context/)
