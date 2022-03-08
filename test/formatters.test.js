@@ -335,3 +335,30 @@ test('formatter with transport', async ({ match, equal }) => {
     nested: { object: true }
   })
 })
+
+test('throws when custom level formatter is used with transport.targets', async ({ throws }) => {
+  const destination = join(
+    os.tmpdir(),
+    '_' + Math.random().toString(36).substr(2, 9)
+  )
+
+  throws(() => {
+    pino({
+      formatters: {
+        level (label) {
+          return label
+        }
+      },
+      transport: {
+        targets: [
+          {
+            target: 'pino/file',
+            options: { destination }
+          }
+        ]
+      }
+    }
+    )
+  },
+  Error('option.transport.targets do not allow custom level formatters'))
+})
