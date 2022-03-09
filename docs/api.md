@@ -293,6 +293,8 @@ Changes the shape of the log level. The default shape is `{ level: number }`.
 The function takes two arguments, the label of the level (e.g. `'info'`)
 and the numeric value (e.g. `30`).
 
+ps: The log level cannot be customized when using multiple transports
+
 ```js
 const formatters = {
   level (label, number) {
