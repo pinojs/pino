@@ -140,3 +140,23 @@ test('mixin works without context', async ({ ok, same }) => {
   instance.level = name
   instance[name]('test')
 })
+
+test('mixin can use level number', async ({ ok, same }) => {
+  const stream = sink()
+  const instance = pino({
+    mixin (context, num) {
+      ok(num !== null, 'level should be defined')
+      ok(num !== undefined, 'level should be defined')
+      same(num, level)
+      return Object.assign({
+        error: context.message,
+        stack: context.stack
+      })
+    }
+  }, stream)
+  instance.level = name
+  instance[name]({
+    message: '123',
+    stack: 'stack'
+  }, 'test')
+})

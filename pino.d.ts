@@ -31,7 +31,7 @@ import type { WorkerOptions } from "worker_threads";
 type ThreadStream = any
 
 type TimeFn = () => string;
-type MixinFn = (mergeObject: object) => object;
+type MixinFn = (mergeObject: object, level: number) => object;
 type MixinMergeStrategyFn = (mergeObject: object, mixinObject: object) => object;
 
 type CustomLevelLogger<Options> = Options extends { customLevels: Record<string, number> } ? Record<keyof Options["customLevels"], LogFn> : Record<never, LogFn>
