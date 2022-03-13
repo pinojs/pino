@@ -119,8 +119,8 @@ Option to limit stringification of properties/elements when logging a specific o
 Default: `undefined`
 
 If provided, the `mixin` function is called each time one of the active
-logging methods is called. The first and only parameter is the value `mergeObject` or an empty object. The function must synchronously return an
-object. The properties of the returned object will be added to the
+logging methods is called. The first parameter is the value `mergeObject` or an empty object. The second parameter is the leg level number.
+The function must synchronously return an object. The properties of the returned object will be added to the
 logged JSON.
 
 ```js
@@ -153,10 +153,26 @@ const logger = pino({
 logger.info({
     description: 'Ok'
 }, 'Message 1')
-// {"level":30,"time":1591195061437,"pid":16012,"hostname":"x","appName":"My app","description":"Ok" "msg":"Message 1"}
+// {"level":30,"time":1591195061437,"pid":16012,"hostname":"x","appName":"My app","description":"Ok","msg":"Message 1"}
 logger.info('Message 2')
 // {"level":30,"time":1591195061437,"pid":16012,"hostname":"x","appName":"My app","description":"Ok","msg":"Message 2"}
 // Note: the second log contains "description":"Ok" text, even if it was not provided.
+```
+
+The `mixin` method can be used to add the level label to each log message such as in the following example:
+```js
+const logger = pino({
+  mixin(_context, level) {
+    return { 'level-label': logger.levels.labels[level] }
+  }
+})
+
+logger.info({
+    description: 'Ok'
+}, 'Message 1')
+// {"level":30,"time":1591195061437,"pid":16012,"hostname":"x","appName":"My app","description":"Ok","level-label":"info","msg":"Message 1"}
+logger.error('Message 2')
+// {"level":30,"time":1591195061437,"pid":16012,"hostname":"x","appName":"My app","description":"Ok","level-label":"error","msg":"Message 2"}
 ```
 
 If the `mixin` feature is being used merely to add static metadata to each log message,

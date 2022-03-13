@@ -48,6 +48,14 @@ pino({
 });
 
 pino({
+    mixin: (context: object) => ({ customName: "unknown", customId: 111 }),
+});
+
+pino({
+    mixin: (context: object, level: number) => ({ customName: "unknown", customId: 111 }),
+});
+
+pino({
     redact: { paths: [], censor: "SECRET" },
 });
 
