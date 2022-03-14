@@ -224,7 +224,7 @@ declare namespace pino {
 
     interface TransportTargetOptions<TransportOptions = Record<string, any>> {
         target: string
-        options: TransportOptions
+        options?: TransportOptions
         level: LevelWithSilent
     }
 
