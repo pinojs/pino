@@ -12,6 +12,7 @@ const stream = require('stream')
 
 const pipeline = promisify(stream.pipeline)
 const { Writable } = stream
+const sleep = promisify(setTimeout)
 
 test('eight million lines', async ({ equal, comment }) => {
   const destination = join(
@@ -21,6 +22,7 @@ test('eight million lines', async ({ equal, comment }) => {
   const child = execa(process.argv[0], [join(__dirname, '..', 'fixtures', 'transport-many-lines.js'), destination])
 
   await once(child, 'exit')
+  await sleep(1000) // wait for the file to be written
   const toWrite = 8 * 1000000
   let count = 0
   await pipeline(createReadStream(destination), split(), new Writable({
