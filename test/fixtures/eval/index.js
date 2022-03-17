@@ -5,7 +5,7 @@ const pino = require('../../../')
 
 const logger = pino(
   pino.transport({
-    target: 'pino-pretty'
+    target: 'pino/file'
   })
 )
 
