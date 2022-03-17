@@ -221,11 +221,16 @@ test('supports pretty print', function (t) {
     cb()
   })
 
-  const pretty = proxyquire('pino-pretty', {
+  const nested = proxyquire('pino-pretty/lib/utils', {
     'sonic-boom': function () {
       t.pass('sonic created')
+      stream.flushSync = () => {}
+      stream.flush = () => {}
       return stream
     }
+  })
+  const pretty = proxyquire('pino-pretty', {
+    './lib/utils': nested
   })
 
   const log = pino({
