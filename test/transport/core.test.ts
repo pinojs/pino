@@ -15,8 +15,6 @@ const readFile = fs.promises.readFile
 const { pid } = process
 const hostname = os.hostname()
 
-interface IError { message?: string }
-
 test('pino.transport with file', async ({ same, teardown }) => {
   const destination = join(
     os.tmpdir(),

@@ -1,4 +1,4 @@
-import fs from 'fs'
+import * as fs from 'fs'
 import { once } from 'events'
 
 async function run (opts: { destination?: fs.PathLike }): Promise<fs.WriteStream> {

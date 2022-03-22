@@ -1,4 +1,4 @@
-import fs from 'fs'
+import * as fs from 'fs'
 import { once } from 'events'
 import { Transform } from 'stream'
 
