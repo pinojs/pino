@@ -1,14 +1,16 @@
 import * as os from 'os'
 import { join } from 'path'
 import { once } from 'events'
-import { readFile } from 'fs/promises'
+import fs from 'fs'
 import { watchFileCreated } from '../helper'
-import { test, only } from 'tap'
+import { test } from 'tap'
 import pino from '../../'
 import * as url from 'url'
 import { default as strip } from 'strip-ansi'
 import execa from 'execa'
 import writer from 'flush-write-stream'
+
+const readFile = fs.promises.readFile
 
 const { pid } = process
 const hostname = os.hostname()
