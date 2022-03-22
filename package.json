@@ -28,7 +28,7 @@
     "test-ci-pnpm": "pnpm run lint && tap --ts --no-coverage --no-check-coverage && pnpm run test-types",
     "test-ci-yarn-pnp": "yarn run lint && tap --ts --no-check-coverage --coverage-report=lcovonly",
     "test-types": "tsc && tsd && ts-node test/types/pino.ts",
-    "cov-ui": "tap --coverage-report=html",
+    "cov-ui": "tap --ts --coverage-report=html",
     "bench": "node benchmarks/utils/runbench all",
     "bench-basic": "node benchmarks/utils/runbench basic",
     "bench-object": "node benchmarks/utils/runbench object",

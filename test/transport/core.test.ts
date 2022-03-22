@@ -69,7 +69,7 @@ test('pino.transport with file URL', async ({ same, teardown }) => {
   })
 })
 
-only('pino.transport with two files', async ({ same, teardown }) => { // TODO:FAILS
+test('pino.transport with two files', async ({ same, teardown }) => {
   const dest1 = join(
     os.tmpdir(),
     '_' + Math.random().toString(36).substr(2, 9)
