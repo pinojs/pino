@@ -10,12 +10,10 @@ else
   export RUNNER="npx";
 fi
 
-for filename in $(ls | grep "\.ts$"); do
-  for esv in "es5" "es6" "es2017" "esnext"; do
-    test "${filename}" -ot "${filename%.ts}.${esv}.cjs" \
-    || (
-         "${RUNNER}" tsc --target "${esv}" --module commonjs "${filename}" \
-         && mv "${filename%.ts}.js" "${filename%.ts}.${esv}.cjs"
-       );
-  done
+for esv in "es5" "es6" "es2017" "esnext"; do
+  test "to-file-transport.ts" -ot "to-file-transport.${esv}.cjs" \
+  || (
+       "${RUNNER}" tsc --target "${esv}" --module commonjs "to-file-transport.ts" \
+       && mv "to-file-transport.js" "to-file-transport.${esv}.cjs"
+     );
 done
