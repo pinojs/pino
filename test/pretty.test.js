@@ -341,6 +341,18 @@ test('works as expected with an object with the msg prop', async ({ not }) => {
   not(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): hello/), null)
 })
 
+test('handles objects with null prototypes', async ({ not }) => {
+  let actual = ''
+  const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'pretty', 'null-prototype.js')])
+
+  child.stdout.pipe(writer((s, enc, cb) => {
+    actual += s
+    cb()
+  }))
+  await once(child, 'close')
+  not(strip(actual).match(/\(123456 on abcdefghijklmnopqr\): hello\s+foo: "bar"/), null)
+})
+
 test('should not lose stream metadata for streams with `needsMetadataGsym` flag', async ({ not }) => {
   const dest = new Writable({
     objectMode: true,
