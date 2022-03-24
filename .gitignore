@@ -60,3 +60,4 @@ package-lock.json
 
 # Generated files
 test/fixtures/ts/*js
+!test/fixtures/ts/transpile.cjs
