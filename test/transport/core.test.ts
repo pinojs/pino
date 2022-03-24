@@ -10,8 +10,12 @@ import { default as strip } from 'strip-ansi'
 import execa from 'execa'
 import writer from 'flush-write-stream'
 
-const readFile = fs.promises.readFile
+if (process.platform === 'win32') {
+  // TODO: Implement .ts files loading support for Windows
+  process.exit()
+}
 
+const readFile = fs.promises.readFile
 const { pid } = process
 const hostname = os.hostname()
 
