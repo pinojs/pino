@@ -1,3 +1,6 @@
 coverage: true
 timeout: 480
 check-coverage: false
+
+files:
+  - 'test/**/*.test.js'
