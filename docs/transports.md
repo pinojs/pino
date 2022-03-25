@@ -241,8 +241,8 @@ a terminating target, i.e. a `Writable` stream.__
 Pino provides basic support for transports written in TypeScript.
 
 Ideally, they should be transpiled to ensure maximum compatibility, but some
-times you might want to use tools such as TS-Node or TSM, to execute your
-TypeScript code without having to go through an explicit transpilation step.
+times you might want to use tools such as TS-Node, to execute your TypeScript
+code without having to go through an explicit transpilation step.
 
 You can use your TypeScript code without explicit transpilation, but there are
 some known caveats:
