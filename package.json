@@ -85,7 +85,7 @@
     "jest": "^27.3.1",
     "log": "^6.0.0",
     "loglevel": "^1.6.7",
-    "pino-pretty": "^v7.5.4",
+    "pino-pretty": "^v7.6.0",
     "pre-commit": "^1.2.2",
     "proxyquire": "^2.1.3",
     "pump": "^3.0.0",
