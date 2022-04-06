@@ -1,6 +1,6 @@
 import { tmpdir, hostname } from 'os'
 import t from 'tap'
-import { sink, check, once, watchFileCreated } from '../helper.js'
+import { sink, check, once, watchFileCreated, file } from '../helper.js'
 import { pino, destination } from '../../pino.js'
 import { join } from 'path'
 import { readFileSync } from 'fs'
@@ -13,10 +13,7 @@ t.test('named exports support', async ({ equal }) => {
 })
 
 t.test('destination', async ({ same }) => {
-  const tmp = join(
-    tmpdir(),
-    '_' + Math.random().toString(36).substr(2, 9)
-  )
+  const tmp = file()
   const instance = pino(destination(tmp))
   instance.info('hello')
   await watchFileCreated(tmp)

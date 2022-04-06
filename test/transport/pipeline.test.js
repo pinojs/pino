@@ -3,7 +3,7 @@
 const os = require('os')
 const { join } = require('path')
 const { readFile } = require('fs').promises
-const { watchFileCreated } = require('../helper')
+const { watchFileCreated, file } = require('../helper')
 const { test } = require('tap')
 const pino = require('../../')
 
@@ -11,10 +11,7 @@ const { pid } = process
 const hostname = os.hostname()
 
 test('pino.transport with a pipeline', async ({ same, teardown }) => {
-  const destination = join(
-    os.tmpdir(),
-    '_' + Math.random().toString(36).substr(2, 9)
-  )
+  const destination = file()
   const transport = pino.transport({
     pipeline: [{
       target: join(__dirname, '..', 'fixtures', 'transport-transform.js')

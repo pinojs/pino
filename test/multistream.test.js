@@ -1,14 +1,13 @@
 'use strict'
 
 const writeStream = require('flush-write-stream')
-const { join } = require('path')
 const { readFileSync } = require('fs')
-const os = require('os')
 const test = require('tap').test
 const pino = require('../')
 const multistream = pino.multistream
 const proxyquire = require('proxyquire')
 const strip = require('strip-ansi')
+const { file } = require('./helper')
 
 test('sends to multiple streams using string levels', function (t) {
   let messageCount = 0
@@ -540,10 +539,7 @@ test('multistream throws if not a stream', function (t) {
 })
 
 test('flushSync', function (t) {
-  const tmp = join(
-    os.tmpdir(),
-    '_' + Math.random().toString(36).substr(2, 9)
-  )
+  const tmp = file()
   const destination = pino.destination({ dest: tmp, sync: false, minLength: 4096 })
   const log = pino({ level: 'info' }, multistream([{ level: 'info', stream: destination }]))
   destination.on('ready', () => {
