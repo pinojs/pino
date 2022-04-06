@@ -104,7 +104,8 @@ function watchForWrite (filename, testString) {
 const files = []
 
 function file () {
-  const file = join(tmpdir(), `pino-${pid}-${crypto.randomUUID()}`)
+  const hash = crypto.randomBytes(12).toString('hex')
+  const file = join(tmpdir(), `pino-${pid}-${hash}`)
   files.push(file)
   return file
 }
