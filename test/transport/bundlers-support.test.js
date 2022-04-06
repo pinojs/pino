@@ -3,7 +3,7 @@
 const os = require('os')
 const { join } = require('path')
 const { readFile } = require('fs').promises
-const { watchFileCreated } = require('../helper')
+const { watchFileCreated, file } = require('../helper')
 const { test } = require('tap')
 const pino = require('../../pino')
 
@@ -15,10 +15,7 @@ test('pino.transport with destination overriden by bundler', async ({ same, tear
     foobar: join(__dirname, '..', 'fixtures', 'to-file-transport.js')
   }
 
-  const destination = join(
-    os.tmpdir(),
-    '_' + Math.random().toString(36).substr(2, 9)
-  )
+  const destination = file()
   const transport = pino.transport({
     target: 'foobar',
     options: { destination }
@@ -44,10 +41,7 @@ test('pino.transport with worker destination overriden by bundler', async ({ sam
     'pino-worker': join(__dirname, '..', '..', 'lib/worker.js')
   }
 
-  const destination = join(
-    os.tmpdir(),
-    '_' + Math.random().toString(36).substr(2, 9)
-  )
+  const destination = file()
   const transport = pino.transport({
     targets: [
       {
@@ -77,10 +71,7 @@ test('pino.transport with worker-pipeline destination overriden by bundler', asy
     'pino-pipeline-worker': join(__dirname, '..', '..', 'lib/worker-pipeline.js')
   }
 
-  const destination = join(
-    os.tmpdir(),
-    '_' + Math.random().toString(36).substr(2, 9)
-  )
+  const destination = file()
   const transport = pino.transport({
     pipeline: [
       {

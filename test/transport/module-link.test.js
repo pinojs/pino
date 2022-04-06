@@ -4,10 +4,11 @@ const os = require('os')
 const { join } = require('path')
 const { readFile, symlink, unlink, mkdir, writeFile } = require('fs').promises
 const { test } = require('tap')
-const { isWin, isYarnPnp, watchFileCreated } = require('../helper')
+const { isWin, isYarnPnp, watchFileCreated, file } = require('../helper')
 const { once } = require('events')
 const execa = require('execa')
 const pino = require('../../')
+const rimraf = require('rimraf')
 
 const { pid } = process
 const hostname = os.hostname()
@@ -39,10 +40,7 @@ async function uninstallTransportModule () {
 
 // TODO make this test pass on Windows
 test('pino.transport with package', { skip: isWin }, async ({ same, teardown }) => {
-  const destination = join(
-    os.tmpdir(),
-    '_' + Math.random().toString(36).substr(2, 9)
-  )
+  const destination = file()
 
   await installTransportModule()
 
@@ -70,10 +68,7 @@ test('pino.transport with package', { skip: isWin }, async ({ same, teardown }) 
 
 // TODO make this test pass on Windows
 test('pino.transport with package as a target', { skip: isWin }, async ({ same, teardown }) => {
-  const destination = join(
-    os.tmpdir(),
-    '_' + Math.random().toString(36).substr(2, 9)
-  )
+  const destination = file()
 
   await installTransportModule()
 
@@ -106,6 +101,10 @@ test('pino({ transport })', { skip: isWin || isYarnPnp }, async ({ same, teardow
     os.tmpdir(),
     '_' + Math.random().toString(36).substr(2, 9)
   )
+
+  teardown(() => {
+    rimraf.sync(folder)
+  })
 
   const destination = join(folder, 'output')
 
@@ -149,7 +148,7 @@ test('pino({ transport })', { skip: isWin || isYarnPnp }, async ({ same, teardow
 })
 
 // TODO make this test pass on Windows
-test('pino({ transport }) from a wrapped dependency', { skip: isWin || isYarnPnp, only: true }, async ({ same, teardown }) => {
+test('pino({ transport }) from a wrapped dependency', { skip: isWin || isYarnPnp }, async ({ same, teardown }) => {
   const folder = join(
     os.tmpdir(),
     '_' + Math.random().toString(36).substr(2, 9)
@@ -164,6 +163,11 @@ test('pino({ transport }) from a wrapped dependency', { skip: isWin || isYarnPnp
 
   await mkdir(join(folder, 'node_modules'), { recursive: true })
   await mkdir(join(wrappedFolder, 'node_modules'), { recursive: true })
+
+  teardown(() => {
+    rimraf.sync(wrappedFolder)
+    rimraf.sync(folder)
+  })
 
   // Link pino
   await symlink(

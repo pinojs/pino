@@ -3,9 +3,12 @@
 const os = require('os')
 const writer = require('flush-write-stream')
 const split = require('split2')
-const { existsSync, readFileSync, statSync } = require('fs')
+const { existsSync, readFileSync, statSync, unlinkSync } = require('fs')
 const pid = process.pid
 const hostname = os.hostname()
+const t = require('tap')
+const { join } = require('path')
+const { tmpdir } = os
 
 const isWin = process.platform === 'win32'
 const isYarnPnp = process.versions.pnp !== undefined
@@ -97,4 +100,27 @@ function watchForWrite (filename, testString) {
   })
 }
 
-module.exports = { getPathToNull, sink, check, once, sleep, watchFileCreated, watchForWrite, isWin, isYarnPnp }
+const files = []
+
+function file () {
+  const file = join(tmpdir(), `pino-${pid}-${crypto.randomUUID()}`)
+  files.push(file)
+  return file
+}
+
+process.on('beforeExit', () => {
+  if (files.length === 0) return
+  t.comment('unlink files')
+  for (const file of files) {
+    try {
+      t.comment(`unliking ${file}`)
+      unlinkSync(file)
+    } catch (e) {
+      console.log(e)
+    }
+  }
+  files = []
+  t.comment('unlink completed')
+})
+
+module.exports = { getPathToNull, sink, check, once, sleep, watchFileCreated, watchForWrite, isWin, isYarnPnp, file }

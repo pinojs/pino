@@ -1,12 +1,11 @@
 'use strict'
 /* eslint no-prototype-builtins: 0 */
 
-const os = require('os')
 const { hostname } = require('os')
 const { join } = require('path')
 const { readFile } = require('fs').promises
 const { test } = require('tap')
-const { sink, once, watchFileCreated } = require('./helper')
+const { sink, once, watchFileCreated, file } = require('./helper')
 const pino = require('../')
 
 test('level formatter', async ({ match }) => {
@@ -304,10 +303,7 @@ test('elastic common schema format', async ({ match, type }) => {
 })
 
 test('formatter with transport', async ({ match, equal }) => {
-  const destination = join(
-    os.tmpdir(),
-    '_' + Math.random().toString(36).substr(2, 9)
-  )
+  const destination = file()
   const logger = pino({
     formatters: {
       log (obj) {
@@ -337,11 +333,6 @@ test('formatter with transport', async ({ match, equal }) => {
 })
 
 test('throws when custom level formatter is used with transport.targets', async ({ throws }) => {
-  const destination = join(
-    os.tmpdir(),
-    '_' + Math.random().toString(36).substr(2, 9)
-  )
-
   throws(() => {
     pino({
       formatters: {
@@ -353,7 +344,7 @@ test('throws when custom level formatter is used with transport.targets', async 
         targets: [
           {
             target: 'pino/file',
-            options: { destination }
+            options: { destination: 'foo.log' }
           }
         ]
       }
