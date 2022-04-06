@@ -1,5 +1,6 @@
 'use strict'
 
+const crypto = require('crypto')
 const os = require('os')
 const writer = require('flush-write-stream')
 const split = require('split2')
