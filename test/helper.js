@@ -101,7 +101,7 @@ function watchForWrite (filename, testString) {
   })
 }
 
-const files = []
+let files = []
 
 function file () {
   const hash = crypto.randomBytes(12).toString('hex')
