@@ -1,5 +1,6 @@
 'use strict'
 
+const crypto = require('crypto')
 const os = require('os')
 const writer = require('flush-write-stream')
 const split = require('split2')
@@ -100,10 +101,11 @@ function watchForWrite (filename, testString) {
   })
 }
 
-const files = []
+let files = []
 
 function file () {
-  const file = join(tmpdir(), `pino-${pid}-${crypto.randomUUID()}`)
+  const hash = crypto.randomBytes(12).toString('hex')
+  const file = join(tmpdir(), `pino-${pid}-${hash}`)
   files.push(file)
   return file
 }
