@@ -225,7 +225,7 @@ declare namespace pino {
     interface TransportTargetOptions<TransportOptions = Record<string, any>> {
         target: string
         options: TransportOptions
-        level: LevelWithSilent
+        level: LevelWithSilent | string
     }
 
     interface TransportBaseOptions<TransportOptions = Record<string, any>> {
@@ -242,7 +242,8 @@ declare namespace pino {
     }
 
     interface TransportMultiOptions<TransportOptions = Record<string, any>> extends TransportBaseOptions<TransportOptions>{
-        targets: readonly TransportTargetOptions<TransportOptions>[]
+        targets: readonly TransportTargetOptions<TransportOptions>[],
+        levels?: Record<string, number>
     }
 
     interface MultiStreamOptions {
