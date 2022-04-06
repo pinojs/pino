@@ -100,11 +100,10 @@ function watchForWrite (filename, testString) {
   })
 }
 
-let files = []
-let count = 0
+const files = []
 
 function file () {
-  const file = join(tmpdir(), `pino-${pid}-${count++}`)
+  const file = join(tmpdir(), `pino-${pid}-${crypto.randomUUID()}`)
   files.push(file)
   return file
 }
