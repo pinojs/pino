@@ -8,7 +8,7 @@ const time = require('./lib/time')
 const proto = require('./lib/proto')
 const symbols = require('./lib/symbols')
 const { configure } = require('safe-stable-stringify')
-const { assertDefaultLevelFound, mappings, genLsCache } = require('./lib/levels')
+const { assertDefaultLevelFound, mappings, genLsCache, levels } = require('./lib/levels')
 const {
   createArgsNormalizer,
   asChindings,
@@ -48,6 +48,7 @@ const hostname = os.hostname()
 const defaultErrorSerializer = stdSerializers.err
 const defaultOptions = {
   level: 'info',
+  levels,
   messageKey: 'msg',
   nestedKey: null,
   enabled: true,
