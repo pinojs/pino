@@ -96,6 +96,19 @@ const transport = pino.transport({
 pino(transport)
 ```
 
+If we're using custom levels, they should be passed in when using more than one transport.
+```js
+const pino = require('pino')
+const transport = pino.transport({
+  targets: [
+    { target: '/absolute/path/to/my-transport.mjs', level: 'error' },
+    { target: 'some-file-transport', options: { destination: '/dev/null' }
+  ],
+  levels: { foo: 35 }
+})
+pino(transport)
+```
+
 For more details on `pino.transport` see the [API docs for `pino.transport`][pino-transport].
 
 [pino-transport]: /docs/api.md#pino-transport

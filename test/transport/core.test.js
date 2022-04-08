@@ -136,6 +136,43 @@ test('pino.transport with two files', async ({ same, teardown }) => {
   })
 })
 
+test('pino.transport with two files and custom levels', async ({ same, teardown }) => {
+  const dest1 = file()
+  const dest2 = file()
+  const transport = pino.transport({
+    targets: [{
+      level: 'info',
+      target: join(__dirname, '..', 'fixtures', 'to-file-transport.js'),
+      options: { destination: dest1 }
+    }, {
+      level: 'foo',
+      target: join(__dirname, '..', 'fixtures', 'to-file-transport.js'),
+      options: { destination: dest2 }
+    }],
+    levels: { trace: 10, debug: 20, info: 30, warn: 40, error: 50, fatal: 60, foo: 25 }
+  })
+  teardown(transport.end.bind(transport))
+  const instance = pino(transport)
+  instance.info('hello')
+  await Promise.all([watchFileCreated(dest1), watchFileCreated(dest2)])
+  const result1 = JSON.parse(await readFile(dest1))
+  delete result1.time
+  same(result1, {
+    pid,
+    hostname,
+    level: 30,
+    msg: 'hello'
+  })
+  const result2 = JSON.parse(await readFile(dest2))
+  delete result2.time
+  same(result2, {
+    pid,
+    hostname,
+    level: 30,
+    msg: 'hello'
+  })
+})
+
 test('pino.transport with an array including a pino-pretty destination', async ({ same, match, teardown }) => {
   const dest1 = file()
   const dest2 = file()

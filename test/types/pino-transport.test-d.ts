@@ -44,6 +44,35 @@ expectType<pino.Logger>(pino({
         ]},
 }))
 
+const transportsWithCustomLevels = pino.transport({targets: [
+    {
+        level: 'info',
+        target: '#pino/pretty',
+        options: { some: 'options for', the: 'transport' }
+    },
+    {
+        level: 'foo',
+        target: '#pino/file',
+        options: { destination: './test.log' }
+    }
+], levels: { foo: 35 }})
+pino(transports)
+
+expectType<pino.Logger>(pino({
+    transport: {targets: [
+            {
+                level: 'info',
+                target: '#pino/pretty',
+                options: { some: 'options for', the: 'transport' }
+            },
+            {
+                level: 'trace',
+                target: '#pino/file',
+                options: { destination: './test.log' }
+            }
+        ], levels: { foo: 35 }
+    },
+}))
 
 const pipelineTransport = pino.transport({
     pipeline: [{
