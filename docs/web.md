@@ -11,6 +11,7 @@ web framework ecosystem.
   - [Pino with Koa](#pino-with-koa)
   - [Pino with Node core `http`](#pino-with-node-core-http)
   - [Pino with Nest](#pino-with-nest)
+  - [Pino with H3](#pino-with-h3)
 
 <a id="fastify"></a>
 ## Pino with Fastify
@@ -227,3 +228,30 @@ bootstrap()
 ```
 
 See the [nestjs-pino readme](https://npm.im/nestjs-pino) for more info.
+
+
+<a id="h3"></a>
+## Pino with H3
+
+```sh
+npm install pino-http
+```
+
+```js
+import { createServer } from 'http'
+import { createApp } from 'h3'
+import pino from 'pino-http'
+
+const app = createApp()
+
+app.use(pino())
+
+app.use('/', (req) => {
+  req.log.info('something')
+  return 'hello world'
+})
+
+createServer(app).listen(process.env.PORT || 3000)
+```
+
+See the [pino-http readme](https://npm.im/pino-http) for more info.
