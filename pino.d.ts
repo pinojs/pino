@@ -38,7 +38,7 @@ type CustomLevelLogger<Options> = Options extends { customLevels: Record<string,
 
 interface redactOptions {
     paths: string[];
-    censor?: string | ((v: any) => any);
+    censor?: string | ((value: any, path: string[]) => any);
     remove?: boolean;
 }
 

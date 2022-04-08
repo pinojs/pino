@@ -64,6 +64,14 @@ pino({
 });
 
 pino({
+    redact: { paths: [], censor: (value) => value },
+});
+
+pino({
+    redact: { paths: [], censor: (value, path) => path.join() },
+});
+
+pino({
     depthLimit: 1
 });
 
