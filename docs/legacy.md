@@ -59,8 +59,8 @@ uses the high speed [`sonic-boom` ⇗](https://github.com/mcollina/sonic-boom) l
 
 #### Extreme Mode
 
-The `extreme` setting does not exist as an option in Pino v5, instead use
-a `pino.extreme` destination.
+The `extreme` mode does not exist as an option in Pino v5, instead use
+[asynchronous logging](/docs/asynchronous.md).
 
 ##### v4
 
@@ -73,13 +73,13 @@ const fileLogger = require('pino')({extreme: true}, fs.createWriteStream('/log/p
 ##### v5
 
 ```js
-const stdoutLogger = require('pino')(pino.extreme())
-const stderrLogger = require('pino')(pino.extreme(2))
-const fileLogger = require('pino')(pino.extreme('/log/path'))
+const stdoutLogger = require('pino')(pino.destination({sync: false, minLength: 4096}))
+const stderrLogger = require('pino')(pino.destination({dest: 2, sync: false, minLength: 4096}))
+const fileLogger = require('pino')(pino.destination({dest: '/log/path', sync: false, minLength: 4096}))
 ```
 
-* See [pino.extreme](/docs/api.md#pino-extreme)
-* See [Extreme mode ⇗](/docs/extreme.md)
+* See [`destination` parameter](/docs/api.md#destination)
+* See [Asynchronous Logging ⇗](/docs/asynchronous.md)
 
 
 #### Pino CLI is now pino-pretty CLI
