@@ -119,7 +119,7 @@ Option to limit stringification of properties/elements when logging a specific o
 Default: `undefined`
 
 If provided, the `mixin` function is called each time one of the active
-logging methods is called. The first parameter is the value `mergeObject` or an empty object. The second parameter is the leg level number.
+logging methods is called. The first parameter is the value `mergeObject` or an empty object. The second parameter is the log level number.
 The function must synchronously return an object. The properties of the returned object will be added to the
 logged JSON.
 
