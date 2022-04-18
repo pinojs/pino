@@ -2,7 +2,6 @@
 
 const { test } = require('tap')
 const { join } = require('path')
-const { once } = require('events')
 const { createReadStream } = require('fs')
 const { promisify } = require('util')
 const execa = require('execa')
@@ -16,10 +15,17 @@ const sleep = promisify(setTimeout)
 
 test('eight million lines', async ({ equal, comment }) => {
   const destination = file()
-  const child = execa(process.argv[0], [join(__dirname, '..', 'fixtures', 'transport-many-lines.js'), destination])
+  await execa(process.argv[0], [join(__dirname, '..', 'fixtures', 'transport-many-lines.js'), destination])
 
-  await once(child, 'exit')
-  await sleep(1000) // wait for the file to be written
+  if (process.platform !== 'win32') {
+    try {
+      await execa('sync') // Wait for the file to be writen to disk
+    } catch {
+      // Just a fallback, this should be unreachable
+    }
+  }
+  await sleep(1000) // It seems that sync is not enough (even in POSIX systems)
+
   const toWrite = 8 * 1000000
   let count = 0
   await pipeline(createReadStream(destination), split(), new Writable({

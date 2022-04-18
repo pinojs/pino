@@ -80,6 +80,32 @@ test('pino.transport errors if file does not exists', ({ plan, pass }) => {
   })
 })
 
+test('pino.transport errors if transport worker module does not export a function', ({ plan, equal }) => {
+  // TODO: add case for non-pipelined single target (needs changes in thread-stream)
+  plan(2)
+  const manyTargetsInstance = pino.transport({
+    targets: [{
+      level: 'info',
+      target: join(__dirname, '..', 'fixtures', 'transport-wrong-export-type.js')
+    }, {
+      level: 'info',
+      target: join(__dirname, '..', 'fixtures', 'transport-wrong-export-type.js')
+    }]
+  })
+  manyTargetsInstance.on('error', function (e) {
+    equal(e.message, 'exported worker is not a function')
+  })
+
+  const pipelinedInstance = pino.transport({
+    pipeline: [{
+      target: join(__dirname, '..', 'fixtures', 'transport-wrong-export-type.js')
+    }]
+  })
+  pipelinedInstance.on('error', function (e) {
+    equal(e.message, 'exported worker is not a function')
+  })
+})
+
 test('pino.transport with esm', async ({ same, teardown }) => {
   const destination = file()
   const transport = pino.transport({

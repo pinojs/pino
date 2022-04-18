@@ -57,3 +57,7 @@ yarn.lock
 package-lock.json
 
 !test/fixtures/eval/node_modules
+
+# Generated files
+test/fixtures/ts/*js
+!test/fixtures/ts/transpile.cjs
