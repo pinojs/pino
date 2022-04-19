@@ -771,7 +771,7 @@ declare function pino<Options extends LoggerOptions | DestinationStream>(options
  * relative protocol is enabled. Default: process.stdout
  * @returns a new logger instance.
  */
-declare function pino<Options extends LoggerOptions>(options: Options, stream: DestinationStream): Logger<Options>;
+declare function pino<Options extends LoggerOptions>(options: Options, stream?: DestinationStream): Logger<Options>;
 
 
 // Pass through all the top-level exports, allows `import {version} from "pino"`
