@@ -603,7 +603,7 @@ const transport = pino.transport({
 pino(transport)
 ```
 
-Full documentation and configuration, see the [readme](https://github.com/Julien-R44/pino-loki)
+For full documentation and configuration, see the [readme](https://github.com/Julien-R44/pino-loki)
 
 <a id="pino-papertrail"></a>
 ### pino-papertrail
