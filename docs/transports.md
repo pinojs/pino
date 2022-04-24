@@ -377,6 +377,7 @@ PR's to this document are welcome for any new transports!
 
 + [pino-elasticsearch](#pino-elasticsearch)
 + [pino-pretty](#pino-pretty)
++ [pino-loki](#pino-loki)
 
 ### Legacy
 
@@ -390,6 +391,7 @@ PR's to this document are welcome for any new transports!
 + [pino-kafka](#pino-kafka)
 + [pino-logdna](#pino-logdna)
 + [pino-logflare](#pino-logflare)
++ [pino-loki](#pino-loki)
 + [pino-mq](#pino-mq)
 + [pino-mysql](#pino-mysql)
 + [pino-papertrail](#pino-papertrail)
@@ -580,6 +582,28 @@ pino-mq -g
 ```
 
 For full documentation of command line switches and configuration see [the `pino-mq` readme](https://github.com/itavy/pino-mq#readme)
+
+<a id="pino-loki"></a>
+### pino-loki
+pino-loki is a transport that will forwards logs into [Grafana Loki](https://grafana.com/oss/loki/)
+Can be used in CLI version in a separate process or in a dedicated worker :
+
+CLI :
+```console
+node app.js | pino-loki --hostname localhost:3100 --labels='{ "application": "my-application"}' --user my-username --password my-password
+```
+
+Worker : 
+```js
+const pino = require('pino')
+const transport = pino.transport({
+  target: 'pino-loki',
+  options: { hostname: 'localhost:3100' }
+})
+pino(transport)
+```
+
+Full documentation and configuration, see the [readme](https://github.com/Julien-R44/pino-loki)
 
 <a id="pino-papertrail"></a>
 ### pino-papertrail
