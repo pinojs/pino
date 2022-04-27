@@ -105,7 +105,8 @@ interface LoggerExtras<Options = LoggerOptions> extends EventEmitter {
     bindings(): pino.Bindings;
 
     /**
-     * Overwrites the bindings of this logger instance.
+     * Adds to the bindings of this logger instance.
+     * Note: Does not overwrite bindings. Can potentially result in duplicate keys in log lines.
      *
      * @param bindings: an object of key-value pairs to include in log lines as properties.
      */
