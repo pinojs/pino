@@ -1330,7 +1330,7 @@ Exposes the Pino package version. Also available on the logger instance.
     - `level` [Level](#level-1)
     - Returns: [MultiStreamRes](#multistreamres)
 
- Returns a cloned object of the current instance but with the the provided `level`.
+ Returns a cloned object of the current instance but with the provided `level`.
 
 ### `StreamEntry`
   Properties:
