@@ -19,7 +19,7 @@ test('eight million lines', async ({ equal, comment }) => {
 
   if (process.platform !== 'win32') {
     try {
-      await execa('sync') // Wait for the file to be writen to disk
+      await execa('sync') // Wait for the file to be written to disk
     } catch {
       // Just a fallback, this should be unreachable
     }
