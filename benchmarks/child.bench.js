@@ -45,7 +45,7 @@ const run = bench([
     }
     setImmediate(cb)
   },
-  function benchPinoAssyncChild (cb) {
+  function benchPinoAsyncChild (cb) {
     for (var i = 0; i < max; i++) {
       plogAsync.info({ hello: 'world' })
     }
