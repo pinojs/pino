@@ -256,7 +256,7 @@ test('children support custom levels', function (t) {
   child.foo('bar')
 })
 
-test('levelVal ovverides level', function (t) {
+test('levelVal overrides level', function (t) {
   let messageCount = 0
   const stream = writeStream(function (data, enc, cb) {
     messageCount += 1
