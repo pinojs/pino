@@ -10,7 +10,7 @@ const pino = require('../../pino')
 const { pid } = process
 const hostname = os.hostname()
 
-test('pino.transport with destination overriden by bundler', async ({ same, teardown }) => {
+test('pino.transport with destination overridden by bundler', async ({ same, teardown }) => {
   globalThis.__bundlerPathsOverrides = {
     foobar: join(__dirname, '..', 'fixtures', 'to-file-transport.js')
   }
@@ -36,7 +36,7 @@ test('pino.transport with destination overriden by bundler', async ({ same, tear
   globalThis.__bundlerPathsOverrides = undefined
 })
 
-test('pino.transport with worker destination overriden by bundler', async ({ same, teardown }) => {
+test('pino.transport with worker destination overridden by bundler', async ({ same, teardown }) => {
   globalThis.__bundlerPathsOverrides = {
     'pino-worker': join(__dirname, '..', '..', 'lib/worker.js')
   }
@@ -66,7 +66,7 @@ test('pino.transport with worker destination overriden by bundler', async ({ sam
   globalThis.__bundlerPathsOverrides = undefined
 })
 
-test('pino.transport with worker-pipeline destination overriden by bundler', async ({ same, teardown }) => {
+test('pino.transport with worker-pipeline destination overridden by bundler', async ({ same, teardown }) => {
   globalThis.__bundlerPathsOverrides = {
     'pino-pipeline-worker': join(__dirname, '..', '..', 'lib/worker-pipeline.js')
   }
