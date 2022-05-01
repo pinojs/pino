@@ -10,7 +10,7 @@
 * [Log levels as labels instead of numbers](#level-string)
 * [Pino with `debug`](#debug)
 * [Unicode and Windows terminal](#windows)
-* [Mapping Pino Log Levels to Google Cloud Logging (Stackdriver) Serverity Levels](#stackdriver)
+* [Mapping Pino Log Levels to Google Cloud Logging (Stackdriver) Severity Levels](#stackdriver)
 * [Avoid Message Conflict](#avoid-message-conflict)
 * [Exit logging](#exit-logging)
 
@@ -201,12 +201,12 @@ executing in the terminal `chcp 65001`. This is a known limitation of
 Node.js.
 
 <a id="stackdriver"></a>
-## Mapping Pino Log Levels to Google Cloud Logging (Stackdriver) Serverity Levels
+## Mapping Pino Log Levels to Google Cloud Logging (Stackdriver) Severity Levels
 
 Google Cloud Logging uses `severity` levels instead log levels. As a result, all logs may show as INFO
 level logs while completely ignoring the level set in the pino log. Google Cloud Logging also prefers that
 log data is present inside a `message` key instead of the default `msg` key that Pino uses. Use a technique
-similar to the one below to retain log levels in Google Clould Logging
+similar to the one below to retain log levels in Google Cloud Logging
 
 ```js
 const pino = require('pino')

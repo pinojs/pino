@@ -983,7 +983,7 @@ The listener is passed four arguments:
 * `levelLabel` – the new level string, e.g `trace`
 * `levelValue` – the new level number, e.g `10`
 * `previousLevelLabel` – the prior level string, e.g `info`
-* `previousLevelValue` – the prior level numbebr, e.g `30`
+* `previousLevelValue` – the prior level number, e.g `30`
 
 ```js
 const logger = require('pino')()

@@ -732,7 +732,7 @@ test('supports leading bracket notation (single-segment path)', async ({ equal }
   equal(o['a.a'], '[Redacted]')
 })
 
-test('supports leading bracket notation (single-segment path, wilcard)', async ({ equal }) => {
+test('supports leading bracket notation (single-segment path, wildcard)', async ({ equal }) => {
   const stream = sink()
   const instance = pino({ redact: ['[*]'] }, stream)
   const obj = {
