@@ -206,7 +206,7 @@ Node.js.
 Google Cloud Logging uses `severity` levels instead log levels. As a result, all logs may show as INFO
 level logs while completely ignoring the level set in the pino log. Google Cloud Logging also prefers that
 log data is present inside a `message` key instead of the default `msg` key that Pino uses. Use a technique
-similar to the one below to retain log levels in Google Clould Logging
+similar to the one below to retain log levels in Google Cloud Logging
 
 ```js
 const pino = require('pino')
