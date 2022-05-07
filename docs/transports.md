@@ -378,6 +378,7 @@ PR's to this document are welcome for any new transports!
 + [pino-elasticsearch](#pino-elasticsearch)
 + [pino-pretty](#pino-pretty)
 + [pino-loki](#pino-loki)
++ [pino-seq-transport](#pino-seq-transport)
 
 ### Legacy
 
@@ -593,7 +594,7 @@ CLI :
 node app.js | pino-loki --hostname localhost:3100 --labels='{ "application": "my-application"}' --user my-username --password my-password
 ```
 
-Worker : 
+Worker :
 ```js
 const pino = require('pino')
 const transport = pino.transport({
@@ -680,6 +681,24 @@ $ node app.js | pino-seq --serverUrl http://localhost:5341 --apiKey 1234567890 -
 ```
 
 [pino-seq]: https://www.npmjs.com/package/pino-seq
+[Seq]: https://datalust.co/seq
+
+<a id="pino-seq-transport"></a>
+### pino-seq-transport
+
+[pino-seq-transport][pino-seq-transport] is a Pino v7+ compatible transport to forward log events to [Seq][Seq]
+from a dedicated worker:
+
+```js
+const pino = require('pino')
+const transport = pino.transport({
+  target: '@autotelic/pino-seq-transport',
+  options: { serverUrl: 'http://localhost:5341' }
+})
+pino(transport)
+```
+
+[pino-seq-transport]: https://github.com/autotelic/pino-seq-transport
 [Seq]: https://datalust.co/seq
 
 <a id="pino-socket"></a>
