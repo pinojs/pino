@@ -26,7 +26,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: 12
+          node-version: 16
       - name: Install Modules
         run: npm i
       - name: Run Benchmark
@@ -46,7 +46,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: 12
+          node-version: 16
       - name: Install Modules
         run: npm i
       - name: Run Benchmark
