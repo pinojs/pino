@@ -723,5 +723,5 @@ test('throws if prettyPrint is passed in as an option', async (t) => {
     pino({
       prettyPrint: true
     })
-  }, new Error('prettyPrint option is no longer supported, see the pino-pretty package.'))
+  }, new Error('prettyPrint option is no longer supported, see the pino-pretty package (https://github.com/pinojs/pino-pretty)'))
 })
