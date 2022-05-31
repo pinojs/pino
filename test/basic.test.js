@@ -717,3 +717,11 @@ test('nestedKey should not be used for non-objects', async ({ strictSame }) => {
     msg: message
   })
 })
+
+test('throws if prettyPrint is passed in as an option', async (t) => {
+  t.throws(() => {
+    pino({
+      prettyPrint: true
+    })
+  }, new Error('prettyPrint option is no longer supported, see the pino-pretty package (https://github.com/pinojs/pino-pretty)'))
+})

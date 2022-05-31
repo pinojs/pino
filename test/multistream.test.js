@@ -541,21 +541,17 @@ test('multistream throws if not a stream', function (t) {
 test('flushSync', function (t) {
   const tmp = file()
   const destination = pino.destination({ dest: tmp, sync: false, minLength: 4096 })
-  const log = pino({ level: 'info' }, multistream([{ level: 'info', stream: destination }]))
+  const stream = multistream([{ level: 'info', stream: destination }])
+  const log = pino({ level: 'info' }, stream)
   destination.on('ready', () => {
     log.info('foo')
     log.info('bar')
-    t.equal(readFileSync(tmp, { encoding: 'utf-8' }).split('\n').length - 1, 0)
-    pino.final(log, (err, finalLogger) => {
-      if (err) {
-        t.fail()
-        return t.end()
-      }
-      t.equal(readFileSync(tmp, { encoding: 'utf-8' }).split('\n').length - 1, 2)
-      finalLogger.info('biz')
-      t.equal(readFileSync(tmp, { encoding: 'utf-8' }).split('\n').length - 1, 3)
-      t.end()
-    })()
+    stream.flushSync()
+    t.equal(readFileSync(tmp, { encoding: 'utf-8' }).split('\n').length - 1, 2)
+    log.info('biz')
+    stream.flushSync()
+    t.equal(readFileSync(tmp, { encoding: 'utf-8' }).split('\n').length - 1, 3)
+    t.end()
   })
 })
 

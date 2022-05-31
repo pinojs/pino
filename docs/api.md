@@ -440,27 +440,6 @@ logger.info(thing)
 In this way, logged objects' properties don't conflict with pino's standard logging properties,
 and searching for logged objects can start from a consistent path.
 
-<a id=prettyPrint></a>
-#### `prettyPrint` (Boolean | Object)
-
-Default: `false`
-
-__DEPRECATED: look at [pino-pretty documentation](https://github.com/pinojs/pino-pretty)
-for alternatives__. Using a [`transport`](#transport) is also an option.__
-
-Enables pretty printing log logs. This is intended for non-production
-configurations. This may be set to a configuration object as outlined in the
-[`pino-pretty` documentation](https://github.com/pinojs/pino-pretty).
-
-The options object may additionally contain a `prettifier` property to define
-which prettifier module to use. When not present, `prettifier` defaults to
-`'pino-pretty'`. Regardless of the value, the specified prettifier module
-must be installed as a separate dependency:
-
-```sh
-npm install pino-pretty
-```
-
 #### `browser` (Object)
 
 Browser only, may have `asObject` and `write` keys. This option is separately

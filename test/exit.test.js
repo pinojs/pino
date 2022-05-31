@@ -37,24 +37,7 @@ test('pino with no args log everything when calling process.exit(0)', async ({ n
   not(actual.match(/world/), null)
 })
 
-const hasWeak = !!global.WeakRef
-
-test('sync false does not log everything when calling process.exit(0)', { skip: hasWeak }, async ({ equal }) => {
-  let actual = ''
-  const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'syncfalse-exit.js')])
-
-  child.stdout.pipe(writer((s, enc, cb) => {
-    actual += s
-    cb()
-  }))
-
-  await once(child, 'close')
-
-  equal(actual.match(/hello/), null)
-  equal(actual.match(/world/), null)
-})
-
-test('sync false logs everything when calling process.exit(0)', { skip: !hasWeak }, async ({ not }) => {
+test('sync false logs everything when calling process.exit(0)', async ({ not }) => {
   let actual = ''
   const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'syncfalse-exit.js')])
 

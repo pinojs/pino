@@ -12,7 +12,6 @@ const { assertDefaultLevelFound, mappings, genLsCache, levels } = require('./lib
 const {
   createArgsNormalizer,
   asChindings,
-  final,
   buildSafeSonicBoom,
   buildFormatters,
   stringify,
@@ -52,7 +51,6 @@ const defaultOptions = {
   messageKey: 'msg',
   nestedKey: null,
   enabled: true,
-  prettyPrint: false,
   base: { pid, hostname },
   serializers: Object.assign(Object.create(null), {
     err: defaultErrorSerializer
@@ -199,7 +197,6 @@ module.exports.destination = (dest = process.stdout.fd) => {
 module.exports.transport = require('./lib/transport')
 module.exports.multistream = require('./lib/multistream')
 
-module.exports.final = final
 module.exports.levels = mappings()
 module.exports.stdSerializers = serializers
 module.exports.stdTimeFunctions = Object.assign({}, time)
