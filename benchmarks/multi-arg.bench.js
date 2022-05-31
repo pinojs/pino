@@ -11,7 +11,7 @@ const plogNodeStream = pino(dest)
 delete require.cache[require.resolve('../')]
 const plogDest = require('../')(pino.destination('/dev/null'))
 delete require.cache[require.resolve('../')]
-const plogAsync = require('../')(pino.destination({ dest: '/dev/null', sync: false, minLength: 4096 }))
+const plogMinLength = require('../')(pino.destination({ dest: '/dev/null', sync: false, minLength: 4096 }))
 delete require.cache[require.resolve('../')]
 
 const deep = require('../package.json')
@@ -67,9 +67,9 @@ const run = bench([
     }
     setImmediate(cb)
   },
-  function benchPinoAsyncInterpolate (cb) {
+  function benchPinoMinLengthInterpolate (cb) {
     for (var i = 0; i < max; i++) {
-      plogAsync.info('hello %s', 'world')
+      plogMinLength.info('hello %s', 'world')
     }
     setImmediate(cb)
   },
@@ -104,9 +104,9 @@ const run = bench([
     }
     setImmediate(cb)
   },
-  function benchPinoAsyncInterpolateAll (cb) {
+  function benchPinoMinLengthInterpolateAll (cb) {
     for (var i = 0; i < max; i++) {
-      plogAsync.info('hello %s %j %d', 'world', { obj: true }, 4)
+      plogMinLength.info('hello %s %j %d', 'world', { obj: true }, 4)
     }
     setImmediate(cb)
   },
@@ -140,9 +140,9 @@ const run = bench([
     }
     setImmediate(cb)
   },
-  function benchPinoAsyncInterpolateExtra (cb) {
+  function benchPinoMinLengthInterpolateExtra (cb) {
     for (var i = 0; i < max; i++) {
-      plogAsync.info('hello %s %j %d', 'world', { obj: true }, 4, { another: 'obj' })
+      plogMinLength.info('hello %s %j %d', 'world', { obj: true }, 4, { another: 'obj' })
     }
     setImmediate(cb)
   },
@@ -176,9 +176,9 @@ const run = bench([
     }
     setImmediate(cb)
   },
-  function benchPinoAsyncInterpolateDeep (cb) {
+  function benchPinoMinLengthInterpolateDeep (cb) {
     for (var i = 0; i < max; i++) {
-      plogAsync.info('hello %j', deep)
+      plogMinLength.info('hello %j', deep)
     }
     setImmediate(cb)
   },

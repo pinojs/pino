@@ -10,7 +10,7 @@ const dest = fs.createWriteStream('/dev/null')
 const loglevel = require('./utils/wrap-log-level')(dest)
 const plogNodeStream = pino(dest)
 delete require.cache[require.resolve('../')]
-const plogAsync = require('../')(pino.destination({ dest: '/dev/null', sync: false, minLength: 4096 }))
+const plogMinLength = require('../')(pino.destination({ dest: '/dev/null', minLength: 4096 }))
 delete require.cache[require.resolve('../')]
 const plogDest = require('../')(pino.destination('/dev/null'))
 
@@ -78,9 +78,9 @@ const run = bench([
     }
     setImmediate(cb)
   },
-  function benchPinoAsync (cb) {
+  function benchPinoMinLength (cb) {
     for (var i = 0; i < max; i++) {
-      plogAsync.info('hello world')
+      plogMinLength.info('hello world')
     }
     setImmediate(cb)
   },

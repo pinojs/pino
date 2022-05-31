@@ -1,58 +1,55 @@
-# Benchmarks
 
-The following values show the time spent to call each function 100000 times.
+# Benchmarks
 
 `pino.info('hello world')`:
 
 ```
+
 BASIC benchmark averages
-Bunyan average: 662.904ms
-Winston average: 564.752ms
-Bole average: 301.894ms
-Debug average: 361.052ms
-LogLevel average: 330.394ms
-Pino average: 246.336ms
-PinoAsync average: 129.507ms
-PinoNodeStream average: 276.479ms
+Bunyan average: 377.434ms
+Winston average: 270.249ms
+Bole average: 172.690ms
+Debug average: 220.527ms
+LogLevel average: 222.802ms
+Pino average: 114.801ms
+PinoMinLength average: 70.968ms
+PinoNodeStream average: 159.192ms
+
 ```
 
 `pino.info({'hello': 'world'})`:
 
 ```
+
 OBJECT benchmark averages
-BunyanObj average: 678.477ms
-WinstonObj average: 563.154ms
-BoleObj average: 364.748ms
-LogLevelObject average: 627.196ms
-PinoObj average: 237.543ms
-PinoAsyncObj average: 125.532ms
-PinoNodeStreamObj average: 310.614ms
+BunyanObj average: 410.379ms
+WinstonObj average: 273.120ms
+BoleObj average: 185.069ms
+LogLevelObject average: 433.425ms
+PinoObj average: 119.315ms
+PinoMinLengthObj average: 76.968ms
+PinoNodeStreamObj average: 164.268ms
+
 ```
 
 `pino.info(aBigDeeplyNestedObject)`:
 
 ```
-DEEPOBJECT benchmark averages
-BunyanDeepObj average: 1838.970ms
-WinstonDeepObj average: 3173.947ms
-BoleDeepObj average: 2888.894ms
-LogLevelDeepObj average: 7426.592ms
-PinoDeepObj average: 3074.177ms
-PinoAsyncDeepObj average: 2987.925ms
-PinoNodeStreamDeepObj average: 3459.883ms
+
+DEEP-OBJECT benchmark averages
+BunyanDeepObj average: 1.839ms
+WinstonDeepObj average: 5.604ms
+BoleDeepObj average: 3.422ms
+LogLevelDeepObj average: 11.716ms
+PinoDeepObj average: 2.256ms
+PinoMinLengthDeepObj average: 2.240ms
+PinoNodeStreamDeepObj average: 2.595ms
+
 ```
 
 `pino.info('hello %s %j %d', 'world', {obj: true}, 4, {another: 'obj'})`:
 
-```
-BunyanInterpolateExtra average: 971.019ms
-WinstonInterpolateExtra average: 535.009ms
-BoleInterpolateExtra average: 575.668ms
-PinoInterpolateExtra average: 332.099ms
-PinoAsyncInterpolateExtra average: 209.552ms
-PinoNodeStreamInterpolateExtra average: 413.195ms
-```
-
-For a fair comparison, [LogLevel](https://npm.im/loglevel) was extended
-to include a timestamp and [bole](https://npm.im/bole) had
+For a fair comparison, [LogLevel](http://npm.im/loglevel) was extended
+to include a timestamp and [bole](http://npm.im/bole) had
 `fastTime` mode switched on.
+
