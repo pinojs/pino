@@ -21,7 +21,7 @@ output stream, as the messages are generated with a _blocking_ operation.
 
 ### AWS Lambda
 
-Asynchronous logging is disabled by default on AWS Lambda or any other environemnt
+Asynchronous logging is disabled by default on AWS Lambda, or any other environment
 that modified `process.stdout`. If forcefully turned on, we recommend to call `dest.flushSync()` at the end
 of each function execution to avoid losing data.
 
