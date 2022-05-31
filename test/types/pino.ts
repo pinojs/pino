@@ -13,7 +13,9 @@ const transport = pino.transport({
     options: { some: 'options for', the: 'transport' }
 })
 const logger = pino(transport)
+logger.setBindings({ some: 'bindings' })
 logger.info('test2')
+logger.flush()
 
 const transport2 = pino.transport({
     target: 'pino-pretty',

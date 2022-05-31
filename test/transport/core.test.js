@@ -4,22 +4,21 @@ const os = require('os')
 const { join } = require('path')
 const { once } = require('events')
 const { readFile, writeFile } = require('fs').promises
-const { watchFileCreated, watchForWrite } = require('../helper')
+const { watchFileCreated, watchForWrite, file } = require('../helper')
 const { test } = require('tap')
 const pino = require('../../')
 const url = require('url')
 const strip = require('strip-ansi')
 const execa = require('execa')
 const writer = require('flush-write-stream')
+const rimraf = require('rimraf')
+const { tmpdir } = os
 
-const { pid } = process
+const pid = process.pid
 const hostname = os.hostname()
 
 test('pino.transport with file', async ({ same, teardown }) => {
-  const destination = join(
-    os.tmpdir(),
-    '_' + Math.random().toString(36).substr(2, 9)
-  )
+  const destination = file()
   const transport = pino.transport({
     target: join(__dirname, '..', 'fixtures', 'to-file-transport.js'),
     options: { destination }
@@ -47,10 +46,7 @@ test('pino.transport with file (no options + error handling)', async ({ equal })
 })
 
 test('pino.transport with file URL', async ({ same, teardown }) => {
-  const destination = join(
-    os.tmpdir(),
-    '_' + Math.random().toString(36).substr(2, 9)
-  )
+  const destination = file()
   const transport = pino.transport({
     target: url.pathToFileURL(join(__dirname, '..', 'fixtures', 'to-file-transport.js')).href,
     options: { destination }
@@ -84,11 +80,34 @@ test('pino.transport errors if file does not exists', ({ plan, pass }) => {
   })
 })
 
+test('pino.transport errors if transport worker module does not export a function', ({ plan, equal }) => {
+  // TODO: add case for non-pipelined single target (needs changes in thread-stream)
+  plan(2)
+  const manyTargetsInstance = pino.transport({
+    targets: [{
+      level: 'info',
+      target: join(__dirname, '..', 'fixtures', 'transport-wrong-export-type.js')
+    }, {
+      level: 'info',
+      target: join(__dirname, '..', 'fixtures', 'transport-wrong-export-type.js')
+    }]
+  })
+  manyTargetsInstance.on('error', function (e) {
+    equal(e.message, 'exported worker is not a function')
+  })
+
+  const pipelinedInstance = pino.transport({
+    pipeline: [{
+      target: join(__dirname, '..', 'fixtures', 'transport-wrong-export-type.js')
+    }]
+  })
+  pipelinedInstance.on('error', function (e) {
+    equal(e.message, 'exported worker is not a function')
+  })
+})
+
 test('pino.transport with esm', async ({ same, teardown }) => {
-  const destination = join(
-    os.tmpdir(),
-    '_' + Math.random().toString(36).substr(2, 9)
-  )
+  const destination = file()
   const transport = pino.transport({
     target: join(__dirname, '..', 'fixtures', 'to-file-transport.mjs'),
     options: { destination }
@@ -108,14 +127,8 @@ test('pino.transport with esm', async ({ same, teardown }) => {
 })
 
 test('pino.transport with two files', async ({ same, teardown }) => {
-  const dest1 = join(
-    os.tmpdir(),
-    '_' + Math.random().toString(36).substr(2, 9)
-  )
-  const dest2 = join(
-    os.tmpdir(),
-    '_' + Math.random().toString(36).substr(2, 9)
-  )
+  const dest1 = file()
+  const dest2 = file()
   const transport = pino.transport({
     targets: [{
       level: 'info',
@@ -149,15 +162,46 @@ test('pino.transport with two files', async ({ same, teardown }) => {
   })
 })
 
+test('pino.transport with two files and custom levels', async ({ same, teardown }) => {
+  const dest1 = file()
+  const dest2 = file()
+  const transport = pino.transport({
+    targets: [{
+      level: 'info',
+      target: join(__dirname, '..', 'fixtures', 'to-file-transport.js'),
+      options: { destination: dest1 }
+    }, {
+      level: 'foo',
+      target: join(__dirname, '..', 'fixtures', 'to-file-transport.js'),
+      options: { destination: dest2 }
+    }],
+    levels: { trace: 10, debug: 20, info: 30, warn: 40, error: 50, fatal: 60, foo: 25 }
+  })
+  teardown(transport.end.bind(transport))
+  const instance = pino(transport)
+  instance.info('hello')
+  await Promise.all([watchFileCreated(dest1), watchFileCreated(dest2)])
+  const result1 = JSON.parse(await readFile(dest1))
+  delete result1.time
+  same(result1, {
+    pid,
+    hostname,
+    level: 30,
+    msg: 'hello'
+  })
+  const result2 = JSON.parse(await readFile(dest2))
+  delete result2.time
+  same(result2, {
+    pid,
+    hostname,
+    level: 30,
+    msg: 'hello'
+  })
+})
+
 test('pino.transport with an array including a pino-pretty destination', async ({ same, match, teardown }) => {
-  const dest1 = join(
-    os.tmpdir(),
-    '_' + Math.random().toString(36).substr(2, 9)
-  )
-  const dest2 = join(
-    os.tmpdir(),
-    '_' + Math.random().toString(36).substr(2, 9)
-  )
+  const dest1 = file()
+  const dest2 = file()
   const transport = pino.transport({
     targets: [{
       level: 'info',
@@ -190,10 +234,7 @@ test('pino.transport with an array including a pino-pretty destination', async (
 })
 
 test('no transport.end()', async ({ same, teardown }) => {
-  const destination = join(
-    os.tmpdir(),
-    '_' + Math.random().toString(36).substr(2, 9)
-  )
+  const destination = file()
   const transport = pino.transport({
     target: join(__dirname, '..', 'fixtures', 'to-file-transport.js'),
     options: { destination }
@@ -212,10 +253,7 @@ test('no transport.end()', async ({ same, teardown }) => {
 })
 
 test('autoEnd = false', async ({ equal, same, teardown }) => {
-  const destination = join(
-    os.tmpdir(),
-    '_' + Math.random().toString(36).substr(2, 9)
-  )
+  const destination = file()
   const count = process.listenerCount('exit')
   const transport = pino.transport({
     target: join(__dirname, '..', 'fixtures', 'to-file-transport.js'),
@@ -257,10 +295,7 @@ test('pino.transport with target and targets', async ({ fail, equal }) => {
 })
 
 test('pino.transport with target pino/file', async ({ same, teardown }) => {
-  const destination = join(
-    os.tmpdir(),
-    '_' + Math.random().toString(36).substr(2, 9)
-  )
+  const destination = file()
   const transport = pino.transport({
     target: 'pino/file',
     options: { destination }
@@ -280,8 +315,15 @@ test('pino.transport with target pino/file', async ({ same, teardown }) => {
 })
 
 test('pino.transport with target pino/file and mkdir option', async ({ same, teardown }) => {
-  const folder = '_' + Math.random().toString(36).substr(2, 9)
-  const destination = join(os.tmpdir(), folder, folder)
+  const folder = join(tmpdir(), `pino-${process.pid}-mkdir-transport-file`)
+  const destination = join(folder, 'log.txt')
+  teardown(() => {
+    try {
+      rimraf.sync(folder)
+    } catch (err) {
+      // ignore
+    }
+  })
   const transport = pino.transport({
     target: 'pino/file',
     options: { destination, mkdir: true }
@@ -301,10 +343,7 @@ test('pino.transport with target pino/file and mkdir option', async ({ same, tea
 })
 
 test('pino.transport with target pino/file and append option', async ({ same, teardown }) => {
-  const destination = join(
-    os.tmpdir(),
-    '_' + Math.random().toString(36).substr(2, 9)
-  )
+  const destination = file()
   await writeFile(destination, JSON.stringify({ pid, hostname, time: Date.now(), level: 30, msg: 'hello' }))
   const transport = pino.transport({
     target: 'pino/file',
@@ -324,11 +363,20 @@ test('pino.transport with target pino/file and append option', async ({ same, te
   })
 })
 
+test('pino.transport should error with unknown target', async ({ fail, equal }) => {
+  try {
+    pino.transport({
+      target: 'origin',
+      caller: 'unknown-file.js'
+    })
+    fail('must throw')
+  } catch (err) {
+    equal(err.message, 'unable to determine transport target for "origin"')
+  }
+})
+
 test('pino.transport with target pino-pretty', async ({ match, teardown }) => {
-  const destination = join(
-    os.tmpdir(),
-    '_' + Math.random().toString(36).substr(2, 9)
-  )
+  const destination = file()
   const transport = pino.transport({
     target: 'pino-pretty',
     options: { destination }
@@ -377,6 +425,17 @@ test('log and exit before ready', async ({ not }) => {
   not(strip(actual).match(/Hello/), null)
 })
 
+test('log and exit before ready with async dest', async ({ not }) => {
+  const destination = file()
+  const child = execa(process.argv[0], [join(__dirname, '..', 'fixtures', 'transport-exit-immediately-with-async-dest.js'), destination])
+
+  await once(child, 'exit')
+
+  const actual = await readFile(destination, 'utf8')
+  not(strip(actual).match(/HELLO/), null)
+  not(strip(actual).match(/WORLD/), null)
+})
+
 test('string integer destination', async ({ not }) => {
   let actual = ''
   const child = execa(process.argv[0], [join(__dirname, '..', 'fixtures', 'transport-string-stdout.js')])
@@ -390,10 +449,7 @@ test('string integer destination', async ({ not }) => {
 })
 
 test('pino transport options with target', async ({ teardown, same }) => {
-  const destination = join(
-    os.tmpdir(),
-    '_' + Math.random().toString(36).substr(2, 9)
-  )
+  const destination = file()
   const instance = pino({
     transport: {
       target: 'pino/file',
@@ -415,14 +471,8 @@ test('pino transport options with target', async ({ teardown, same }) => {
 })
 
 test('pino transport options with targets', async ({ teardown, same }) => {
-  const dest1 = join(
-    os.tmpdir(),
-    '_' + Math.random().toString(36).substr(2, 9)
-  )
-  const dest2 = join(
-    os.tmpdir(),
-    '_' + Math.random().toString(36).substr(2, 9)
-  )
+  const dest1 = file()
+  const dest2 = file()
   const instance = pino({
     transport: {
       targets: [
@@ -478,5 +528,19 @@ test('transport options with target and stream', async ({ fail, equal }) => {
     fail('must throw')
   } catch (err) {
     equal(err.message, 'only one of option.transport or stream can be specified')
+  }
+})
+
+test('transport options with stream', async ({ fail, equal, teardown }) => {
+  try {
+    const dest1 = file()
+    const transportStream = pino.transport({ target: 'pino/file', options: { destination: dest1 } })
+    teardown(transportStream.end.bind(transportStream))
+    pino({
+      transport: transportStream
+    })
+    fail('must throw')
+  } catch (err) {
+    equal(err.message, 'option.transport do not allow stream, please pass to option directly. e.g. pino(transport)')
   }
 })

@@ -1,9 +1,8 @@
 'use strict'
 const os = require('os')
-const { join } = require('path')
 const { readFileSync } = require('fs')
 const { test } = require('tap')
-const { sink, check, once, watchFileCreated } = require('./helper')
+const { sink, check, once, watchFileCreated, file } = require('./helper')
 const pino = require('../')
 const { version } = require('../package.json')
 const { pid } = process
@@ -511,10 +510,7 @@ test('handles objects with null prototype', async ({ same }) => {
 })
 
 test('pino.destination', async ({ same }) => {
-  const tmp = join(
-    os.tmpdir(),
-    '_' + Math.random().toString(36).substr(2, 9)
-  )
+  const tmp = file()
   const instance = pino(pino.destination(tmp))
   instance.info('hello')
   await watchFileCreated(tmp)
@@ -529,10 +525,7 @@ test('pino.destination', async ({ same }) => {
 })
 
 test('auto pino.destination with a string', async ({ same }) => {
-  const tmp = join(
-    os.tmpdir(),
-    '_' + Math.random().toString(36).substr(2, 9)
-  )
+  const tmp = file()
   const instance = pino(tmp)
   instance.info('hello')
   await watchFileCreated(tmp)
@@ -547,10 +540,7 @@ test('auto pino.destination with a string', async ({ same }) => {
 })
 
 test('auto pino.destination with a string as second argument', async ({ same }) => {
-  const tmp = join(
-    os.tmpdir(),
-    '_' + Math.random().toString(36).substr(2, 9)
-  )
+  const tmp = file()
   const instance = pino(null, tmp)
   instance.info('hello')
   await watchFileCreated(tmp)
@@ -565,10 +555,7 @@ test('auto pino.destination with a string as second argument', async ({ same }) 
 })
 
 test('does not override opts with a string as second argument', async ({ same }) => {
-  const tmp = join(
-    os.tmpdir(),
-    '_' + Math.random().toString(36).substr(2, 9)
-  )
+  const tmp = file()
   const instance = pino({
     timestamp: () => ',"time":"none"'
   }, tmp)

@@ -3,7 +3,7 @@
 > Redaction is not supported in the browser [#670](https://github.com/pinojs/pino/issues/670)
 
 To redact sensitive information, supply paths to keys that hold sensitive data
-using the `redact` option. Note that paths which contain hypens need to use
+using the `redact` option. Note that paths which contain hyphens need to use
 brackets in order to access the hyphenated property:
 
 ```js

@@ -52,19 +52,19 @@ const run = bench([
     }
     setImmediate(cb)
   },
-  function benchPinoBaseSerilalizers (cb) {
+  function benchPinoBaseSerializers (cb) {
     for (var i = 0; i < max; i++) {
       baseSerializers.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
-  function benchPinoBaseSerilalizersChild (cb) {
+  function benchPinoBaseSerializersChild (cb) {
     for (var i = 0; i < max; i++) {
       baseSerializersChild.info({ hello: 'world' })
     }
     setImmediate(cb)
   },
-  function benchPinoBaseSerilalizersChildSeriazliers (cb) {
+  function benchPinoBaseSerializersChildSerializers (cb) {
     for (var i = 0; i < max; i++) {
       baseSerializersChildSerializers.info({ hello: 'world' })
     }

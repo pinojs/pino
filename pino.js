@@ -2,13 +2,13 @@
 /* eslint no-prototype-builtins: 0 */
 const os = require('os')
 const stdSerializers = require('pino-std-serializers')
-const caller = require('get-caller-file')
+const caller = require('./lib/caller')
 const redaction = require('./lib/redaction')
 const time = require('./lib/time')
 const proto = require('./lib/proto')
 const symbols = require('./lib/symbols')
 const { configure } = require('safe-stable-stringify')
-const { assertDefaultLevelFound, mappings, genLsCache } = require('./lib/levels')
+const { assertDefaultLevelFound, mappings, genLsCache, levels } = require('./lib/levels')
 const {
   createArgsNormalizer,
   asChindings,
@@ -38,7 +38,8 @@ const {
   useOnlyCustomLevelsSym,
   formattersSym,
   hooksSym,
-  nestedKeyStrSym
+  nestedKeyStrSym,
+  mixinMergeStrategySym
 } = symbols
 const { epochTime, nullTime } = time
 const { pid } = process
@@ -46,6 +47,7 @@ const hostname = os.hostname()
 const defaultErrorSerializer = stdSerializers.err
 const defaultOptions = {
   level: 'info',
+  levels,
   messageKey: 'msg',
   nestedKey: null,
   enabled: true,
@@ -92,6 +94,7 @@ function pino (...args) {
     level,
     customLevels,
     mixin,
+    mixinMergeStrategy,
     useOnlyCustomLevels,
     formatters,
     hooks,
@@ -109,13 +112,6 @@ function pino (...args) {
     formatters.bindings,
     formatters.log
   )
-
-  if (!allFormatters.bindings) {
-    allFormatters.bindings = defaultOptions.formatters.bindings
-  }
-  if (!allFormatters.level) {
-    allFormatters.level = defaultOptions.formatters.level
-  }
 
   const stringifiers = redact ? redaction(redact, stringify) : {}
   const stringifyFn = stringify.bind({
@@ -171,6 +167,7 @@ function pino (...args) {
     [nestedKeyStrSym]: nestedKey ? `,${JSON.stringify(nestedKey)}:{` : '',
     [serializersSym]: serializers,
     [mixinSym]: mixin,
+    [mixinMergeStrategySym]: mixinMergeStrategy,
     [chindingsSym]: chindings,
     [formattersSym]: allFormatters,
     [hooksSym]: hooks,

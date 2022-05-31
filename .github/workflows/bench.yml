@@ -11,17 +11,20 @@ on:
         - 'docs/**'
         - '*.md'
 
+permissions:
+  contents: read
+
 jobs:
   benchmark_current:
     name: benchmark current
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: ${{ github.base_ref }}
       - name: Setup Node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: 12
       - name: Install Modules
@@ -29,7 +32,7 @@ jobs:
       - name: Run Benchmark
         run: npm run bench | tee current.txt
       - name: Upload Current Results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: current
           path: current.txt
@@ -39,9 +42,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Setup Node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: 12
       - name: Install Modules
@@ -49,7 +52,7 @@ jobs:
       - name: Run Benchmark
         run: npm run bench | tee branch.txt
       - name: Upload Branch Results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: branch
           path: branch.txt

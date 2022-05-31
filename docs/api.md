@@ -30,6 +30,12 @@
   * [pino.stdTimeFunctions](#pino-stdtimefunctions)
   * [pino.symbols](#pino-symbols)
   * [pino.version](#pino-version)
+* [Interfaces](#interfaces)
+  * [MultiStreamRes](#multistreamres)
+  * [StreamEntry](#streamentry)
+  * [DestinationStream](#destinationstream)
+* [Types](#types)
+  * [Level](#level-1)
 
 <a id="export"></a>
 ## `pino([options], [destination]) => logger`
@@ -107,13 +113,14 @@ Default: `100`
 
 Option to limit stringification of properties/elements when logging a specific object/array with circular references.
 
+<a id="opt-mixin"></a>
 #### `mixin` (Function):
 
 Default: `undefined`
 
 If provided, the `mixin` function is called each time one of the active
-logging methods is called. The first and only parameter is the value `mergeObject` or an empty object. The function must synchronously return an
-object. The properties of the returned object will be added to the
+logging methods is called. The first parameter is the value `mergeObject` or an empty object. The second parameter is the log level number.
+The function must synchronously return an object. The properties of the returned object will be added to the
 logged JSON.
 
 ```js
@@ -130,7 +137,8 @@ logger.info('world')
 ```
 
 The result of `mixin()` is supposed to be a _new_ object. For performance reason, the object returned by `mixin()` will be mutated by pino.
-In the following example, passing `mergingObject` argument to the first `info` call will mutate the global `mixin` object:
+In the following example, passing `mergingObject` argument to the first `info` call will mutate the global `mixin` object by default:
+(* See [`mixinMergeStrategy` option](#opt-mixin-merge-strategy)):
 ```js
 const mixin = {
     appName: 'My app'
@@ -145,14 +153,91 @@ const logger = pino({
 logger.info({
     description: 'Ok'
 }, 'Message 1')
-// {"level":30,"time":1591195061437,"pid":16012,"hostname":"x","appName":"My app","description":"Ok" "msg":"Message 1"}
+// {"level":30,"time":1591195061437,"pid":16012,"hostname":"x","appName":"My app","description":"Ok","msg":"Message 1"}
 logger.info('Message 2')
 // {"level":30,"time":1591195061437,"pid":16012,"hostname":"x","appName":"My app","description":"Ok","msg":"Message 2"}
 // Note: the second log contains "description":"Ok" text, even if it was not provided.
 ```
 
+The `mixin` method can be used to add the level label to each log message such as in the following example:
+```js
+const logger = pino({
+  mixin(_context, level) {
+    return { 'level-label': logger.levels.labels[level] }
+  }
+})
+
+logger.info({
+    description: 'Ok'
+}, 'Message 1')
+// {"level":30,"time":1591195061437,"pid":16012,"hostname":"x","appName":"My app","description":"Ok","level-label":"info","msg":"Message 1"}
+logger.error('Message 2')
+// {"level":30,"time":1591195061437,"pid":16012,"hostname":"x","appName":"My app","description":"Ok","level-label":"error","msg":"Message 2"}
+```
+
 If the `mixin` feature is being used merely to add static metadata to each log message,
 then a [child logger ⇗](/docs/child-loggers.md) should be used instead.
+
+<a id="opt-mixin-merge-strategy"></a>
+#### `mixinMergeStrategy` (Function):
+
+Default: `undefined`
+
+If provided, the `mixinMergeStrategy` function is called each time one of the active
+logging methods is called. The first parameter is the value `mergeObject` or an empty object,
+the second parameter is the value resulting from `mixin()` (* See [`mixin` option](#opt-mixin) or an empty object.
+The function must synchronously return an object.
+
+```js
+// Default strategy, `mergeObject` has priority
+const logger = pino({
+    mixin() {
+        return { tag: 'docker' }
+    },
+    // mixinMergeStrategy(mergeObject, mixinObject) {
+    //     return Object.assign(mixinMeta, mergeObject)
+    // }
+})
+
+logger.info({
+  tag: 'local'
+}, 'Message')
+// {"level":30,"time":1591195061437,"pid":16012,"hostname":"x","tag":"local","msg":"Message"}
+```
+
+```js
+// Custom mutable strategy, `mixin` has priority
+const logger = pino({
+    mixin() {
+        return { tag: 'k8s' }
+    },
+    mixinMergeStrategy(mergeObject, mixinObject) {
+        return Object.assign(mergeObject, mixinObject)
+    }
+})
+
+logger.info({
+    tag: 'local'
+}, 'Message')
+// {"level":30,"time":1591195061437,"pid":16012,"hostname":"x","tag":"k8s","msg":"Message"}
+```
+
+```js
+// Custom immutable strategy, `mixin` has priority
+const logger = pino({
+    mixin() {
+        return { tag: 'k8s' }
+    },
+    mixinMergeStrategy(mergeObject, mixinObject) {
+        return Object.assign({}, mergeObject, mixinObject)
+    }
+})
+
+logger.info({
+    tag: 'local'
+}, 'Message')
+// {"level":30,"time":1591195061437,"pid":16012,"hostname":"x","tag":"k8s","msg":"Message"}
+```
 
 <a id="opt-redact"></a>
 #### `redact` (Array | Object):
@@ -223,6 +308,8 @@ the level key name or to enrich the default metadata.
 Changes the shape of the log level. The default shape is `{ level: number }`.
 The function takes two arguments, the label of the level (e.g. `'info'`)
 and the numeric value (e.g. `30`).
+
+ps: The log level cannot be customized when using multiple transports
 
 ```js
 const formatters = {
@@ -705,7 +792,7 @@ After the creation of the child logger, it is also accessible using the [`logger
 ```js
 const logger = pino()
 logger.debug('nope') // will not log, since default level is info
-const child = logger.child({foo: 'bar'}, {level: 'debug')
+const child = logger.child({foo: 'bar'}, {level: 'debug'})
 child.debug('debug!') // will log as the `level` property set the level to debug
 ```
 
@@ -875,7 +962,7 @@ The listener is passed four arguments:
 * `levelLabel` – the new level string, e.g `trace`
 * `levelValue` – the new level number, e.g `10`
 * `previousLevelLabel` – the prior level string, e.g `info`
-* `previousLevelValue` – the prior level numbebr, e.g `30`
+* `previousLevelValue` – the prior level number, e.g `30`
 
 ```js
 const logger = require('pino')()
@@ -1080,9 +1167,10 @@ finalLogger.info('exiting...')
 
 <a id="pino-multistream"></a>
 
-### `pino.multistream(options) => Stream`
+### `pino.multistream(streamsArray, opts) => MultiStreamRes`
 
-Create a stream composed by multiple destination streams:
+Create a stream composed by multiple destination streams and returns an
+object implementing the [MultiStreamRes](#multistreamres) interface.
 
 ```js
 var fs = require('fs')
@@ -1188,3 +1276,56 @@ for general use.
 Exposes the Pino package version. Also available on the logger instance.
 
 * See [`logger.version`](#version)
+
+## Interfaces
+<a id="pino-multistreamres"></a>
+
+### `MultiStreamRes`
+  Properties:
+
+  * `write(data)`
+    - `data` Object | string
+    - Returns: void
+
+ Write `data` onto the streams held by the current instance.
+ *  `add(dest)`
+    - `dest` [StreamEntry](#streamentry) | [DestinationStream](#destinationstream)
+    - Returns: [MultiStreamRes](#multistreamres)
+
+ Add `dest` stream to the array of streams of the current instance.
+ * `flushSync()`
+   - Returns: `undefined`
+
+ Call `flushSync` on each stream held by the current instance.
+ * `minLevel`
+   - number
+
+ The minimum level amongst all the streams held by the current instance.
+ * `streams`
+    - Returns: [StreamEntry[]](#streamentry)
+
+ The array of streams currently held by the current instance.
+ * `clone(level)`
+    - `level` [Level](#level-1)
+    - Returns: [MultiStreamRes](#multistreamres)
+
+ Returns a cloned object of the current instance but with the provided `level`.
+
+### `StreamEntry`
+  Properties:
+
+  * `stream`
+    - DestinationStream
+  * `level`
+    - Optional: [Level](#level-1)
+
+### `DestinationStream`
+  Properties:
+
+  * `write(msg)`
+    - `msg` string
+
+## Types
+### `Level`
+
+  * Values: `"fatal"` | `"error"` | `"warn"` | `"info"` | `"debug"` | `"trace"`

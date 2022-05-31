@@ -20,9 +20,9 @@ jobs:
         os: [macOS-latest, windows-latest, ubuntu-latest]
         node-version: [14, 16, 17]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
       - name: Install
@@ -33,8 +33,11 @@ jobs:
   automerge:
     needs: test
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: write
     steps:
-      - uses: fastify/github-action-merge-dependabot@v2.5.0
+      - uses: fastify/github-action-merge-dependabot@v3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           exclude: 'sonic-boom,pino-std-serializers,quick-format-unescaped,fast-redact'

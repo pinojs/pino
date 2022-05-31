@@ -1,12 +1,11 @@
 'use strict'
 /* eslint no-prototype-builtins: 0 */
 
-const os = require('os')
 const { hostname } = require('os')
 const { join } = require('path')
 const { readFile } = require('fs').promises
 const { test } = require('tap')
-const { sink, once, watchFileCreated } = require('./helper')
+const { sink, once, watchFileCreated, file } = require('./helper')
 const pino = require('../')
 
 test('level formatter', async ({ match }) => {
@@ -304,10 +303,7 @@ test('elastic common schema format', async ({ match, type }) => {
 })
 
 test('formatter with transport', async ({ match, equal }) => {
-  const destination = join(
-    os.tmpdir(),
-    '_' + Math.random().toString(36).substr(2, 9)
-  )
+  const destination = file()
   const logger = pino({
     formatters: {
       log (obj) {
@@ -334,4 +330,26 @@ test('formatter with transport', async ({ match, equal }) => {
     foo: 'bar',
     nested: { object: true }
   })
+})
+
+test('throws when custom level formatter is used with transport.targets', async ({ throws }) => {
+  throws(() => {
+    pino({
+      formatters: {
+        level (label) {
+          return label
+        }
+      },
+      transport: {
+        targets: [
+          {
+            target: 'pino/file',
+            options: { destination: 'foo.log' }
+          }
+        ]
+      }
+    }
+    )
+  },
+  Error('option.transport.targets do not allow custom level formatters'))
 })

@@ -18,115 +18,31 @@
 
 import type { EventEmitter } from "events";
 // @ts-ignore -- gracefully falls back to `any` if not installed
-import type { PrettyOptions } from "pino-pretty";
+import type { PrettyOptions as PinoPrettyOptions } from "pino-pretty";
+import * as pinoStdSerializers from "pino-std-serializers";
 import type { SonicBoom, SonicBoomOpts } from "sonic-boom";
 import type { WorkerOptions } from "worker_threads";
 
-import * as pinoStdSerializers from "pino-std-serializers";
 
 
 //// Non-exported types and interfaces
-
-type SerializerFn = (value: any) => any;
-type WriteFn = (o: object) => void;
 
 // ToDo https://github.com/pinojs/thread-stream/issues/24
 type ThreadStream = any
 
 type TimeFn = () => string;
-type MixinFn = () => object;
+type MixinFn = (mergeObject: object, level: number) => object;
+type MixinMergeStrategyFn = (mergeObject: object, mixinObject: object) => object;
+
+type CustomLevelLogger<Options> = Options extends { customLevels: Record<string, number> } ? Record<keyof Options["customLevels"], LogFn> : Record<never, LogFn>
 
 interface redactOptions {
     paths: string[];
-    censor?: string | ((v: any) => any);
+    censor?: string | ((value: any, path: string[]) => any);
     remove?: boolean;
 }
 
-interface BaseLogger {
-    /**
-     * Set this property to the desired logging level. In order of priority, available levels are:
-     *
-     * - 'fatal'
-     * - 'error'
-     * - 'warn'
-     * - 'info'
-     * - 'debug'
-     * - 'trace'
-     *
-     * The logging level is a __minimum__ level. For instance if `logger.level` is `'info'` then all `'fatal'`, `'error'`, `'warn'`,
-     * and `'info'` logs will be enabled.
-     *
-     * You can pass `'silent'` to disable logging.
-     */
-    level: pino.LevelWithSilent | string;
-
-    /**
-     * Log at `'fatal'` level the given msg. If the first argument is an object, all its properties will be included in the JSON line.
-     * If more args follows `msg`, these will be used to format `msg` using `util.format`.
-     *
-     * @typeParam T: the interface of the object being serialized. Default is object.
-     * @param obj: object to be serialized
-     * @param msg: the log message to write
-     * @param ...args: format string values when `msg` is a format string
-     */
-    fatal: pino.LogFn;
-    /**
-     * Log at `'error'` level the given msg. If the first argument is an object, all its properties will be included in the JSON line.
-     * If more args follows `msg`, these will be used to format `msg` using `util.format`.
-     *
-     * @typeParam T: the interface of the object being serialized. Default is object.
-     * @param obj: object to be serialized
-     * @param msg: the log message to write
-     * @param ...args: format string values when `msg` is a format string
-     */
-    error: pino.LogFn;
-    /**
-     * Log at `'warn'` level the given msg. If the first argument is an object, all its properties will be included in the JSON line.
-     * If more args follows `msg`, these will be used to format `msg` using `util.format`.
-     *
-     * @typeParam T: the interface of the object being serialized. Default is object.
-     * @param obj: object to be serialized
-     * @param msg: the log message to write
-     * @param ...args: format string values when `msg` is a format string
-     */
-    warn: pino.LogFn;
-    /**
-     * Log at `'info'` level the given msg. If the first argument is an object, all its properties will be included in the JSON line.
-     * If more args follows `msg`, these will be used to format `msg` using `util.format`.
-     *
-     * @typeParam T: the interface of the object being serialized. Default is object.
-     * @param obj: object to be serialized
-     * @param msg: the log message to write
-     * @param ...args: format string values when `msg` is a format string
-     */
-    info: pino.LogFn;
-    /**
-     * Log at `'debug'` level the given msg. If the first argument is an object, all its properties will be included in the JSON line.
-     * If more args follows `msg`, these will be used to format `msg` using `util.format`.
-     *
-     * @typeParam T: the interface of the object being serialized. Default is object.
-     * @param obj: object to be serialized
-     * @param msg: the log message to write
-     * @param ...args: format string values when `msg` is a format string
-     */
-    debug: pino.LogFn;
-    /**
-     * Log at `'trace'` level the given msg. If the first argument is an object, all its properties will be included in the JSON line.
-     * If more args follows `msg`, these will be used to format `msg` using `util.format`.
-     *
-     * @typeParam T: the interface of the object being serialized. Default is object.
-     * @param obj: object to be serialized
-     * @param msg: the log message to write
-     * @param ...args: format string values when `msg` is a format string
-     */
-    trace: pino.LogFn;
-    /**
-     * Noop function.
-     */
-    silent: pino.LogFn;
-}
-
-interface LoggerExtras extends EventEmitter {
+interface LoggerExtras<Options = LoggerOptions> extends EventEmitter {
     /**
      * Exposes the Pino package version. Also available on the exported pino function.
      */
@@ -161,7 +77,7 @@ interface LoggerExtras extends EventEmitter {
      * @param options: an options object that will override child logger inherited options.
      * @returns a child logger instance.
      */
-    child(bindings: pino.Bindings, options?: pino.ChildLoggerOptions): pino.Logger;
+    child<ChildOptions extends pino.ChildLoggerOptions>(bindings: pino.Bindings, options?: ChildOptions): pino.Logger<Options & ChildOptions>;
 
     /**
      * Registers a listener function that is triggered when the level is changed.
@@ -187,26 +103,127 @@ interface LoggerExtras extends EventEmitter {
      * Returns an object containing all the current bindings, cloned from the ones passed in via logger.child().
      */
     bindings(): pino.Bindings;
+
+    /**
+     * Adds to the bindings of this logger instance.
+     * Note: Does not overwrite bindings. Can potentially result in duplicate keys in log lines.
+     *
+     * @param bindings: an object of key-value pairs to include in log lines as properties.
+     */
+    setBindings(bindings: pino.Bindings): void;
+
+    /**
+     * Flushes the content of the buffer when using pino.destination({ sync: false }).
+     */
+    flush(): () => void;
 }
 
 
 declare namespace pino {
     //// Exported types and interfaces
+
+    interface BaseLogger {
+        /**
+         * Set this property to the desired logging level. In order of priority, available levels are:
+         *
+         * - 'fatal'
+         * - 'error'
+         * - 'warn'
+         * - 'info'
+         * - 'debug'
+         * - 'trace'
+         *
+         * The logging level is a __minimum__ level. For instance if `logger.level` is `'info'` then all `'fatal'`, `'error'`, `'warn'`,
+         * and `'info'` logs will be enabled.
+         *
+         * You can pass `'silent'` to disable logging.
+         */
+        level: pino.LevelWithSilent | string;
+
+        /**
+         * Log at `'fatal'` level the given msg. If the first argument is an object, all its properties will be included in the JSON line.
+         * If more args follows `msg`, these will be used to format `msg` using `util.format`.
+         *
+         * @typeParam T: the interface of the object being serialized. Default is object.
+         * @param obj: object to be serialized
+         * @param msg: the log message to write
+         * @param ...args: format string values when `msg` is a format string
+         */
+        fatal: pino.LogFn;
+        /**
+         * Log at `'error'` level the given msg. If the first argument is an object, all its properties will be included in the JSON line.
+         * If more args follows `msg`, these will be used to format `msg` using `util.format`.
+         *
+         * @typeParam T: the interface of the object being serialized. Default is object.
+         * @param obj: object to be serialized
+         * @param msg: the log message to write
+         * @param ...args: format string values when `msg` is a format string
+         */
+        error: pino.LogFn;
+        /**
+         * Log at `'warn'` level the given msg. If the first argument is an object, all its properties will be included in the JSON line.
+         * If more args follows `msg`, these will be used to format `msg` using `util.format`.
+         *
+         * @typeParam T: the interface of the object being serialized. Default is object.
+         * @param obj: object to be serialized
+         * @param msg: the log message to write
+         * @param ...args: format string values when `msg` is a format string
+         */
+        warn: pino.LogFn;
+        /**
+         * Log at `'info'` level the given msg. If the first argument is an object, all its properties will be included in the JSON line.
+         * If more args follows `msg`, these will be used to format `msg` using `util.format`.
+         *
+         * @typeParam T: the interface of the object being serialized. Default is object.
+         * @param obj: object to be serialized
+         * @param msg: the log message to write
+         * @param ...args: format string values when `msg` is a format string
+         */
+        info: pino.LogFn;
+        /**
+         * Log at `'debug'` level the given msg. If the first argument is an object, all its properties will be included in the JSON line.
+         * If more args follows `msg`, these will be used to format `msg` using `util.format`.
+         *
+         * @typeParam T: the interface of the object being serialized. Default is object.
+         * @param obj: object to be serialized
+         * @param msg: the log message to write
+         * @param ...args: format string values when `msg` is a format string
+         */
+        debug: pino.LogFn;
+        /**
+         * Log at `'trace'` level the given msg. If the first argument is an object, all its properties will be included in the JSON line.
+         * If more args follows `msg`, these will be used to format `msg` using `util.format`.
+         *
+         * @typeParam T: the interface of the object being serialized. Default is object.
+         * @param obj: object to be serialized
+         * @param msg: the log message to write
+         * @param ...args: format string values when `msg` is a format string
+         */
+        trace: pino.LogFn;
+        /**
+         * Noop function.
+         */
+        silent: pino.LogFn;
+    }
+
     type Bindings = Record<string, any>;
 
     type Level = "fatal" | "error" | "warn" | "info" | "debug" | "trace";
     type LevelWithSilent = pino.Level | "silent";
-    
+
+    type SerializerFn = (value: any) => any;
+    type WriteFn = (o: object) => void;
+
     type LevelChangeEventListener = (
         lvl: LevelWithSilent | string,
         val: number,
         prevLvl: LevelWithSilent | string,
         prevVal: number,
     ) => void;
-    
+
     type LogDescriptor = Record<string, any>;
 
-    type Logger = BaseLogger & LoggerExtras & Record<string, any>;
+    type Logger<Options = LoggerOptions> = BaseLogger & LoggerExtras<Options> & CustomLevelLogger<Options>;
 
     type SerializedError = pinoStdSerializers.SerializedError;
     type SerializedResponse = pinoStdSerializers.SerializedResponse;
@@ -216,7 +233,7 @@ declare namespace pino {
     interface TransportTargetOptions<TransportOptions = Record<string, any>> {
         target: string
         options: TransportOptions
-        level: LevelWithSilent
+        level: LevelWithSilent | string
     }
 
     interface TransportBaseOptions<TransportOptions = Record<string, any>> {
@@ -228,12 +245,13 @@ declare namespace pino {
         target: string
     }
 
-    interface TransportPipelineOptions{
-        pipeline: TransportSingleOptions[]
+    interface TransportPipelineOptions<TransportOptions = Record<string, any>> extends TransportBaseOptions<TransportOptions>{
+        pipeline: TransportSingleOptions<TransportOptions>[]
     }
 
     interface TransportMultiOptions<TransportOptions = Record<string, any>> extends TransportBaseOptions<TransportOptions>{
-        targets: readonly TransportTargetOptions<TransportOptions>[]
+        targets: readonly TransportTargetOptions<TransportOptions>[],
+        levels?: Record<string, number>
     }
 
     interface MultiStreamOptions {
@@ -252,10 +270,10 @@ declare namespace pino {
 
     interface MultiStreamRes {
         write: (data: any) => void,
-        add: (dest: Record<string, any>) => MultiStreamRes,
+        add: (dest: StreamEntry | DestinationStream) => MultiStreamRes,
         flushSync: () => void,
         minLevel: number,
-        streams: ({ stream: DestinationStream, level: number, id: number })[],
+        streams: StreamEntry[],
         clone(level: Level): MultiStreamRes,
     }
 
@@ -277,6 +295,8 @@ declare namespace pino {
         (obj: unknown, msg?: string, ...args: any[]): void;
         (msg: string, ...args: any[]): void;
     }
+
+    interface PrettyOptions extends PinoPrettyOptions {}
 
     interface LoggerOptions {
         transport?: TransportSingleOptions | TransportMultiOptions | TransportPipelineOptions
@@ -325,6 +345,14 @@ declare namespace pino {
          * returned object will be added to the logged JSON.
          */
         mixin?: MixinFn;
+
+        /**
+         * If provided, the `mixinMergeStrategy` function is called each time one of the active
+         * logging methods is called. The first parameter is the value `mergeObject` or an empty object,
+         * the second parameter is the value resulting from `mixin()` or an empty object.
+         * The function must synchronously return an object.
+         */
+        mixinMergeStrategy?: MixinMergeStrategyFn
 
         /**
          * As an array, the redact option specifies paths that should have their values redacted from any log output.
@@ -559,6 +587,16 @@ declare namespace pino {
              */
             logMethod?: (args: any[], method: LogFn, level: number) => void;
         };
+
+        /**
+         * Stringification limit at a specific nesting depth when logging circular object. Default: `5`.
+         */
+         depthLimit?: number
+
+         /**
+          * Stringification limit of properties/elements when logging a specific object/array with circular references. Default: `100`.
+          */
+          edgeLimit?: number
     }
 
     interface ChildLoggerOptions {
@@ -651,12 +689,12 @@ declare namespace pino {
         readonly formattersSym: unique symbol;
         readonly hooksSym: unique symbol;
     };
- 
+
     /**
      * Exposes the Pino package version. Also available on the logger instance.
      */
     export const version: string;
- 
+
     /**
      * Provides functions for generating the timestamp property in the log output. You can set the `timestamp` option during
      * initialization to one of these functions to adjust the output format. Alternatively, you can specify your own time function.
@@ -681,7 +719,7 @@ declare namespace pino {
             */
         isoTime: TimeFn;
     };
- 
+
     //// Exported functions
 
     /**
@@ -696,7 +734,7 @@ declare namespace pino {
     ): SonicBoom;
 
     export function transport<TransportOptions = Record<string, any>>(
-        options: TransportSingleOptions<TransportOptions> | TransportMultiOptions<TransportOptions>
+        options: TransportSingleOptions<TransportOptions> | TransportMultiOptions<TransportOptions> | TransportPipelineOptions<TransportOptions>
     ): ThreadStream
 
     export function multistream(
@@ -726,7 +764,7 @@ declare namespace pino {
  * relative protocol is enabled. Default: process.stdout
  * @returns a new logger instance.
  */
-declare function pino(optionsOrStream?: LoggerOptions | DestinationStream): Logger;
+declare function pino<Options extends LoggerOptions | DestinationStream>(optionsOrStream?: Options): Logger<Options>;
 
 /**
  * @param [options]: an options object
@@ -734,8 +772,8 @@ declare function pino(optionsOrStream?: LoggerOptions | DestinationStream): Logg
  * relative protocol is enabled. Default: process.stdout
  * @returns a new logger instance.
  */
-declare function pino(options: LoggerOptions, stream: DestinationStream): Logger;
- 
+declare function pino<Options extends LoggerOptions>(options: Options, stream: DestinationStream): Logger<Options>;
+
 
 // Pass through all the top-level exports, allows `import {version} from "pino"`
 // Constants and functions
@@ -752,14 +790,18 @@ export const version: typeof pino.version;
 // Types
 export type Bindings = pino.Bindings;
 export type Level = pino.Level;
+export type LevelWithSilent = pino.LevelWithSilent;
 export type LevelChangeEventListener = pino.LevelChangeEventListener;
 export type LogDescriptor = pino.LogDescriptor;
-export type Logger = pino.Logger;
+export type Logger<Options = LoggerOptions> = pino.Logger<Options>;
 export type SerializedError = pino.SerializedError;
+export type SerializerFn = pino.SerializerFn;
 export type SerializedRequest = pino.SerializedRequest;
 export type SerializedResponse = pino.SerializedResponse;
+export type WriteFn = pino.WriteFn;
 
 // Interfaces
+export interface BaseLogger extends pino.BaseLogger {}
 export interface ChildLoggerOptions extends pino.ChildLoggerOptions {}
 export interface DestinationStream extends pino.DestinationStream {}
 export interface LevelMapping extends pino.LevelMapping {}
@@ -768,6 +810,7 @@ export interface LogFn extends pino.LogFn {}
 export interface LoggerOptions extends pino.LoggerOptions {}
 export interface MultiStreamOptions extends pino.MultiStreamOptions {}
 export interface MultiStreamRes extends pino.MultiStreamRes {}
+export interface PrettyOptions extends pino.PrettyOptions {}
 export interface StreamEntry extends pino.StreamEntry {}
 export interface TransportBaseOptions extends pino.TransportBaseOptions {}
 export interface TransportMultiOptions extends pino.TransportMultiOptions {}
@@ -779,7 +822,6 @@ export interface TransportTargetOptions extends pino.TransportTargetOptions {}
 // as default (`import pino from "pino"`) and named variable
 // (`import {pino} from "pino"`).
 export { pino as default, pino };
-
 // Export just the type side of the namespace as "P", allows
 // `import {P} from "pino"; const log: P.Logger;`.
 // (Legacy support for early 7.x releases, remove in 8.x.)

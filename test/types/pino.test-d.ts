@@ -1,6 +1,7 @@
 import P, { pino } from "../../";
 import { IncomingMessage, ServerResponse } from "http";
 import { Socket } from "net";
+import { expectError } from 'tsd'
 import Logger = P.Logger;
 
 const log = pino();
@@ -47,11 +48,35 @@ pino({
 });
 
 pino({
+    mixin: (context: object) => ({ customName: "unknown", customId: 111 }),
+});
+
+pino({
+    mixin: (context: object, level: number) => ({ customName: "unknown", customId: 111 }),
+});
+
+pino({
     redact: { paths: [], censor: "SECRET" },
 });
 
 pino({
     redact: { paths: [], censor: () => "SECRET" },
+});
+
+pino({
+    redact: { paths: [], censor: (value) => value },
+});
+
+pino({
+    redact: { paths: [], censor: (value, path) => path.join() },
+});
+
+pino({
+    depthLimit: 1
+});
+
+pino({
+    edgeLimit: 1
 });
 
 pino({
@@ -82,6 +107,7 @@ pino({
 });
 
 pino({ base: null });
+// @ts-expect-error
 if ("pino" in log) console.log(`pino version: ${log.pino}`);
 
 log.child({ a: "property" }).info("hello child!");
@@ -122,9 +148,6 @@ log.level = "info";
 if (log.levelVal === 30) {
     console.log("logger level is `info`");
 }
-
-log.level = "myLevel";
-log.myLevel("a message");
 
 const listener = (lvl: any, val: any, prevLvl: any, prevVal: any) => {
     console.log(lvl, val, prevLvl, prevVal);
@@ -277,3 +300,42 @@ const logLine: pino.LogDescriptor = {
 interface CustomLogger extends pino.Logger {
     customMethod(msg: string, ...args: unknown[]): void;
 }
+
+const serializerFunc: pino.SerializerFn = () => {}
+const writeFunc: pino.WriteFn = () => {}
+
+interface CustomBaseLogger extends pino.BaseLogger {
+  child(): CustomBaseLogger
+}
+
+const customBaseLogger: CustomBaseLogger = {
+  level: 'info',
+  fatal() {},
+  error() {},
+  warn() {},
+  info() {},
+  debug() {},
+  trace() {},
+  silent() {},
+  child() { return this }
+}
+
+// custom levels
+const log3 = pino({ customLevels: { myLevel: 100 } })
+expectError(log3.log())
+log3.level = 'myLevel'
+log3.myLevel('')
+log3.child({}).myLevel('')
+
+const clog3 = log3.child({}, { customLevels: { childLevel: 120 } })
+// child inherit parant
+clog3.myLevel('')
+// child itself
+clog3.childLevel('')
+const cclog3 = clog3.child({}, { customLevels: { childLevel2: 130 } })
+// child inherit root
+cclog3.myLevel('')
+// child inherit parant
+cclog3.childLevel('')
+// child itself
+cclog3.childLevel2('')

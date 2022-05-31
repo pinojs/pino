@@ -7,4 +7,5 @@ const transport = pino.transport({
 const logger = pino(transport)
 
 logger.info('Hello')
+
 process.exit(0)

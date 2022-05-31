@@ -12,7 +12,7 @@ In particular, a bundler must ensure that the following files are also bundle se
 
 Once the files above have been generated, the bundler must also add information about the files above by injecting a code which sets `__bundlerPathsOverrides` in the `globalThis` object.
 
-The variable is a object whose keys are identifier for the files and the the values are the paths of files relative to the currently bundle files.
+The variable is a object whose keys are identifier for the files and the values are the paths of files relative to the currently bundle files.
 
 Example:
 

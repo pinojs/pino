@@ -1,14 +1,13 @@
 'use strict'
 
 const writeStream = require('flush-write-stream')
-const { join } = require('path')
 const { readFileSync } = require('fs')
-const os = require('os')
 const test = require('tap').test
 const pino = require('../')
 const multistream = pino.multistream
 const proxyquire = require('proxyquire')
 const strip = require('strip-ansi')
+const { file } = require('./helper')
 
 test('sends to multiple streams using string levels', function (t) {
   let messageCount = 0
@@ -221,11 +220,16 @@ test('supports pretty print', function (t) {
     cb()
   })
 
-  const pretty = proxyquire('pino-pretty', {
+  const nested = proxyquire('pino-pretty/lib/utils', {
     'sonic-boom': function () {
       t.pass('sonic created')
+      stream.flushSync = () => {}
+      stream.flush = () => {}
       return stream
     }
+  })
+  const pretty = proxyquire('pino-pretty', {
+    './lib/utils': nested
   })
 
   const log = pino({
@@ -252,7 +256,7 @@ test('children support custom levels', function (t) {
   child.foo('bar')
 })
 
-test('levelVal ovverides level', function (t) {
+test('levelVal overrides level', function (t) {
   let messageCount = 0
   const stream = writeStream(function (data, enc, cb) {
     messageCount += 1
@@ -481,7 +485,7 @@ test('no stream', function (t) {
   t.end()
 })
 
-test('add a stream', function (t) {
+test('one stream', function (t) {
   let messageCount = 0
   const stream = writeStream(function (data, enc, cb) {
     messageCount += 1
@@ -497,11 +501,45 @@ test('add a stream', function (t) {
   t.end()
 })
 
+test('add a stream', function (t) {
+  let messageCount = 0
+  const stream = writeStream(function (data, enc, cb) {
+    messageCount += 1
+    cb()
+  })
+
+  const log = pino({
+    level: 'trace'
+  }, multistream().add(stream))
+  log.info('info stream')
+  log.debug('debug stream')
+  log.fatal('fatal stream')
+  t.equal(messageCount, 2)
+  t.end()
+})
+
+test('multistream.add throws if not a stream', function (t) {
+  try {
+    pino({
+      level: 'trace'
+    }, multistream().add({}))
+  } catch (_) {
+    t.end()
+  }
+})
+
+test('multistream throws if not a stream', function (t) {
+  try {
+    pino({
+      level: 'trace'
+    }, multistream({}))
+  } catch (_) {
+    t.end()
+  }
+})
+
 test('flushSync', function (t) {
-  const tmp = join(
-    os.tmpdir(),
-    '_' + Math.random().toString(36).substr(2, 9)
-  )
+  const tmp = file()
   const destination = pino.destination({ dest: tmp, sync: false, minLength: 4096 })
   const stream = multistream([{ level: 'info', stream: destination }])
   const log = pino({ level: 'info' }, stream)
