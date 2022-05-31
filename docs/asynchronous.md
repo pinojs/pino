@@ -14,7 +14,7 @@ const logger = pino(pino.destination({
 
 It's always possible to turn on synchronous logging by passing `sync: true`. 
 In this mode of operation log messages are directly written to the
-output stream as the messages are generated with a _blocking_ operation.
+output stream, as the messages are generated with a _blocking_ operation.
 
 * See [`pino.destination`](/docs/api.md#pino-destination)
 * `pino.destination` is implemented on [`sonic-boom` ⇗](https://github.com/mcollina/sonic-boom).
