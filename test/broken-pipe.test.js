@@ -27,7 +27,7 @@ test('syncfalse.js')
 
 t.test('let error pass through', ({ equal, plan }) => {
   plan(3)
-  const stream = pino.destination()
+  const stream = pino.destination({ sync: true })
 
   // side effect of the pino constructor is that it will set an
   // event handler for error
