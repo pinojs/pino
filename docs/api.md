@@ -1000,7 +1000,7 @@ Exposes the Pino package version. Also available on the exported `pino` function
 ### `pino.destination([opts]) => SonicBoom`
 
 Create a Pino Destination instance: a stream-like object with
-significantly more throughput (over 30%) than a standard Node.js stream.
+significantly more throughput than a standard Node.js stream.
 
 ```js
 const pino = require('pino')
@@ -1009,7 +1009,11 @@ const logger2 = pino(pino.destination())
 const logger3 = pino(pino.destination({
   dest: './my-file',
   minLength: 4096, // Buffer before writing
-  sync: false // Asynchronous logging
+  sync: false // Asynchronous logging, the default
+}))
+const logger4 = pino(pino.destination({
+  dest: './my-file2',
+  sync: true // Synchronous logging
 }))
 ```
 

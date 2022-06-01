@@ -108,7 +108,7 @@
   "dependencies": {
     "atomic-sleep": "^1.0.0",
     "fast-redact": "^3.0.0",
-    "on-exit-leak-free": "^0.2.0",
+    "on-exit-leak-free": "^1.0.0",
     "pino-abstract-transport": "v0.5.0",
     "pino-std-serializers": "^4.0.0",
     "process-warning": "^1.0.0",
