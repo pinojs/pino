@@ -150,22 +150,6 @@ test('stack is omitted if it is not set on err', t => {
   instance[name](err)
 })
 
-test('stack is rendered as any other property if it\'s not a string', t => {
-  t.plan(3)
-  const err = new Error('myerror')
-  err.stack = null
-  const instance = pino(sink(function (chunk, enc, cb) {
-    t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
-    delete chunk.time
-    t.equal(chunk.err.hasOwnProperty('stack'), true)
-    t.equal(chunk.err.stack, null)
-    cb()
-  }))
-
-  instance.level = name
-  instance[name](err)
-})
-
 test('correctly ignores toString on errors', async ({ same }) => {
   const err = new Error('myerror')
   err.toString = () => undefined
