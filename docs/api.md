@@ -178,6 +178,24 @@ logger.error('Message 2')
 If the `mixin` feature is being used merely to add static metadata to each log message,
 then a [child logger ⇗](/docs/child-loggers.md) should be used instead.
 
+As of pino 7.x, when the `mixin` is used with the [`nestedKey` option](#opt-nestedkey), 
+the object returned from the `mixin` method will also be nested. Prior versions would mix 
+this object into the root. 
+
+```js
+const logger = pino({
+    nestedKey: 'payload', 
+    mixin() {
+        return { requestId: requestId.currentId() }
+    }
+})
+
+logger.info({
+    description: 'Ok'
+}, 'Message 1')
+// {"level":30,"time":1591195061437,"pid":16012,"hostname":"x","payload":{"requestId":"dfe9a9014b","description":"Ok"},"msg":"Message 1"}
+```
+
 <a id="opt-mixin-merge-strategy"></a>
 #### `mixinMergeStrategy` (Function):
 
