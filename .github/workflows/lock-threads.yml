@@ -18,6 +18,7 @@ jobs:
     steps:
       - uses: dessant/lock-threads@v3
         with:
+          log-output: true
           issue-inactive-days: '30'
           issue-comment: >
             This issue has been automatically locked since there
