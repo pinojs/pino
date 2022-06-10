@@ -5,10 +5,9 @@ on:
     - cron: '0 0 * * *'
   workflow_dispatch:
 
-# Testing if permissions are breaking this workflow.
-# permissions:
-#   issues: write
-#   pull-requests: write
+permissions:
+  issues: write
+  pull-requests: write
 
 concurrency:
   group: lock
@@ -17,7 +16,7 @@ jobs:
   action:
     runs-on: ubuntu-latest
     steps:
-      - uses: jsumners/lock-threads@cd3ce4e76ecddddf6dbba912f6f9c730d4f705a9
+      - uses: jsumners/lock-threads@b27edac0ac998d42b2815e122b6c24b32b568321
         with:
           log-output: true
           issue-inactive-days: '30'
