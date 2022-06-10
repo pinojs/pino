@@ -6,6 +6,11 @@ const { fork } = require('child_process')
 const { once } = require('./helper')
 const pino = require('..')
 
+if (process.platform === 'win32') {
+  t.skip('skipping on windows')
+  process.exit(0)
+}
+
 function test (file) {
   file = join('fixtures', 'broken-pipe', file)
   t.test(file, { parallel: true }, async ({ equal }) => {
