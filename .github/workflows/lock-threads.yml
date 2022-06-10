@@ -16,7 +16,7 @@ jobs:
   action:
     runs-on: ubuntu-latest
     steps:
-      - uses: jsumners/lock-threads@12c086eac738542b8bbe9d3c3f14e8d0b3b39bee
+      - uses: jsumners/lock-threads@89d92510a879e3fd63e02780dcbaea9b47442119
         with:
           log-output: true
           issue-inactive-days: '30'
