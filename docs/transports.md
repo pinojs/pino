@@ -599,7 +599,7 @@ Worker :
 const pino = require('pino')
 const transport = pino.transport({
   target: 'pino-loki',
-  options: { hostname: 'localhost:3100' }
+  options: { host: 'localhost:3100' }
 })
 pino(transport)
 ```
