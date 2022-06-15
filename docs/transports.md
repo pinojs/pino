@@ -379,6 +379,7 @@ PR's to this document are welcome for any new transports!
 + [pino-pretty](#pino-pretty)
 + [pino-loki](#pino-loki)
 + [pino-seq-transport](#pino-seq-transport)
++ [pino-sentry-transport](#pino-sentry-transport)
 
 ### Legacy
 
@@ -700,6 +701,28 @@ pino(transport)
 
 [pino-seq-transport]: https://github.com/autotelic/pino-seq-transport
 [Seq]: https://datalust.co/seq
+
+<a id="pino-sentry-transport"></a>
+### pino-sentry-transport
+
+[pino-sentry-transport][pino-sentry-transport] is a Pino v7+ compatible transport to forward log events to [Sentry][Sentry]
+from a dedicated worker:
+
+```js
+const pino = require('pino')
+const transport = pino.transport({
+  target: 'pino-sentry-transport',
+  options: {
+    sentry: {
+      dsn: 'https://******@sentry.io/12345',
+    }
+  }
+})
+pino(transport)
+```
+
+[pino-sentry-transport]: https://github.com/tomer-yechiel/pino-sentry-transport
+[Sentry]: https://sentry.io/
 
 <a id="pino-socket"></a>
 ### pino-socket
