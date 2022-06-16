@@ -13,10 +13,6 @@ const filesToTranspile = ['to-file-transport.ts']
 async function transpile () {
   process.chdir(__dirname)
 
-  const runner = (process.env.npm_config_user_agent || '').match(/yarn/)
-    ? 'yarn'
-    : 'npx'
-
   for (const sourceFileName of filesToTranspile) {
     const sourceStat = await stat(sourceFileName)
 
@@ -27,7 +23,7 @@ async function transpile () {
       const shouldTranspile = !existsSync(targetFileName) || (await stat(targetFileName)).mtimeMs < sourceStat.mtimeMs
 
       if (shouldTranspile) {
-        await execa(runner, ['tsc', '--target', esVersion, '--module', 'commonjs', sourceFileName])
+        await execa('tsc', ['--target', esVersion, '--module', 'commonjs', sourceFileName])
         await execa('mv', [intermediateFileName, targetFileName])
       }
     }
