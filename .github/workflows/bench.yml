@@ -29,7 +29,7 @@ jobs:
         with:
           node-version: lts/*
       - name: Install Modules
-        run: npm i
+        run: npm i --ignore-scripts
       - name: Run Benchmark
         run: npm run bench | tee current.txt
       - name: Upload Current Results
@@ -51,7 +51,7 @@ jobs:
         with:
           node-version: lts/*
       - name: Install Modules
-        run: npm i
+        run: npm i --ignore-scripts
       - name: Run Benchmark
         run: npm run bench | tee branch.txt
       - name: Upload Branch Results
