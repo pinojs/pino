@@ -1,4 +1,4 @@
-# Bundling 
+# Bundling
 
 Due to its internal architecture based on Worker Threads, it is not possible to bundle Pino *without* generating additional files.
 
@@ -31,4 +31,8 @@ Note that `pino/file`, `pino-worker`, `pino-pipeline-worker` and `thread-stream-
 
 ## Webpack Plugin
 
-If you are a Webpack user, you can achieve this with [pino-webpack-plugin](https://github.com/pinojs/pino-webpack-plugin) without manual configuration of `__bundlerPathsOverrides`; however, you still need to configure it manually if you are using other bundlers. 
+If you are a Webpack user, you can achieve this with [pino-webpack-plugin](https://github.com/pinojs/pino-webpack-plugin) without manual configuration of `__bundlerPathsOverrides`; however, you still need to configure it manually if you are using other bundlers.
+
+## Esbuild Plugin
+
+[esbuild-plugin-pino](https://github.com/davipon/esbuild-plugin-pino) is the esbuild plugin to generate extra pino files for bundling.
