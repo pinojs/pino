@@ -4,6 +4,9 @@ on:
   pull_request_target:
     types: [opened]
 
+permissions:
+  pull-requests: write
+
 jobs:
   comment:
     if: ${{ github.base_ref != "master" }}
