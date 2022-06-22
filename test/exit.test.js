@@ -66,3 +66,12 @@ test('sync false logs everything when calling flushSync', async ({ not }) => {
   not(actual.match(/hello/), null)
   not(actual.match(/world/), null)
 })
+
+test('transports exits gracefully when logging in exit', async ({ equal }) => {
+  const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'transport-with-on-exit.js')])
+  child.stdout.resume()
+
+  const code = await once(child, 'close')
+
+  equal(code, 0)
+})
