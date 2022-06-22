@@ -3,7 +3,7 @@ const pino = require('../..')
 const log = pino({
   transport: {
     target: 'pino/file',
-    options: { destination: '/dev/null' }
+    options: { destination: 1 }
   }
 })
 log.info('hello world!')
