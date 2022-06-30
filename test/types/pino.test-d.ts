@@ -103,6 +103,7 @@ pino({
                 logEvent.messages;
             },
         },
+        disabled: false
     },
 });
 

@@ -53,7 +53,7 @@ function pino (opts) {
     proto.error = proto.fatal = proto.warn =
     proto.info = proto.debug = proto.trace = proto
   }
-  if (opts.enabled === false) opts.level = 'silent'
+  if (opts.enabled === false || opts.browser.disabled) opts.level = 'silent'
   const level = opts.level || 'info'
   const logger = Object.create(proto)
   if (!logger.log) logger.log = noop

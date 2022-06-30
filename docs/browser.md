@@ -197,3 +197,12 @@ const pino = require('pino')({
   }
 })
 ```
+
+### `disabled` (Boolean)
+
+```js
+const pino = require('pino')({browser: {disabled: true}})
+```
+
+The `disabled` option will disable logging in browser if set
+to `true`. Default is set to `false`.
