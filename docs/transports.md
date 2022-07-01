@@ -726,32 +726,32 @@ pino(transport)
 [Sentry]: https://sentry.io/
 
 
-<a id="pino-aibrake-transport"></a>
+<a id="pino-airbrake-transport"></a>
 ### pino-airbrake-transport
 
-[pino-airbrake-transport][pino-airbrake-transport] is a Pino v7+ compatible transport to forward log events to [Aibrake][Aibrake]
+[pino-airbrake-transport][pino-airbrake-transport] is a Pino v7+ compatible transport to forward log events to [Airbrake][Airbrake]
 from a dedicated worker:
 
 ```js
 const pino = require('pino')
 const transport = pino.transport({
-  target: 'pino-aibrake-transport',
+  target: 'pino-airbrake-transport',
   options: {
-    aibrake: {
+    airbrake: {
       projectId: 1,
       projectKey: "REPLACE_ME",
       environment: "production",
-      // aditional options for aibrake
+      // aditional options for airbrake
       performanceStats: false,
     },
   },
-  level: "error", // minimum log level that should be sent to Aibrake
+  level: "error", // minimum log level that should be sent to airbrake
 })
 pino(transport)
 ```
 
-[pino-airbrake-transport]: https://github.com/enricodeleo/pino-aibrake-transport
-[Aibrake]: https://aibrake.io/
+[pino-airbrake-transport]: https://github.com/enricodeleo/pino-airbrake-transport
+[Airbrake]: https://airbrake.io/
 
 <a id="pino-socket"></a>
 ### pino-socket
