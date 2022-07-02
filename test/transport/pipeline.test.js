@@ -34,3 +34,113 @@ test('pino.transport with a pipeline', async ({ same, teardown }) => {
     service: 'pino' // this property was added by the transform
   })
 })
+
+test('pino.transport with targets and a shared pipeline', async ({ same, teardown }) => {
+  const destinationA = join(
+    os.tmpdir(),
+    '_' + Math.random().toString(36).substr(2, 9)
+  )
+  const destinationB = join(
+    os.tmpdir(),
+    '_' + Math.random().toString(36).substr(2, 9)
+  )
+  const transport = pino.transport({
+    targets: [
+      {
+        target: join(__dirname, '..', 'fixtures', 'to-file-transport.js'),
+        options: { destination: destinationA }
+      },
+      {
+        target: join(__dirname, '..', 'fixtures', 'to-file-transport.js'),
+        options: { destination: destinationB }
+      }
+    ],
+    pipeline: [
+      {
+        target: join(__dirname, '..', 'fixtures', 'transport-transform.js'),
+        options: { payload: 'foobar' }
+      }
+    ]
+  })
+
+  teardown(transport.end.bind(transport))
+  const instance = pino(transport)
+  instance.info('hello')
+  await watchFileCreated(destinationA)
+  await watchFileCreated(destinationB)
+  const resultA = JSON.parse(await readFile(destinationA))
+  const resultB = JSON.parse(await readFile(destinationB))
+  delete resultA.time
+  delete resultB.time
+  same(resultA, {
+    pid,
+    hostname,
+    level: 30,
+    msg: 'hello',
+    service: 'foobar' // this property was added by the transform
+  })
+  same(resultB, {
+    pid,
+    hostname,
+    level: 30,
+    msg: 'hello',
+    service: 'foobar' // this property was added by the transform
+  })
+})
+
+test('pino.transport with targets and a custom pipeline', async ({ same, teardown }) => {
+  const destinationA = join(
+    os.tmpdir(),
+    '_' + Math.random().toString(36).substr(2, 9)
+  )
+  const destinationB = join(
+    os.tmpdir(),
+    '_' + Math.random().toString(36).substr(2, 9)
+  )
+  const transport = pino.transport({
+    targets: [
+      {
+        target: join(__dirname, '..', 'fixtures', 'to-file-transport.js'),
+        options: { destination: destinationA },
+        pipeline: [{
+          target: join(__dirname, '..', 'fixtures', 'transport-transform.js'),
+          options: { payload: 'customPipeline' }
+        }]
+      },
+      {
+        target: join(__dirname, '..', 'fixtures', 'to-file-transport.js'),
+        options: { destination: destinationB }
+      }
+    ],
+    pipeline: [
+      {
+        target: join(__dirname, '..', 'fixtures', 'transport-transform.js'),
+        options: { payload: 'globalPipeline' }
+      }
+    ]
+  })
+
+  teardown(transport.end.bind(transport))
+  const instance = pino(transport)
+  instance.info('hello')
+  await watchFileCreated(destinationA)
+  await watchFileCreated(destinationB)
+  const resultA = JSON.parse(await readFile(destinationA))
+  const resultB = JSON.parse(await readFile(destinationB))
+  delete resultA.time
+  delete resultB.time
+  same(resultA, {
+    pid,
+    hostname,
+    level: 30,
+    msg: 'hello',
+    service: 'customPipeline' // this property was added by the transform
+  })
+  same(resultB, {
+    pid,
+    hostname,
+    level: 30,
+    msg: 'hello',
+    service: 'globalPipeline' // this property was added by the transform
+  })
+})

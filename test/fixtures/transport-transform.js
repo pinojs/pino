@@ -8,7 +8,7 @@ module.exports = (options) => {
       autoDestroy: true,
       objectMode: true,
       transform (chunk, enc, cb) {
-        chunk.service = 'pino'
+        chunk.service = (options && options.payload) || 'pino'
         this.push(JSON.stringify(chunk))
         cb()
       }
