@@ -35,7 +35,7 @@ test('pino.transport with a pipeline', async ({ same, teardown }) => {
   })
 })
 
-test('pino.transport with targets and a shared pipeline', async ({ same, teardown }) => {
+test('pino.transport with targets using a shared pipeline', async ({ same, teardown }) => {
   const destinationA = join(
     os.tmpdir(),
     '_' + Math.random().toString(36).substr(2, 9)
@@ -88,7 +88,59 @@ test('pino.transport with targets and a shared pipeline', async ({ same, teardow
   })
 })
 
-test('pino.transport with targets and a custom pipeline', async ({ same, teardown }) => {
+test('pino.transport with shared pipeline and target with excludeFromPipeline flag', async ({ same, teardown }) => {
+  const destinationA = join(
+    os.tmpdir(),
+    '_' + Math.random().toString(36).substr(2, 9)
+  )
+  const destinationB = join(
+    os.tmpdir(),
+    '_' + Math.random().toString(36).substr(2, 9)
+  )
+  const transport = pino.transport({
+    targets: [
+      {
+        target: join(__dirname, '..', 'fixtures', 'to-file-transport.js'),
+        options: { destination: destinationA }
+      },
+      {
+        target: join(__dirname, '..', 'fixtures', 'to-file-transport.js'),
+        options: { destination: destinationB, excludeFromPipeline: true }
+      }
+    ],
+    pipeline: [
+      {
+        target: join(__dirname, '..', 'fixtures', 'transport-transform.js'),
+        options: { payload: 'foobar' }
+      }
+    ]
+  })
+
+  teardown(transport.end.bind(transport))
+  const instance = pino(transport)
+  instance.info('hello')
+  await watchFileCreated(destinationA)
+  await watchFileCreated(destinationB)
+  const resultA = JSON.parse(await readFile(destinationA))
+  const resultB = JSON.parse(await readFile(destinationB))
+  delete resultA.time
+  delete resultB.time
+  same(resultA, {
+    pid,
+    hostname,
+    level: 30,
+    msg: 'hello',
+    service: 'foobar' // this property was added by the transform
+  })
+  same(resultB, {
+    pid,
+    hostname,
+    level: 30,
+    msg: 'hello'
+  })
+})
+
+test('pino.transport with target using a custom pipeline', async ({ same, teardown }) => {
   const destinationA = join(
     os.tmpdir(),
     '_' + Math.random().toString(36).substr(2, 9)
