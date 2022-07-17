@@ -2,6 +2,7 @@
 
 const writeStream = require('flush-write-stream')
 const { readFileSync } = require('fs')
+const { join } = require('path')
 const test = require('tap').test
 const pino = require('../')
 const multistream = pino.multistream
@@ -536,6 +537,42 @@ test('multistream throws if not a stream', function (t) {
   } catch (_) {
     t.end()
   }
+})
+
+test('multistream.write should not throw if one stream fails', function (t) {
+  let messageCount = 0
+  const stream = writeStream(function (data, enc, cb) {
+    messageCount += 1
+    cb()
+  })
+  const noopStream = pino.transport({
+    target: join(__dirname, 'fixtures', 'noop-transport.js')
+  })
+  // eslint-disable-next-line
+  noopStream.on('error', function (err) {
+    // something went wrong while writing to noop stream, ignoring!
+  })
+  const log = pino({
+    level: 'trace'
+  },
+  multistream([
+    {
+      level: 'trace',
+      stream
+    },
+    {
+      level: 'debug',
+      stream: noopStream
+    }
+  ])
+  )
+  log.debug('0')
+  noopStream.end()
+  // noop stream is ending, should emit an error but not throw
+  log.debug('1')
+  log.debug('2')
+  t.equal(messageCount, 3)
+  t.end()
 })
 
 test('flushSync', function (t) {
