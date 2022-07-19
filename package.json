@@ -67,7 +67,7 @@
   "bugs": {
     "url": "https://github.com/pinojs/pino/issues"
   },
-  "homepage": "http://getpino.io",
+  "homepage": "https://getpino.io",
   "devDependencies": {
     "@types/flush-write-stream": "^1.0.0",
     "@types/node": "^18.0.0",
