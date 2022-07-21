@@ -5,6 +5,7 @@ const { join } = require('path')
 const { fork } = require('child_process')
 const { once } = require('./helper')
 const writer = require('flush-write-stream')
+const pino = require('..')
 
 test('do not use SonicBoom is someone tampered with process.stdout.write', async ({ not }) => {
   let actual = ''
@@ -16,4 +17,9 @@ test('do not use SonicBoom is someone tampered with process.stdout.write', async
   }))
   await once(child, 'close')
   not(actual.match(/^hack/), null)
+})
+
+test('do not use SonicBoom is someone has passed process.stdout to pino', async ({ equal }) => {
+  const logger = pino(process.stdout)
+  equal(logger[pino.symbols.streamSym], process.stdout)
 })
