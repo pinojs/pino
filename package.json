@@ -1,6 +1,6 @@
 {
   "name": "pino",
-  "version": "8.2.0",
+  "version": "8.3.0",
   "description": "super fast, all natural json logger",
   "main": "pino.js",
   "type": "commonjs",
@@ -117,7 +117,7 @@
     "quick-format-unescaped": "^4.0.3",
     "real-require": "^0.1.0",
     "safe-stable-stringify": "^2.3.1",
-    "sonic-boom": "^3.0.0",
+    "sonic-boom": "^3.1.0",
     "thread-stream": "^2.0.0"
   },
   "tsd": {
