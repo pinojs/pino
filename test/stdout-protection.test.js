@@ -23,3 +23,10 @@ test('do not use SonicBoom is someone has passed process.stdout to pino', async 
   const logger = pino(process.stdout)
   equal(logger[pino.symbols.streamSym], process.stdout)
 })
+
+test('do not crash if process.stdout has no fd', async ({ teardown }) => {
+  const fd = process.stdout.fd
+  delete process.stdout.fd
+  teardown(function () { process.stdout.fd = fd })
+  pino()
+})
