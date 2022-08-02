@@ -434,6 +434,41 @@ test('dedupe', function (t) {
   t.end()
 })
 
+test('dedupe when logs have different levels', function (t) {
+  let messageCount = 0
+  const stream1 = writeStream(function (data, enc, cb) {
+    messageCount += 1
+    cb()
+  })
+
+  const stream2 = writeStream(function (data, enc, cb) {
+    messageCount += 2
+    cb()
+  })
+
+  const streams = [
+    {
+      stream: stream1,
+      level: 'info'
+    },
+    {
+      stream: stream2,
+      level: 'error'
+    }
+  ]
+
+  const log = pino({
+    level: 'trace'
+  }, multistream(streams, { dedupe: true }))
+
+  log.info('info stream')
+  log.warn('warn stream')
+  log.error('error streams')
+  log.fatal('fatal streams')
+  t.equal(messageCount, 6)
+  t.end()
+})
+
 test('dedupe when some streams has the same level', function (t) {
   let messageCount = 0
   const stream1 = writeStream(function (data, enc, cb) {
