@@ -381,6 +381,7 @@ matching the exact key of a serializer will be serialized using the defined seri
 The serializers are applied when a property in the logged object matches a property
 in the serializers. The only exception is the `err` serializer as it is also applied in case
 the object is an instance of `Error`, e.g. `logger.info(new Error('kaboom'))`.
+See `errorKey` option to change `err` namespace.
 
 * See [pino.stdSerializers](#pino-stdserializers)
 
@@ -433,6 +434,13 @@ timestamp: () => `,"time":"${new Date(Date.now()).toISOString()}"`
 Default: `'msg'`
 
 The string key for the 'message' in the JSON object.
+
+<a id=opt-messagekey></a>
+#### `errorKey` (String)
+
+Default: `'err'`
+
+The string key for the 'error' in the JSON object.
 
 <a id=opt-nestedkey></a>
 #### `nestedKey` (String)
@@ -603,6 +611,9 @@ logger.info({MIX: {IN: true}})
 If the object is of type Error, it is wrapped in an object containing a property err (`{ err: mergingObject }`).
 This allows for a unified error handling flow.
 
+Options `serializers` and `errorKey` could be used at instantiation time to change the namespace
+from `err` to another string as preferred.
+
 <a id="message"></a>
 #### `message` (String)
 
@@ -625,7 +636,7 @@ See [Avoid Message Conflict](/docs/help.md#avoid-message-conflict) for informati
 on how to overcome this limitation.
 
 If no `message` parameter is provided, and the `mergingObject` is of type `Error` or it has a property named `err`, the
-`message` parameter is set to the `message` value of the error.
+`message` parameter is set to the `message` value of the error. See option `errorKey` if you want to change the namespace.
 
 The `messageKey` option can be used at instantiation time to change the namespace
 from `msg` to another string as preferred.
@@ -688,6 +699,9 @@ const logger = pino(pinoOptions)
 #### Errors
 
 Errors can be supplied as either the first parameter or if already using `mergingObject` then as the `err` property on the `mergingObject`.
+
+Options `serializers` and `errorKey` could be used at instantiation time to change the namespace
+from `err` to another string as preferred.
 
 > ## Note
 > This section describes the default configuration. The error serializer can be

@@ -395,12 +395,9 @@ test('stdout in worker', async ({ not }) => {
   let actual = ''
   const child = execa(process.argv[0], [join(__dirname, '..', 'fixtures', 'transport-main.js')])
 
-  child.stdout.pipe(writer((s, enc, cb) => {
-    actual += s
-    cb()
-  }))
-  await once(child, 'close')
-  await immediate()
+  for await (const chunk of child.stdout) {
+    actual += chunk
+  }
   not(strip(actual).match(/Hello/), null)
 })
 

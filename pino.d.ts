@@ -376,6 +376,10 @@ declare namespace pino {
          */
         messageKey?: string;
         /**
+         * The string key for the 'error' in the JSON object. Default: "err".
+         */
+        errorKey?: string;
+        /**
          * The string key to place any logged object under.
          */
         nestedKey?: string;
@@ -682,6 +686,7 @@ declare namespace pino {
         readonly endSym: unique symbol;
         readonly formatOptsSym: unique symbol;
         readonly messageKeySym: unique symbol;
+        readonly errorKeySym: unique symbol;
         readonly nestedKeySym: unique symbol;
         readonly wildcardFirstSym: unique symbol;
         readonly needsMetadataGsym: unique symbol;
