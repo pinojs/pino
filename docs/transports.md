@@ -381,6 +381,7 @@ PR's to this document are welcome for any new transports!
 + [pino-seq-transport](#pino-seq-transport)
 + [pino-sentry-transport](#pino-sentry-transport)
 + [pino-airbrake-transport](#pino-airbrake-transport)
++ [pino-datadog-transport](#pino-datadog-transport)
 
 ### Legacy
 
@@ -774,6 +775,31 @@ $ node app.js | pino-socket -p 6000
 Logs from the application should be observed on both consoles.
 
 [pino-socket]: https://www.npmjs.com/package/pino-socket
+
+<a id="pino-datadog-transport"></a>
+### pino-datadog-transport
+
+[pino-datadog-transport][pino-datadog-transport] is a Pino v7+ compatible transport to forward log events to [Datadog][Datadog]
+from a dedicated worker:
+
+```js
+const pino = require('pino')
+const transport = pino.transport({
+  target: 'pino-datadog-transport',
+  options: {
+    ddClientConf: {
+      authMethods: {
+        apiKeyAuth: <your datadog API key>
+      }
+    },
+  },
+  level: "error", // minimum log level that should be sent to datadog
+})
+pino(transport)
+```
+
+[pino-datadog-transport]: https://github.com/theogravity/pino-datadog-transport
+[Datadog]: https://www.datadoghq.com/
 
 #### Logstash
 
