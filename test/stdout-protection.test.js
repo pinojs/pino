@@ -30,3 +30,10 @@ test('do not crash if process.stdout has no fd', async ({ teardown }) => {
   teardown(function () { process.stdout.fd = fd })
   pino()
 })
+
+test('use fd=1 if process.stdout has no fd in pino.destination() (worker case)', async ({ teardown }) => {
+  const fd = process.stdout.fd
+  delete process.stdout.fd
+  teardown(function () { process.stdout.fd = fd })
+  pino.destination()
+})
