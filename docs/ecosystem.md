@@ -73,3 +73,4 @@ prettifier inspired by the [logrus](https://github.com/sirupsen/logrus) logger.
 + [`pino-dev`](https://github.com/dnjstrom/pino-dev): simple prettifier for pino with built-in support for common ecosystem packages.
 + [`@newrelic/pino-enricher`](https://github.com/newrelic/newrelic-node-log-extensions/blob/main/packages/pino-log-enricher): a log customization to add New Relic context to use [Logs In Context](https://docs.newrelic.com/docs/logs/logs-context/logs-in-context/)
 + [`pino-lambda`](https://github.com/FormidableLabs/pino-lambda): log transport for cloudwatch support inside aws-lambda 
++ [`cloud-pine`](https://github.com/metcoder95/cloud-pine): transport that provide abstraction and compatibility with [`@google-cloud/logging`](https://www.npmjs.com/package/@google-cloud/logging).
