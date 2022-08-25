@@ -200,7 +200,7 @@ export default async function (options) {
         chunk.service = 'pino'
 
         // stringify the payload again
-        this.push(JSON.stringify(chunk))
+        this.push(`${JSON.stringify(chunk)}\n`)
         cb()
       }
     })
