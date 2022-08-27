@@ -154,9 +154,29 @@ for information on this is handled.
 <a id="level-string"></a>
 ## Log levels as labels instead of numbers
 Pino log lines are meant to be parseable. Thus, Pino's default mode of operation
-is to print the level value instead of the string name. However, while it is
-possible to set the `useLevelLabels` option, we recommend using one of these
-options instead if you are able:
+is to print the level value instead of the string name. 
+However, you can use the [`formatters`](/docs/api.md#formatters-object) option 
+with a [`level`](/docs/api.md#level) function to print the string name instead the level value :
+
+```js
+const pino = require('pino')
+
+const log = pino({
+  formatters: {
+    level: (label) => {
+      return {
+        level: label
+      }
+    }
+  }
+})
+
+log.info('message')
+
+// {"level":"info","time":1661632832200,"pid":18188,"hostname":"foo","msg":"message"}
+```
+
+Although it is works, we recommend using one of these options instead if you are able:
 
 1. If the only change desired is the name then a transport can be used. One such
 transport is [`pino-text-level-transport`](https://npm.im/pino-text-level-transport).
