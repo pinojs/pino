@@ -74,7 +74,7 @@
     "@types/tap": "^15.0.6",
     "airtap": "4.0.4",
     "benchmark": "^2.1.4",
-    "bole": "^4.0.0",
+    "bole": "^5.0.0",
     "bunyan": "^1.8.14",
     "debug": "^4.3.4",
     "docsify-cli": "^4.4.4",
