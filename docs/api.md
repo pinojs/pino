@@ -508,6 +508,18 @@ when using the `transport` option. In this case an `Error` will be thrown.
 
 * See [pino.transport()](#pino-transport)
 
+#### `onChild` (Function)
+
+The `onChild` function is a callback that will be called on each creation of a new child and use the child instance as it's first argument.
+```js
+const parent = require('pino')({ onChild: (instance) => {
+  // Exceute call back code for each newly created child.
+}})
+// `onChild` will now be executed with the new child.
+parent.child(bindings)
+```
+
+
 <a id="destination"></a>
 ### `destination` (SonicBoom | WritableStream | String | Object)
 

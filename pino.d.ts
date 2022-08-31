@@ -80,6 +80,12 @@ interface LoggerExtras<Options = LoggerOptions> extends EventEmitter {
     child<ChildOptions extends pino.ChildLoggerOptions>(bindings: pino.Bindings, options?: ChildOptions): pino.Logger<Options & ChildOptions>;
 
     /**
+     * A callback that will run on each creation of a new child.
+     * @param child: The newly created child logger instance.
+     */
+    onChild<ChildOptions extends pino.ChildLoggerOptions>(child: pino.Logger<Options & ChildOptions>): void;
+
+    /**
      * Registers a listener function that is triggered when the level is changed.
      * Note: When browserified, this functionality will only be available if the `events` module has been required elsewhere
      * (e.g. if you're using streams in the browser). This allows for a trade-off between bundle size and functionality.
