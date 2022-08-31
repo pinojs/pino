@@ -340,3 +340,8 @@ cclog3.myLevel('')
 cclog3.childLevel('')
 // child itself
 cclog3.childLevel2('')
+
+const withChildCallback = pino({
+    onChild: (child: Logger) => {}
+})
+withChildCallback.onChild = (child: Logger) => {}

@@ -36,6 +36,12 @@ type MixinMergeStrategyFn = (mergeObject: object, mixinObject: object) => object
 
 type CustomLevelLogger<Options> = Options extends { customLevels: Record<string, number> } ? Record<keyof Options["customLevels"], LogFn> : Record<never, LogFn>
 
+/**
+* A callback that will run on each creation of a new child.
+* @param child: The newly created child logger instance.
+*/
+type OnChildCallback<Options = LoggerOptions> = <ChildOptions extends pino.ChildLoggerOptions>(child: pino.Logger<Options & ChildOptions>) => void
+
 interface redactOptions {
     paths: string[];
     censor?: string | ((value: any, path: string[]) => any);
@@ -80,10 +86,9 @@ interface LoggerExtras<Options = LoggerOptions> extends EventEmitter {
     child<ChildOptions extends pino.ChildLoggerOptions>(bindings: pino.Bindings, options?: ChildOptions): pino.Logger<Options & ChildOptions>;
 
     /**
-     * A callback that will run on each creation of a new child.
-     * @param child: The newly created child logger instance.
+     * This can be used to modify the callback function on creation of a new child.
      */
-    onChild<ChildOptions extends pino.ChildLoggerOptions>(child: pino.Logger<Options & ChildOptions>): void;
+    onChild: OnChildCallback<Options>;
 
     /**
      * Registers a listener function that is triggered when the level is changed.
@@ -607,6 +612,11 @@ declare namespace pino {
           * Stringification limit of properties/elements when logging a specific object/array with circular references. Default: `100`.
           */
           edgeLimit?: number
+
+        /**
+         * Optional child creation callback.
+         */
+        onChild?: OnChildCallback;
     }
 
     interface ChildLoggerOptions {
