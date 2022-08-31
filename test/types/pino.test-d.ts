@@ -108,6 +108,9 @@ pino({
 });
 
 pino({ base: null });
+
+pino({ browser: { disabled: true }});
+
 // @ts-expect-error
 if ("pino" in log) console.log(`pino version: ${log.pino}`);
 
