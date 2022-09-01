@@ -762,20 +762,6 @@ declare namespace pino {
         streamsArray: (DestinationStream | StreamEntry)[] | DestinationStream | StreamEntry,
         opts?: MultiStreamOptions
     ): MultiStreamRes
-
-    /**
-     * The pino.final method can be used to create an exit listener function.
-     * This listener function can be supplied to process exit events.
-     * The exit listener function will call the handler with
-     * @param [logger]: pino logger that serves as reference for the final logger
-     * @param [handler]: Function that will be called by the handler returned from this function
-     * @returns Exit listener function that can be supplied to process exit events and will call the supplied handler function
-     */
-    export function final(
-        logger: Logger,
-        handler: (error: Error, finalLogger: Logger, ...args: any[]) => void,
-    ): (error: Error | null, ...args: any[]) => void;
-    export function final(logger: Logger): Logger;
 }
 
 //// Callable default export
@@ -801,7 +787,6 @@ declare function pino<Options extends LoggerOptions>(options: Options, stream: D
 export const destination: typeof pino.destination;
 export const transport: typeof pino.transport;
 export const multistream: typeof pino.multistream;
-export const final: typeof pino.final;
 export const levels: typeof pino.levels;
 export const stdSerializers: typeof pino.stdSerializers;
 export const stdTimeFunctions: typeof pino.stdTimeFunctions;
