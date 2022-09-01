@@ -37,7 +37,7 @@ type MixinMergeStrategyFn = (mergeObject: object, mixinObject: object) => object
 type CustomLevelLogger<Options> = Options extends { customLevels: Record<string, number> } ? Record<keyof Options["customLevels"], LogFn> : Record<never, LogFn>
 
 /**
-* A callback that will run on each creation of a new child.
+* A synchronous callback that will run on each creation of a new child.
 * @param child: The newly created child logger instance.
 */
 type OnChildCallback<Options = LoggerOptions> = <ChildOptions extends pino.ChildLoggerOptions>(child: pino.Logger<Options & ChildOptions>) => void

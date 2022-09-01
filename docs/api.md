@@ -509,7 +509,7 @@ when using the `transport` option. In this case an `Error` will be thrown.
 
 #### `onChild` (Function)
 
-The `onChild` function is a callback that will be called on each creation of a new child, passing the child instance as its first argument.
+The `onChild` function is a synchronous callback that will be called on each creation of a new child, passing the child instance as its first argument.
 ```js
 const parent = require('pino')({ onChild: (instance) => {
   // Exceute call back code for each newly created child.
