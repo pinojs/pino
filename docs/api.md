@@ -24,7 +24,6 @@
 * [Statics](#statics)
   * [pino.destination()](#pino-destination)
   * [pino.transport()](#pino-transport)
-  * [pino.final()](#pino-final)
   * [pino.multistream()](#pino-multistream)
   * [pino.stdSerializers](#pino-stdserializers)
   * [pino.stdTimeFunctions](#pino-stdtimefunctions)
@@ -1149,59 +1148,6 @@ For more on transports, how they work, and how to create them see the [`Transpor
 * `worker`: [Worker thread](https://nodejs.org/api/worker_threads.html#worker_threads_new_worker_filename_options) configuration options. Additionally, the `worker` option supports `worker.autoEnd`. If this is set to `false` logs will not be flushed on process exit. It is then up to the developer to call `transport.end()` to flush logs.
 * `targets`: May be specified instead of `target`. Must be an array of transport configurations. Transport configurations include the aforementioned `options` and `target` options plus a `level` option which will send only logs above a specified level to a transport.
 * `pipeline`: May be specified instead of `target`. Must be an array of transport configurations. Transport configurations include the aforementioned `options` and `target` options. All intermediate steps in the pipeline _must_ be `Transform` streams and not `Writable`.
-
-<a id="pino-final"></a>
-
-### `pino.final(logger, [handler]) => Function | FinalLogger`
-
-__The use of `pino.final` is discouraged in Node.js v14+ and not required.
-It will be removed in the next major version.__
-
-The `pino.final` method can be used to acquire a final logger instance
-or create an exit listener function. This is _not_ needed in Node.js v14+
-as pino automatically can handle those.
-
-The `finalLogger` is a specialist logger that synchronously flushes
-on every write. This is important to guarantee final log writes,
-when using `pino.destination({ sync: false })` target.
-
-Since final log writes cannot be guaranteed with normal Node.js streams,
-if the `destination` parameter of the `logger` supplied to `pino.final`
-is a Node.js stream `pino.final` will throw.
-
-The use of `pino.final` with `pino.destination` is not needed, as
-`pino.destination` writes things synchronously.
-
-#### `pino.final(logger, handler) => Function`
-
-In this case the `pino.final` method supplies an exit listener function that can be
-supplied to process exit events such as `exit`, `uncaughtException`,
-`SIGHUP` and so on.
-
-The exit listener function will call the supplied `handler` function
-with an error object (or else `null`), a `finalLogger` instance followed
-by any additional arguments the `handler` may be called with.
-
-```js
-process.on('uncaughtException', pino.final(logger, (err, finalLogger) => {
-  finalLogger.error(err, 'uncaughtException')
-  process.exit(1)
-}))
-```
-
-#### `pino.final(logger) => FinalLogger`
-
-In this case the `pino.final` method returns a finalLogger instance.
-
-```js
-var finalLogger = pino.final(logger)
-finalLogger.info('exiting...')
-```
-
-* See [`destination` parameter](#destination)
-* See [Exit logging help](/docs/help.md#exit-logging)
-* See [Asynchronous logging ⇗](/docs/asynchronous.md)
-* See [Log loss prevention ⇗](/docs/asynchronous.md#log-loss-prevention)
 
 <a id="pino-multistream"></a>
 
