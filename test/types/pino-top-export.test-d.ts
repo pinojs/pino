@@ -3,7 +3,6 @@ import type { SonicBoom } from "sonic-boom";
 
 import {
     destination,
-    final,
     LevelMapping,
     levels,
     Logger,
@@ -20,7 +19,6 @@ import pino from "../../pino";
 
 expectType<SonicBoom>(destination(""));
 expectType<LevelMapping>(levels);
-expectType<Logger>(final(pino()));
 expectType<MultiStreamRes>(multistream(process.stdout));
 expectType<SerializedError>(stdSerializers.err({} as any));
 expectType<string>(stdTimeFunctions.isoTime());
