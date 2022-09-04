@@ -890,7 +890,7 @@ For full documentation of command line switches read the [README](https://github
 
 <a id="communication-between-pino-and-transport"></a>
 ## Communication between pino and transport
-Here we discuss some technical details of how pino communicates with its worker threads.
+Here we discuss some technical details of how pino communicates with its [worker threads](https://nodejs.org/api/worker_threads.html).
 
 pino uses [`thread-stream`](https://github.com/pinojs/thread-stream) to create a stream for transports.
 When we create a stream with `thread-stream`, `thread-stream` spawns a [worker](https://github.com/pinojs/thread-stream/blob/f19ac8dbd602837d2851e17fbc7dfc5bbc51083f/index.js#L50-L60) (an independent JS execution thread).
