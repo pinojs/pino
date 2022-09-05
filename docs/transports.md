@@ -887,3 +887,32 @@ $ node app.js | pino-websocket -a my-websocket-server.example.com -p 3004
 For full documentation of command line switches read the [README](https://github.com/abeai/pino-websocket#readme).
 
 [pino-pretty]: https://github.com/pinojs/pino-pretty
+
+<a id="communication-between-pino-and-transport"></a>
+## Communication between Pino and Transports
+Here we discuss some technical details of how Pino communicates with its [worker threads](https://nodejs.org/api/worker_threads.html).
+
+Pino uses [`thread-stream`](https://github.com/pinojs/thread-stream) to create a stream for transports.
+When we create a stream with `thread-stream`, `thread-stream` spawns a [worker](https://github.com/pinojs/thread-stream/blob/f19ac8dbd602837d2851e17fbc7dfc5bbc51083f/index.js#L50-L60) (an independent JavaScript execution thread).
+
+
+### Error messages
+How are error messages propagated from a transport worker to Pino?
+
+Let's assume we have a transport with an error listener:
+```js
+// index.js
+const transport = pino.transport({
+  target: './transport.js'
+})
+
+transport.on('error', err => {
+  console.error('error caught', err)
+})
+
+const log = pino(transport)
+```
+
+When our worker emits an error event, the worker has listeners for it: [error](https://github.com/pinojs/thread-stream/blob/f19ac8dbd602837d2851e17fbc7dfc5bbc51083f/lib/worker.js#L59-L70) and [unhandledRejection](https://github.com/pinojs/thread-stream/blob/f19ac8dbd602837d2851e17fbc7dfc5bbc51083f/lib/worker.js#L135-L141). These listeners send the error message to the main thread where Pino is present.
+
+When Pino receives the error message, it further [emits](https://github.com/pinojs/thread-stream/blob/f19ac8dbd602837d2851e17fbc7dfc5bbc51083f/index.js#L349) the error message. Finally, the error message arrives at our `index.js` and is caught by our error listener.
