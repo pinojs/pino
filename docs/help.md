@@ -12,7 +12,6 @@
 * [Unicode and Windows terminal](#windows)
 * [Mapping Pino Log Levels to Google Cloud Logging (Stackdriver) Severity Levels](#stackdriver)
 * [Avoid Message Conflict](#avoid-message-conflict)
-* [Exit logging](#exit-logging)
 
 <a id="rotate"></a>
 ## Log rotation
