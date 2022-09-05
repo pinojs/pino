@@ -898,6 +898,7 @@ When we create a stream with `thread-stream`, `thread-stream` spawns a [worker](
 
 ### Error messages
 How are error messages propagated from a transport worker to Pino?
+
 Let's assume we have a transport with an error listener:
 ```js
 // index.js
