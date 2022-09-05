@@ -88,7 +88,7 @@
     "fastbench": "^1.0.1",
     "flush-write-stream": "^2.0.0",
     "import-fresh": "^3.2.1",
-    "jest": "^28.1.0",
+    "jest": "^29.0.2",
     "log": "^6.0.0",
     "loglevel": "^1.6.7",
     "pino-pretty": "^9.0.0",
