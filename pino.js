@@ -102,7 +102,8 @@ function pino (...args) {
     formatters,
     hooks,
     depthLimit,
-    edgeLimit
+    edgeLimit,
+    onChild
   } = opts
 
   const stringifySafe = configure({
@@ -175,7 +176,8 @@ function pino (...args) {
     [chindingsSym]: chindings,
     [formattersSym]: allFormatters,
     [hooksSym]: hooks,
-    silent: noop
+    silent: noop,
+    onChild
   })
 
   Object.setPrototypeOf(instance, proto())

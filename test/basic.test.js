@@ -725,3 +725,13 @@ test('throws if prettyPrint is passed in as an option', async (t) => {
     })
   }, new Error('prettyPrint option is no longer supported, see the pino-pretty package (https://github.com/pinojs/pino-pretty)'))
 })
+
+test('Should invoke `onChild` with the newly created child', async ({ equal }) => {
+  let innerChild
+  const child = pino({
+    onChild: (instance) => {
+      innerChild = instance
+    }
+  }).child({ foo: 'bar' })
+  equal(child, innerChild)
+})
