@@ -1,6 +1,6 @@
 # Browser API
 
-Pino is compatible with [`browserify`](https://npm.im/browserify) for browser side usage:
+Pino is compatible with [`browserify`](https://npm.im/browserify) for browser-side usage:
 
 This can be useful with isomorphic/universal JavaScript code.
 
@@ -101,7 +101,7 @@ pino.info({custom: 'a', another: 'b'})
 ```
 
 When `serialize` is `true` the standard error serializer is also enabled (see https://github.com/pinojs/pino/blob/master/docs/api.md#stdSerializers).
-This is a global serializer which will apply to any `Error` objects passed to the logger methods.
+This is a global serializer, which will apply to any `Error` objects passed to the logger methods.
 
 If `serialize` is an array the standard error serializer is also automatically enabled, it can
 be explicitly disabled by including a string in the serialize array: `!stdSerializers.err`, like so:
@@ -141,7 +141,7 @@ message and a `logEvent` object.
 
 The `logEvent` object is a data structure representing a log message, it represents
 the arguments passed to a logger statement, the level
-at which they were logged and the hierarchy of child bindings.
+at which they were logged, and the hierarchy of child bindings.
 
 The `logEvent` format is structured like so:
 
@@ -154,25 +154,25 @@ The `logEvent` format is structured like so:
 }
 ```
 
-The `ts` property is a unix epoch timestamp in milliseconds, the time is taken from the moment the
+The `ts` property is a Unix epoch timestamp in milliseconds, the time is taken from the moment the
 logger method is called.
 
 The `messages` array is all arguments passed to logger method, (for instance `logger.info('a', 'b', 'c')`
 would result in `messages` array `['a', 'b', 'c']`).
 
 The `bindings` array represents each child logger (if any), and the relevant bindings.
-For instance given `logger.child({a: 1}).child({b: 2}).info({c: 3})`, the bindings array
+For instance, given `logger.child({a: 1}).child({b: 2}).info({c: 3})`, the bindings array
 would hold `[{a: 1}, {b: 2}]` and the `messages` array would be `[{c: 3}]`. The `bindings`
 are ordered according to their position in the child logger hierarchy, with the lowest index
 being the top of the hierarchy.
 
-By default serializers are not applied to log output in the browser, but they will *always* be
+By default, serializers are not applied to log output in the browser, but they will *always* be
 applied to `messages` and `bindings` in the `logEvent` object. This allows us to ensure a consistent
 format for all values between server and client.
 
 The `level` holds the label (for instance `info`), and the corresponding numerical value
-(for instance `30`). This could be important in cases where client side level values and
-labels differ from server side.
+(for instance `30`). This could be important in cases where client-side level values and
+labels differ from server-side.
 
 The point of the `send` function is to remotely record log messages:
 
@@ -184,7 +184,7 @@ const pino = require('pino')({
       send: function (level, logEvent) {
         if (level === 'warn') {
           // maybe send the logEvent to a separate endpoint
-          // or maybe analyse the messages further before sending
+          // or maybe analyze the messages further before sending
         }
         // we could also use the `logEvent.level.value` property to determine
         // numerical value
@@ -205,4 +205,4 @@ const pino = require('pino')({browser: {disabled: true}})
 ```
 
 The `disabled` option will disable logging in browser if set
-to `true`. Default is set to `false`.
+to `true`, by default it is set to `false`.
