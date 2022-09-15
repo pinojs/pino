@@ -600,7 +600,7 @@ declare namespace pino {
              * log method and method is the log method itself, and level is the log level. This hook must invoke the method function by
              * using apply, like so: method.apply(this, newArgumentsArray).
              */
-            logMethod?: (args: any[], method: LogFn, level: number) => void;
+            logMethod?: (this: Logger, args: any[], method: LogFn, level: number) => void;
         };
 
         /**
