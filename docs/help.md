@@ -47,9 +47,9 @@ help.
 <a id="reopening"></a>
 ## Reopening log files
 
-In cases where a log rotation tool doesn't offer a copy-truncate capabilities,
+In cases where a log rotation tool doesn't offer copy-truncate capabilities,
 or where using them is deemed inappropriate, `pino.destination`
-is able to reopen file paths after a file has been moved away.
+can reopen file paths after a file has been moved away.
 
 One way to use this is to set up a `SIGUSR2` or `SIGHUP` signal handler that
 reopens the log file destination, making sure to write the process PID out
@@ -124,7 +124,7 @@ Pino's default log destination is the singular destination of `stdout`. While
 not recommended for performance reasons, multiple destinations can be targeted
 by using [`pino.multistream`](/doc/api.md#pino-multistream).
 
-In this example we use `stderr` for `error` level logs and `stdout` as default
+In this example, we use `stderr` for `error` level logs and `stdout` as default
 for all other levels (e.g. `debug`, `info`, and `warn`).
 
 ```js
@@ -155,7 +155,7 @@ for information on this is handled.
 Pino log lines are meant to be parseable. Thus, Pino's default mode of operation
 is to print the level value instead of the string name. 
 However, you can use the [`formatters`](/docs/api.md#formatters-object) option 
-with a [`level`](/docs/api.md#level) function to print the string name instead the level value :
+with a [`level`](/docs/api.md#level) function to print the string name instead of the level value :
 
 ```js
 const pino = require('pino')
@@ -175,7 +175,7 @@ log.info('message')
 // {"level":"info","time":1661632832200,"pid":18188,"hostname":"foo","msg":"message"}
 ```
 
-Although it is works, we recommend using one of these options instead if you are able:
+Although it works, we recommend using one of these options instead if you are able:
 
 1. If the only change desired is the name then a transport can be used. One such
 transport is [`pino-text-level-transport`](https://npm.im/pino-text-level-transport).
@@ -202,7 +202,7 @@ $ npm i pino-debug
 $ DEBUG=* node -r pino-debug app.js
 ```
 
-[`pino-debug`](https://github.com/pinojs/pino-debug) also offers fine grain control to map specific `debug`
+[`pino-debug`](https://github.com/pinojs/pino-debug) also offers fine-grain control to map specific `debug`
 namespaces to `pino` log levels. See [`pino-debug`](https://github.com/pinojs/pino-debug)
 for more.
 
@@ -211,8 +211,8 @@ for more.
 
 Pino uses [sonic-boom](https://github.com/mcollina/sonic-boom) to speed
 up logging. Internally, it uses [`fs.write`](https://nodejs.org/dist/latest-v10.x/docs/api/fs.html#fs_fs_write_fd_string_position_encoding_callback) to write log lines directly to a file
-descriptor. On Windows, unicode output is not handled properly in the
-terminal (both `cmd.exe` and powershell), and as such the output could
+descriptor. On Windows, Unicode output is not handled properly in the
+terminal (both `cmd.exe` and PowerShell), and as such the output could
 be visualized incorrectly if the log lines include utf8 characters. It
 is possible to configure the terminal to visualize those characters
 correctly with the use of [`chcp`](https://ss64.com/nt/chcp.html) by
@@ -222,7 +222,7 @@ Node.js.
 <a id="stackdriver"></a>
 ## Mapping Pino Log Levels to Google Cloud Logging (Stackdriver) Severity Levels
 
-Google Cloud Logging uses `severity` levels instead log levels. As a result, all logs may show as INFO
+Google Cloud Logging uses `severity` levels instead of log levels. As a result, all logs may show as INFO
 level logs while completely ignoring the level set in the pino log. Google Cloud Logging also prefers that
 log data is present inside a `message` key instead of the default `msg` key that Pino uses. Use a technique
 similar to the one below to retain log levels in Google Cloud Logging
