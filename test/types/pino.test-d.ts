@@ -1,7 +1,7 @@
 import P, { pino } from "../../";
 import { IncomingMessage, ServerResponse } from "http";
 import { Socket } from "net";
-import { expectError } from 'tsd'
+import { expectError, expectType } from 'tsd'
 import Logger = P.Logger;
 
 const log = pino();
@@ -229,6 +229,7 @@ const withNestedKey = pino({
 const withHooks = pino({
     hooks: {
         logMethod(args, method, level) {
+            expectType<pino.Logger>(this);
             return method.apply(this, ['msg', ...args]);
         },
     },
