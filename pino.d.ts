@@ -586,7 +586,7 @@ declare namespace pino {
              * All arguments passed to the log method, except the message, will be pass to this function.
              * By default it does not change the shape of the log object.
              */
-            log?: (object: object) => object;
+            log?: (object: Record<string, unknown>) => Record<string, unknown>;
         };
 
         /**
