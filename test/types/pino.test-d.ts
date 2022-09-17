@@ -230,7 +230,7 @@ const withHooks = pino({
     hooks: {
         logMethod(args, method, level) {
             expectType<pino.Logger>(this);
-            return method.apply(this, ['msg', ...args]);
+            return method.apply(this, args);
         },
     },
 });
