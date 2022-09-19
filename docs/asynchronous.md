@@ -1,6 +1,6 @@
 # Asynchronous Logging
 
-In essence, asynchronous logging enables the minimum overhead of Pino.
+Asynchronous logging enables the minimum overhead of Pino.
 Asynchronous logging works by buffering log messages and writing them in larger chunks.
 
 ```js
@@ -13,16 +13,16 @@ const logger = pino(pino.destination({
 ```
 
 It's always possible to turn on synchronous logging by passing `sync: true`. 
-In this mode of operation log messages are directly written to the
-output stream, as the messages are generated with a _blocking_ operation.
+In this mode of operation, log messages are directly written to the
+output stream as the messages are generated with a _blocking_ operation.
 
 * See [`pino.destination`](/docs/api.md#pino-destination)
 * `pino.destination` is implemented on [`sonic-boom` ⇗](https://github.com/mcollina/sonic-boom).
 
 ### AWS Lambda
 
-Asynchronous logging is disabled by default on AWS Lambda, or any other environment
-that modifies `process.stdout`. If forcefully turned on, we recommend to call `dest.flushSync()` at the end
+Asynchronous logging is disabled by default on AWS Lambda or any other environment
+that modifies `process.stdout`. If forcefully turned on, we recommend calling `dest.flushSync()` at the end
 of each function execution to avoid losing data.
 
 ## Caveats
@@ -36,5 +36,5 @@ Asynchronous logging has a couple of important caveats:
 
 See also:
 
-* [`pino.destination` api](/docs/api.md#pino-destination)
+* [`pino.destination` API](/docs/api.md#pino-destination)
 * [`destination` parameter](/docs/api.md#destination)

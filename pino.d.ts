@@ -586,7 +586,7 @@ declare namespace pino {
              * All arguments passed to the log method, except the message, will be pass to this function.
              * By default it does not change the shape of the log object.
              */
-            log?: (object: object) => object;
+            log?: (object: Record<string, unknown>) => Record<string, unknown>;
         };
 
         /**
@@ -600,7 +600,7 @@ declare namespace pino {
              * log method and method is the log method itself, and level is the log level. This hook must invoke the method function by
              * using apply, like so: method.apply(this, newArgumentsArray).
              */
-            logMethod?: (args: any[], method: LogFn, level: number) => void;
+            logMethod?: (this: Logger, args: Parameters<LogFn>, method: LogFn, level: number) => void;
         };
 
         /**

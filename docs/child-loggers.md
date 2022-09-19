@@ -50,7 +50,7 @@ benchPinoExtremeChildChild*10000: 127.753ms
 
 ## Duplicate keys caveat
 
-It's possible for naming conflicts to arise between child loggers and
+Naming conflicts can arise between child loggers and
 children of child loggers.
 
 This isn't as bad as it sounds, even if the same keys between
@@ -71,10 +71,10 @@ $ cat my-log
 {"pid":95469,"hostname":"MacBook-Pro-3.home","level":30,"msg":"howdy","time":1459534114473,"a":"property","a":"prop"}
 ```
 
-Notice how there's two key's named `a` in the JSON output. The sub-childs properties
+Notice how there are two keys named `a` in the JSON output. The sub-childs properties
 appear after the parent child properties.
 
-At some point the logs will most likely be processed (for instance with a [transport](transports.md)),
+At some point, the logs will most likely be processed (for instance with a [transport](transports.md)),
 and this generally involves parsing. `JSON.parse` will return an object where the conflicting
 namespace holds the final value assigned to it:
 
@@ -92,4 +92,4 @@ in light of an expected log processing approach.
 
 One of Pino's performance tricks is to avoid building objects and stringifying
 them, so we're building strings instead. This is why duplicate keys between
-parents and children will end up in log output.
+parents and children will end up in the log output.

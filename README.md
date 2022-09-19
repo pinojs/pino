@@ -72,10 +72,10 @@ format logs during development:
 ### Transports & Log Processing
 
 Due to Node's single-threaded event-loop, it's highly recommended that sending,
-alert triggering, reformatting and all forms of log processing
-be conducted in a separate process or thread.
+alert triggering, reformatting, and all forms of log processing
+are conducted in a separate process or thread.
 
-In Pino terminology we call all log processors "transports", and recommend that the
+In Pino terminology, we call all log processors "transports" and recommend that the
 transports be run in a worker thread using our `pino.transport` API.
 
 For more details see our [Transports⇗](docs/transports.md) document.
@@ -92,9 +92,9 @@ See the [Benchmarks](docs/benchmarks.md) document for comparisons.
 
 ### Bundling support
 
-Pino supports to being bundled using tools like webpack or esbuild. 
+Pino supports being bundled using tools like webpack or esbuild. 
 
-See [Bundling](docs/bundling.md) document for more informations.
+See [Bundling](docs/bundling.md) document for more information.
 
 <a name="team"></a>
 ## The Team
@@ -139,8 +139,8 @@ Pino is an **OPEN Open Source Project**. This means that:
 
 See the [CONTRIBUTING.md](https://github.com/pinojs/pino/blob/master/CONTRIBUTING.md) file for more details.
 
-<a name="acknowledgements"></a>
-## Acknowledgements
+<a name="acknowledgments"></a>
+## Acknowledgments
 
 This project was kindly sponsored by [nearForm](https://nearform.com).
 

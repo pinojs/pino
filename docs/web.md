@@ -1,6 +1,6 @@
 # Web Frameworks
 
-Since HTTP logging is a primary use case, Pino has first class support for the Node.js
+Since HTTP logging is a primary use case, Pino has first-class support for the Node.js
 web framework ecosystem.
 
 - [Web Frameworks](#web-frameworks)
@@ -18,7 +18,7 @@ web framework ecosystem.
 
 The Fastify web framework comes bundled with Pino by default, simply set Fastify's
 `logger` option to `true` and use `request.log` or `reply.log` for log messages that correspond
-to each individual request:
+to each request:
 
 ```js
 const fastify = require('fastify')({
@@ -84,7 +84,7 @@ async function start () {
     method: 'GET',
     path: '/',
     handler: async function (request, h) {
-      // request.log is HAPI standard way of logging
+      // request.log is HAPI's standard way of logging
       request.log(['a', 'b'], 'Request into hello world')
 
       // a pino instance can also be used, which will be faster
