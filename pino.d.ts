@@ -273,6 +273,19 @@ declare namespace pino {
     interface DestinationStream {
         write(msg: string): void;
     }
+    
+    const metadata = Symbol.for("pino.metadata");
+
+    interface DestinationStreamHasMetadata {
+      [metadata]: true;
+      lastLevel: number;
+      lastTime: string;
+      lastMsg: string;
+      lastObj: object;
+      lastLogger: pino.Logger;
+    }
+
+     type DestinationStreamMetadata = { [metadata]?: boolean } | DestinationStreamHasMetadata;
 
     interface StreamEntry {
         stream: DestinationStream
@@ -795,6 +808,7 @@ export const version: typeof pino.version;
 
 // Types
 export type Bindings = pino.Bindings;
+export type DestinationStreamMetadata = pino.DestinationStreamMetadata;
 export type Level = pino.Level;
 export type LevelWithSilent = pino.LevelWithSilent;
 export type LevelChangeEventListener = pino.LevelChangeEventListener;
