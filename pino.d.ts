@@ -283,7 +283,7 @@ declare namespace pino {
       lastLogger: pino.Logger;
     }
 
-    type DestinationStreamWithMetadata = (DestinationStream & { [symbols.needsMetadataGsym]?: false }) | DestinationStreamHasMetadata;
+    type DestinationStreamWithMetadata = DestinationStream & ({ [symbols.needsMetadataGsym]?: false } | DestinationStreamHasMetadata);
 
     interface StreamEntry {
         stream: DestinationStream
