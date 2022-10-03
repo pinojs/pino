@@ -43,7 +43,7 @@ in a MongoDB database.
 + [`pino-noir`](https://github.com/pinojs/pino-noir): redact sensitive information
 in logs.
 + [`pino-pretty`](https://github.com/pinojs/pino-pretty): basic prettifier to
-make log lines human readable.
+make log lines human-readable.
 + [`pino-socket`](https://github.com/pinojs/pino-socket): send logs to TCP or UDP
 destinations.
 + [`pino-std-serializers`](https://github.com/pinojs/pino-std-serializers): the
@@ -64,7 +64,7 @@ the logger for the [Rill framework](https://rill.site/).
 
 + [`pino-colada`](https://github.com/lrlna/pino-colada): cute ndjson formatter for pino.
 + [`pino-fluentd`](https://github.com/davidedantonio/pino-fluentd): send Pino logs to Elasticsearch,
-MongoDB and many [others](https://www.fluentd.org/dataoutputs) via Fluentd.
+MongoDB, and many [others](https://www.fluentd.org/dataoutputs) via Fluentd.
 + [`pino-pretty-min`](https://github.com/unjello/pino-pretty-min): a minimal
 prettifier inspired by the [logrus](https://github.com/sirupsen/logrus) logger.
 + [`pino-rotating-file`](https://github.com/homeaway/pino-rotating-file): a hapi-pino log transport for splitting logs into separate, automatically rotating files.
@@ -73,3 +73,4 @@ prettifier inspired by the [logrus](https://github.com/sirupsen/logrus) logger.
 + [`pino-dev`](https://github.com/dnjstrom/pino-dev): simple prettifier for pino with built-in support for common ecosystem packages.
 + [`@newrelic/pino-enricher`](https://github.com/newrelic/newrelic-node-log-extensions/blob/main/packages/pino-log-enricher): a log customization to add New Relic context to use [Logs In Context](https://docs.newrelic.com/docs/logs/logs-context/logs-in-context/)
 + [`pino-lambda`](https://github.com/FormidableLabs/pino-lambda): log transport for cloudwatch support inside aws-lambda 
++ [`cloud-pine`](https://github.com/metcoder95/cloud-pine): transport that provides abstraction and compatibility with [`@google-cloud/logging`](https://www.npmjs.com/package/@google-cloud/logging).

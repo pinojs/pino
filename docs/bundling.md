@@ -2,7 +2,7 @@
 
 Due to its internal architecture based on Worker Threads, it is not possible to bundle Pino *without* generating additional files.
 
-In particular, a bundler must ensure that the following files are also bundle separately:
+In particular, a bundler must ensure that the following files are also bundled separately:
 
 * `lib/worker.js` from the `thread-stream` dependency
 * `file.js`
@@ -10,9 +10,9 @@ In particular, a bundler must ensure that the following files are also bundle se
 * `lib/worker-pipeline.js`
 * Any transport used by the user (like `pino-pretty`)
 
-Once the files above have been generated, the bundler must also add information about the files above by injecting a code which sets `__bundlerPathsOverrides` in the `globalThis` object.
+Once the files above have been generated, the bundler must also add information about the files above by injecting a code that sets `__bundlerPathsOverrides` in the `globalThis` object.
 
-The variable is a object whose keys are identifier for the files and the values are the paths of files relative to the currently bundle files.
+The variable is an object whose keys are an identifier for the files and the values are the paths of files relative to the currently bundle files.
 
 Example:
 
@@ -27,7 +27,7 @@ globalThis.__bundlerPathsOverrides = {
 };
 ```
 
-Note that `pino/file`, `pino-worker`, `pino-pipeline-worker` and `thread-stream-worker` are required identifiers. Other identifiers are possible based on the user configuration.
+Note that `pino/file`, `pino-worker`, `pino-pipeline-worker`, and `thread-stream-worker` are required identifiers. Other identifiers are possible based on the user configuration.
 
 ## Webpack Plugin
 

@@ -24,7 +24,6 @@
 * [Statics](#statics)
   * [pino.destination()](#pino-destination)
   * [pino.transport()](#pino-transport)
-  * [pino.final()](#pino-final)
   * [pino.multistream()](#pino-multistream)
   * [pino.stdSerializers](#pino-stdserializers)
   * [pino.stdTimeFunctions](#pino-stdtimefunctions)
@@ -41,7 +40,7 @@
 ## `pino([options], [destination]) => logger`
 
 The exported `pino` function takes two optional arguments,
-[`options`](#options) and [`destination`](#destination) and
+[`options`](#options) and [`destination`](#destination), and
 returns a [logger instance](#logger).
 
 <a id=options></a>
@@ -71,7 +70,7 @@ Additional levels can be added to the instance via the `customLevels` option.
 Default: `undefined`
 
 Use this option to define additional logging levels.
-The keys of the object correspond the namespace of the log level,
+The keys of the object correspond to the namespace of the log level,
 and the values should be the numerical value of the level.
 
 ```js
@@ -89,7 +88,7 @@ logger.foo('hi')
 Default: `false`
 
 Use this option to only use defined `customLevels` and omit Pino's levels.
-Logger's default `level` must be changed to a value in `customLevels` in order to use `useOnlyCustomLevels`
+Logger's default `level` must be changed to a value in `customLevels` to use `useOnlyCustomLevels`
 Warning: this option may not be supported by downstream transports.
 
 ```js
@@ -101,13 +100,13 @@ const logger = pino({
   level: 'foo'
 })
 logger.foo('hi')
-logger.info('hello') // Will throw an error saying info in not found in logger object
+logger.info('hello') // Will throw an error saying info is not found in logger object
 ```
 #### `depthLimit` (Number)
 
 Default: `5`
 
-Option to limit stringification at a specific nesting depth when logging circular object.
+Option to limit stringification at a specific nesting depth when logging circular objects.
 
 #### `edgeLimit` (Number)
 
@@ -267,11 +266,11 @@ Default: `undefined`
 As an array, the `redact` option specifies paths that should
 have their values redacted from any log output.
 
-Each path must be a string using a syntax which corresponds to JavaScript dot and bracket notation.
+Each path must be a string using a syntax that corresponds to JavaScript dot and bracket notation.
 
 If an object is supplied, three options can be specified:
   * `paths` (array): Required. An array of paths. See [redaction - Path Syntax ⇗](/docs/redaction.md#paths) for specifics.
-  * `censor` (String|Function|Undefined): Optional. When supplied as a String the `censor` option will overwrite keys which are to be redacted. When set to `undefined` the key will be removed entirely from the object.
+  * `censor` (String|Function|Undefined): Optional. When supplied as a String the `censor` option will overwrite keys that are to be redacted. When set to `undefined` the key will be removed entirely from the object.
     The `censor` option may also be a mapping function. The (synchronous) mapping function has the signature `(value, path) => redactedValue` and is called with the unredacted `value` and `path` to the key being redacted, as an array. For example given a redaction path of `a.b.c` the `path` argument would be `['a', 'b', 'c']`. The value returned from the mapping function becomes the applied censor value. Default: `'[Redacted]'`
     value synchronously.
     Default: `'[Redacted]'`
@@ -357,7 +356,7 @@ const formatters = {
 
 Changes the shape of the log object. This function will be called every time
 one of the log methods (such as `.info`) is called. All arguments passed to the
-log method, except the message, will be pass to this function. By default it does
+log method, except the message, will be passed to this function. By default, it does
 not change the shape of the log object.
 
 ```js
@@ -381,6 +380,7 @@ matching the exact key of a serializer will be serialized using the defined seri
 The serializers are applied when a property in the logged object matches a property
 in the serializers. The only exception is the `err` serializer as it is also applied in case
 the object is an instance of `Error`, e.g. `logger.info(new Error('kaboom'))`.
+See `errorKey` option to change `err` namespace.
 
 * See [pino.stdSerializers](#pino-stdserializers)
 
@@ -433,6 +433,13 @@ timestamp: () => `,"time":"${new Date(Date.now()).toISOString()}"`
 Default: `'msg'`
 
 The string key for the 'message' in the JSON object.
+
+<a id=opt-messagekey></a>
+#### `errorKey` (String)
+
+Default: `'err'`
+
+The string key for the 'error' in the JSON object.
 
 <a id=opt-nestedkey></a>
 #### `nestedKey` (String)
@@ -496,9 +503,22 @@ pino({ transport: {}}, '/path/to/somewhere') // THIS WILL NOT WORK, DO NOT DO TH
 pino({ transport: {}}, process.stderr) // THIS WILL NOT WORK, DO NOT DO THIS
 ```
 
-when using the `transport` option. In this case an `Error` will be thrown.
+when using the `transport` option. In this case, an `Error` will be thrown.
 
 * See [pino.transport()](#pino-transport)
+
+#### `onChild` (Function)
+
+The `onChild` function is a synchronous callback that will be called on each creation of a new child, passing the child instance as its first argument.  
+Any error thrown inside the callback will be uncaught and should be handled inside the callback.
+```js
+const parent = require('pino')({ onChild: (instance) => {
+  // Execute call back code for each newly created child.
+}})
+// `onChild` will now be executed with the new child.
+parent.child(bindings)
+```
+
 
 <a id="destination"></a>
 ### `destination` (SonicBoom | WritableStream | String | Object)
@@ -547,7 +567,7 @@ path, e.g. `/tmp/1`.
 Default: `false`
 
 Using the global symbol `Symbol.for('pino.metadata')` as a key on the `destination` parameter and
-setting the key it to `true`, indicates that the following properties should be
+setting the key to `true`, indicates that the following properties should be
 set on the `destination` object after each log line is written:
 
 * the last logging level as `destination.lastLevel`
@@ -593,7 +613,7 @@ The parameters are explained below using the `logger.info` method but the same a
 #### `mergingObject` (Object)
 
 An object can optionally be supplied as the first parameter. Each enumerable key and value
-of the `mergingObject` is copied in to the JSON log line.
+of the `mergingObject` is copied into the JSON log line.
 
 ```js
 logger.info({MIX: {IN: true}})
@@ -602,6 +622,9 @@ logger.info({MIX: {IN: true}})
 
 If the object is of type Error, it is wrapped in an object containing a property err (`{ err: mergingObject }`).
 This allows for a unified error handling flow.
+
+Options `serializers` and `errorKey` could be used at instantiation time to change the namespace
+from `err` to another string as preferred.
 
 <a id="message"></a>
 #### `message` (String)
@@ -625,7 +648,7 @@ See [Avoid Message Conflict](/docs/help.md#avoid-message-conflict) for informati
 on how to overcome this limitation.
 
 If no `message` parameter is provided, and the `mergingObject` is of type `Error` or it has a property named `err`, the
-`message` parameter is set to the `message` value of the error.
+`message` parameter is set to the `message` value of the error. See option `errorKey` if you want to change the namespace.
 
 The `messageKey` option can be used at instantiation time to change the namespace
 from `msg` to another string as preferred.
@@ -635,7 +658,7 @@ the following placeholders:
 
 * `%s` – string placeholder
 * `%d` – digit placeholder
-* `%O`, `%o` and `%j` – object placeholder
+* `%O`, `%o`, and `%j` – object placeholder
 
 Values supplied as additional arguments to the logger method will
 then be interpolated accordingly.
@@ -688,6 +711,9 @@ const logger = pino(pinoOptions)
 #### Errors
 
 Errors can be supplied as either the first parameter or if already using `mergingObject` then as the `err` property on the `mergingObject`.
+
+Options `serializers` and `errorKey` could be used at instantiation time to change the namespace
+from `err` to another string as preferred.
 
 > ## Note
 > This section describes the default configuration. The error serializer can be
@@ -750,7 +776,7 @@ Write a `'error'` level log, if the configured `level` allows for it.
 
 Write a `'fatal'` level log, if the configured `level` allows for it.
 
-Since `'fatal'` level messages are intended to be logged just prior to the process exiting the `fatal`
+Since `'fatal'` level messages are intended to be logged just before the process exiting the `fatal`
 method will always sync flush the destination.
 Therefore it's important not to misuse `fatal` since
 it will cause performance overhead if used for any
@@ -806,7 +832,7 @@ Options for child logger. These options will override the parent logger options.
 ##### `options.level` (String)
 
 The `level` property overrides the log level of the child logger.
-By default the parent log level is inherited.
+By default, the parent log level is inherited.
 After the creation of the child logger, it is also accessible using the [`logger.level`](#logger-level) key.
 
 ```js
@@ -895,9 +921,9 @@ The core levels and their values are as follows:
 
 The logging level is a *minimum* level based on the associated value of that level.
 
-For instance if `logger.level` is `info` *(30)* then `info` *(30)*, `warn` *(40)*, `error` *(50)* and `fatal` *(60)* log methods will be enabled but the `trace` *(10)* and `debug` *(20)* methods, being less than 30, will not.
+For instance if `logger.level` is `info` *(30)* then `info` *(30)*, `warn` *(40)*, `error` *(50)*, and `fatal` *(60)* log methods will be enabled but the `trace` *(10)* and `debug` *(20)* methods, being less than 30, will not.
 
-The `silent` logging level is a specialized level which will disable all logging,
+The `silent` logging level is a specialized level that will disable all logging,
 the `silent` log method is a noop function.
 
 <a id="islevelenabled"></a>
@@ -968,7 +994,7 @@ $ node -p "require('pino')().levels"
 ### logger\[Symbol.for('pino.serializers')\]
 
 Returns the serializers as applied to the current logger instance. If a child logger did not
-register it's own serializer upon instantiation the serializers of the parent will be returned.
+register its own serializer upon instantiation the serializers of the parent will be returned.
 
 <a id="level-change"></a>
 ### Event: 'level-change'
@@ -1053,7 +1079,7 @@ A `pino.destination` instance can also be used to reopen closed files
 <a id="pino-transport"></a>
 ### `pino.transport(options) => ThreadStream`
 
-Create a a stream that routes logs to a worker thread that
+Create a stream that routes logs to a worker thread that
 wraps around a [Pino Transport](/docs/transports.md).
 
 ```js
@@ -1096,7 +1122,7 @@ const transport = pino.transport({
 pino(transport)
 ```
 
-If `WeakRef`, `WeakMap` and `FinalizationRegistry` are available in the current runtime (v14.5.0+), then the thread
+If `WeakRef`, `WeakMap`, and `FinalizationRegistry` are available in the current runtime (v14.5.0+), then the thread
 will be automatically terminated in case the stream or logger goes out of scope.
 The `transport()` function adds a listener to `process.on('beforeExit')` and `process.on('exit')` to ensure the worker
 is flushed and all data synced before the process exits.
@@ -1135,59 +1161,6 @@ For more on transports, how they work, and how to create them see the [`Transpor
 * `worker`: [Worker thread](https://nodejs.org/api/worker_threads.html#worker_threads_new_worker_filename_options) configuration options. Additionally, the `worker` option supports `worker.autoEnd`. If this is set to `false` logs will not be flushed on process exit. It is then up to the developer to call `transport.end()` to flush logs.
 * `targets`: May be specified instead of `target`. Must be an array of transport configurations. Transport configurations include the aforementioned `options` and `target` options plus a `level` option which will send only logs above a specified level to a transport.
 * `pipeline`: May be specified instead of `target`. Must be an array of transport configurations. Transport configurations include the aforementioned `options` and `target` options. All intermediate steps in the pipeline _must_ be `Transform` streams and not `Writable`.
-
-<a id="pino-final"></a>
-
-### `pino.final(logger, [handler]) => Function | FinalLogger`
-
-__The use of `pino.final` is discouraged in Node.js v14+ and not required.
-It will be removed in the next major version.__
-
-The `pino.final` method can be used to acquire a final logger instance
-or create an exit listener function. This is _not_ needed in Node.js v14+
-as pino automatically can handle those.
-
-The `finalLogger` is a specialist logger that synchronously flushes
-on every write. This is important to guarantee final log writes,
-when using `pino.destination({ sync: false })` target.
-
-Since final log writes cannot be guaranteed with normal Node.js streams,
-if the `destination` parameter of the `logger` supplied to `pino.final`
-is a Node.js stream `pino.final` will throw.
-
-The use of `pino.final` with `pino.destination` is not needed, as
-`pino.destination` writes things synchronously.
-
-#### `pino.final(logger, handler) => Function`
-
-In this case the `pino.final` method supplies an exit listener function that can be
-supplied to process exit events such as `exit`, `uncaughtException`,
-`SIGHUP` and so on.
-
-The exit listener function will call the supplied `handler` function
-with an error object (or else `null`), a `finalLogger` instance followed
-by any additional arguments the `handler` may be called with.
-
-```js
-process.on('uncaughtException', pino.final(logger, (err, finalLogger) => {
-  finalLogger.error(err, 'uncaughtException')
-  process.exit(1)
-}))
-```
-
-#### `pino.final(logger) => FinalLogger`
-
-In this case the `pino.final` method returns a finalLogger instance.
-
-```js
-var finalLogger = pino.final(logger)
-finalLogger.info('exiting...')
-```
-
-* See [`destination` parameter](#destination)
-* See [Exit logging help](/docs/help.md#exit-logging)
-* See [Asynchronous logging ⇗](/docs/asynchronous.md)
-* See [Log loss prevention ⇗](/docs/asynchronous.md#log-loss-prevention)
 
 <a id="pino-multistream"></a>
 
@@ -1269,7 +1242,7 @@ The `pino.stdSerializers` object provides functions for serializing objects comm
 <a id="pino-stdtimefunctions"></a>
 ### `pino.stdTimeFunctions` (Object)
 
-The [`timestamp`](#opt-timestamp) option can accept a function which determines the
+The [`timestamp`](#opt-timestamp) option can accept a function that determines the
 `timestamp` value in a log line.
 
 The `pino.stdTimeFunctions` object provides a very small set of common functions for generating the
@@ -1285,7 +1258,7 @@ The `pino.stdTimeFunctions` object provides a very small set of common functions
 <a id="pino-symbols"></a>
 ### `pino.symbols` (Object)
 
-For integration purposes with ecosystem and third party libraries `pino.symbols`
+For integration purposes with ecosystem and third-party libraries `pino.symbols`
 exposes the symbols used to hold non-public state and methods on the logger instance.
 
 Access to the symbols allows logger state to be adjusted, and methods to be overridden or

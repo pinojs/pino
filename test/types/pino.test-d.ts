@@ -1,7 +1,7 @@
 import P, { pino } from "../../";
 import { IncomingMessage, ServerResponse } from "http";
 import { Socket } from "net";
-import { expectError } from 'tsd'
+import { expectError, expectType } from 'tsd'
 import Logger = P.Logger;
 
 const log = pino();
@@ -229,7 +229,8 @@ const withNestedKey = pino({
 const withHooks = pino({
     hooks: {
         logMethod(args, method, level) {
-            return method.apply(this, ['msg', ...args]);
+            expectType<pino.Logger>(this);
+            return method.apply(this, args);
         },
     },
 });
@@ -340,3 +341,8 @@ cclog3.myLevel('')
 cclog3.childLevel('')
 // child itself
 cclog3.childLevel2('')
+
+const withChildCallback = pino({
+    onChild: (child: Logger) => {}
+})
+withChildCallback.onChild = (child: Logger) => {}

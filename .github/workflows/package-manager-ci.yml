@@ -4,6 +4,8 @@ on:
     branches:
       - main
       - package-manager-load
+permissions:
+  contents: read
 jobs:
   pnpm:
     name: pnpm package manager on ${{ matrix.node-version }} ${{ matrix.os }}

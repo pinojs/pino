@@ -33,6 +33,7 @@ const {
   endSym,
   formatOptsSym,
   messageKeySym,
+  errorKeySym,
   nestedKeySym,
   mixinSym,
   useOnlyCustomLevelsSym,
@@ -49,6 +50,7 @@ const defaultOptions = {
   level: 'info',
   levels,
   messageKey: 'msg',
+  errorKey: 'err',
   nestedKey: null,
   enabled: true,
   base: { pid, hostname },
@@ -88,6 +90,7 @@ function pino (...args) {
     serializers,
     timestamp,
     messageKey,
+    errorKey,
     nestedKey,
     base,
     name,
@@ -99,7 +102,8 @@ function pino (...args) {
     formatters,
     hooks,
     depthLimit,
-    edgeLimit
+    edgeLimit,
+    onChild
   } = opts
 
   const stringifySafe = configure({
@@ -162,6 +166,7 @@ function pino (...args) {
     [endSym]: end,
     [formatOptsSym]: formatOpts,
     [messageKeySym]: messageKey,
+    [errorKeySym]: errorKey,
     [nestedKeySym]: nestedKey,
     // protect against injection
     [nestedKeyStrSym]: nestedKey ? `,${JSON.stringify(nestedKey)}:{` : '',
@@ -171,7 +176,8 @@ function pino (...args) {
     [chindingsSym]: chindings,
     [formattersSym]: allFormatters,
     [hooksSym]: hooks,
-    silent: noop
+    silent: noop,
+    onChild
   })
 
   Object.setPrototypeOf(instance, proto())

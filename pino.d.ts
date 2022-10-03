@@ -36,6 +36,12 @@ type MixinMergeStrategyFn = (mergeObject: object, mixinObject: object) => object
 
 type CustomLevelLogger<Options> = Options extends { customLevels: Record<string, number> } ? Record<keyof Options["customLevels"], LogFn> : Record<never, LogFn>
 
+/**
+* A synchronous callback that will run on each creation of a new child.
+* @param child: The newly created child logger instance.
+*/
+type OnChildCallback<Options = LoggerOptions> = <ChildOptions extends pino.ChildLoggerOptions>(child: pino.Logger<Options & ChildOptions>) => void
+
 interface redactOptions {
     paths: string[];
     censor?: string | ((value: any, path: string[]) => any);
@@ -78,6 +84,11 @@ interface LoggerExtras<Options = LoggerOptions> extends EventEmitter {
      * @returns a child logger instance.
      */
     child<ChildOptions extends pino.ChildLoggerOptions>(bindings: pino.Bindings, options?: ChildOptions): pino.Logger<Options & ChildOptions>;
+
+    /**
+     * This can be used to modify the callback function on creation of a new child.
+     */
+    onChild: OnChildCallback<Options>;
 
     /**
      * Registers a listener function that is triggered when the level is changed.
@@ -376,6 +387,10 @@ declare namespace pino {
          */
         messageKey?: string;
         /**
+         * The string key for the 'error' in the JSON object. Default: "err".
+         */
+        errorKey?: string;
+        /**
          * The string key to place any logged object under.
          */
         nestedKey?: string;
@@ -571,7 +586,7 @@ declare namespace pino {
              * All arguments passed to the log method, except the message, will be pass to this function.
              * By default it does not change the shape of the log object.
              */
-            log?: (object: object) => object;
+            log?: (object: Record<string, unknown>) => Record<string, unknown>;
         };
 
         /**
@@ -585,7 +600,7 @@ declare namespace pino {
              * log method and method is the log method itself, and level is the log level. This hook must invoke the method function by
              * using apply, like so: method.apply(this, newArgumentsArray).
              */
-            logMethod?: (args: any[], method: LogFn, level: number) => void;
+            logMethod?: (this: Logger, args: Parameters<LogFn>, method: LogFn, level: number) => void;
         };
 
         /**
@@ -597,6 +612,11 @@ declare namespace pino {
           * Stringification limit of properties/elements when logging a specific object/array with circular references. Default: `100`.
           */
           edgeLimit?: number
+
+        /**
+         * Optional child creation callback.
+         */
+        onChild?: OnChildCallback;
     }
 
     interface ChildLoggerOptions {
@@ -682,6 +702,7 @@ declare namespace pino {
         readonly endSym: unique symbol;
         readonly formatOptsSym: unique symbol;
         readonly messageKeySym: unique symbol;
+        readonly errorKeySym: unique symbol;
         readonly nestedKeySym: unique symbol;
         readonly wildcardFirstSym: unique symbol;
         readonly needsMetadataGsym: unique symbol;
@@ -741,20 +762,6 @@ declare namespace pino {
         streamsArray: (DestinationStream | StreamEntry)[] | DestinationStream | StreamEntry,
         opts?: MultiStreamOptions
     ): MultiStreamRes
-
-    /**
-     * The pino.final method can be used to create an exit listener function.
-     * This listener function can be supplied to process exit events.
-     * The exit listener function will call the handler with
-     * @param [logger]: pino logger that serves as reference for the final logger
-     * @param [handler]: Function that will be called by the handler returned from this function
-     * @returns Exit listener function that can be supplied to process exit events and will call the supplied handler function
-     */
-    export function final(
-        logger: Logger,
-        handler: (error: Error, finalLogger: Logger, ...args: any[]) => void,
-    ): (error: Error | null, ...args: any[]) => void;
-    export function final(logger: Logger): Logger;
 }
 
 //// Callable default export
@@ -780,7 +787,6 @@ declare function pino<Options extends LoggerOptions>(options: Options, stream: D
 export const destination: typeof pino.destination;
 export const transport: typeof pino.transport;
 export const multistream: typeof pino.multistream;
-export const final: typeof pino.final;
 export const levels: typeof pino.levels;
 export const stdSerializers: typeof pino.stdSerializers;
 export const stdTimeFunctions: typeof pino.stdTimeFunctions;

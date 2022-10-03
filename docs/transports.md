@@ -10,17 +10,17 @@ The way Pino generates logs:
 It is recommended that any log transformation or transmission is performed either
 in a separate thread or a separate process.
 
-Prior to Pino v7 transports would ideally operate in a separate process - these are
+Before Pino v7 transports would ideally operate in a separate process - these are
 now referred to as [Legacy Transports](#legacy-transports).
 
-From Pino v7 and upwards transports can also operate inside a [Worker Thread][worker-thread],
+From Pino v7 and upwards transports can also operate inside a [Worker Thread][worker-thread]
 and can be used or configured via the options object passed to `pino` on initialization.
 
 [worker-thread]: https://nodejs.org/dist/latest-v14.x/docs/api/worker_threads.html
 
 ## v7+ Transports
 
-A transport is a module that exports a default function which returns a writable stream:
+A transport is a module that exports a default function that returns a writable stream:
 
 ```js
 import { createWriteStream } from 'fs'
@@ -62,11 +62,11 @@ export default async (options) => {
 ```
 
 While initializing the stream we're able to use `await` to perform asynchronous operations. In this
-case waiting for the write streams `open` event.
+case, waiting for the write streams `open` event.
 
 Let's imagine the above was published to npm with the module name `some-file-transport`.
 
-The `options.destination` value can be set when the creating the transport stream with `pino.transport` like so:
+The `options.destination` value can be set when creating the transport stream with `pino.transport` like so:
 
 ```js
 const pino = require('pino')
@@ -80,7 +80,7 @@ pino(transport)
 Note here we've specified a module by package rather than by relative path. The options object we provide
 is serialized and injected into the transport worker thread, then passed to the module's exported function.
 This means that the options object can only contain types that are supported by the
-[Structured Clone Algorithm][sca] which is used to (de)serializing objects between threads.
+[Structured Clone Algorithm][sca] which is used to (de)serialize objects between threads.
 
 What if we wanted to use both transports, but send only error logs to `some-file-transport` while
 sending all logs to `my-transport.mjs`? We can use the `pino.transport` function's `destinations` option:
@@ -120,7 +120,7 @@ For more details on `pino.transport` see the [API docs for `pino.transport`][pin
 The module [pino-abstract-transport](https://github.com/pinojs/pino-abstract-transport) provides
 a simple utility to parse each line.  Its usage is highly recommended.
 
-You can see an example using a async iterator with ESM:
+You can see an example using an async iterator with ESM:
 
 ```js
 import build from 'pino-abstract-transport'
@@ -176,7 +176,7 @@ module.exports = function (opts) {
 To consume async iterators in batches, consider using the [hwp](https://github.com/mcollina/hwp) library.
 
 The `close()` function is needed to make sure that the stream is closed and flushed when its
-callback is called or the returned promise resolved. Otherwise log lines will be lost.
+callback is called or the returned promise resolves. Otherwise, log lines will be lost.
 
 ### Creating a transport pipeline
 
@@ -200,7 +200,7 @@ export default async function (options) {
         chunk.service = 'pino'
 
         // stringify the payload again
-        this.push(JSON.stringify(chunk))
+        this.push(`${JSON.stringify(chunk)}\n`)
         cb()
       }
     })
@@ -240,8 +240,8 @@ a terminating target, i.e. a `Writable` stream.__
 
 Pino provides basic support for transports written in TypeScript.
 
-Ideally, they should be transpiled to ensure maximum compatibility, but some
-times you might want to use tools such as TS-Node, to execute your TypeScript
+Ideally, they should be transpiled to ensure maximum compatibility, but sometimes
+you might want to use tools such as TS-Node, to execute your TypeScript
 code without having to go through an explicit transpilation step.
 
 You can use your TypeScript code without explicit transpilation, but there are
@@ -315,7 +315,7 @@ pino(transport)
 ### Asynchronous startup
 
 The new transports boot asynchronously and calling `process.exit()` before the transport
-started will cause logs to not be delivered.
+starts will cause logs to not be delivered.
 
 ```js
 const pino = require('pino')
@@ -338,7 +338,7 @@ transport.on('ready', function () {
 
 ## Legacy Transports
 
-A legacy Pino "transport" is a supplementary tool which consumes Pino logs.
+A legacy Pino "transport" is a supplementary tool that consumes Pino logs.
 
 Consider the following example for creating a transport:
 
@@ -367,11 +367,11 @@ node my-app-which-logs-stuff-to-stdout.js | node my-transport-process.js
 
 Ideally, a transport should consume logs in a separate process to the application,
 Using transports in the same process causes unnecessary load and slows down
-Node's single threaded event loop.
+Node's single-threaded event loop.
 
 ## Known Transports
 
-PR's to this document are welcome for any new transports!
+PRs to this document are welcome for any new transports!
 
 ### Pino v7+ Compatible
 
@@ -381,6 +381,7 @@ PR's to this document are welcome for any new transports!
 + [pino-seq-transport](#pino-seq-transport)
 + [pino-sentry-transport](#pino-sentry-transport)
 + [pino-airbrake-transport](#pino-airbrake-transport)
++ [pino-datadog-transport](#pino-datadog-transport)
 
 ### Legacy
 
@@ -459,7 +460,7 @@ $ node app.js | pino-couch -U https://couch-server -d mylogs
 
 <a id="pino-datadog"></a>
 ### pino-datadog
-The [pino-datadog](https://www.npmjs.com/package/pino-datadog) module is a transport that will forward logs to [DataDog](https://www.datadoghq.com/) through it's API.
+The [pino-datadog](https://www.npmjs.com/package/pino-datadog) module is a transport that will forward logs to [DataDog](https://www.datadoghq.com/) through its API.
 
 Given an application `foo` that logs via pino, you would use `pino-datadog` like so:
 
@@ -563,7 +564,7 @@ $ node index.js | pino-logflare --key YOUR_KEY --source YOUR_SOURCE
 
 The `pino-mq` transport will take all messages received on `process.stdin` and send them over a message bus using JSON serialization.
 
-This useful for:
+This is useful for:
 
 * moving backpressure from application to broker
 * transforming messages pressure to another component
@@ -572,7 +573,7 @@ This useful for:
 node app.js | pino-mq -u "amqp://guest:guest@localhost/" -q "pino-logs"
 ```
 
-Alternatively a configuration file can be used:
+Alternatively, a configuration file can be used:
 
 ```
 node app.js | pino-mq -c pino-mq.json
@@ -588,8 +589,8 @@ For full documentation of command line switches and configuration see [the `pino
 
 <a id="pino-loki"></a>
 ### pino-loki
-pino-loki is a transport that will forwards logs into [Grafana Loki](https://grafana.com/oss/loki/)
-Can be used in CLI version in a separate process or in a dedicated worker :
+pino-loki is a transport that will forwards logs into [Grafana Loki](https://grafana.com/oss/loki/).
+Can be used in CLI version in a separate process or in a dedicated worker:
 
 CLI :
 ```console
@@ -606,7 +607,7 @@ const transport = pino.transport({
 pino(transport)
 ```
 
-For full documentation and configuration, see the [readme](https://github.com/Julien-R44/pino-loki)
+For full documentation and configuration, see the [readme](https://github.com/Julien-R44/pino-loki).
 
 <a id="pino-papertrail"></a>
 ### pino-papertrail
@@ -636,7 +637,7 @@ Full documentation in the [readme](https://github.com/Xstoudi/pino-pg).
 $ node app.js | pino-mysql -c db-configuration.json
 ```
 
-`pino-mysql` can extract and save log fields into corresponding database field
+`pino-mysql` can extract and save log fields into corresponding database fields
 and/or save the entire log stream as a [JSON Data Type][JSONDT].
 
 For full documentation and command line switches read the [readme][pino-mysql].
@@ -667,7 +668,7 @@ $ node app.js | pino-redis -U redis://username:password@localhost:6379
 $ node app.js | pino-sentry --dsn=https://******@sentry.io/12345
 ```
 
-For full documentation of command line switches see the [pino-sentry readme](https://github.com/aandrewww/pino-sentry/blob/master/README.md)
+For full documentation of command line switches see the [pino-sentry readme](https://github.com/aandrewww/pino-sentry/blob/master/README.md).
 
 [pino-sentry]: https://www.npmjs.com/package/pino-sentry
 [Sentry]: https://sentry.io/
@@ -741,7 +742,7 @@ const transport = pino.transport({
       projectId: 1,
       projectKey: "REPLACE_ME",
       environment: "production",
-      // aditional options for airbrake
+      // additional options for airbrake
       performanceStats: false,
     },
   },
@@ -756,7 +757,7 @@ pino(transport)
 <a id="pino-socket"></a>
 ### pino-socket
 
-[pino-socket][pino-socket] is a transport that will forward logs to a IPv4
+[pino-socket][pino-socket] is a transport that will forward logs to an IPv4
 UDP or TCP socket.
 
 As an example, use `socat` to fake a listener:
@@ -774,6 +775,31 @@ $ node app.js | pino-socket -p 6000
 Logs from the application should be observed on both consoles.
 
 [pino-socket]: https://www.npmjs.com/package/pino-socket
+
+<a id="pino-datadog-transport"></a>
+### pino-datadog-transport
+
+[pino-datadog-transport][pino-datadog-transport] is a Pino v7+ compatible transport to forward log events to [Datadog][Datadog]
+from a dedicated worker:
+
+```js
+const pino = require('pino')
+const transport = pino.transport({
+  target: 'pino-datadog-transport',
+  options: {
+    ddClientConf: {
+      authMethods: {
+        apiKeyAuth: <your datadog API key>
+      }
+    },
+  },
+  level: "error", // minimum log level that should be sent to datadog
+})
+pino(transport)
+```
+
+[pino-datadog-transport]: https://github.com/theogravity/pino-datadog-transport
+[Datadog]: https://www.datadoghq.com/
 
 #### Logstash
 
@@ -815,9 +841,9 @@ https://github.com/deviantony/docker-elk to setup an ELK stack.
 
 <a id="pino-stackdriver"></a>
 ### pino-stackdriver
-The [pino-stackdriver](https://www.npmjs.com/package/pino-stackdriver) module is a transport that will forward logs to the [Google Stackdriver](https://cloud.google.com/logging/) log service through it's API.
+The [pino-stackdriver](https://www.npmjs.com/package/pino-stackdriver) module is a transport that will forward logs to the [Google Stackdriver](https://cloud.google.com/logging/) log service through its API.
 
-Given an application `foo` that logs via pino, a stackdriver log project `bar` and credentials in the file `/credentials.json`, you would use `pino-stackdriver`
+Given an application `foo` that logs via pino, a stackdriver log project `bar`, and credentials in the file `/credentials.json`, you would use `pino-stackdriver`
 like so:
 
 ``` sh
@@ -861,3 +887,32 @@ $ node app.js | pino-websocket -a my-websocket-server.example.com -p 3004
 For full documentation of command line switches read the [README](https://github.com/abeai/pino-websocket#readme).
 
 [pino-pretty]: https://github.com/pinojs/pino-pretty
+
+<a id="communication-between-pino-and-transport"></a>
+## Communication between Pino and Transports
+Here we discuss some technical details of how Pino communicates with its [worker threads](https://nodejs.org/api/worker_threads.html).
+
+Pino uses [`thread-stream`](https://github.com/pinojs/thread-stream) to create a stream for transports.
+When we create a stream with `thread-stream`, `thread-stream` spawns a [worker](https://github.com/pinojs/thread-stream/blob/f19ac8dbd602837d2851e17fbc7dfc5bbc51083f/index.js#L50-L60) (an independent JavaScript execution thread).
+
+
+### Error messages
+How are error messages propagated from a transport worker to Pino?
+
+Let's assume we have a transport with an error listener:
+```js
+// index.js
+const transport = pino.transport({
+  target: './transport.js'
+})
+
+transport.on('error', err => {
+  console.error('error caught', err)
+})
+
+const log = pino(transport)
+```
+
+When our worker emits an error event, the worker has listeners for it: [error](https://github.com/pinojs/thread-stream/blob/f19ac8dbd602837d2851e17fbc7dfc5bbc51083f/lib/worker.js#L59-L70) and [unhandledRejection](https://github.com/pinojs/thread-stream/blob/f19ac8dbd602837d2851e17fbc7dfc5bbc51083f/lib/worker.js#L135-L141). These listeners send the error message to the main thread where Pino is present.
+
+When Pino receives the error message, it further [emits](https://github.com/pinojs/thread-stream/blob/f19ac8dbd602837d2851e17fbc7dfc5bbc51083f/index.js#L349) the error message. Finally, the error message arrives at our `index.js` and is caught by our error listener.

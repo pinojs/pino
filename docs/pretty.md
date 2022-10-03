@@ -1,7 +1,7 @@
 # Pretty Printing
 
 By default, Pino log lines are newline delimited JSON (NDJSON). This is perfect
-for production usage and long term storage. It's not so great for development
+for production usage and long-term storage. It's not so great for development
 environments. Thus, Pino logs can be prettified by using a Pino prettifier
 module like [`pino-pretty`][pp]:
 
@@ -11,15 +11,15 @@ $ cat app.log | pino-pretty
 
 For almost all situations, this is the recommended way to prettify logs. The
 programmatic API, described in the next section, is primarily for integration
-purposes with other CLI based prettifiers.
+purposes with other CLI-based prettifiers.
 
 ## Prettifier API
 
 Pino prettifier modules are extra modules that provide a CLI for parsing NDJSON
-log lines piped via `stdin` and expose an API which conforms to the Pino
+log lines piped via `stdin` and expose an API that conforms to the Pino
 [metadata streams](/docs/api.md#metadata) API.
 
-The API requires modules provide a factory function which returns a prettifier
+The API requires modules provide a factory function that returns a prettifier
 function. This prettifier function must accept either a string of NDJSON or
 a Pino log object. A pseudo-example of such a prettifier is:
 
@@ -86,7 +86,7 @@ will be written to the destination stream.
   that can be passed via `prettyPrint`.
 
 The default prettifier write stream does not guarantee final log writes.
-Correspondingly, a warning is written to logs on first synchronous flushing.
+Correspondingly, a warning is written to logs on the first synchronous flushing.
 This warning may be suppressed by passing `suppressFlushSyncWarning : true` to
 `prettyPrint`:
   ```js

@@ -109,6 +109,22 @@ function levelTest (name, level) {
     same(Object.keys(obj), ['hello'])
   })
 
+  test(`passing a undefined and a string at level ${name}`, async ({ equal, same }) => {
+    const stream = sink()
+    const instance = pino(stream)
+    instance.level = name
+    instance[name](undefined, 'a string')
+    const result = await once(stream, 'data')
+    equal(new Date(result.time) <= new Date(), true, 'time is greater than Date.now()')
+    delete result.time
+    same(result, {
+      pid,
+      hostname,
+      level,
+      msg: 'a string'
+    })
+  })
+
   test(`overriding object key by string at level ${name}`, async ({ equal, same }) => {
     const stream = sink()
     const instance = pino(stream)
@@ -724,4 +740,14 @@ test('throws if prettyPrint is passed in as an option', async (t) => {
       prettyPrint: true
     })
   }, new Error('prettyPrint option is no longer supported, see the pino-pretty package (https://github.com/pinojs/pino-pretty)'))
+})
+
+test('Should invoke `onChild` with the newly created child', async ({ equal }) => {
+  let innerChild
+  const child = pino({
+    onChild: (instance) => {
+      innerChild = instance
+    }
+  }).child({ foo: 'bar' })
+  equal(child, innerChild)
 })

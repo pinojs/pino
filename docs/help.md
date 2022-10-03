@@ -12,7 +12,6 @@
 * [Unicode and Windows terminal](#windows)
 * [Mapping Pino Log Levels to Google Cloud Logging (Stackdriver) Severity Levels](#stackdriver)
 * [Avoid Message Conflict](#avoid-message-conflict)
-* [Exit logging](#exit-logging)
 
 <a id="rotate"></a>
 ## Log rotation
@@ -48,9 +47,9 @@ help.
 <a id="reopening"></a>
 ## Reopening log files
 
-In cases where a log rotation tool doesn't offer a copy-truncate capabilities,
+In cases where a log rotation tool doesn't offer copy-truncate capabilities,
 or where using them is deemed inappropriate, `pino.destination`
-is able to reopen file paths after a file has been moved away.
+can reopen file paths after a file has been moved away.
 
 One way to use this is to set up a `SIGUSR2` or `SIGHUP` signal handler that
 reopens the log file destination, making sure to write the process PID out
@@ -125,7 +124,7 @@ Pino's default log destination is the singular destination of `stdout`. While
 not recommended for performance reasons, multiple destinations can be targeted
 by using [`pino.multistream`](/doc/api.md#pino-multistream).
 
-In this example we use `stderr` for `error` level logs and `stdout` as default
+In this example, we use `stderr` for `error` level logs and `stdout` as default
 for all other levels (e.g. `debug`, `info`, and `warn`).
 
 ```js
@@ -154,9 +153,29 @@ for information on this is handled.
 <a id="level-string"></a>
 ## Log levels as labels instead of numbers
 Pino log lines are meant to be parseable. Thus, Pino's default mode of operation
-is to print the level value instead of the string name. However, while it is
-possible to set the `useLevelLabels` option, we recommend using one of these
-options instead if you are able:
+is to print the level value instead of the string name. 
+However, you can use the [`formatters`](/docs/api.md#formatters-object) option 
+with a [`level`](/docs/api.md#level) function to print the string name instead of the level value :
+
+```js
+const pino = require('pino')
+
+const log = pino({
+  formatters: {
+    level: (label) => {
+      return {
+        level: label
+      }
+    }
+  }
+})
+
+log.info('message')
+
+// {"level":"info","time":1661632832200,"pid":18188,"hostname":"foo","msg":"message"}
+```
+
+Although it works, we recommend using one of these options instead if you are able:
 
 1. If the only change desired is the name then a transport can be used. One such
 transport is [`pino-text-level-transport`](https://npm.im/pino-text-level-transport).
@@ -183,7 +202,7 @@ $ npm i pino-debug
 $ DEBUG=* node -r pino-debug app.js
 ```
 
-[`pino-debug`](https://github.com/pinojs/pino-debug) also offers fine grain control to map specific `debug`
+[`pino-debug`](https://github.com/pinojs/pino-debug) also offers fine-grain control to map specific `debug`
 namespaces to `pino` log levels. See [`pino-debug`](https://github.com/pinojs/pino-debug)
 for more.
 
@@ -192,8 +211,8 @@ for more.
 
 Pino uses [sonic-boom](https://github.com/mcollina/sonic-boom) to speed
 up logging. Internally, it uses [`fs.write`](https://nodejs.org/dist/latest-v10.x/docs/api/fs.html#fs_fs_write_fd_string_position_encoding_callback) to write log lines directly to a file
-descriptor. On Windows, unicode output is not handled properly in the
-terminal (both `cmd.exe` and powershell), and as such the output could
+descriptor. On Windows, Unicode output is not handled properly in the
+terminal (both `cmd.exe` and PowerShell), and as such the output could
 be visualized incorrectly if the log lines include utf8 characters. It
 is possible to configure the terminal to visualize those characters
 correctly with the use of [`chcp`](https://ss64.com/nt/chcp.html) by
@@ -203,7 +222,7 @@ Node.js.
 <a id="stackdriver"></a>
 ## Mapping Pino Log Levels to Google Cloud Logging (Stackdriver) Severity Levels
 
-Google Cloud Logging uses `severity` levels instead log levels. As a result, all logs may show as INFO
+Google Cloud Logging uses `severity` levels instead of log levels. As a result, all logs may show as INFO
 level logs while completely ignoring the level set in the pino log. Google Cloud Logging also prefers that
 log data is present inside a `message` key instead of the default `msg` key that Pino uses. Use a technique
 similar to the one below to retain log levels in Google Cloud Logging
@@ -224,14 +243,12 @@ const PinoLevelToSeverityLookup = {
 const defaultPinoConf = {
   messageKey: 'message',
   formatters: {
+    messageKey: 'message',
     level(label, number) {
       return {
         severity: PinoLevelToSeverityLookup[label] || PinoLevelToSeverityLookup['info'],
         level: number,
       }
-    },
-    log(message) {
-      return { message }
     }
   },
 }
@@ -271,35 +288,3 @@ log.info({ msg: 'mapped to originalMsg' }, 'a message')
 // {"level":30,"time":1596313323106,"pid":63739,"hostname":"foo","msg":"no original message"}
 // {"level":30,"time":1596313323107,"pid":63739,"hostname":"foo","msg":"a message","originalMsg":"mapped to originalMsg"}
 ```
-
-<a id="exit-logging"></a>
-## Exit logging (deprecated for Node v14+)
-
-__In pino v7, The following piece of documentation is not needed in Node v14+ and it will
-emit a deprecation notice.__
-
-When a Node process crashes from uncaught exception, exits due to a signal,
-or exits of it's own accord we may want to write some final logs – particularly
-in cases of error.
-
-Writing to a Node.js stream on exit is not necessarily guaranteed, and naively writing
-to an asynchronous logger on exit will definitely lead to lost logs.
-
-To write logs in an exit handler, create the handler with [`pino.final`](/docs/api.md#pino-final):
-
-```js
-process.on('uncaughtException', pino.final(logger, (err, finalLogger) => {
-  finalLogger.error(err, 'uncaughtException')
-  process.exit(1)
-}))
-
-process.on('unhandledRejection', pino.final(logger, (err, finalLogger) => {
-  finalLogger.error(err, 'unhandledRejection')
-  process.exit(1)
-}))
-```
-
-The `finalLogger` is a special logger instance that will synchronously and reliably
-flush every log line. This is important in exit handlers, since no more asynchronous
-activity may be scheduled.
-

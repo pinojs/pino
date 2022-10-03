@@ -12,8 +12,10 @@ const strip = require('strip-ansi')
 const execa = require('execa')
 const writer = require('flush-write-stream')
 const rimraf = require('rimraf')
+const { promisify } = require('util')
 const { tmpdir } = os
 
+const immediate = promisify(setImmediate)
 const pid = process.pid
 const hostname = os.hostname()
 
@@ -393,11 +395,9 @@ test('stdout in worker', async ({ not }) => {
   let actual = ''
   const child = execa(process.argv[0], [join(__dirname, '..', 'fixtures', 'transport-main.js')])
 
-  child.stdout.pipe(writer((s, enc, cb) => {
-    actual += s
-    cb()
-  }))
-  await once(child, 'close')
+  for await (const chunk of child.stdout) {
+    actual += chunk
+  }
   not(strip(actual).match(/Hello/), null)
 })
 
@@ -410,6 +410,7 @@ test('log and exit on ready', async ({ not }) => {
     cb()
   }))
   await once(child, 'close')
+  await immediate()
   not(strip(actual).match(/Hello/), null)
 })
 
