@@ -20,8 +20,9 @@ function createStream(): DestinationStreamWithMetadata {
 }
 
 const stream = createStream();
-// Argh. TypeScript doesn't seem to narrow unless we assign the symbol like so
-const needsMetadata = pino.symbols.needsMetadataGsym;
+// Argh. TypeScript doesn't seem to narrow unless we assign the symbol like so, and tsd seems to
+// break without annotating the type explicitly
+const needsMetadata: typeof pino.symbols.needsMetadataGsym = pino.symbols.needsMetadataGsym;
 if (stream[needsMetadata]) {
     expectType<number>(stream.lastLevel);
 }
