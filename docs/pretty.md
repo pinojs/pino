@@ -62,39 +62,11 @@ will be written to the destination stream.
 > be easily investigated at a later date.
 
 1. Install a prettifier module as a separate dependency, e.g. `npm install pino-pretty`.
-1. Instantiate the logger with pretty printing enabled:
+1. Instantiate the logger with the prettifier option:
   ```js
   const pino = require('pino')
   const log = pino({
-    prettyPrint: {
-      levelFirst: true
-    },
     prettifier: require('pino-pretty')
-  })
-  ```
-  Note: the default prettifier module is `pino-pretty`, so the preceding
-  example could be:
-  ```js
-  const pino = require('pino')
-  const log = pino({
-    prettyPrint: {
-      levelFirst: true
-    }
-  })
-  ```
-  See the [`pino-pretty` documentation][pp] for more information on the options
-  that can be passed via `prettyPrint`.
-
-The default prettifier write stream does not guarantee final log writes.
-Correspondingly, a warning is written to logs on the first synchronous flushing.
-This warning may be suppressed by passing `suppressFlushSyncWarning : true` to
-`prettyPrint`:
-  ```js
-  const pino = require('pino')
-  const log = pino({
-    prettyPrint: {
-      suppressFlushSyncWarning: true
-    }
   })
   ```
 

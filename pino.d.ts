@@ -17,8 +17,6 @@
 // TypeScript Version: 4.4
 
 import type { EventEmitter } from "events";
-// @ts-ignore -- gracefully falls back to `any` if not installed
-import type { PrettyOptions as PinoPrettyOptions } from "pino-pretty";
 import * as pinoStdSerializers from "pino-std-serializers";
 import type { SonicBoom, SonicBoomOpts } from "sonic-boom";
 import type { WorkerOptions } from "worker_threads";
@@ -318,8 +316,6 @@ declare namespace pino {
         (msg: string, ...args: any[]): void;
     }
 
-    interface PrettyOptions extends PinoPrettyOptions {}
-
     interface LoggerOptions {
         transport?: TransportSingleOptions | TransportMultiOptions | TransportPipelineOptions
         /**
@@ -405,11 +401,6 @@ declare namespace pino {
          * The string key to place any logged object under.
          */
         nestedKey?: string;
-        /**
-         * Enables pino.pretty. This is intended for non-production configurations. This may be set to a configuration
-         * object as outlined in http://getpino.io/#/docs/API?id=pretty. Default: `false`.
-         */
-        prettyPrint?: boolean | PrettyOptions;
         /**
          * Allows to optionally define which prettifier module to use.
          */
@@ -828,7 +819,6 @@ export interface LogFn extends pino.LogFn {}
 export interface LoggerOptions extends pino.LoggerOptions {}
 export interface MultiStreamOptions extends pino.MultiStreamOptions {}
 export interface MultiStreamRes extends pino.MultiStreamRes {}
-export interface PrettyOptions extends pino.PrettyOptions {}
 export interface StreamEntry extends pino.StreamEntry {}
 export interface TransportBaseOptions extends pino.TransportBaseOptions {}
 export interface TransportMultiOptions extends pino.TransportMultiOptions {}
