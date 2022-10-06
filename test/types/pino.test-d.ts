@@ -192,32 +192,6 @@ anotherRedacted.info({
     anotherPath: "Not shown",
 });
 
-const pretty = pino({
-    prettyPrint: {
-        colorize: true,
-        crlf: false,
-        errorLikeObjectKeys: ["err", "error"],
-        errorProps: "",
-        messageFormat: false,
-        ignore: "",
-        levelFirst: false,
-        messageKey: "msg",
-        timestampKey: "timestamp",
-        translateTime: "UTC:h:MM:ss TT Z",
-    },
-});
-
-const withMessageFormatFunc = pino({
-    prettyPrint: {
-        ignore: "requestId",
-        messageFormat: (log, messageKey: string) => {
-            const message = log[messageKey] as string;
-            if (log.requestId) return `[${log.requestId}] ${message}`;
-            return message;
-        },
-    },
-});
-
 const withTimeFn = pino({
     timestamp: pino.stdTimeFunctions.isoTime,
 });
