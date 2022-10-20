@@ -228,6 +228,7 @@ declare namespace pino {
         val: number,
         prevLvl: LevelWithSilent | string,
         prevVal: number,
+        logger: Logger
     ) => void;
 
     type LogDescriptor = Record<string, any>;

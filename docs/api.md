@@ -1003,12 +1003,13 @@ The logger instance is also an [`EventEmitter ⇗`](https://nodejs.org/dist/late
 
 A listener function can be attached to a logger via the `level-change` event
 
-The listener is passed four arguments:
+The listener is passed five arguments:
 
 * `levelLabel` – the new level string, e.g `trace`
 * `levelValue` – the new level number, e.g `10`
 * `previousLevelLabel` – the prior level string, e.g `info`
 * `previousLevelValue` – the prior level number, e.g `30`
+* `logger` – the logger instance from which the event originated
 
 ```js
 const logger = require('pino')()
@@ -1023,8 +1024,8 @@ fire a `level-change` event. These events can be ignored by writing an event han
 
 ```js
 const logger = require('pino')()
-logger.on('level-change', function (lvl, val, prevLvl, prevVal) {
-  if (logger !== this) {
+logger.on('level-change', function (lvl, val, prevLvl, prevVal, instance) {
+  if (logger !== instance) {
     return
   }
   console.log('%s (%d) was changed to %s (%d)', prevLvl, prevVal, lvl, val)
