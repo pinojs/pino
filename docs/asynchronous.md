@@ -29,7 +29,7 @@ of each function execution to avoid losing data.
 
 Asynchronous logging has a couple of important caveats:
 
-* As opposed to the default mode, there is not a one-to-one relationship between
+* As opposed to the synchronous mode, there is not a one-to-one relationship between
   calls to logging methods (e.g. `logger.info`) and writes to a log file
 * There is a possibility of the most recently buffered log messages being lost
   in case of a system failure, e.g. a power cut.
