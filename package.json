@@ -111,6 +111,7 @@
   "dependencies": {
     "atomic-sleep": "^1.0.0",
     "fast-redact": "^3.1.1",
+    "lodash.clonedeep": "^4.5.0",
     "on-exit-leak-free": "^2.1.0",
     "pino-abstract-transport": "v1.0.0",
     "pino-std-serializers": "^6.0.0",

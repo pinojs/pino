@@ -40,6 +40,36 @@ test('redact.paths option – throws if array contains an invalid path', async (
   })
 })
 
+test('pino should not change original object', async ({ equal }) => {
+  const stream = sink()
+  const config = {
+    level: 'debug',
+    redact: [
+      'context.password',
+      'password',
+      'context.*.password',
+      'context[*].password'
+    ]
+  }
+
+  const logger = pino(config, stream)
+
+  const test = {
+    whatever: { password: '1234' }
+  }
+
+  logger.info({ context: test }, 'info')
+
+  equal(JSON.stringify(test), JSON.stringify({
+    whatever: { password: '1234' }
+  }))
+
+  const { context } = await once(stream, 'data')
+  equal(JSON.stringify(context), JSON.stringify({
+    whatever: { password: '[Redacted]' }
+  }))
+})
+
 test('redact option – top level key', async ({ equal }) => {
   const stream = sink()
   const instance = pino({ redact: ['key'] }, stream)
