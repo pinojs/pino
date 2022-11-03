@@ -1023,15 +1023,15 @@ Please note that due to a [known bug](https://github.com/pinojs/pino/issues/1006
 fire a `level-change` event. These events can be ignored by writing an event handler like:
 
 ```js
-const logger = require('pino')()
-logger.on('level-change', function (lvl, val, prevLvl, prevVal, instance) {
-  if (logger !== instance) {
+const pino = require('pino')()
+pino.on('level-change', function (level, levelId, previousLevel, previousLevelId, logger) {
+  if (pino !== logger) {
     return
   }
-  console.log('%s (%d) was changed to %s (%d)', prevLvl, prevVal, lvl, val)
+  console.log('%s (%d) was changed to %s (%d)', previousLevel, previousLevelId, level, levelId)
 })
-logger.child({}); // trigger an event by creating a child instance, notice no console.log
-logger.level = 'trace' // trigger event using actual value change, notice console.log
+pino.child({}); // trigger an event by creating a child instance, notice no console.log
+pino.level = 'trace' // trigger event using actual value change, notice console.log
 ```
 
 <a id="version"></a>

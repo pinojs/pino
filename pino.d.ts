@@ -224,8 +224,8 @@ declare namespace pino {
     type WriteFn = (o: object) => void;
 
     type LevelChangeEventListener<Options = LoggerOptions> = (
-        modifiedLevel: LevelWithSilent | string,
-        modifiedLevelId: number,
+        level: LevelWithSilent | string,
+        levelId: number,
         previousLevel: LevelWithSilent | string,
         previousLevelId: number,
         logger: Logger<Options>
