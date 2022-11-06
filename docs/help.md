@@ -12,7 +12,7 @@
 * [Unicode and Windows terminal](#windows)
 * [Mapping Pino Log Levels to Google Cloud Logging (Stackdriver) Severity Levels](#stackdriver)
 * [Avoid Message Conflict](#avoid-message-conflict)
-* [Best performance for basic stdout logging](#best-performance-for-stdout)
+* [Best performance for logging to `stdout`](#best-performance-for-stdout)
 
 <a id="rotate"></a>
 ## Log rotation
@@ -291,7 +291,7 @@ log.info({ msg: 'mapped to originalMsg' }, 'a message')
 ```
 
 <a id="best-performance-for-stdout"></a>
-## Best performance for basic stdout logging
+## Best performance for logging to `stdout`
 
 The best performance for logging directly to stdout is achieved by using the
 default configuration:
