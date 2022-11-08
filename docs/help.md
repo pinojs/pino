@@ -300,5 +300,5 @@ default configuration:
 const log = require('pino')();
 ```
 
-You should only have to configure custom transports if you have broader logging
-requirements.
+You should only have to configure custom transports or other settings
+if you have broader logging requirements.
