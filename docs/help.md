@@ -293,7 +293,7 @@ log.info({ msg: 'mapped to originalMsg' }, 'a message')
 <a id="best-performance-for-stdout"></a>
 ## Best performance for logging to `stdout`
 
-The best performance for logging directly to stdout is achieved by using the
+The best performance for logging directly to stdout is _usually_ achieved by using the
 default configuration:
 
 ```js
