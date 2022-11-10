@@ -826,3 +826,22 @@ test('child can remove parent redact by array', async ({ equal }) => {
   equal(req.headers.cookie, 'SESSID=298zf09hf012fh2; csrftoken=u32t4o3tb3gg43; _gat=1;')
   equal(req.method, 'GET')
 })
+
+test('redact safe stringify', async ({ equal }) => {
+  const stream = sink()
+  const instance = pino({ redact: { paths: ['that.secret'] } }, stream)
+
+  instance.info({
+    that: {
+      secret: 'please hide me',
+      myBigInt: 123n
+    },
+    other: {
+      mySecondBigInt: 222n
+    }
+  })
+  const { that, other } = await once(stream, 'data')
+  equal(that.secret, '[Redacted]')
+  equal(that.myBigInt, 123)
+  equal(other.mySecondBigInt, 222)
+})
