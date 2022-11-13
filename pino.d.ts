@@ -557,6 +557,12 @@ declare namespace pino {
                  */
                 send: (level: Level, logEvent: LogEvent) => void;
             };
+            
+            /**
+             * The `disabled` option will disable logging in the browser if set
+             * to `true`.
+             */
+            disabled?: boolean;
         };
         /**
          * key-value object added as child logger to each log line. If set to null the base child logger is not added
