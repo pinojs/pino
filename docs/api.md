@@ -171,9 +171,9 @@ const logger = pino({
 logger.info({
     description: 'Ok'
 }, 'Message 1')
-// {"level":30,"time":1591195061437,"pid":16012,"hostname":"x","appName":"My app","description":"Ok","level-label":"info","msg":"Message 1"}
+// {"level":30,"time":1591195061437,"pid":16012,"hostname":"x","description":"Ok","level-label":"info","msg":"Message 1"}
 logger.error('Message 2')
-// {"level":30,"time":1591195061437,"pid":16012,"hostname":"x","appName":"My app","description":"Ok","level-label":"error","msg":"Message 2"}
+// {"level":30,"time":1591195061437,"pid":16012,"hostname":"x","level-label":"error","msg":"Message 2"}
 ```
 
 If the `mixin` feature is being used merely to add static metadata to each log message,
