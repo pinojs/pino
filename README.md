@@ -101,7 +101,7 @@ See [Bundling](docs/bundling.md) document for more information.
 
 ### Matteo Collina
 
-<https://github.com/pinojs>
+<https://github.com/mcollina>
 
 <https://www.npmjs.com/~matteo.collina>
 
