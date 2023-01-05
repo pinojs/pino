@@ -31,7 +31,7 @@ jobs:
           persist-credentials: false
 
       - name: Dependency review
-        uses: actions/dependency-review-action@v2
+        uses: actions/dependency-review-action@v3
 
   test:
     name: ${{ matrix.node-version }} ${{ matrix.os }}
