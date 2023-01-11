@@ -62,12 +62,30 @@ will be written to the destination stream.
 > be easily investigated at a later date.
 
 1. Install a prettifier module as a separate dependency, e.g. `npm install pino-pretty`.
-1. Instantiate the logger with the prettifier option:
+2. Instantiate the logger with the `transport.target` option set to `'pino-pretty'`:
   ```js
   const pino = require('pino')
-  const log = pino({
-    prettifier: require('pino-pretty')
+  const logger = pino({
+    transport: {
+      target: 'pino-pretty'
+    },
   })
+
+  logger.info('hi')
+  ```
+3. The transport option can also have an options object containing `pino-pretty` options:
+  ```js
+  const pino = require('pino')
+  const logger = pino({
+    transport: {
+      target: 'pino-pretty',
+      options: {
+        colorize: true
+      }
+    }
+  })
+
+  logger.info('hi')
   ```
 
   [pp]: https://github.com/pinojs/pino-pretty
