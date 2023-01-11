@@ -403,10 +403,6 @@ declare namespace pino {
          */
         nestedKey?: string;
         /**
-         * Allows to optionally define which prettifier module to use.
-         */
-        prettifier?: any;
-        /**
          * Enables logging. Default: `true`.
          */
         enabled?: boolean;
