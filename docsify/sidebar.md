@@ -11,7 +11,6 @@
 * [Benchmarks](/docs/benchmarks.md)
 * [Long Term Support](/docs/lts.md)
 * [Help](/docs/help.md)
-  * [Exit logging](/docs/help.md#exit-logging)
   * [Log rotation](/docs/help.md#rotate)
   * [Reopening log files](/docs/help.md#reopening)
   * [Saving to multiple files](/docs/help.md#multiple)
