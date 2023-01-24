@@ -153,7 +153,7 @@ if (log.levelVal === 30) {
 const listener = (lvl: any, val: any, prevLvl: any, prevVal: any) => {
     console.log(lvl, val, prevLvl, prevVal);
 };
-log.on("level-change", (lvl, val, prevLvl, prevVal) => {
+log.on("level-change", (lvl, val, prevLvl, prevVal, logger) => {
     console.log(lvl, val, prevLvl, prevVal);
 });
 log.level = "trace";
@@ -303,6 +303,10 @@ log3.level = 'myLevel'
 log3.myLevel('')
 log3.child({}).myLevel('')
 
+log3.on('level-change', (lvl, val, prevLvl, prevVal, instance) => {
+    instance.myLevel('foo');
+});
+
 const clog3 = log3.child({}, { customLevels: { childLevel: 120 } })
 // child inherit parant
 clog3.myLevel('')
@@ -320,3 +324,4 @@ const withChildCallback = pino({
     onChild: (child: Logger) => {}
 })
 withChildCallback.onChild = (child: Logger) => {}
+

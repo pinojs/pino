@@ -117,10 +117,10 @@ function pino (...args) {
     formatters.log
   )
 
-  const stringifiers = redact ? redaction(redact, stringify) : {}
   const stringifyFn = stringify.bind({
     [stringifySafeSym]: stringifySafe
   })
+  const stringifiers = redact ? redaction(redact, stringifyFn) : {}
   const formatOpts = redact
     ? { stringify: stringifiers[redactFmtSym] }
     : { stringify: stringifyFn }

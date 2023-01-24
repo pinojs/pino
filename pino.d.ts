@@ -96,12 +96,12 @@ interface LoggerExtras<Options = LoggerOptions> extends EventEmitter {
      * @param event: only ever fires the `'level-change'` event
      * @param listener: The listener is passed four arguments: `levelLabel`, `levelValue`, `previousLevelLabel`, `previousLevelValue`.
      */
-    on(event: "level-change", listener: pino.LevelChangeEventListener): this;
-    addListener(event: "level-change", listener: pino.LevelChangeEventListener): this;
-    once(event: "level-change", listener: pino.LevelChangeEventListener): this;
-    prependListener(event: "level-change", listener: pino.LevelChangeEventListener): this;
-    prependOnceListener(event: "level-change", listener: pino.LevelChangeEventListener): this;
-    removeListener(event: "level-change", listener: pino.LevelChangeEventListener): this;
+    on<Opts = Options>(event: "level-change", listener: pino.LevelChangeEventListener<Opts>): this;
+    addListener<Opts = Options>(event: "level-change", listener: pino.LevelChangeEventListener<Opts>): this;
+    once<Opts = Options>(event: "level-change", listener: pino.LevelChangeEventListener<Opts>): this;
+    prependListener<Opts = Options>(event: "level-change", listener: pino.LevelChangeEventListener<Opts>): this;
+    prependOnceListener<Opts = Options>(event: "level-change", listener: pino.LevelChangeEventListener<Opts>): this;
+    removeListener<Opts = Options>(event: "level-change", listener: pino.LevelChangeEventListener<Opts>): this;
 
     /**
      * A utility method for determining if a given log level will write to the destination.
@@ -223,11 +223,12 @@ declare namespace pino {
     type SerializerFn = (value: any) => any;
     type WriteFn = (o: object) => void;
 
-    type LevelChangeEventListener = (
+    type LevelChangeEventListener<Options = LoggerOptions> = (
         lvl: LevelWithSilent | string,
         val: number,
         prevLvl: LevelWithSilent | string,
         prevVal: number,
+        logger: Logger<Options>
     ) => void;
 
     type LogDescriptor = Record<string, any>;
@@ -401,10 +402,6 @@ declare namespace pino {
          * The string key to place any logged object under.
          */
         nestedKey?: string;
-        /**
-         * Allows to optionally define which prettifier module to use.
-         */
-        prettifier?: any;
         /**
          * Enables logging. Default: `true`.
          */

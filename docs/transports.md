@@ -15,6 +15,8 @@ now referred to as [Legacy Transports](#legacy-transports).
 
 From Pino v7 and upwards transports can also operate inside a [Worker Thread][worker-thread]
 and can be used or configured via the options object passed to `pino` on initialization.
+In this case the transports would always operate asynchronously, and logs would be
+flushed as quickly as possible (there is nothing to do).
 
 [worker-thread]: https://nodejs.org/dist/latest-v14.x/docs/api/worker_threads.html
 

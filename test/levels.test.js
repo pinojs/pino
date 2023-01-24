@@ -96,11 +96,12 @@ test('set the level via exported pino function', async ({ equal }) => {
 
 test('level-change event', async ({ equal }) => {
   const instance = pino()
-  function handle (lvl, val, prevLvl, prevVal) {
+  function handle (lvl, val, prevLvl, prevVal, logger) {
     equal(lvl, 'trace')
     equal(val, 10)
     equal(prevLvl, 'info')
     equal(prevVal, 30)
+    equal(logger, instance)
   }
   instance.on('level-change', handle)
   instance.level = 'trace'
@@ -125,6 +126,12 @@ test('level-change event', async ({ equal }) => {
   instance.level = 'info'
 
   equal(count, 6)
+
+  instance.once('level-change', (lvl, val, prevLvl, prevVal, logger) => equal(logger, instance))
+  instance.level = 'info'
+  const child = instance.child({})
+  instance.once('level-change', (lvl, val, prevLvl, prevVal, logger) => equal(logger, child))
+  child.level = 'trace'
 })
 
 test('enable', async ({ fail }) => {

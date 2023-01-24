@@ -24,9 +24,17 @@ to each request:
 const fastify = require('fastify')({
   logger: true
 })
+
 fastify.get('/', async (request, reply) => {
   request.log.info('something')
   return { hello: 'world' }
+})
+
+fastify.listen({ port: 3000 }, (err) => {
+  if (err) {
+    fastify.log.error(err)
+    process.exit(1)
+  }
 })
 ```
 
@@ -70,7 +78,8 @@ npm install hapi-pino
 
 require('make-promises-safe')
 
-const Hapi = require('hapi')
+const Hapi = require('@hapi/hapi')
+const Pino = require('hapi-pino');
 
 async function start () {
   // Create a server with a host and port
@@ -94,15 +103,10 @@ async function start () {
     }
   })
 
-  await server.register({
-    plugin: require('.'),
-    options: {
-      prettyPrint: process.env.NODE_ENV !== 'production'
-    }
-  })
+  await server.register(Pino)
 
   // also as a decorated API
-  server.logger().info('another way for accessing it')
+  server.logger.info('another way for accessing it')
 
   // and through Hapi standard logging system
   server.log(['subsystem'], 'third way for accessing it')
