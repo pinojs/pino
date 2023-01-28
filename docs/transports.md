@@ -377,6 +377,7 @@ PRs to this document are welcome for any new transports!
 
 ### Pino v7+ Compatible
 
++ [@logtail/pino](#@logtail/pino)
 + [pino-elasticsearch](#pino-elasticsearch)
 + [pino-pretty](#pino-pretty)
 + [pino-loki](#pino-loki)
@@ -411,6 +412,12 @@ PRs to this document are welcome for any new transports!
 + [pino-websocket](#pino-websocket)
 
 
+<a id="@logtail/pino"></a>
+### @logtail/pino
+
+The [@logtail/pino](https://www.npmjs.com/package/@logtail/pino) NPM package is a transport that forwards logs to [Logtail](https://logtail.com) by [Better Stack](https://betterstack.com).
+
+[Quick start guide ⇗](https://betterstack.com/docs/logs/javascript/pino)
 
 <a id="pino-applicationinsights"></a>
 ### pino-applicationinsights
