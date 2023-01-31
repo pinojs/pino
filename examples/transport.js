@@ -21,7 +21,10 @@ const transport = pino.transport({
     }
   }, {
     level: 'info',
-    target: '#pino/pretty'
+    target: '#pino/pretty',
+    options: {
+      destination: 1
+    }
   }]
 })
 
