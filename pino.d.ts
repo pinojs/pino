@@ -628,6 +628,7 @@ declare namespace pino {
             log?: (object: object) => object;
         };
         redact?: string[] | redactOptions;
+        msgPrefix?: string
     }
 
     /**
