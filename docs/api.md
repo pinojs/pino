@@ -842,6 +842,23 @@ const child = logger.child({foo: 'bar'}, {level: 'debug'})
 child.debug('debug!') // will log as the `level` property set the level to debug
 ```
 
+##### `options.msgPrefix` (String)
+
+The `msgPrefix` property allows you to specify a prefix for every message of the child logger.
+By default, the parent prefix is inherited.
+If the parent already has a prefix, the prefix of the parent and then the child will be displayed.
+
+```js
+const logger = pino()
+const child = logger.child({avengers: 'assemble'}, {msgPrefix: '[HTTP] '})
+child.info('got new request!')
+// >  [HTTP] got new request!
+
+const grandchild = child.child({aim: 'for the head'}, {msgPrefix: '[Proxy] '})
+child.debug('message proxied!')
+// >  [HTTP] [Proxy] message proxied!
+```
+
 ##### `options.redact` (Array | Object)
 
 Setting `options.redact` to an array or object will override the parent `redact` options. To remove `redact` options inherited from the parent logger set this value as an empty array (`[]`).
