@@ -752,6 +752,16 @@ test('Should invoke `onChild` with the newly created child', async ({ equal }) =
   equal(child, innerChild)
 })
 
+test('logger message should have the prefix message that defined in the logger creation', async ({ equal }) => {
+  const stream = sink()
+  const logger = pino({
+    msgPrefix: 'My name is Bond '
+  }, stream)
+  logger.info('James Bond')
+  const { msg } = await once(stream, 'data')
+  equal(msg, 'My name is Bond James Bond')
+})
+
 test('child message should have the prefix message that defined in the child creation', async ({ equal }) => {
   const stream = sink()
   const instance = pino(stream)
@@ -771,7 +781,7 @@ test('child message should have the prefix message that defined in the child cre
   equal(msg, 'My name is Bond James Bond')
 })
 
-test('child message should not have the prefix when not providing any message', async ({ equal }) => {
+test('logged message should not have the prefix when not providing any message', async ({ equal }) => {
   const stream = sink()
   const instance = pino(stream)
   const child = instance.child({}, { msgPrefix: 'This should not be shown ' })
@@ -781,22 +791,34 @@ test('child message should not have the prefix when not providing any message', 
   equal(msg, undefined)
 })
 
+test('child message should append parent prefix to current prefix that defined in the child creation', async ({ equal }) => {
+  const stream = sink()
+  const instance = pino({
+    msgPrefix: 'My name is Bond '
+  }, stream)
+  const child = instance.child({}, { msgPrefix: 'James ' })
+  child.info('Bond')
+  const { msg } = await once(stream, 'data')
+  equal(msg, 'My name is Bond James Bond')
+})
+
+test('child message should inherent parent prefix', async ({ equal }) => {
+  const stream = sink()
+  const instance = pino({
+    msgPrefix: 'My name is Bond '
+  }, stream)
+  const child = instance.child({})
+  child.info('James Bond')
+  const { msg } = await once(stream, 'data')
+  equal(msg, 'My name is Bond James Bond')
+})
+
 test('grandchild message should inherent parent prefix', async ({ equal }) => {
   const stream = sink()
   const instance = pino(stream)
   const child = instance.child({}, { msgPrefix: 'My name is Bond ' })
   const grandchild = child.child({})
   grandchild.info('James Bond')
-  const { msg } = await once(stream, 'data')
-  equal(msg, 'My name is Bond James Bond')
-})
-
-test('grandchild message should append parent prefix to current prefix that defined in the child creation', async ({ equal }) => {
-  const stream = sink()
-  const instance = pino(stream)
-  const child = instance.child({}, { msgPrefix: 'My name is Bond ' })
-  const grandchild = child.child({}, { msgPrefix: 'James ' })
-  grandchild.info('Bond')
   const { msg } = await once(stream, 'data')
   equal(msg, 'My name is Bond James Bond')
 })

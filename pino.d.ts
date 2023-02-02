@@ -589,6 +589,11 @@ declare namespace pino {
         };
 
         /**
+         * A string that would be prefixed to every message (and child message)
+         */
+        msgPrefix?: string
+
+        /**
          * An object mapping to hook functions. Hook functions allow for customizing internal logger operations.
          * Hook functions must be synchronous functions.
          */
