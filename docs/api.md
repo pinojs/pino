@@ -388,7 +388,7 @@ See `errorKey` option to change `err` namespace.
 
 Default: `undefined`
 
-The `msgPrefix` property allows you to specify a prefix for every message of the logger and it's children.
+The `msgPrefix` property allows you to specify a prefix for every message of the logger and its children.
 
 ```js
 const logger = pino({
