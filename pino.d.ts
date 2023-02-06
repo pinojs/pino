@@ -262,6 +262,7 @@ declare namespace pino {
     interface TransportMultiOptions<TransportOptions = Record<string, any>> extends TransportBaseOptions<TransportOptions>{
         targets: readonly TransportTargetOptions<TransportOptions>[],
         levels?: Record<string, number>
+        dedupe?: boolean
     }
 
     interface MultiStreamOptions {
