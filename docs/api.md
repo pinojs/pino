@@ -384,6 +384,24 @@ See `errorKey` option to change `err` namespace.
 
 * See [pino.stdSerializers](#pino-stdserializers)
 
+#### `msgPrefix` (String)
+
+Default: `undefined`
+
+The `msgPrefix` property allows you to specify a prefix for every message of the logger and its children.
+
+```js
+const logger = pino({
+  msgPrefix: '[HTTP] '
+})
+logger.info('got new request!')
+// >  [HTTP] got new request!
+
+const child = logger.child({})
+child.info('User authenticated!')
+// >  [HTTP] User authenticated!
+```
+
 #### `base` (Object)
 
 Default: `{pid: process.pid, hostname: os.hostname}`
@@ -840,6 +858,26 @@ const logger = pino()
 logger.debug('nope') // will not log, since default level is info
 const child = logger.child({foo: 'bar'}, {level: 'debug'})
 child.debug('debug!') // will log as the `level` property set the level to debug
+```
+
+##### `options.msgPrefix` (String)
+
+Default: `undefined`
+
+The `msgPrefix` property allows you to specify a prefix for every message of the child logger.
+By default, the parent prefix is inherited.
+If the parent already has a prefix, the prefix of the parent and then the child will be displayed.
+
+```js
+const logger = pino({
+  msgPrefix: '[HTTP] '
+})
+logger.info('got new request!')
+// >  [HTTP] got new request!
+
+const child = logger.child({avengers: 'assemble'}, {msgPrefix: '[Proxy] '})
+child.info('message proxied!')
+// >  [HTTP] [Proxy] message proxied!
 ```
 
 ##### `options.redact` (Array | Object)
