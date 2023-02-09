@@ -120,3 +120,9 @@ pino.transport({
     },
     options: { id: 'abc' }
 })
+
+// Dedupe
+pino.transport({
+    targets: [],
+    dedupe: true,
+})

@@ -111,6 +111,19 @@ const transport = pino.transport({
 pino(transport)
 ```
 
+It is also possible to use the `dedupe` option to send logs only to the stream with the higher level.
+```js
+const pino = require('pino')
+const transport = pino.transport({
+  targets: [
+    { target: '/absolute/path/to/my-transport.mjs', level: 'error' },
+    { target: 'some-file-transport', options: { destination: '/dev/null' }
+  ],
+  dedupe: true
+})
+pino(transport)
+```
+
 For more details on `pino.transport` see the [API docs for `pino.transport`][pino-transport].
 
 [pino-transport]: /docs/api.md#pino-transport
