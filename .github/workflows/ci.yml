@@ -42,7 +42,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [macOS-latest, windows-latest, ubuntu-latest]
-        node-version: [14, 16, 18]
+        node-version: [14, 16, 18, 19]
     steps:
       - name: Check out repo
         uses: actions/checkout@v3
