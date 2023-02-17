@@ -1230,7 +1230,7 @@ log.info('this will be written to /tmp/debug.stream.out and /tmp/info.stream.out
 log.fatal('this will be written to /tmp/debug.stream.out, /tmp/info.stream.out and /tmp/fatal.stream.out')
 ```
 
-In order for `multistream` to work, the log level __must__ be set to the lowest level used in the streams array.
+In order for `multistream` to work, the log level __must__ be set to the lowest level used in the streams array. Default is `info`.
 
 #### Options
 
@@ -1244,7 +1244,7 @@ In order for `multistream` to work, the log level __must__ be set to the lowest 
     var pino = require('pino')
     var multistream = pino.multistream
     var streams = [
-      {stream: process.stdout},
+      {level: 'debug', stream: process.stdout},
       {level: 'error', stream: process.stderr},
     ]
 
