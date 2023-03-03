@@ -1,13 +1,5 @@
 'use strict'
-
-// Pino's primary usage writes ndjson to `stdout`:
 const pino = require('pino')()
-
-// However, if "human readable" output is desired,
-// `pino-pretty` can be provided as the destination
-// stream by uncommenting the following line in place
-// of the previous declaration:
-// const pino = require('..')(require('pino-pretty')())
 
 pino.info('hello world')
 pino.error('this is at error level')
