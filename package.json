@@ -12,11 +12,8 @@
     "pino.d.ts",
     "bin.js",
     "browser.js",
-    "pretty.js",
-    "usage.txt",
     "test",
     "docs",
-    "example.js",
     "examples",
     "lib"
   ],
