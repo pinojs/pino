@@ -21,7 +21,7 @@
     "docs": "docsify serve",
     "browser-test": "airtap --local 8080 test/browser*test.js",
     "lint": "eslint .",
-    "smoker": "npm exec smoker test-ci-smoke",
+    "smoker": "node ./node_modules/.bin/smoker test-ci-smoke",
     "prepublishOnly": "tap --no-check-coverage test/internals/version.test.js",
     "test": "npm run lint && npm run transpile && tap --ts && jest test/jest && npm run test-types",
     "test-ci": "npm run lint && npm run transpile && tap --ts --no-check-coverage --coverage-report=lcovonly && npm run test-types && npm run smoker",
