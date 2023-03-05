@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   smoke:
-    name: smoke :: run tests against package after npm pack
+    name: Smoke Test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
