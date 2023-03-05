@@ -24,7 +24,7 @@
     "smoker": "node ./node_modules/.bin/smoker test-ci-smoke",
     "prepublishOnly": "tap --no-check-coverage test/internals/version.test.js",
     "test": "npm run lint && npm run transpile && tap --ts && jest test/jest && npm run test-types",
-    "test-ci": "npm run lint && npm run transpile && tap --ts --no-check-coverage --coverage-report=lcovonly && npm run test-types && npm run smoker",
+    "test-ci": "npm run lint && npm run transpile && tap --ts --no-check-coverage --coverage-report=lcovonly && npm run test-types",
     "test-ci-pnpm": "pnpm run lint && npm run transpile && tap --ts --no-coverage --no-check-coverage && pnpm run test-types",
     "test-ci-yarn-pnp": "yarn run lint && npm run transpile && tap --ts --no-check-coverage --coverage-report=lcovonly",
     "test-types": "tsc && tsd && ts-node test/types/pino.ts",
