@@ -60,6 +60,12 @@ jobs:
       - name: Run tests
         run: npm run test-ci
 
+      - name: Run smoke test
+        if: >
+          matrix.os != 'windows-latest' &&
+          matrix.node-version > 14
+        run: npm run test:smoke
+
   automerge:
     name: Automerge Dependabot PRs
     if: >
