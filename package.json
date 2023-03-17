@@ -6,19 +6,6 @@
   "type": "commonjs",
   "types": "pino.d.ts",
   "browser": "./browser.js",
-  "files": [
-    "pino.js",
-    "file.js",
-    "pino.d.ts",
-    "bin.js",
-    "browser.js",
-    "pretty.js",
-    "usage.txt",
-    "test",
-    "docs",
-    "example.js",
-    "lib"
-  ],
   "scripts": {
     "docs": "docsify serve",
     "browser-test": "airtap --local 8080 test/browser*test.js",
