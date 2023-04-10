@@ -554,6 +554,13 @@ declare namespace pino {
                  */
                 send: (level: Level, logEvent: LogEvent) => void;
             };
+            /**
+             * The disabled option will disable logging in browser if set to true, by default it is set to false.
+             *
+             * @example
+             * const pino = require('pino')({browser: {disabled: true}})
+             */
+            disabled?: boolean;
         };
         /**
          * key-value object added as child logger to each log line. If set to null the base child logger is not added
