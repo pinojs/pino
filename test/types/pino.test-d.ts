@@ -325,3 +325,7 @@ const withChildCallback = pino({
 })
 withChildCallback.onChild = (child: Logger) => {}
 
+pino({
+    crlf: true,
+});
+
