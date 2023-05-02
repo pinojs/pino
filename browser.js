@@ -13,7 +13,8 @@ const stdSerializers = {
   wrapErrorSerializer: passthrough,
   req: mock,
   res: mock,
-  err: asErrValue
+  err: asErrValue,
+  errWithCause: asErrValue
 }
 
 function shouldSerialize (serialize, serializers) {
