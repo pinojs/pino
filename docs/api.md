@@ -341,8 +341,8 @@ const formatters = {
 ##### `bindings`
 
 Changes the shape of the bindings. The default shape is `{ pid, hostname }`.
-The function takes a single argument, the bindings object. It will
-be called every time a child logger is created.
+The function takes a single argument, the bindings object, which can be configured
+using the [`base` option](#opt-base). Called once when creating logger.
 
 ```js
 const formatters = {
@@ -402,6 +402,7 @@ child.info('User authenticated!')
 // >  [HTTP] User authenticated!
 ```
 
+<a id=opt-base></a>
 #### `base` (Object)
 
 Default: `{pid: process.pid, hostname: os.hostname}`
