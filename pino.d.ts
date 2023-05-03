@@ -628,6 +628,11 @@ declare namespace pino {
          * Optional child creation callback.
          */
         onChild?: OnChildCallback;
+
+        /**
+         * logs newline delimited JSON with `\r\n` instead of `\n`. Default: `false`.
+         */
+        crlf?: boolean;
     }
 
     interface ChildLoggerOptions {
