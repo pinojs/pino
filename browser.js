@@ -48,11 +48,13 @@ function pino (opts) {
     opts.browser.serialize.indexOf('!stdSerializers.err') > -1
   ) stdErrSerialize = false
 
-  const levels = ['error', 'fatal', 'warn', 'info', 'debug', 'trace']
+  const customLevels = Object.keys(opts.customLevels || {})
+  const levels = ['error', 'fatal', 'warn', 'info', 'debug', 'trace'].concat(customLevels)
 
   if (typeof proto === 'function') {
-    proto.error = proto.fatal = proto.warn =
-    proto.info = proto.debug = proto.trace = proto
+    levels.forEach(function (level) {
+      proto[level] = proto
+    })
   }
   if (opts.enabled === false || opts.browser.disabled) opts.level = 'silent'
   const level = opts.level || 'info'
@@ -74,7 +76,7 @@ function pino (opts) {
     levels,
     timestamp: getTimeFunction(opts)
   }
-  logger.levels = pino.levels
+  logger.levels = getLevels(opts)
   logger.level = level
 
   logger.setMaxListeners = logger.getMaxListeners =
@@ -112,6 +114,10 @@ function pino (opts) {
     set(setOpts, logger, 'info', 'log')
     set(setOpts, logger, 'debug', 'log')
     set(setOpts, logger, 'trace', 'log')
+
+    customLevels.forEach(function (level) {
+      set(setOpts, logger, level, 'log')
+    })
   }
 
   function child (bindings, childOptions) {
@@ -153,6 +159,26 @@ function pino (opts) {
     return new Child(this)
   }
   return logger
+}
+
+function getLevels (opts) {
+  const customLevels = opts.customLevels || {}
+
+  const values = Object.assign({}, pino.levels.values, customLevels)
+  const labels = Object.assign({}, pino.levels.labels, invertObject(customLevels))
+
+  return {
+    values,
+    labels
+  }
+}
+
+function invertObject (obj) {
+  const inverted = {}
+  Object.keys(obj).forEach(function (key) {
+    inverted[obj[key]] = key
+  })
+  return inverted
 }
 
 pino.levels = {
@@ -204,15 +230,15 @@ function wrap (opts, logger, level) {
 
       if (opts.transmit) {
         const transmitLevel = opts.transmit.level || logger.level
-        const transmitValue = pino.levels.values[transmitLevel]
-        const methodValue = pino.levels.values[level]
+        const transmitValue = logger.levels.values[transmitLevel]
+        const methodValue = logger.levels.values[level]
         if (methodValue < transmitValue) return
         transmit(this, {
           ts,
           methodLevel: level,
           methodValue,
           transmitLevel,
-          transmitValue: pino.levels.values[opts.transmit.level || logger.level],
+          transmitValue: logger.levels.values[opts.transmit.level || logger.level],
           send: opts.transmit.send,
           val: logger.levelVal
         }, args)
@@ -229,7 +255,7 @@ function asObject (logger, level, args, ts) {
   if (ts) {
     o.time = ts
   }
-  o.level = pino.levels.values[level]
+  o.level = logger.levels.values[level]
   let lvl = (logger._childLevel | 0) + 1
   if (lvl < 1) lvl = 1
   // deliberate, catching objects, arrays

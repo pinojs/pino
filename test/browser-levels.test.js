@@ -115,6 +115,29 @@ test('set the level via constructor', ({ end, same, is }) => {
   end()
 })
 
+test('set custom level and use it', ({ end, same, is }) => {
+  const expected = [
+    {
+      level: 31,
+      msg: 'this is a custom level'
+    }
+  ]
+  const instance = pino({
+    customLevels: {
+      success: 31
+    },
+    browser: {
+      write (actual) {
+        checkLogObjects(is, same, actual, expected.shift())
+      }
+    }
+  })
+
+  instance.success('this is a custom level')
+
+  end()
+})
+
 test('the wrong level throws', ({ end, throws }) => {
   const instance = pino()
   throws(() => {
