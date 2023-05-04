@@ -160,3 +160,59 @@ test('mixin can use level number', async ({ ok, same }) => {
     stack: 'stack'
   }, 'test')
 })
+
+test('mixin receives logger as third parameter', async ({ ok, same }) => {
+  const stream = sink()
+  const instance = pino({
+    mixin (context, num, logger) {
+      ok(logger !== null, 'logger should be defined')
+      ok(logger !== undefined, 'logger should be defined')
+      same(logger, instance)
+      return { ...context, num }
+    }
+  }, stream)
+  instance.level = name
+  instance[name]({
+    message: '123'
+  }, 'test')
+})
+
+test('mixin receives child logger', async ({ ok, same }) => {
+  const stream = sink()
+  let child = null
+  const instance = pino({
+    mixin (context, num, logger) {
+      ok(logger !== null, 'logger should be defined')
+      ok(logger !== undefined, 'logger should be defined')
+      same(logger.expected, child.expected)
+      return { ...context, num }
+    }
+  }, stream)
+  instance.level = name
+  instance.expected = false
+  child = instance.child({})
+  child.expected = true
+  child[name]({
+    message: '123'
+  }, 'test')
+})
+
+test('mixin receives logger even if child exists', async ({ ok, same }) => {
+  const stream = sink()
+  let child = null
+  const instance = pino({
+    mixin (context, num, logger) {
+      ok(logger !== null, 'logger should be defined')
+      ok(logger !== undefined, 'logger should be defined')
+      same(logger.expected, instance.expected)
+      return { ...context, num }
+    }
+  }, stream)
+  instance.level = name
+  instance.expected = false
+  child = instance.child({})
+  child.expected = true
+  instance[name]({
+    message: '123'
+  }, 'test')
+})

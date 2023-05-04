@@ -121,6 +121,8 @@ Default: `undefined`
 
 If provided, the `mixin` function is called each time one of the active
 logging methods is called. The first parameter is the value `mergeObject` or an empty object. The second parameter is the log level number.
+The third parameter is the logger or child logger itself, which can be used to
+retrieve logger-specific context from within the `mixin` function.
 The function must synchronously return an object. The properties of the returned object will be added to the
 logged JSON.
 
@@ -177,7 +179,40 @@ logger.error('Message 2')
 ```
 
 If the `mixin` feature is being used merely to add static metadata to each log message,
-then a [child logger ⇗](/docs/child-loggers.md) should be used instead.
+then a [child logger ⇗](/docs/child-loggers.md) should be used instead. Unless your application
+needs to concatenate values for a specific key multiple times, in which case `mixin` can be
+used to avoid the [duplicate keys caveat](/docs/child-loggers.md#duplicate-keys-caveat):
+
+```js
+const logger = pino({
+  mixin (obj, num, logger) {
+    return {
+      tags: logger.tags
+    }
+  }
+})
+logger.tags = {}
+
+logger.addTag = function (key, value) {
+  logger.tags[key] = value
+}
+
+function createChild (parent, ...context) {
+  const newChild = logger.child(...context)
+  newChild.tags = { ...logger.tags }
+  newChild.addTag = function (key, value) {
+    newChild.tags[key] = value
+  }
+  return newChild
+}
+
+logger.addTag('foo', 1)
+const child = createChild(logger, {})
+child.addTag('bar', 2)
+logger.info('this will only have `foo: 1`')
+child.info('this will have both `foo: 1` and `bar: 2`')
+logger.info('this will still only have `foo: 1`')
+```
 
 As of pino 7.x, when the `mixin` is used with the [`nestedKey` option](#opt-nestedkey), 
 the object returned from the `mixin` method will also be nested. Prior versions would mix 
