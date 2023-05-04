@@ -80,7 +80,7 @@ interface LoggerExtras<Options = LoggerOptions> extends EventEmitter {
      * @param options: an options object that will override child logger inherited options.
      * @returns a child logger instance.
      */
-    child<ChildOptions extends pino.ChildLoggerOptions>(bindings: pino.Bindings, options?: ChildOptions): pino.Logger<Options & ChildOptions>;
+    child<ChildOptions extends pino.ChildLoggerOptions = {}>(bindings: pino.Bindings, options?: ChildOptions): pino.Logger<Options & ChildOptions>;
 
     /**
      * This can be used to modify the callback function on creation of a new child.
