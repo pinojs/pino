@@ -61,7 +61,7 @@
   "homepage": "https://getpino.io",
   "devDependencies": {
     "@types/flush-write-stream": "^1.0.0",
-    "@types/node": "^18.0.0",
+    "@types/node": "^20.2.3",
     "@types/tap": "^15.0.6",
     "airtap": "4.0.4",
     "benchmark": "^2.1.4",
