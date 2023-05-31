@@ -230,7 +230,7 @@ log.info("Привет мир!"); //INFO (11856): ╨Я╤А╨╕╨▓╨╡�
 log.info("你好世界！"); //INFO (11856): ф╜ахе╜ф╕ЦчХМя╝Б
 log.info("Halo Wɔl!"); //INFO (11856): Halo W╔Фl!
 ```
-Use the ffi module to call the native functions SetConsoleOutputCP and SetConsoleCP.
+Use the ffi module to call the native functions [SetConsoleOutputCP](https://learn.microsoft.com/en-us/windows/console/setconsoleoutputcp) and [SetConsoleCP](https://learn.microsoft.com/en-us/windows/console/setconsolecp).
 
 ```js
 import os from 'os';
