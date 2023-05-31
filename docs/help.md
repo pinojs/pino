@@ -220,6 +220,40 @@ correctly with the use of [`chcp`](https://ss64.com/nt/chcp.html) by
 executing in the terminal `chcp 65001`. This is a known limitation of
 Node.js.
 
+It is also possible to change the console encoding from within nodejs using the [ffi-napi](https://www.npmjs.com/package/ffi-napi) module (or any other ffi module you like, [koffi](https://www.npmjs.com/package/koffi) for example).
+
+### Changing encodings from within Nodejs
+
+```js
+log.info("Hello World!"); //INFO (11856): Hello World!
+log.info("Привет мир!"); //INFO (11856): ╨Я╤А╨╕╨▓╨╡╤В ╨╝╨╕╤А!
+log.info("你好世界！"); //INFO (11856): ф╜ахе╜ф╕ЦчХМя╝Б
+log.info("Halo Wɔl!"); //INFO (11856): Halo W╔Фl!
+```
+Use the ffi module to call the native functions SetConsoleOutputCP and SetConsoleCP.
+
+```js
+import os from 'os';
+import ffi from 'ffi-napi';
+if (os.platform() === 'win32') {
+  const kernel = ffi.Library('Kernel32', {
+    'SetConsoleOutputCP' : [ffi.types.bool, [ffi.types.uint]],
+    'SetConsoleCP' : [ffi.types.bool, [ffi.types.uint]]
+  });
+  const CP_UTF8 = 65001;
+  kernel.SetConsoleOutputCP(CP_UTF8);
+  kernel.SetConsoleCP(CP_UTF8);
+}
+```
+Result🙂
+```js
+log.info("Hello World!"); //INFO (4644): Hello World!
+log.info("Привет мир!"); //INFO (11856): Привет мир!
+log.info("你好世界！"); //INFO (11856): 你好世界！
+log.info("Halo Wɔl!"); //INFO (11856): Halo Wɔl!
+```
+Tested on node v20.2.0
+
 <a id="stackdriver"></a>
 ## Mapping Pino Log Levels to Google Cloud Logging (Stackdriver) Severity Levels
 
