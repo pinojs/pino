@@ -337,7 +337,7 @@ const pino = require('pino')
 const transport = pino.transport({
   targets: [
     { target: '/absolute/path/to/my-transport.mjs', level: 'error' },
-    { target: 'some-file-transport', options: { destination: '/dev/null' }
+    { target: 'some-file-transport', options: { destination: '/dev/null' } }
   ]
 })
 const logger = pino(transport)
