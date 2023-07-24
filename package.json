@@ -82,7 +82,7 @@
     "jest": "^29.0.3",
     "log": "^6.0.0",
     "loglevel": "^1.6.7",
-    "midnight-smoker": "1.1.1",
+    "midnight-smoker": "2.0.4",
     "pino-pretty": "^10.0.0",
     "pre-commit": "^1.2.2",
     "proxyquire": "^2.1.3",
