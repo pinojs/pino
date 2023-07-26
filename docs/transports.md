@@ -955,8 +955,6 @@ const transport = pino.transport({
 pino(transport)
 ```
 
-<a id="pino-slack-webhook"></a>
-
 <a id="communication-between-pino-and-transport"></a>
 ## Communication between Pino and Transports
 Here we discuss some technical details of how Pino communicates with its [worker threads](https://nodejs.org/api/worker_threads.html).
