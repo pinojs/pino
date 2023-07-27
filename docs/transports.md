@@ -398,7 +398,8 @@ PRs to this document are welcome for any new transports!
 + [pino-sentry-transport](#pino-sentry-transport)
 + [pino-airbrake-transport](#pino-airbrake-transport)
 + [pino-datadog-transport](#pino-datadog-transport)
-+ [pino-slack-webhook](#pino-slack-webhook)
++ [pino-slack-webhook](#pino-slack-webhook) 
++ [pino-axiom](#pino-axiom)
 
 ### Legacy
 
@@ -933,6 +934,26 @@ pino(transport)
 [Slack]: https://slack.com/
 
 [pino-pretty]: https://github.com/pinojs/pino-pretty
+
+For full documentation of command line switches read the [README](https://github.com/abeai/pino-websocket#readme).
+
+<a id="pino-axiom"></a>
+### pino-axiom
+
+[pino-axiom](https://www.npmjs.com/package/pino-axiom) is a transport that will forward logs to [Axiom](https://axiom.co).
+
+```javascript
+const pino = require('pino')
+const transport = pino.transport({
+  target: 'pino-axiom',
+  options: {
+    orgId: 'YOUR-ORG-ID', 
+    token: 'YOUR-TOKEN', 
+    dataset: 'YOUR-DATASET', 
+  },
+})
+pino(transport)
+```
 
 <a id="communication-between-pino-and-transport"></a>
 ## Communication between Pino and Transports
