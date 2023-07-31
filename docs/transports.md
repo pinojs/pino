@@ -150,7 +150,7 @@ export default async function (opts) {
 
   return build(async function (source) {
     for await (let obj of source) {
-      const toDrain = !destination.write(obj.message.toUpperCase() + '\n')
+      const toDrain = !destination.write(obj.msg.toUpperCase() + '\n')
       // This block will handle backpressure
       if (toDrain) {
         await once(destination, 'drain')
