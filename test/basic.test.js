@@ -420,6 +420,23 @@ test('correctly escape msg strings with unclosed double quote', async ({ same })
   })
 })
 
+test('correctly escape quote in a key', async ({ same }) => {
+  const stream = sink()
+  const instance = pino(stream)
+  const obj = { 'some"obj': 'world' }
+  instance.info(obj, 'a string')
+  const result = await once(stream, 'data')
+  delete result.time
+  same(result, {
+    level: 30,
+    pid,
+    hostname,
+    msg: 'a string',
+    'some"obj': 'world'
+  })
+  same(Object.keys(obj), ['some"obj'])
+})
+
 // https://github.com/pinojs/pino/issues/139
 test('object and format string', async ({ same }) => {
   const stream = sink()
