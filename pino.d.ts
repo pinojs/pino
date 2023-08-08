@@ -284,18 +284,18 @@ declare namespace pino {
 
     type DestinationStreamWithMetadata = DestinationStream & ({ [symbols.needsMetadataGsym]?: false } | DestinationStreamHasMetadata);
 
-    interface StreamEntry {
+    interface StreamEntry<TLevel = Level> {
         stream: DestinationStream
-        level?: Level
+        level?: TLevel
     }
 
-    interface MultiStreamRes {
+    interface MultiStreamRes<TOriginLevel = Level> {
         write: (data: any) => void,
-        add: (dest: StreamEntry | DestinationStream) => MultiStreamRes,
+        add: <TLevel = Level>(dest: StreamEntry<TLevel> | DestinationStream) => MultiStreamRes<TOriginLevel & TLevel>,
         flushSync: () => void,
         minLevel: number,
-        streams: StreamEntry[],
-        clone(level: Level): MultiStreamRes,
+        streams: StreamEntry<TOriginLevel>[],
+        clone<TLevel = Level>(level: TLevel): MultiStreamRes<TLevel>,
     }
 
     interface LevelMapping {
@@ -775,10 +775,10 @@ declare namespace pino {
         options: TransportSingleOptions<TransportOptions> | TransportMultiOptions<TransportOptions> | TransportPipelineOptions<TransportOptions>
     ): ThreadStream
 
-    export function multistream(
-        streamsArray: (DestinationStream | StreamEntry)[] | DestinationStream | StreamEntry,
+    export function multistream<TLevel = Level>(
+        streamsArray: (DestinationStream | StreamEntry<TLevel>)[] | DestinationStream | StreamEntry<TLevel>,
         opts?: MultiStreamOptions
-    ): MultiStreamRes
+    ): MultiStreamRes<TLevel>
 }
 
 //// Callable default export
@@ -833,8 +833,8 @@ export interface LogEvent extends pino.LogEvent {}
 export interface LogFn extends pino.LogFn {}
 export interface LoggerOptions extends pino.LoggerOptions {}
 export interface MultiStreamOptions extends pino.MultiStreamOptions {}
-export interface MultiStreamRes extends pino.MultiStreamRes {}
-export interface StreamEntry extends pino.StreamEntry {}
+export interface MultiStreamRes<TLevel = Level> extends pino.MultiStreamRes<TLevel> {}
+export interface StreamEntry<TLevel = Level> extends pino.StreamEntry<TLevel> {}
 export interface TransportBaseOptions extends pino.TransportBaseOptions {}
 export interface TransportMultiOptions extends pino.TransportMultiOptions {}
 export interface TransportPipelineOptions extends pino.TransportPipelineOptions {}
