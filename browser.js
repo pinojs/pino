@@ -44,7 +44,7 @@ function appendChildLogger (parentLogger, childLogger) {
 function setupBaseLogFunctions (logger, levels, proto) {
   const logFunctions = {}
   levels.forEach(level => {
-    logFunctions[level] = proto[level] ? proto[level] : (_console[level] || _console[logFallbackMap[level] ?? 'log'] || noop)
+    logFunctions[level] = proto[level] ? proto[level] : (_console[level] || _console[logFallbackMap[level] || 'log'] || noop)
   })
   logger[baseLogFunctionSymbol] = logFunctions
 }
