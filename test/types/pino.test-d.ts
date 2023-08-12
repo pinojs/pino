@@ -14,9 +14,9 @@ info("the answer is %d", 42);
 info({ obj: 42 }, "hello world");
 info({ obj: 42, b: 2 }, "hello world");
 info({ obj: { aa: "bbb" } }, "another");
-// @ts-expect-error The type definitions will throw an error if you call log functions using
-// higher order functions.
-setImmediate(info, "after setImmediate");
+// The type definitions will not work properly when using higher order functions, so we have to
+// perform a manual type assertion.
+setImmediate(info as (string) => void, "after setImmediate");
 error(new Error("an error"));
 
 const writeSym = pino.symbols.writeSym;
