@@ -311,6 +311,7 @@ const customBaseLogger: CustomBaseLogger = {
 
 // custom levels
 const log3 = pino({ customLevels: { myLevel: 100 } })
+// @ts-expect-error We intentionally cause a run-time error here.
 expectError(log3.log())
 log3.level = 'myLevel'
 log3.myLevel('')
