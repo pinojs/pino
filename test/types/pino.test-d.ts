@@ -14,6 +14,8 @@ info("the answer is %d", 42);
 info({ obj: 42 }, "hello world");
 info({ obj: 42, b: 2 }, "hello world");
 info({ obj: { aa: "bbb" } }, "another");
+// @ts-expect-error The type definitions will throw an error if you call log functions using
+// higher order functions.
 setImmediate(info, "after setImmediate");
 error(new Error("an error"));
 
@@ -108,7 +110,6 @@ pino({
 });
 
 pino({ base: null });
-// @ts-expect-error
 if ("pino" in log) console.log(`pino version: ${log.pino}`);
 
 expectType<void>(log.flush());
@@ -264,9 +265,19 @@ interface StrictShape {
     err?: unknown;
 }
 
+// The following generic parameter is no longer supported:
+
+/*
 info<StrictShape>({
     activity: "Required property",
 });
+*/
+
+// Instead, the `satisfies` operator should be used like you would with any other TypeScript code, like in the below example.
+
+info({
+    activity: "Required property",
+} satisfies StrictShape);
 
 const logLine: pino.LogDescriptor = {
     level: 20,

@@ -140,6 +140,7 @@ interface StringInterpolationLetterToType {
     j: object;
 }
 
+/** Helper type to extract the string interpolation placeholders and convert them to types. */
 type ExtractArgs<T extends string> = T extends `${string}%${infer R}`
     ? R extends `${infer A}${infer B}`
     ? A extends keyof StringInterpolationLetterToType
@@ -364,7 +365,7 @@ declare namespace pino {
         // e.g.
         // logFn(123);
         // logFn(true);
-        <T extends number | boolean>(arg: T): void;
+        (arg: number | boolean): void;
     }
 
     interface LoggerOptions {
