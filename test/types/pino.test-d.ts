@@ -16,7 +16,7 @@ info({ obj: 42, b: 2 }, "hello world");
 info({ obj: { aa: "bbb" } }, "another");
 // The type definitions will not work properly when using higher order functions, so we have to
 // perform a manual type assertion.
-setImmediate(info as (string) => void, "after setImmediate");
+setImmediate(info as (msg: string) => void, "after setImmediate");
 error(new Error("an error"));
 
 const writeSym = pino.symbols.writeSym;
