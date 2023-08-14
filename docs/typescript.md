@@ -64,3 +64,11 @@ setTimeout(() => {
     logger("A second has passed!");
 }, 1000);
 ```
+
+Another solution would be to perform a manual type assertion like this:
+
+```ts
+setTimeout(logger as (message: string) => void, 1000, "A second has passed!");
+```
+
+Obviously, using type assertions makes your code less safe, so use the second solution with care.
