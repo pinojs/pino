@@ -1,6 +1,7 @@
 ![banner](pino-banner.png)
 
 # pino
+
 [![npm version](https://img.shields.io/npm/v/pino)](https://www.npmjs.com/package/pino)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/pinojs/pino/ci.yml)](https://github.com/pinojs/pino/actions)
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](https://standardjs.com/)
@@ -18,6 +19,7 @@
 * [Web Frameworks ⇗](/docs/web.md)
 * [Pretty Printing ⇗](/docs/pretty.md)
 * [Asynchronous Logging ⇗](/docs/asynchronous.md)
+* [Usage With TypeScript](/docs/typescript.md)
 * [Ecosystem ⇗](/docs/ecosystem.md)
 * [Help ⇗](/docs/help.md)
 * [Long Term Support Policy ⇗](/docs/lts.md)
@@ -63,7 +65,6 @@ For using Pino with a web framework see:
 * [Pino with Koa](docs/web.md#koa)
 * [Pino with Node core `http`](docs/web.md#http)
 * [Pino with Nest](docs/web.md#nest)
-
 
 <a name="essentials"></a>
 ## Essentials
