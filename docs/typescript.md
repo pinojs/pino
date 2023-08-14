@@ -27,6 +27,14 @@ logger.info("foo: %s", foo);
 
 In this case, `%s` refers to a string, as explained in the [documentation for logging method parameters](https://getpino.io/#/docs/api?id=logger).
 
+If you use a string interpolation placeholder without a corresponding argument or with an argument of the wrong type, the TypeScript compiler will throw an error. For example:
+
+```ts
+const foo: string = getFoo();
+logger.info("foo: %s"); // Error: Missing an expected argument.
+logger.info("foo: %d", foo); // Error: `foo` is not a number.
+```
+
 ## Validating the Object
 
 Pino supports [logging both strings and objects](https://getpino.io/#/docs/api?id=logger). If you are passing an object to a Pino logger, you might want to validate that the object is in the correct shape. You can do this with the [`satisfies` operator](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-4-9.html) in the same way that you would in other kinds of TypeScript code. For example:
