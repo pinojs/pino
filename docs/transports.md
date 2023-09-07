@@ -111,6 +111,19 @@ const transport = pino.transport({
 pino(transport)
 ```
 
+It is also possible to use the `dedupe` option to send logs only to the stream with the higher level.
+```js
+const pino = require('pino')
+const transport = pino.transport({
+  targets: [
+    { target: '/absolute/path/to/my-transport.mjs', level: 'error' },
+    { target: 'some-file-transport', options: { destination: '/dev/null' }
+  ],
+  dedupe: true
+})
+pino(transport)
+```
+
 For more details on `pino.transport` see the [API docs for `pino.transport`][pino-transport].
 
 [pino-transport]: /docs/api.md#pino-transport
@@ -137,7 +150,7 @@ export default async function (opts) {
 
   return build(async function (source) {
     for await (let obj of source) {
-      const toDrain = !destination.write(obj.message.toUpperCase() + '\n')
+      const toDrain = !destination.write(obj.msg.toUpperCase() + '\n')
       // This block will handle backpressure
       if (toDrain) {
         await once(destination, 'drain')
@@ -324,7 +337,7 @@ const pino = require('pino')
 const transport = pino.transport({
   targets: [
     { target: '/absolute/path/to/my-transport.mjs', level: 'error' },
-    { target: 'some-file-transport', options: { destination: '/dev/null' }
+    { target: 'some-file-transport', options: { destination: '/dev/null' } }
   ]
 })
 const logger = pino(transport)
@@ -377,6 +390,7 @@ PRs to this document are welcome for any new transports!
 
 ### Pino v7+ Compatible
 
++ [@logtail/pino](#@logtail/pino)
 + [pino-elasticsearch](#pino-elasticsearch)
 + [pino-pretty](#pino-pretty)
 + [pino-loki](#pino-loki)
@@ -384,6 +398,9 @@ PRs to this document are welcome for any new transports!
 + [pino-sentry-transport](#pino-sentry-transport)
 + [pino-airbrake-transport](#pino-airbrake-transport)
 + [pino-datadog-transport](#pino-datadog-transport)
++ [pino-slack-webhook](#pino-slack-webhook) 
++ [pino-axiom](#pino-axiom)
++ [pino-opentelemetry-transport](#pino-opentelemetry-transport)
 
 ### Legacy
 
@@ -411,6 +428,12 @@ PRs to this document are welcome for any new transports!
 + [pino-websocket](#pino-websocket)
 
 
+<a id="@logtail/pino"></a>
+### @logtail/pino
+
+The [@logtail/pino](https://www.npmjs.com/package/@logtail/pino) NPM package is a transport that forwards logs to [Logtail](https://logtail.com) by [Better Stack](https://betterstack.com).
+
+[Quick start guide ⇗](https://betterstack.com/docs/logs/javascript/pino)
 
 <a id="pino-applicationinsights"></a>
 ### pino-applicationinsights
@@ -888,7 +911,73 @@ $ node app.js | pino-websocket -a my-websocket-server.example.com -p 3004
 
 For full documentation of command line switches read the [README](https://github.com/abeai/pino-websocket#readme).
 
+<a id="pino-slack-webhook"></a>
+### pino-slack-webhook
+
+[pino-slack-webhook][pino-slack-webhook] is a Pino v7+ compatible transport to forward log events to [Slack][Slack]
+from a dedicated worker:
+
+```js
+const pino = require('pino')
+const transport = pino.transport({
+  target: '@youngkiu/pino-slack-webhook',
+  options: {
+    webhookUrl: 'https://hooks.slack.com/services/xxx/xxx/xxx',
+    channel: '#pino-log',
+    username: 'webhookbot',
+    icon_emoji: ':ghost:'
+  }
+})
+pino(transport)
+```
+
+[pino-slack-webhook]: https://github.com/youngkiu/pino-slack-webhook
+[Slack]: https://slack.com/
+
 [pino-pretty]: https://github.com/pinojs/pino-pretty
+
+For full documentation of command line switches read the [README](https://github.com/abeai/pino-websocket#readme).
+
+<a id="pino-axiom"></a>
+### pino-axiom
+
+[pino-axiom](https://www.npmjs.com/package/pino-axiom) is a transport that will forward logs to [Axiom](https://axiom.co).
+
+```javascript
+const pino = require('pino')
+const transport = pino.transport({
+  target: 'pino-axiom',
+  options: {
+    orgId: 'YOUR-ORG-ID', 
+    token: 'YOUR-TOKEN', 
+    dataset: 'YOUR-DATASET', 
+  },
+})
+pino(transport)
+```
+
+<a id="pino-opentelemetry-transport"></a>
+### pino-opentelemetry-transport
+
+[pino-opentelemetry-transport](https://www.npmjs.com/package/pino-opentelemetry-transport) is a transport that will forward logs to an [OpenTelemetry log collector](https://opentelemetry.io/docs/collector/) using [OpenTelemetry JS instrumentation](https://opentelemetry.io/docs/instrumentation/js/).
+
+```javascript
+const pino = require('pino')
+
+const transport = pino.transport({
+  target: 'pino-opentelemetry-transport',
+  options: {
+    resourceAttributes: {
+      'service.name': 'test-service',
+      'service.version': '1.0.0'
+    }
+  }
+})
+
+pino(transport)
+```
+
+Documentation on running a minimal example is available in the [README](https://github.com/Vunovati/pino-opentelemetry-transport#minimalistic-example).
 
 <a id="communication-between-pino-and-transport"></a>
 ## Communication between Pino and Transports

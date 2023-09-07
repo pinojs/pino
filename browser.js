@@ -13,7 +13,40 @@ const stdSerializers = {
   wrapErrorSerializer: passthrough,
   req: mock,
   res: mock,
-  err: asErrValue
+  err: asErrValue,
+  errWithCause: asErrValue
+}
+function levelToValue (level, logger) {
+  return level === 'silent'
+    ? Infinity
+    : logger.levels.values[level]
+}
+const baseLogFunctionSymbol = Symbol('pino.logFuncs')
+const hierarchySymbol = Symbol('pino.hierarchy')
+
+const logFallbackMap = {
+  error: 'log',
+  fatal: 'error',
+  warn: 'error',
+  info: 'log',
+  debug: 'log',
+  trace: 'log'
+}
+
+function appendChildLogger (parentLogger, childLogger) {
+  const newEntry = {
+    logger: childLogger,
+    parent: parentLogger[hierarchySymbol]
+  }
+  childLogger[hierarchySymbol] = newEntry
+}
+
+function setupBaseLogFunctions (logger, levels, proto) {
+  const logFunctions = {}
+  levels.forEach(level => {
+    logFunctions[level] = proto[level] ? proto[level] : (_console[level] || _console[logFallbackMap[level] || 'log'] || noop)
+  })
+  logger[baseLogFunctionSymbol] = logFunctions
 }
 
 function shouldSerialize (serialize, serializers) {
@@ -47,16 +80,22 @@ function pino (opts) {
     opts.browser.serialize.indexOf('!stdSerializers.err') > -1
   ) stdErrSerialize = false
 
-  const levels = ['error', 'fatal', 'warn', 'info', 'debug', 'trace']
+  const customLevels = Object.keys(opts.customLevels || {})
+  const levels = ['error', 'fatal', 'warn', 'info', 'debug', 'trace'].concat(customLevels)
 
   if (typeof proto === 'function') {
-    proto.error = proto.fatal = proto.warn =
-    proto.info = proto.debug = proto.trace = proto
+    levels.forEach(function (level) {
+      proto[level] = proto
+    })
   }
   if (opts.enabled === false || opts.browser.disabled) opts.level = 'silent'
   const level = opts.level || 'info'
   const logger = Object.create(proto)
   if (!logger.log) logger.log = noop
+
+  setupBaseLogFunctions(logger, levels, proto)
+  // setup root hierarchy entry
+  appendChildLogger({}, logger)
 
   Object.defineProperty(logger, 'levelVal', {
     get: getLevelVal
@@ -73,7 +112,7 @@ function pino (opts) {
     levels,
     timestamp: getTimeFunction(opts)
   }
-  logger.levels = pino.levels
+  logger.levels = getLevels(opts)
   logger.level = level
 
   logger.setMaxListeners = logger.getMaxListeners =
@@ -91,9 +130,7 @@ function pino (opts) {
   if (transmit) logger._logEvent = createLogEventShape()
 
   function getLevelVal () {
-    return this.level === 'silent'
-      ? Infinity
-      : this.levels.values[this.level]
+    return levelToValue(this.level, this)
   }
 
   function getLevel () {
@@ -105,12 +142,16 @@ function pino (opts) {
     }
     this._level = level
 
-    set(setOpts, logger, 'error', 'log') // <-- must stay first
-    set(setOpts, logger, 'fatal', 'error')
-    set(setOpts, logger, 'warn', 'error')
-    set(setOpts, logger, 'info', 'log')
-    set(setOpts, logger, 'debug', 'log')
-    set(setOpts, logger, 'trace', 'log')
+    set(this, setOpts, logger, 'error') // <-- must stay first
+    set(this, setOpts, logger, 'fatal')
+    set(this, setOpts, logger, 'warn')
+    set(this, setOpts, logger, 'info')
+    set(this, setOpts, logger, 'debug')
+    set(this, setOpts, logger, 'trace')
+
+    customLevels.forEach((level) => {
+      set(this, setOpts, logger, level)
+    })
   }
 
   function child (bindings, childOptions) {
@@ -132,12 +173,10 @@ function pino (opts) {
     }
     function Child (parent) {
       this._childLevel = (parent._childLevel | 0) + 1
-      this.error = bind(parent, bindings, 'error')
-      this.fatal = bind(parent, bindings, 'fatal')
-      this.warn = bind(parent, bindings, 'warn')
-      this.info = bind(parent, bindings, 'info')
-      this.debug = bind(parent, bindings, 'debug')
-      this.trace = bind(parent, bindings, 'trace')
+
+      // make sure bindings are available in the `set` function
+      this.bindings = bindings
+
       if (childSerializers) {
         this.serializers = childSerializers
         this._serialize = childSerialize
@@ -149,9 +188,36 @@ function pino (opts) {
       }
     }
     Child.prototype = this
-    return new Child(this)
+    const newLogger = new Child(this)
+
+    // must happen before the level is assigned
+    appendChildLogger(this, newLogger)
+    // required to actually initialize the logger functions for any given child
+    newLogger.level = this.level
+
+    return newLogger
   }
   return logger
+}
+
+function getLevels (opts) {
+  const customLevels = opts.customLevels || {}
+
+  const values = Object.assign({}, pino.levels.values, customLevels)
+  const labels = Object.assign({}, pino.levels.labels, invertObject(customLevels))
+
+  return {
+    values,
+    labels
+  }
+}
+
+function invertObject (obj) {
+  const inverted = {}
+  Object.keys(obj).forEach(function (key) {
+    inverted[obj[key]] = key
+  })
+  return inverted
 }
 
 pino.levels = {
@@ -176,19 +242,54 @@ pino.levels = {
 pino.stdSerializers = stdSerializers
 pino.stdTimeFunctions = Object.assign({}, { nullTime, epochTime, unixTime, isoTime })
 
-function set (opts, logger, level, fallback) {
-  const proto = Object.getPrototypeOf(logger)
-  logger[level] = logger.levelVal > logger.levels.values[level]
-    ? noop
-    : (proto[level] ? proto[level] : (_console[level] || _console[fallback] || noop))
+function getBindingChain (logger) {
+  const bindings = []
+  if (logger.bindings) {
+    bindings.push(logger.bindings)
+  }
 
-  wrap(opts, logger, level)
+  // traverse up the tree to get all bindings
+  let hierarchy = logger[hierarchySymbol]
+  while (hierarchy.parent) {
+    hierarchy = hierarchy.parent
+    if (hierarchy.logger.bindings) {
+      bindings.push(hierarchy.logger.bindings)
+    }
+  }
+
+  return bindings.reverse()
 }
 
-function wrap (opts, logger, level) {
-  if (!opts.transmit && logger[level] === noop) return
+function set (self, opts, rootLogger, level) {
+  // override the current log functions with either `noop` or the base log function
+  self[level] = levelToValue(self.level, rootLogger) > levelToValue(level, rootLogger)
+    ? noop
+    : rootLogger[baseLogFunctionSymbol][level]
 
-  logger[level] = (function (write) {
+  if (!opts.transmit && self[level] === noop) {
+    return
+  }
+
+  // make sure the log format is correct
+  self[level] = createWrap(self, opts, rootLogger, level)
+
+  // prepend bindings if it is not the root logger
+  const bindings = getBindingChain(self)
+  if (bindings.length === 0) {
+    // early exit in case for rootLogger
+    return
+  }
+  self[level] = prependBindingsInArguments(bindings, self[level])
+}
+
+function prependBindingsInArguments (bindings, logFunc) {
+  return function () {
+    return logFunc.apply(this, [...bindings, ...arguments])
+  }
+}
+
+function createWrap (self, opts, rootLogger, level) {
+  return (function (write) {
     return function LOG () {
       const ts = opts.timestamp()
       const args = new Array(arguments.length)
@@ -202,22 +303,22 @@ function wrap (opts, logger, level) {
       else write.apply(proto, args)
 
       if (opts.transmit) {
-        const transmitLevel = opts.transmit.level || logger.level
-        const transmitValue = pino.levels.values[transmitLevel]
-        const methodValue = pino.levels.values[level]
+        const transmitLevel = opts.transmit.level || self._level
+        const transmitValue = rootLogger.levels.values[transmitLevel]
+        const methodValue = rootLogger.levels.values[level]
         if (methodValue < transmitValue) return
         transmit(this, {
           ts,
           methodLevel: level,
           methodValue,
           transmitLevel,
-          transmitValue: pino.levels.values[opts.transmit.level || logger.level],
+          transmitValue: rootLogger.levels.values[opts.transmit.level || self._level],
           send: opts.transmit.send,
-          val: logger.levelVal
+          val: levelToValue(self._level, rootLogger)
         }, args)
       }
     }
-  })(logger[level])
+  })(self[baseLogFunctionSymbol][level])
 }
 
 function asObject (logger, level, args, ts) {
@@ -228,7 +329,7 @@ function asObject (logger, level, args, ts) {
   if (ts) {
     o.time = ts
   }
-  o.level = pino.levels.values[level]
+  o.level = logger.levels.values[level]
   let lvl = (logger._childLevel | 0) + 1
   if (lvl < 1) lvl = 1
   // deliberate, catching objects, arrays
@@ -253,17 +354,6 @@ function applySerializers (args, serialize, serializers, stdErrSerialize) {
         }
       }
     }
-  }
-}
-
-function bind (parent, bindings, level) {
-  return function () {
-    const args = new Array(1 + arguments.length)
-    args[0] = bindings
-    for (var i = 1; i < args.length; i++) {
-      args[i] = arguments[i - 1]
-    }
-    return parent[level].apply(this, args)
   }
 }
 

@@ -201,6 +201,68 @@ test('pino.transport with two files and custom levels', async ({ same, teardown 
   })
 })
 
+test('pino.transport without specifying default levels', async ({ same, teardown }) => {
+  const dest = file()
+  const transport = pino.transport({
+    targets: [{
+      level: 'foo',
+      target: join(__dirname, '..', 'fixtures', 'to-file-transport.js'),
+      options: { destination: dest }
+    }],
+    levels: { foo: 25 }
+  })
+  teardown(transport.end.bind(transport))
+  const instance = pino(transport)
+  instance.info('hello')
+  await Promise.all([watchFileCreated(dest)])
+  const result1 = JSON.parse(await readFile(dest))
+  delete result1.time
+  same(result1, {
+    pid,
+    hostname,
+    level: 30,
+    msg: 'hello'
+  })
+})
+
+test('pino.transport with two files and dedupe', async ({ same, teardown }) => {
+  const dest1 = file()
+  const dest2 = file()
+  const transport = pino.transport({
+    dedupe: true,
+    targets: [{
+      level: 'info',
+      target: join(__dirname, '..', 'fixtures', 'to-file-transport.js'),
+      options: { destination: dest1 }
+    }, {
+      level: 'error',
+      target: join(__dirname, '..', 'fixtures', 'to-file-transport.js'),
+      options: { destination: dest2 }
+    }]
+  })
+  teardown(transport.end.bind(transport))
+  const instance = pino(transport)
+  instance.info('hello')
+  instance.error('world')
+  await Promise.all([watchFileCreated(dest1), watchFileCreated(dest2)])
+  const result1 = JSON.parse(await readFile(dest1))
+  delete result1.time
+  same(result1, {
+    pid,
+    hostname,
+    level: 30,
+    msg: 'hello'
+  })
+  const result2 = JSON.parse(await readFile(dest2))
+  delete result2.time
+  same(result2, {
+    pid,
+    hostname,
+    level: 50,
+    msg: 'world'
+  })
+})
+
 test('pino.transport with an array including a pino-pretty destination', async ({ same, match, teardown }) => {
   const dest1 = file()
   const dest2 = file()

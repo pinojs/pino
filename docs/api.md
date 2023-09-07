@@ -121,6 +121,8 @@ Default: `undefined`
 
 If provided, the `mixin` function is called each time one of the active
 logging methods is called. The first parameter is the value `mergeObject` or an empty object. The second parameter is the log level number.
+The third parameter is the logger or child logger itself, which can be used to
+retrieve logger-specific context from within the `mixin` function.
 The function must synchronously return an object. The properties of the returned object will be added to the
 logged JSON.
 
@@ -177,7 +179,40 @@ logger.error('Message 2')
 ```
 
 If the `mixin` feature is being used merely to add static metadata to each log message,
-then a [child logger ⇗](/docs/child-loggers.md) should be used instead.
+then a [child logger ⇗](/docs/child-loggers.md) should be used instead. Unless your application
+needs to concatenate values for a specific key multiple times, in which case `mixin` can be
+used to avoid the [duplicate keys caveat](/docs/child-loggers.md#duplicate-keys-caveat):
+
+```js
+const logger = pino({
+  mixin (obj, num, logger) {
+    return {
+      tags: logger.tags
+    }
+  }
+})
+logger.tags = {}
+
+logger.addTag = function (key, value) {
+  logger.tags[key] = value
+}
+
+function createChild (parent, ...context) {
+  const newChild = logger.child(...context)
+  newChild.tags = { ...logger.tags }
+  newChild.addTag = function (key, value) {
+    newChild.tags[key] = value
+  }
+  return newChild
+}
+
+logger.addTag('foo', 1)
+const child = createChild(logger, {})
+child.addTag('bar', 2)
+logger.info('this will only have `foo: 1`')
+child.info('this will have both `foo: 1` and `bar: 2`')
+logger.info('this will still only have `foo: 1`')
+```
 
 As of pino 7.x, when the `mixin` is used with the [`nestedKey` option](#opt-nestedkey), 
 the object returned from the `mixin` method will also be nested. Prior versions would mix 
@@ -341,8 +376,8 @@ const formatters = {
 ##### `bindings`
 
 Changes the shape of the bindings. The default shape is `{ pid, hostname }`.
-The function takes a single argument, the bindings object. It will
-be called every time a child logger is created.
+The function takes a single argument, the bindings object, which can be configured
+using the [`base` option](#opt-base). Called once when creating logger.
 
 ```js
 const formatters = {
@@ -384,6 +419,25 @@ See `errorKey` option to change `err` namespace.
 
 * See [pino.stdSerializers](#pino-stdserializers)
 
+#### `msgPrefix` (String)
+
+Default: `undefined`
+
+The `msgPrefix` property allows you to specify a prefix for every message of the logger and its children.
+
+```js
+const logger = pino({
+  msgPrefix: '[HTTP] '
+})
+logger.info('got new request!')
+// >  [HTTP] got new request!
+
+const child = logger.child({})
+child.info('User authenticated!')
+// >  [HTTP] User authenticated!
+```
+
+<a id=opt-base></a>
 #### `base` (Object)
 
 Default: `{pid: process.pid, hostname: os.hostname}`
@@ -842,6 +896,26 @@ const child = logger.child({foo: 'bar'}, {level: 'debug'})
 child.debug('debug!') // will log as the `level` property set the level to debug
 ```
 
+##### `options.msgPrefix` (String)
+
+Default: `undefined`
+
+The `msgPrefix` property allows you to specify a prefix for every message of the child logger.
+By default, the parent prefix is inherited.
+If the parent already has a prefix, the prefix of the parent and then the child will be displayed.
+
+```js
+const logger = pino({
+  msgPrefix: '[HTTP] '
+})
+logger.info('got new request!')
+// >  [HTTP] got new request!
+
+const child = logger.child({avengers: 'assemble'}, {msgPrefix: '[Proxy] '})
+child.info('message proxied!')
+// >  [HTTP] [Proxy] message proxied!
+```
+
 ##### `options.redact` (Array | Object)
 
 Setting `options.redact` to an array or object will override the parent `redact` options. To remove `redact` options inherited from the parent logger set this value as an empty array (`[]`).
@@ -1162,6 +1236,7 @@ For more on transports, how they work, and how to create them see the [`Transpor
 * `worker`: [Worker thread](https://nodejs.org/api/worker_threads.html#worker_threads_new_worker_filename_options) configuration options. Additionally, the `worker` option supports `worker.autoEnd`. If this is set to `false` logs will not be flushed on process exit. It is then up to the developer to call `transport.end()` to flush logs.
 * `targets`: May be specified instead of `target`. Must be an array of transport configurations. Transport configurations include the aforementioned `options` and `target` options plus a `level` option which will send only logs above a specified level to a transport.
 * `pipeline`: May be specified instead of `target`. Must be an array of transport configurations. Transport configurations include the aforementioned `options` and `target` options. All intermediate steps in the pipeline _must_ be `Transform` streams and not `Writable`.
+* `dedupe`: See [pino.multistream options](#pino-multistream)
 
 <a id="pino-multistream"></a>
 
@@ -1191,7 +1266,7 @@ log.info('this will be written to /tmp/debug.stream.out and /tmp/info.stream.out
 log.fatal('this will be written to /tmp/debug.stream.out, /tmp/info.stream.out and /tmp/fatal.stream.out')
 ```
 
-In order for `multistream` to work, the log level __must__ be set to the lowest level used in the streams array.
+In order for `multistream` to work, the log level __must__ be set to the lowest level used in the streams array. Default is `info`.
 
 #### Options
 
@@ -1205,7 +1280,7 @@ In order for `multistream` to work, the log level __must__ be set to the lowest 
     var pino = require('pino')
     var multistream = pino.multistream
     var streams = [
-      {stream: process.stdout},
+      {level: 'debug', stream: process.stdout},
       {level: 'error', stream: process.stderr},
     ]
 

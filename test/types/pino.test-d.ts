@@ -325,3 +325,19 @@ const withChildCallback = pino({
 })
 withChildCallback.onChild = (child: Logger) => {}
 
+pino({
+    crlf: true,
+});
+
+const customLevels = { foo: 99 };
+
+const customLevelLogger = pino({ customLevels });
+
+type CustomLevelLogger = typeof customLevelLogger
+type CustomLevelLoggerLevels = pino.Level | keyof typeof customLevels
+
+const fn = (logger: Pick<CustomLevelLogger, CustomLevelLoggerLevels>) => {}
+
+const customLevelChildLogger = customLevelLogger.child({ name: "child" })
+
+fn(customLevelChildLogger); // missing foo typing

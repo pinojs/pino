@@ -12,6 +12,7 @@
 * [Unicode and Windows terminal](#windows)
 * [Mapping Pino Log Levels to Google Cloud Logging (Stackdriver) Severity Levels](#stackdriver)
 * [Avoid Message Conflict](#avoid-message-conflict)
+* [Best performance for logging to `stdout`](#best-performance-for-stdout)
 
 <a id="rotate"></a>
 ## Log rotation
@@ -288,3 +289,16 @@ log.info({ msg: 'mapped to originalMsg' }, 'a message')
 // {"level":30,"time":1596313323106,"pid":63739,"hostname":"foo","msg":"no original message"}
 // {"level":30,"time":1596313323107,"pid":63739,"hostname":"foo","msg":"a message","originalMsg":"mapped to originalMsg"}
 ```
+
+<a id="best-performance-for-stdout"></a>
+## Best performance for logging to `stdout`
+
+The best performance for logging directly to stdout is _usually_ achieved by using the
+default configuration:
+
+```js
+const log = require('pino')();
+```
+
+You should only have to configure custom transports or other settings
+if you have broader logging requirements.

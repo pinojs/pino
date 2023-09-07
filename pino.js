@@ -40,7 +40,8 @@ const {
   formattersSym,
   hooksSym,
   nestedKeyStrSym,
-  mixinMergeStrategySym
+  mixinMergeStrategySym,
+  msgPrefixSym
 } = symbols
 const { epochTime, nullTime } = time
 const { pid } = process
@@ -103,7 +104,8 @@ function pino (...args) {
     hooks,
     depthLimit,
     edgeLimit,
-    onChild
+    onChild,
+    msgPrefix
   } = opts
 
   const stringifySafe = configure({
@@ -150,6 +152,7 @@ function pino (...args) {
 
   if (useOnlyCustomLevels && !customLevels) throw Error('customLevels is required if useOnlyCustomLevels is set true')
   if (mixin && typeof mixin !== 'function') throw Error(`Unknown mixin type "${typeof mixin}" - expected "function"`)
+  if (msgPrefix && typeof msgPrefix !== 'string') throw Error(`Unknown msgPrefix type "${typeof msgPrefix}" - expected "string"`)
 
   assertDefaultLevelFound(level, customLevels, useOnlyCustomLevels)
   const levels = mappings(customLevels, useOnlyCustomLevels)
@@ -177,7 +180,8 @@ function pino (...args) {
     [formattersSym]: allFormatters,
     [hooksSym]: hooks,
     silent: noop,
-    onChild
+    onChild,
+    [msgPrefixSym]: msgPrefix
   })
 
   Object.setPrototypeOf(instance, proto())

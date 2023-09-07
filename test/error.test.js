@@ -356,3 +356,43 @@ test('correctly adds msg on error when nestedKey is used', async ({ same }) => {
     msg: 'msg message'
   })
 })
+
+test('msg should take precedence over error message on mergingObject', async ({ same }) => {
+  const err = new Error('myerror')
+  const stream = sink()
+  const instance = pino(stream)
+  instance.error({ msg: 'my message', err })
+  const result = await once(stream, 'data')
+  delete result.time
+  same(result, {
+    pid,
+    hostname,
+    level: 50,
+    err: {
+      type: 'Error',
+      stack: err.stack,
+      message: err.message
+    },
+    msg: 'my message'
+  })
+})
+
+test('considers messageKey when giving msg precedence over error', async ({ same }) => {
+  const err = new Error('myerror')
+  const stream = sink()
+  const instance = pino({ messageKey: 'message' }, stream)
+  instance.error({ message: 'my message', err })
+  const result = await once(stream, 'data')
+  delete result.time
+  same(result, {
+    pid,
+    hostname,
+    level: 50,
+    err: {
+      type: 'Error',
+      stack: err.stack,
+      message: err.message
+    },
+    message: 'my message'
+  })
+})
