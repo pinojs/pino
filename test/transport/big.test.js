@@ -13,7 +13,9 @@ const pipeline = promisify(stream.pipeline)
 const { Writable } = stream
 const sleep = promisify(setTimeout)
 
-test('eight million lines', async ({ equal, comment }) => {
+const skip = process.env.CI || process.env.CITGM
+
+test('eight million lines', { skip }, async ({ equal, comment }) => {
   const destination = file()
   await execa(process.argv[0], [join(__dirname, '..', 'fixtures', 'transport-many-lines.js'), destination])
 
