@@ -357,3 +357,6 @@ function pfGlobalThisOrFallback () {
   }
 }
 /* eslint-enable */
+
+module.exports.default = pino
+module.exports.pino = pino
