@@ -105,7 +105,7 @@ interface LoggerExtras<Options = LoggerOptions> extends EventEmitter {
     /**
      * A utility method for determining if a given log level will write to the destination.
      */
-    isLevelEnabled(level: pino.LevelWithSilent | string): boolean;
+    isLevelEnabled(level: pino.LevelWithSilentOrString): boolean;
 
     /**
      * Returns an object containing all the current bindings, cloned from the ones passed in via logger.child().
@@ -146,7 +146,7 @@ declare namespace pino {
          *
          * You can pass `'silent'` to disable logging.
          */
-        level: pino.LevelWithSilent | string;
+        level: pino.LevelWithSilentOrString;
 
         /**
          * Log at `'fatal'` level the given msg. If the first argument is an object, all its properties will be included in the JSON line.
@@ -217,15 +217,17 @@ declare namespace pino {
     type Bindings = Record<string, any>;
 
     type Level = "fatal" | "error" | "warn" | "info" | "debug" | "trace";
+    type LevelOrString = Level | (string & {});
     type LevelWithSilent = pino.Level | "silent";
+    type LevelWithSilentOrString = LevelWithSilent | (string & {});
 
     type SerializerFn = (value: any) => any;
     type WriteFn = (o: object) => void;
 
     type LevelChangeEventListener<Options = LoggerOptions> = (
-        lvl: LevelWithSilent | string,
+        lvl: LevelWithSilentOrString,
         val: number,
-        prevLvl: LevelWithSilent | string,
+        prevLvl: LevelWithSilentOrString,
         prevVal: number,
         logger: Logger<Options>
     ) => void;
@@ -242,7 +244,7 @@ declare namespace pino {
     interface TransportTargetOptions<TransportOptions = Record<string, any>> {
         target: string
         options: TransportOptions
-        level: LevelWithSilent | string
+        level: LevelWithSilentOrString
     }
 
     interface TransportBaseOptions<TransportOptions = Record<string, any>> {
@@ -344,7 +346,7 @@ declare namespace pino {
          * One of the supported levels or `silent` to disable logging. Any other value defines a custom level and
          * requires supplying a level value via `levelVal`. Default: 'info'.
          */
-        level?: LevelWithSilent | string;
+        level?: LevelWithSilentOrString;
 
         /**
          * Use this option to define additional logging levels.
@@ -545,7 +547,7 @@ declare namespace pino {
                  * the `send` function will be called based on the main logging `level` (set via `options.level`,
                  * defaulting to `info`).
                  */
-                level?: Level | string;
+                level?: LevelOrString;
                 /**
                  * Remotely record log messages.
                  *
@@ -636,7 +638,7 @@ declare namespace pino {
     }
 
     interface ChildLoggerOptions {
-        level?: Level | string;
+        level?: LevelOrString;
         serializers?: { [key: string]: SerializerFn };
         customLevels?: { [key: string]: number };
         formatters?: {
@@ -814,7 +816,9 @@ export const version: typeof pino.version;
 export type Bindings = pino.Bindings;
 export type DestinationStreamWithMetadata = pino.DestinationStreamWithMetadata;
 export type Level = pino.Level;
+export type LevelOrString = pino.LevelOrString;
 export type LevelWithSilent = pino.LevelWithSilent;
+export type LevelWithSilentOrString = pino.LevelWithSilentOrString;
 export type LevelChangeEventListener = pino.LevelChangeEventListener;
 export type LogDescriptor = pino.LogDescriptor;
 export type Logger<Options = LoggerOptions> = pino.Logger<Options>;
