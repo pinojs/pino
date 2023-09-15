@@ -58,7 +58,7 @@ Default: `'info'`
 
 The minimum level to log: Pino will not log messages with a lower level. Setting this option reduces the load, as typically, debug and trace logs are only valid for development, and not needed in production.
 
-One of `'fatal'`, `'error'`, `'warn'`, `'info`', `'debug'`, `'trace'` or `'silent'`.
+One of `'fatal'`, `'error'`, `'warn'`, `'info'`, `'debug'`, `'trace'` or `'silent'`.
 
 Additional levels can be added to the instance via the `customLevels` option.
 
