@@ -1,11 +1,12 @@
 import { expectAssignable, expectType, expectNotAssignable } from "tsd";
 
 import pino from "../../";
-import type {LevelWithSilent, Logger, LogFn, P, DestinationStreamWithMetadata,  Level, LevelOrString, LevelWithSilentOrString } from "../../pino";
+import type {LevelWithSilent, Logger, LogFn, P, DestinationStreamWithMetadata,  Level, LevelOrString, LevelWithSilentOrString, LoggerExtras } from "../../pino";
 
 // NB: can also use `import * as pino`, but that form is callable as `pino()`
 // under `esModuleInterop: false` or `pino.default()` under `esModuleInterop: true`.
 const log = pino();
+expectAssignable<LoggerExtras>(log);
 expectType<Logger>(log);
 expectType<LogFn>(log.info);
 
