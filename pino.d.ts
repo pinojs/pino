@@ -45,7 +45,7 @@ interface redactOptions {
     remove?: boolean;
 }
 
-interface LoggerExtras<Options = LoggerOptions> extends EventEmitter {
+export interface LoggerExtras<Options = LoggerOptions> extends EventEmitter {
     /**
      * Exposes the Pino package version. Also available on the exported pino function.
      */
