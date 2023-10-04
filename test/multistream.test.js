@@ -1,4 +1,4 @@
-' use strict'
+'use strict'
 
 const writeStream = require('flush-write-stream')
 const { readFileSync } = require('fs')
