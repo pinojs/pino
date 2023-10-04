@@ -221,7 +221,7 @@ test('supports pretty print', function (t) {
     cb()
   })
 
-  const nested = proxyquire('pino-pretty/lib/utils', {
+  const safeBoom = proxyquire('pino-pretty/lib/utils/build-safe-sonic-boom.js', {
     'sonic-boom': function () {
       t.pass('sonic created')
       stream.flushSync = () => {}
@@ -229,8 +229,11 @@ test('supports pretty print', function (t) {
       return stream
     }
   })
+  const nested = proxyquire('pino-pretty/lib/utils/index.js', {
+    './build-safe-sonic-boom.js': safeBoom
+  })
   const pretty = proxyquire('pino-pretty', {
-    './lib/utils': nested
+    './lib/utils/index.js': nested
   })
 
   const log = pino({
