@@ -10,7 +10,7 @@ const { watchFileCreated, file } = require('../helper')
 const { pid } = process
 const hostname = os.hostname()
 
-test('thread-stream async flush', async ({ same }) => {
+test('thread-stream async flush', async ({ equal, same }) => {
   const destination = file()
   const transport = pino.transport({
     target: join(__dirname, '..', 'fixtures', 'to-file-transport.js'),
@@ -18,7 +18,9 @@ test('thread-stream async flush', async ({ same }) => {
   })
   const instance = pino(transport)
   instance.info('hello')
-  instance.flush()
+
+  equal(instance.flush(), undefined)
+
   await watchFileCreated(destination)
   const result = JSON.parse(await readFile(destination))
   delete result.time
