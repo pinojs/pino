@@ -123,7 +123,7 @@ export interface LoggerExtras<Options = LoggerOptions> extends EventEmitter {
     /**
      * Flushes the content of the buffer when using pino.destination({ sync: false }).
      */
-    flush(): () => void;
+    flush(): void;
 }
 
 
