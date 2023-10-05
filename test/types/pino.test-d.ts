@@ -111,7 +111,7 @@ pino({ base: null });
 // @ts-expect-error
 if ("pino" in log) console.log(`pino version: ${log.pino}`);
 
-expectType<undefined>(log.flush());
+expectType<void>(log.flush());
 log.child({ a: "property" }).info("hello child!");
 log.level = "error";
 log.info("nope");
