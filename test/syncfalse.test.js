@@ -112,7 +112,7 @@ test('sync false with child', async ({ equal, teardown }) => {
   })
 })
 
-test('flush does nothing with sync true (default)', async () => {
+test('flush does nothing with sync true (default)', async ({ equal }) => {
   const instance = require('..')()
-  instance.flush()
+  equal(instance.flush(), undefined)
 })
