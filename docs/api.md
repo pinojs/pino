@@ -979,7 +979,6 @@ optimum balance between extremely efficient logging at high demand periods
 and safer logging at low demand periods.
 
 if needed to wait for the logs to be flushed, the callback can be used.
-(when using a custom `WritableStream` in destination that has the `flush` function,  you should call the callback after finish flushing)
 
 * See [`destination` parameter](#destination)
 * See [Asynchronous Logging ⇗](/docs/asynchronous.md)
