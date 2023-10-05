@@ -460,7 +460,6 @@ test('stdout in worker', async ({ not }) => {
   for await (const chunk of child.stdout) {
     actual += chunk
   }
-  await immediate()
   not(strip(actual).match(/Hello/), null)
 })
 
