@@ -978,7 +978,7 @@ on a long interval, say ten seconds. Such a strategy can provide an
 optimum balance between extremely efficient logging at high demand periods
 and safer logging at low demand periods.
 
-if needed to wait for the logs to be flushed, the callback can be used.
+If there is a need to wait for the logs to be flushed, a callback should be used.
 
 * See [`destination` parameter](#destination)
 * See [Asynchronous Logging ⇗](/docs/asynchronous.md)
