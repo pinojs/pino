@@ -964,12 +964,12 @@ console.log(anotherChild.bindings())
 ```
 
 <a id="flush"></a>
-### `logger.flush()`
+### `logger.flush([cb])`
 
 Flushes the content of the buffer when using `pino.destination({
 sync: false })`.
 
-This is an asynchronous, fire and forget, operation.
+This is an asynchronous, best used as fire and forget, operation.
 
 The use case is primarily for asynchronous logging, which may buffer
 log lines while others are being written. The `logger.flush` method can be
@@ -977,6 +977,9 @@ used to flush the logs
 on a long interval, say ten seconds. Such a strategy can provide an
 optimum balance between extremely efficient logging at high demand periods
 and safer logging at low demand periods.
+
+if needed to wait for the logs to be flushed, the callback can be used.
+(when using a custom `WritableStream` in destination that has the `flush` function,  you should call the callback after finish flushing)
 
 * See [`destination` parameter](#destination)
 * See [Asynchronous Logging ⇗](/docs/asynchronous.md)
