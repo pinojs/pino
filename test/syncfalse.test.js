@@ -17,6 +17,8 @@ const {
 } = require('./helper')
 const { promisify } = require('util')
 
+const sleep = promisify(setTimeout)
+
 test('asynchronous logging', async ({
   equal,
   teardown
@@ -60,6 +62,8 @@ test('asynchronous logging', async ({
     cb()
   }))
   await once(child, 'close')
+  // Wait for the last write to be flushed
+  await sleep(100)
   equal(actual, expected)
   equal(actual2.trim(), expected2)
 
