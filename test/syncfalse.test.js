@@ -7,6 +7,7 @@ const { test } = require('tap')
 const { fork } = require('child_process')
 const writer = require('flush-write-stream')
 const { once, getPathToNull } = require('./helper')
+const { setImmediate } = require('timers/promises')
 
 test('asynchronous logging', async ({ equal, teardown }) => {
   const now = Date.now
@@ -48,6 +49,8 @@ test('asynchronous logging', async ({ equal, teardown }) => {
     cb()
   }))
   await once(child, 'close')
+  // Wait for the last write to be flushed
+  await setImmediate()
   equal(actual, expected)
   equal(actual2.trim(), expected2)
 
