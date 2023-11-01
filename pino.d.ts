@@ -31,7 +31,7 @@ type TimeFn = () => string;
 type MixinFn = (mergeObject: object, level: number) => object;
 type MixinMergeStrategyFn = (mergeObject: object, mixinObject: object) => object;
 
-type CustomLevelLogger<CustomLevels> = CustomLevels extends Record<string, number> ? Record<keyof CustomLevels, LogFn> : Record<never, LogFn>
+type CustomLevelLogger<CustomLevels extends Record<string, number>> = Record<keyof CustomLevels, LogFn>
 
 /**
 * A synchronous callback that will run on each creation of a new child.
@@ -80,7 +80,7 @@ export interface LoggerExtras<CustomLevels extends Record<string, number> = {}> 
      * @param options: an options object that will override child logger inherited options.
      * @returns a child logger instance.
      */
-    child<ChildCustomLevels extends Record<string, number>>(bindings: pino.Bindings, options?: ChildLoggerOptions<ChildCustomLevels>): pino.Logger<CustomLevels & ChildCustomLevels>;
+    child<ChildCustomLevels extends Record<string, number> = {}>(bindings: pino.Bindings, options?: ChildLoggerOptions<ChildCustomLevels>): pino.Logger<CustomLevels & ChildCustomLevels>;
 
     /**
      * This can be used to modify the callback function on creation of a new child.
