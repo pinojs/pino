@@ -108,7 +108,8 @@ pino({
 });
 
 pino({ base: null });
-if ("pino" in log) console.log(`pino version: `);
+// @ts-expect-error
+if ("pino" in log) console.log(`pino version: ${log.pino}`);
 
 expectType<void>(log.flush());
 log.flush((err?: Error) => undefined);
@@ -321,6 +322,9 @@ cclog3.childLevel('')
 // child itself
 cclog3.childLevel2('')
 
+const ccclog3 = clog3.child({})
+expectError(ccclog3.nonLevel(''))
+
 const withChildCallback = pino({
     onChild: (child: Logger) => {}
 })
@@ -341,7 +345,7 @@ const fn = (logger: Pick<CustomLevelLogger, CustomLevelLoggerLevels>) => {}
 
 const customLevelChildLogger = customLevelLogger.child({ name: "child" })
 
-expectError(fn(customLevelChildLogger)); // missing foo typing
+fn(customLevelChildLogger); // missing foo typing
 
 // unknown option
 expectError(
