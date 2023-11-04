@@ -39,7 +39,7 @@ type CustomLevelLogger<Options> = Options extends { customLevels: Record<string,
 */
 type OnChildCallback<Options = LoggerOptions> = <ChildOptions extends pino.ChildLoggerOptions>(child: pino.Logger<Options & ChildOptions>) => void
 
-interface redactOptions {
+export interface redactOptions {
     paths: string[];
     censor?: string | ((value: any, path: string[]) => any);
     remove?: boolean;
