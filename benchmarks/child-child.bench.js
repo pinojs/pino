@@ -7,7 +7,7 @@ const fs = require('fs')
 const dest = fs.createWriteStream('/dev/null')
 const plogNodeStream = pino(dest).child({ a: 'property' }).child({ sub: 'child' })
 delete require.cache[require.resolve('../')]
-const plogDest = require('../')(pino.destination('/dev/null'))
+const plogDest = require('../')(pino.destination('/dev/null')).child({ a: 'property' }).child({ sub: 'child' })
 delete require.cache[require.resolve('../')]
 const plogMinLength = require('../')(pino.destination({ dest: '/dev/null', sync: false, minLength: 4096 }))
   .child({ a: 'property' })
