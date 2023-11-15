@@ -322,9 +322,6 @@ cclog3.childLevel('')
 // child itself
 cclog3.childLevel2('')
 
-const ccclog3 = clog3.child({})
-expectError(ccclog3.nonLevel(''))
-
 const withChildCallback = pino({
     onChild: (child: Logger) => {}
 })
@@ -346,20 +343,3 @@ const fn = (logger: Pick<CustomLevelLogger, CustomLevelLoggerLevels>) => {}
 const customLevelChildLogger = customLevelLogger.child({ name: "child" })
 
 fn(customLevelChildLogger); // missing foo typing
-
-// unknown option
-expectError(
-  pino({
-    hello: 'world'
-  })
-);
-
-// unknown option
-expectError(
-  pino({
-    hello: 'world',
-    customLevels: {
-      'log': 30
-    }
-  })
-);

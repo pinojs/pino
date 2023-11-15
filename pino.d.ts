@@ -31,13 +31,13 @@ type TimeFn = () => string;
 type MixinFn = (mergeObject: object, level: number) => object;
 type MixinMergeStrategyFn = (mergeObject: object, mixinObject: object) => object;
 
-type CustomLevelLogger<CustomLevels extends Record<string, number>> = Record<keyof CustomLevels, LogFn>
+type CustomLevelLogger<Options> = Options extends { customLevels: Record<string, number> } ? Record<keyof Options["customLevels"], LogFn> : Record<never, LogFn>
 
 /**
 * A synchronous callback that will run on each creation of a new child.
 * @param child: The newly created child logger instance.
 */
-type OnChildCallback<CustomLevels extends Record<string, number> = {}> = (child: pino.Logger<CustomLevels>) => void
+type OnChildCallback<Options = LoggerOptions> = <ChildOptions extends pino.ChildLoggerOptions>(child: pino.Logger<Options & ChildOptions>) => void
 
 export interface redactOptions {
     paths: string[];
@@ -45,7 +45,7 @@ export interface redactOptions {
     remove?: boolean;
 }
 
-export interface LoggerExtras<CustomLevels extends Record<string, number> = {}> extends EventEmitter {
+export interface LoggerExtras<Options = LoggerOptions> extends EventEmitter {
     /**
      * Exposes the Pino package version. Also available on the exported pino function.
      */
@@ -60,7 +60,7 @@ export interface LoggerExtras<CustomLevels extends Record<string, number> = {}> 
     /**
      * Define additional logging levels.
      */
-    customLevels: CustomLevels;
+    customLevels: { [key: string]: number };
     /**
      * Use only defined `customLevels` and omit Pino's levels.
      */
@@ -80,12 +80,12 @@ export interface LoggerExtras<CustomLevels extends Record<string, number> = {}> 
      * @param options: an options object that will override child logger inherited options.
      * @returns a child logger instance.
      */
-    child<ChildCustomLevels extends Record<string, number> = {}>(bindings: pino.Bindings, options?: ChildLoggerOptions<ChildCustomLevels>): pino.Logger<CustomLevels & ChildCustomLevels>;
+    child<ChildOptions extends pino.ChildLoggerOptions = {}>(bindings: pino.Bindings, options?: ChildOptions): pino.Logger<Options & ChildOptions>;
 
     /**
      * This can be used to modify the callback function on creation of a new child.
      */
-    onChild: OnChildCallback<CustomLevels>;
+    onChild: OnChildCallback<Options>;
 
     /**
      * Registers a listener function that is triggered when the level is changed.
@@ -95,12 +95,12 @@ export interface LoggerExtras<CustomLevels extends Record<string, number> = {}> 
      * @param event: only ever fires the `'level-change'` event
      * @param listener: The listener is passed four arguments: `levelLabel`, `levelValue`, `previousLevelLabel`, `previousLevelValue`.
      */
-    on(event: "level-change", listener: pino.LevelChangeEventListener<CustomLevels>): this;
-    addListener(event: "level-change", listener: pino.LevelChangeEventListener<CustomLevels>): this;
-    once(event: "level-change", listener: pino.LevelChangeEventListener<CustomLevels>): this;
-    prependListener(event: "level-change", listener: pino.LevelChangeEventListener<CustomLevels>): this;
-    prependOnceListener(event: "level-change", listener: pino.LevelChangeEventListener<CustomLevels>): this;
-    removeListener(event: "level-change", listener: pino.LevelChangeEventListener<CustomLevels>): this;
+    on<Opts = Options>(event: "level-change", listener: pino.LevelChangeEventListener<Opts>): this;
+    addListener<Opts = Options>(event: "level-change", listener: pino.LevelChangeEventListener<Opts>): this;
+    once<Opts = Options>(event: "level-change", listener: pino.LevelChangeEventListener<Opts>): this;
+    prependListener<Opts = Options>(event: "level-change", listener: pino.LevelChangeEventListener<Opts>): this;
+    prependOnceListener<Opts = Options>(event: "level-change", listener: pino.LevelChangeEventListener<Opts>): this;
+    removeListener<Opts = Options>(event: "level-change", listener: pino.LevelChangeEventListener<Opts>): this;
 
     /**
      * A utility method for determining if a given log level will write to the destination.
@@ -225,17 +225,17 @@ declare namespace pino {
     type SerializerFn = (value: any) => any;
     type WriteFn = (o: object) => void;
 
-    type LevelChangeEventListener<CustomLevels extends Record<string, number> = {}> = (
+    type LevelChangeEventListener<Options = LoggerOptions> = (
         lvl: LevelWithSilentOrString,
         val: number,
         prevLvl: LevelWithSilentOrString,
         prevVal: number,
-        logger: Logger<CustomLevels>
+        logger: Logger<Options>
     ) => void;
 
     type LogDescriptor = Record<string, any>;
 
-    type Logger<CustomLevels extends Record<string, number> = {}> = BaseLogger & LoggerExtras<CustomLevels> & CustomLevelLogger<CustomLevels>;
+    type Logger<Options = LoggerOptions> = BaseLogger & LoggerExtras<Options> & CustomLevelLogger<Options>;
 
     type SerializedError = pinoStdSerializers.SerializedError;
     type SerializedResponse = pinoStdSerializers.SerializedResponse;
@@ -320,7 +320,7 @@ declare namespace pino {
         (msg: string, ...args: any[]): void;
     }
 
-    interface LoggerOptions<CustomLevels extends Record<string, number>> {
+    interface LoggerOptions {
         transport?: TransportSingleOptions | TransportMultiOptions | TransportPipelineOptions
         /**
          * Avoid error causes by circular references in the object tree. Default: `true`.
@@ -353,7 +353,7 @@ declare namespace pino {
          * Use this option to define additional logging levels.
          * The keys of the object correspond the namespace of the log level, and the values should be the numerical value of the level.
          */
-        customLevels?: CustomLevels;
+        customLevels?: { [key: string]: number };
         /**
          * Use this option to only use defined `customLevels` and omit Pino's levels.
          * Logger's default `level` must be changed to a value in `customLevels` in order to use `useOnlyCustomLevels`
@@ -638,10 +638,10 @@ declare namespace pino {
         crlf?: boolean;
     }
 
-    interface ChildLoggerOptions<CustomLevels extends Record<string, number>> {
+    interface ChildLoggerOptions {
         level?: LevelOrString;
         serializers?: { [key: string]: SerializerFn };
-        customLevels?: CustomLevels;
+        customLevels?: { [key: string]: number };
         formatters?: {
             level?: (label: string, number: number) => object;
             bindings?: (bindings: Bindings) => object;
@@ -791,7 +791,7 @@ declare namespace pino {
  * relative protocol is enabled. Default: process.stdout
  * @returns a new logger instance.
  */
-declare function pino<CustomLevels extends { [key: string]: number; } = {}>(optionsOrStream?: LoggerOptions<CustomLevels> | DestinationStream): Logger<CustomLevels>;
+declare function pino<Options extends LoggerOptions | DestinationStream>(optionsOrStream?: Options): Logger<Options>;
 
 /**
  * @param [options]: an options object
@@ -799,7 +799,7 @@ declare function pino<CustomLevels extends { [key: string]: number; } = {}>(opti
  * relative protocol is enabled. Default: process.stdout
  * @returns a new logger instance.
  */
-declare function pino<CustomLevels extends { [key: string]: number; }>(options: LoggerOptions<CustomLevels>, stream: DestinationStream): Logger<CustomLevels>;
+declare function pino<Options extends LoggerOptions>(options: Options, stream: DestinationStream): Logger<Options>;
 
 
 // Pass through all the top-level exports, allows `import {version} from "pino"`
@@ -820,9 +820,9 @@ export type Level = pino.Level;
 export type LevelOrString = pino.LevelOrString;
 export type LevelWithSilent = pino.LevelWithSilent;
 export type LevelWithSilentOrString = pino.LevelWithSilentOrString;
-export type LevelChangeEventListener<CustomLevels extends { [key: string]: number; }> = pino.LevelChangeEventListener<CustomLevels>;
+export type LevelChangeEventListener = pino.LevelChangeEventListener;
 export type LogDescriptor = pino.LogDescriptor;
-export type Logger<CustomLevels extends Record<string, number> = {}> = pino.Logger<CustomLevels>;
+export type Logger<Options = LoggerOptions> = pino.Logger<Options>;
 export type SerializedError = pino.SerializedError;
 export type SerializerFn = pino.SerializerFn;
 export type SerializedRequest = pino.SerializedRequest;
@@ -831,12 +831,12 @@ export type WriteFn = pino.WriteFn;
 
 // Interfaces
 export interface BaseLogger extends pino.BaseLogger {}
-export interface ChildLoggerOptions<CustomLevels extends Record<string, number>> extends pino.ChildLoggerOptions<CustomLevels> {}
+export interface ChildLoggerOptions extends pino.ChildLoggerOptions {}
 export interface DestinationStream extends pino.DestinationStream {}
 export interface LevelMapping extends pino.LevelMapping {}
 export interface LogEvent extends pino.LogEvent {}
 export interface LogFn extends pino.LogFn {}
-export interface LoggerOptions<CustomLevels extends Record<string, number>> extends pino.LoggerOptions<CustomLevels> {}
+export interface LoggerOptions extends pino.LoggerOptions {}
 export interface MultiStreamOptions extends pino.MultiStreamOptions {}
 export interface MultiStreamRes<TLevel = Level> extends pino.MultiStreamRes<TLevel> {}
 export interface StreamEntry<TLevel = Level> extends pino.StreamEntry<TLevel> {}
