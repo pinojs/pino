@@ -256,7 +256,7 @@ pino({ name: "my-logger" }, destinationViaOptionsObject);
 
 try {
     throw new Error('Some error')
-} catch (err) {
+} catch (err: any) {
     log.error(err)
 }
 
@@ -264,16 +264,6 @@ interface StrictShape {
     activity: string;
     err?: unknown;
 }
-
-// The following generic parameter is no longer supported:
-
-/*
-info<StrictShape>({
-    activity: "Required property",
-});
-*/
-
-// Instead, the `satisfies` operator should be used like you would with any other TypeScript code, like in the below example.
 
 info({
     activity: "Required property",
@@ -311,7 +301,6 @@ const customBaseLogger: CustomBaseLogger = {
 
 // custom levels
 const log3 = pino({ customLevels: { myLevel: 100 } })
-// @ts-expect-error We intentionally cause a run-time error here.
 expectError(log3.log())
 log3.level = 'myLevel'
 log3.myLevel('')
