@@ -115,6 +115,5 @@
   },
   "tsd": {
     "directory": "test/types"
-  },
-  "packageManager": "yarn@1.22.19"
+  }
 }
