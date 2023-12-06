@@ -195,13 +195,13 @@ callback is called or the returned promise resolves. Otherwise, log lines will b
 
 ### Combining transport with writing to an stdout
 
-In case you want to both use a custom transport, and output the unprocessed log entries to stdout, you can use 'pino/file' transport configured with `destination: 1`:
+In case you want to both use a custom transport, and output the log entries with default processing to STDOUT, you can use 'pino/file' transport configured with `destination: 1`:
 
 ```js
     const transports = [
       {
         target: 'pino/file',
-        options: { destination: 1 } // this writes to stdout
+        options: { destination: 1 } // this writes to STDOUT
       },
       {
         target: 'my-custom-transport',
@@ -257,7 +257,7 @@ const logger = pino({
     pipeline: [{
       target: './my-transform.js'
     }, {
-      // Use target: 'pino/file' with 'options: { destination: 1 }' to write to stdout
+      // Use target: 'pino/file' with 'options: { destination: 1 }' to write to STDOUT
       // without any change.
       target: 'pino-pretty'
     }]
@@ -382,7 +382,7 @@ const split = require('split2')
 
 const myTransportStream = new Writable({
   write (chunk, enc, cb) {
-  // apply a transform and send to stdout
+  // apply a transform and send to STDOUT
   console.log(chunk.toString().toUpperCase())
   cb()
   }
