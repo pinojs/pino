@@ -193,7 +193,7 @@ To consume async iterators in batches, consider using the [hwp](https://github.c
 The `close()` function is needed to make sure that the stream is closed and flushed when its
 callback is called or the returned promise resolves. Otherwise, log lines will be lost.
 
-### Combining transport with writing to an stdout
+### Writing to a custom transport & stdout
 
 In case you want to both use a custom transport, and output the log entries with default processing to STDOUT, you can use 'pino/file' transport configured with `destination: 1`:
 
