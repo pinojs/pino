@@ -193,6 +193,25 @@ To consume async iterators in batches, consider using the [hwp](https://github.c
 The `close()` function is needed to make sure that the stream is closed and flushed when its
 callback is called or the returned promise resolves. Otherwise, log lines will be lost.
 
+### Writing to a custom transport & stdout
+
+In case you want to both use a custom transport, and output the log entries with default processing to STDOUT, you can use 'pino/file' transport configured with `destination: 1`:
+
+```js
+    const transports = [
+      {
+        target: 'pino/file',
+        options: { destination: 1 } // this writes to STDOUT
+      },
+      {
+        target: 'my-custom-transport',
+        options: { someParameter: true } 
+      }
+    ]
+
+    const logger = pino(pino.transport({ targets: transports })
+```
+
 ### Creating a transport pipeline
 
 As an example, the following transport returns a `Transform` stream:
@@ -238,9 +257,10 @@ const logger = pino({
     pipeline: [{
       target: './my-transform.js'
     }, {
-      // Use target: 'pino/file' to write to stdout
-      // without any change.
-      target: 'pino-pretty'
+      // Use target: 'pino/file' with STDOUT descriptor 1 to write
+      // logs without any change.
+      target: 'pino/file',
+      options: { destination: 1 }
     }]
   }
 })
@@ -363,7 +383,7 @@ const split = require('split2')
 
 const myTransportStream = new Writable({
   write (chunk, enc, cb) {
-  // apply a transform and send to stdout
+  // apply a transform and send to STDOUT
   console.log(chunk.toString().toUpperCase())
   cb()
   }
