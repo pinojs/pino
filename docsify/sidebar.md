@@ -7,6 +7,7 @@
 * [Web Frameworks](/docs/web.md)
 * [Pretty Printing](/docs/pretty.md)
 * [Asynchronous Logging](/docs/asynchronous.md)
+* [Usage With TypeScript](/docs/typescript.md)
 * [Ecosystem](/docs/ecosystem.md)
 * [Benchmarks](/docs/benchmarks.md)
 * [Long Term Support](/docs/lts.md)

@@ -13,6 +13,7 @@
 //                 Michel Nemnom <https://github.com/Pegase745>
 //                 Igor Savin <https://github.com/kibertoad>
 //                 James Bromwell <https://github.com/thw0rted>
+//                 Zamiell <https://github.com/Zamiell>
 // TypeScript Version: 4.4
 
 import type { EventEmitter } from "events";
@@ -127,6 +128,26 @@ export interface LoggerExtras<CustomLevels extends string = never> extends Event
     flush(cb?: (err?: Error) => void): void;
 }
 
+/**
+ * The valid string interpolation placeholders are documented here:
+ * https://getpino.io/#/docs/api?id=logger
+ */
+interface StringInterpolationLetterToType {
+    s: string;
+    d: number;
+    o: object;
+    O: object;
+    j: object;
+}
+
+/** Helper type to extract the string interpolation placeholders and convert them to types. */
+type ExtractArgs<T extends string> = T extends `${string}%${infer R}`
+    ? R extends `${infer A}${infer B}`
+    ? A extends keyof StringInterpolationLetterToType
+    ? [StringInterpolationLetterToType[A], ...ExtractArgs<B>]
+    : ExtractArgs<B>
+    : ExtractArgs<R>
+    : []
 
 declare namespace pino {
     //// Exported types and interfaces
@@ -313,11 +334,38 @@ declare namespace pino {
     }
 
     interface LogFn {
-        // TODO: why is this different from `obj: object` or `obj: any`?
-        /* tslint:disable:no-unnecessary-generics */
-        <T extends object>(obj: T, msg?: string, ...args: any[]): void;
-        (obj: unknown, msg?: string, ...args: any[]): void;
-        (msg: string, ...args: any[]): void;
+        // The first overload has:
+        // - An object as the first argument. (But functions are explicitly disallowed, which count as objects.)
+        // - An optional string as the second argument.
+        // - N optional arguments after that corresponding to the string interpolation placeholders.
+        // e.g.
+        // logFn({ foo: "foo" });
+        // logFn({ foo: "foo" }, "bar");
+        // logFn({ foo: "foo" }, "Message with an interpolation value: %s", "bar");
+        // logFn({ foo: "foo" }, "Message with two interpolation values: %s %d", "bar", 123);
+        <T extends object, Msg extends string>(
+          // We want to disallow functions, which count as the "object" type.
+          obj: never extends T ? (T extends Function ? never : T) : T,
+          msg?: Msg,
+          ...stringInterpolationArgs: ExtractArgs<Msg>
+        ): void;
+    
+        // The second overload has:
+        // - A string as the first argument.
+        // - N optional arguments after that corresponding to the string interpolation placeholders.
+        // e.g.
+        // logFn("foo");
+        // logFn("Message with an interpolation value: %s", "foo");
+        // logFn("Message with two interpolation values: %s %d", "foo", 123);
+        <Msg extends string>(msg: Msg, ...stringInterpolationArgs: ExtractArgs<Msg>): void;
+    
+        // The third overload has:
+        // - A `number` or `boolean` as the first argument. (`symbol` is explicitly disallowed.)
+        // - No additional arguments should be allowed.
+        // e.g.
+        // logFn(123);
+        // logFn(true);
+        (arg: number | boolean): void;
     }
 
     interface LoggerOptions<CustomLevels extends string = never> {

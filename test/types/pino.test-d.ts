@@ -14,7 +14,9 @@ info("the answer is %d", 42);
 info({ obj: 42 }, "hello world");
 info({ obj: 42, b: 2 }, "hello world");
 info({ obj: { aa: "bbb" } }, "another");
-setImmediate(info, "after setImmediate");
+// The type definitions will not work properly when using higher order functions, so we have to
+// perform a manual type assertion.
+setImmediate(info as (msg: string) => void, "after setImmediate");
 error(new Error("an error"));
 
 const writeSym = pino.symbols.writeSym;
@@ -254,7 +256,7 @@ pino({ name: "my-logger" }, destinationViaOptionsObject);
 
 try {
     throw new Error('Some error')
-} catch (err) {
+} catch (err: any) {
     log.error(err)
 }
 
@@ -263,9 +265,9 @@ interface StrictShape {
     err?: unknown;
 }
 
-info<StrictShape>({
+info({
     activity: "Required property",
-});
+} satisfies StrictShape);
 
 const logLine: pino.LogDescriptor = {
     level: 20,

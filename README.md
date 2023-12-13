@@ -1,6 +1,7 @@
 ![banner](pino-banner.png)
 
 # pino
+
 [![npm version](https://img.shields.io/npm/v/pino)](https://www.npmjs.com/package/pino)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/pinojs/pino/ci.yml)](https://github.com/pinojs/pino/actions)
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](https://standardjs.com/)
@@ -9,18 +10,28 @@
 
 ## Documentation
 
-* [Benchmarks ⇗](/docs/benchmarks.md)
-* [API ⇗](/docs/api.md)
-* [Browser API ⇗](/docs/browser.md)
-* [Redaction ⇗](/docs/redaction.md)
-* [Child Loggers ⇗](/docs/child-loggers.md)
-* [Transports ⇗](/docs/transports.md)
-* [Web Frameworks ⇗](/docs/web.md)
-* [Pretty Printing ⇗](/docs/pretty.md)
-* [Asynchronous Logging ⇗](/docs/asynchronous.md)
-* [Ecosystem ⇗](/docs/ecosystem.md)
-* [Help ⇗](/docs/help.md)
-* [Long Term Support Policy ⇗](/docs/lts.md)
+* [Readme](/)
+* [API](/docs/api.md)
+* [Browser API](/docs/browser.md)
+* [Redaction](/docs/redaction.md)
+* [Child Loggers](/docs/child-loggers.md)
+* [Transports](/docs/transports.md)
+* [Web Frameworks](/docs/web.md)
+* [Pretty Printing](/docs/pretty.md)
+* [Asynchronous Logging](/docs/asynchronous.md)
+* [Usage With TypeScript](/docs/typescript.md)
+* [Ecosystem](/docs/ecosystem.md)
+* [Benchmarks](/docs/benchmarks.md)
+* [Long Term Support](/docs/lts.md)
+* [Help](/docs/help.md)
+  * [Log rotation](/docs/help.md#rotate)
+  * [Reopening log files](/docs/help.md#reopening)
+  * [Saving to multiple files](/docs/help.md#multiple)
+  * [Log filtering](/docs/help.md#filter-logs)
+  * [Transports and systemd](/docs/help.md#transport-systemd)
+  * [Duplicate keys](/docs/help.md#dupe-keys)
+  * [Log levels as labels instead of numbers](/docs/help.md#level-string)
+  * [Pino with `debug`](/docs/help.md#debug)
 
 ## Install
 
@@ -63,7 +74,6 @@ For using Pino with a web framework see:
 * [Pino with Koa](docs/web.md#koa)
 * [Pino with Node core `http`](docs/web.md#http)
 * [Pino with Nest](docs/web.md#nest)
-
 
 <a name="essentials"></a>
 ## Essentials
