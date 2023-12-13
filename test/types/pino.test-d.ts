@@ -108,7 +108,6 @@ pino({
 });
 
 pino({ base: null });
-// @ts-expect-error
 if ("pino" in log) console.log(`pino version: ${log.pino}`);
 
 expectType<void>(log.flush());
