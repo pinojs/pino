@@ -363,14 +363,18 @@ expectError(
   })
 );
 
-try {
+function dangerous () {
   throw Error('foo')
+}
+
+try {
+  dangerous()
 } catch (err) {
   log.error(err)
 }
 
 try {
-  throw Error('foo')
+  dangerous()
 } catch (err) {
   log.error({ err })
 }
