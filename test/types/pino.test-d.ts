@@ -333,7 +333,7 @@ pino({
     crlf: true,
 });
 
-const customLevels = { foo: 99 };
+const customLevels = { foo: 99, bar: 42 }
 
 const customLevelLogger = pino({ customLevels });
 
@@ -378,3 +378,29 @@ try {
 } catch (err) {
   log.error({ err })
 }
+
+const bLogger = pino({
+  customLevels: {
+    log: 5,
+  },
+  level: 'log',
+  transport: {
+    target: 'pino-pretty',
+    options: {
+      colorize: true,
+    },
+  },
+});
+
+expectType<Logger<'log'>>(pino({
+  customLevels: {
+    log: 5,
+  },
+  level: 'log',
+  transport: {
+    target: 'pino-pretty',
+    options: {
+      colorize: true,
+    },
+  },
+}))
