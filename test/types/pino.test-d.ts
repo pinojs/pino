@@ -362,3 +362,15 @@ expectError(
     }
   })
 );
+
+try {
+  throw Error('foo')
+} catch (err) {
+  log.error(err)
+}
+
+try {
+  throw Error('foo')
+} catch (err) {
+  log.error({ err })
+}
