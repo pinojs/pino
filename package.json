@@ -106,7 +106,7 @@
     "on-exit-leak-free": "^2.1.0",
     "pino-abstract-transport": "v1.1.0",
     "pino-std-serializers": "^6.0.0",
-    "process-warning": "^2.0.0",
+    "process-warning": "^3.0.0",
     "quick-format-unescaped": "^4.0.3",
     "real-require": "^0.2.0",
     "safe-stable-stringify": "^2.3.1",
