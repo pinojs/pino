@@ -404,3 +404,23 @@ expectType<Logger<'log'>>(pino({
     },
   },
 }))
+
+const parentLogger1 = pino({
+  customLevels: { myLevel: 90 },
+  onChild: (child) => { const a = child.myLevel; }
+}, process.stdout)
+parentLogger1.onChild = (child) => { child.myLevel(''); }
+
+const childLogger1 = parentLogger1.child({});
+childLogger1.myLevel('');
+expectError(childLogger1.doesntExist(''));
+
+const parentLogger2 = pino({}, process.stdin);
+expectError(parentLogger2.onChild = (child) => { const b = child.doesntExist; });
+
+const childLogger2 = parentLogger2.child({});
+expectError(childLogger2.doesntExist);
+
+expectError(pino({
+  onChild: (child) => { const a = child.doesntExist; }
+}, process.stdout));
