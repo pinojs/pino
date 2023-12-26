@@ -630,7 +630,7 @@ declare namespace pino {
         /**
          * Optional child creation callback.
          */
-        onChild?: OnChildCallback;
+        onChild?: OnChildCallback<CustomLevels>;
 
         /**
          * logs newline delimited JSON with `\r\n` instead of `\n`. Default: `false`.
@@ -799,7 +799,7 @@ declare function pino<CustomLevels extends string = never>(optionsOrStream?: Log
  * relative protocol is enabled. Default: process.stdout
  * @returns a new logger instance.
  */
-declare function pino<CustomLevels extends string>(options: LoggerOptions<CustomLevels>, stream: DestinationStream): Logger<CustomLevels>;
+declare function pino<CustomLevels extends string = never>(options: LoggerOptions<CustomLevels>, stream: DestinationStream): Logger<CustomLevels>;
 
 
 // Pass through all the top-level exports, allows `import {version} from "pino"`
