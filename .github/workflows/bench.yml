@@ -33,7 +33,7 @@ jobs:
       - name: Run Benchmark
         run: npm run bench | tee current.txt
       - name: Upload Current Results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: current
           path: current.txt
@@ -55,7 +55,7 @@ jobs:
       - name: Run Benchmark
         run: npm run bench | tee branch.txt
       - name: Upload Branch Results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: branch
           path: branch.txt
