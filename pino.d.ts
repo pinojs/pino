@@ -799,7 +799,7 @@ declare function pino<CustomLevels extends string = never>(optionsOrStream?: Log
  * relative protocol is enabled. Default: process.stdout
  * @returns a new logger instance.
  */
-declare function pino<CustomLevels extends string = never>(options: LoggerOptions<CustomLevels>, stream: DestinationStream): Logger<CustomLevels>;
+declare function pino<CustomLevels extends string = never>(options: LoggerOptions<CustomLevels>, stream?: DestinationStream | undefined): Logger<CustomLevels>;
 
 
 // Pass through all the top-level exports, allows `import {version} from "pino"`
