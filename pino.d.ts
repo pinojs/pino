@@ -355,6 +355,12 @@ declare namespace pino {
          */
         customLevels?: { [level in CustomLevels]: number };
         /**
+         *  Use this option to define custom comparison of log levels.
+         *  Usefull to compare custom log levels or non-standard level values.
+         *  Default: "ASC"
+         */
+        levelComparison?: "ASC" | "DESC" | ((current: number, expected: number) => boolean);
+        /**
          * Use this option to only use defined `customLevels` and omit Pino's levels.
          * Logger's default `level` must be changed to a value in `customLevels` in order to use `useOnlyCustomLevels`
          * Warning: this option may not be supported by downstream transports.
@@ -853,4 +859,5 @@ export { pino as default, pino };
 // Export just the type side of the namespace as "P", allows
 // `import {P} from "pino"; const log: P.Logger;`.
 // (Legacy support for early 7.x releases, remove in 8.x.)
-export type { pino as P };
+    export type { pino as P };
+
