@@ -107,6 +107,8 @@ pino({
     },
 });
 
+pino({}, undefined);
+
 pino({ base: null });
 if ("pino" in log) console.log(`pino version: ${log.pino}`);
 
