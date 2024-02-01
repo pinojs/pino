@@ -1,7 +1,7 @@
-import P, { pino } from "../../";
 import { IncomingMessage, ServerResponse } from "http";
 import { Socket } from "net";
-import { expectError, expectType } from 'tsd'
+import { expectError, expectType } from 'tsd';
+import P, { pino } from "../../";
 import Logger = P.Logger;
 
 const log = pino();
@@ -426,3 +426,16 @@ expectError(childLogger2.doesntExist);
 expectError(pino({
   onChild: (child) => { const a = child.doesntExist; }
 }, process.stdout));
+
+const pinoWithoutLevelsSorting = pino({});
+const pinoWithDescSortingLevels = pino({ levelComparison: 'DESC' });
+const pinoWithAscSortingLevels = pino({ levelComparison: 'ASC' });
+const pinoWithCustomSortingLevels = pino({ levelComparison: () => false });
+// with wrong level comparison direction
+expectError(pino({ levelComparison: 'SOME'}), process.stdout);
+// with wrong level comparison type
+expectError(pino({ levelComparison: 123}), process.stdout);
+// with wrong custom level comparison return type
+expectError(pino({ levelComparison: () => null }), process.stdout);
+expectError(pino({ levelComparison: () => 1 }), process.stdout);
+expectError(pino({ levelComparison: () => 'string' }), process.stdout);

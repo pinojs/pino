@@ -65,6 +65,32 @@ Additional levels can be added to the instance via the `customLevels` option.
 * See [`customLevels` option](#opt-customlevels)
 
 <a id=opt-customlevels></a>
+
+#### `levelComparison` ("ASC", "DESC", Function)
+
+Default: `ASC`
+
+Use this option to customize levels order.
+In order to be able to define custom levels ordering pass a function which will accept `current` and `expected` values and return `boolean` which shows should `current` level to be shown or not.
+
+```js
+const logger = pino({
+  levelComparison: 'DESC',
+  customLevels: {
+    foo: 20, // `foo` is more valuable than `bar`
+    bar: 10
+  },
+})
+
+// OR
+
+const logger = pino({
+  levelComparison: function(current, expected) {
+    return current >= expected;
+  }
+})
+```
+
 #### `customLevels` (Object)
 
 Default: `undefined`
