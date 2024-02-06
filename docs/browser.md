@@ -27,6 +27,25 @@ pino.info('hi') // creates and logs {msg: 'hi', level: 30, time: <ts>}
 
 When `write` is set, `asObject` will always be `true`.
 
+### `formatters` (Object)
+
+An object containing functions for formatting the shape of the log lines. When provided, it enables the logger to produce a pino-like log object with customized formatting. Currently, it supports formatting for the `level` object only.
+
+##### `level`
+
+Changes the shape of the log level. The default shape is `{ level: number }`.
+The function takes two arguments, the label of the level (e.g. `'info'`)
+and the numeric value (e.g. `30`).
+
+```js
+const formatters = {
+  level (label, number) {
+    return { level: number }
+  }
+}
+```
+
+
 ### `write` (Function | Object)
 
 Instead of passing log messages to `console.log` they can be passed to
