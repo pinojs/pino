@@ -2,6 +2,7 @@
 /* eslint no-prototype-builtins: 0 */
 const os = require('os')
 const stdSerializers = require('pino-std-serializers')
+const test = require('./lib/test')
 const caller = require('./lib/caller')
 const redaction = require('./lib/redaction')
 const time = require('./lib/time')
@@ -220,6 +221,7 @@ module.exports.stdSerializers = serializers
 module.exports.stdTimeFunctions = Object.assign({}, time)
 module.exports.symbols = symbols
 module.exports.version = version
+module.exports.test = test
 
 // Enables default and name export with TypeScript and Babel
 module.exports.default = pino

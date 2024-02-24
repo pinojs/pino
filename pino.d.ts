@@ -15,11 +15,12 @@
 //                 James Bromwell <https://github.com/thw0rted>
 // TypeScript Version: 4.4
 
+import type { deepStrictEqual } from "assert";
 import type { EventEmitter } from "events";
 import * as pinoStdSerializers from "pino-std-serializers";
 import type { SonicBoom, SonicBoomOpts } from "sonic-boom";
+import type { Transform } from "stream";
 import type { WorkerOptions } from "worker_threads";
-
 
 
 //// Non-exported types and interfaces
@@ -767,6 +768,12 @@ declare namespace pino {
         isoTime: TimeFn;
     };
 
+    export const test: {
+        sink: (cb: (chunk: unknown) => void) => Transform
+        once: (stream: Transform, expected: unknown, assert?: typeof deepStrictEqual) => Promise<void>
+        consecutive: (stream: Transform, expected: unknown[], assert?: typeof deepStrictEqual) => Promise<void>
+    };
+
     //// Exported functions
 
     /**
@@ -818,6 +825,7 @@ export const stdSerializers: typeof pino.stdSerializers;
 export const stdTimeFunctions: typeof pino.stdTimeFunctions;
 export const symbols: typeof pino.symbols;
 export const version: typeof pino.version;
+export const test: typeof pino.test;
 
 // Types
 export type Bindings = pino.Bindings;

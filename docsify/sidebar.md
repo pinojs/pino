@@ -11,6 +11,7 @@
 * [Benchmarks](/docs/benchmarks.md)
 * [Long Term Support](/docs/lts.md)
 * [Help](/docs/help.md)
+  * [Test](/docs/help.md#test)
   * [Log rotation](/docs/help.md#rotate)
   * [Reopening log files](/docs/help.md#reopening)
   * [Saving to multiple files](/docs/help.md#multiple)
@@ -19,3 +20,8 @@
   * [Duplicate keys](/docs/help.md#dupe-keys)
   * [Log levels as labels instead of numbers](/docs/help.md#level-string)
   * [Pino with `debug`](/docs/help.md#debug)
+  * [Unicode and Windows terminal](/docs/help.md#windows)
+  * [Mapping Pino Log Levels to Google Cloud Logging (Stackdriver) Severity Levels](/docs/help.md#stackdriver)
+  * [Avoid Message Conflict](/docs/help.md#avoid-message-conflict)
+  * [Best performance for logging to `stdout`](/docs/help.md#best-performance-for-stdout)
+

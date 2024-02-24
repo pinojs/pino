@@ -1,5 +1,6 @@
 # Help
 
+* [Test](#test)
 * [Log rotation](#rotate)
 * [Reopening log files](#reopening)
 * [Saving to multiple files](#multiple)
@@ -13,6 +14,84 @@
 * [Mapping Pino Log Levels to Google Cloud Logging (Stackdriver) Severity Levels](#stackdriver)
 * [Avoid Message Conflict](#avoid-message-conflict)
 * [Best performance for logging to `stdout`](#best-performance-for-stdout)
+
+## Test
+Pino provides a test module with some utility functions. The default assert function is the `deepStrictEqual` of the `node:assert` module, which can be used with all the test frameworks that support it. However, a custom assert function can be used.
+
+```js
+const pino = require('pino')
+
+test('pino.test.once', async () => {
+  const stream = pino.test.sink()
+  const instance = pino(stream)
+
+  instance.info('hello world')
+
+  const expected = { msg: 'hello world', level: 30 }
+  await pino.test.once(stream, expected)
+})
+
+// using tap
+test('pino.test.once with own assert function', async ({ same }) => {
+  const stream = pino.test.sink()
+  const instance = pino(stream)
+
+  instance.info('hello world')
+
+  const expected = { msg: 'hello world', level: 30 }
+  await pino.test.once(stream, expected, same)
+})
+
+test('pino.test.consecutive', async () => {
+  const stream = pino.test.sink()
+  const instance = pino(stream)
+
+  instance.info('test')
+  instance.info('hello world')
+
+  const expected = [
+    { msg: 'test', level: 30 },
+    { msg: 'hello world', level: 30 }
+  ]
+  await pino.test.consecutive(stream, expected)
+})
+
+// using tap
+test('pino.test.consecutive with own assert function', async ({ same }) => {
+  const stream = pino.test.sink()
+  const instance = pino(stream)
+
+  instance.info('test')
+  instance.info('hello world')
+
+  const expected = [
+    { msg: 'test', level: 30 },
+    { msg: 'hello world', level: 30 }
+  ]
+  await pino.test.consecutive(stream, expected, same)
+})
+
+// using jest
+function is (received, expected, msg) {
+  expect(received).toStrictEqual(expected)
+}
+
+test('pino.test.consecutive with own assert function on jest', async () => {
+  const stream = pino.test.sink()
+  const instance = pino(stream)
+
+  instance.info('test')
+  instance.info('hello world')
+
+  const expected = [
+    { msg: 'test', level: 30 },
+    { msg: 'hello world', level: 30 }
+  ]
+  await pino.test.consecutive(stream, expected, is)
+})
+```
+
+If a complete mock of the pino module is needed, a library as `proxyquire` should be used.
 
 <a id="rotate"></a>
 ## Log rotation
