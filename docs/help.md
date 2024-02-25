@@ -16,7 +16,7 @@
 * [Best performance for logging to `stdout`](#best-performance-for-stdout)
 
 ## Test
-Pino provides a test module with some utility functions; see also [`pino.test`](/docs/api.md#test) for more details.
+Pino provides a test module with some utility functions; see [`pino.test`](/docs/api.md#test) for more details.
 
 ```js
 const pino = require('pino')
@@ -61,7 +61,6 @@ test('pino instance should log a info message using a own assert function on jes
   await pino.test.consecutive(stream, expected, is)
 })
 ```
-See [`pino.test`](/docs/api.md#test).
 
 If a complete mock of the pino module is needed, a library as `proxyquire` should be used.
 
