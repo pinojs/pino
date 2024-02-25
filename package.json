@@ -5,9 +5,8 @@
   "main": "pino.js",
   "type": "commonjs",
   "types": "pino.d.ts",
-  "browser": "./browser.js",
   "scripts": {
-    "t": "jest test/jest",
+  "browser": "./browser.js",
     "docs": "docsify serve",
     "browser-test": "airtap --local 8080 test/browser*test.js",
     "lint": "eslint .",

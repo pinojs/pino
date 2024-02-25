@@ -29,6 +29,10 @@
   * [pino.stdTimeFunctions](#pino-stdtimefunctions)
   * [pino.symbols](#pino-symbols)
   * [pino.version](#pino-version)
+* [Test](#test)
+  * [pino.test.sink()](#pino-test-sink)
+  * [pino.test.once()](#pino-test-once)
+  * [pino.test.consecutive()](#pino-test-consecutive)
 * [Interfaces](#interfaces)
   * [MultiStreamRes](#multistreamres)
   * [StreamEntry](#streamentry)
@@ -1379,6 +1383,153 @@ for general use.
 Exposes the Pino package version. Also available on the logger instance.
 
 * See [`logger.version`](#version)
+
+## Test
+Pino provides a test module with some useful APIs that you can use importing it as the following
+```js
+require('pino').test
+// OR
+const { test } = require('pino')
+```
+
+<a id="pino-test-sink"></a>
+### `pino.test.sink({ destroyOnError = false, emitErrorEvent = false }) => Transform`
+Create a stream using `split2` so that each line is a chunk and each chunk is JSON parsed.
+
+```js
+const pino = require('pino')
+
+const stream = pino.test.sink()
+stream.write('{"hello":"world"}\n')
+stream.end()
+
+stream.once('data', (data) => {
+  console.log(data.hello) // "world"
+})
+```
+
+Destroy the stream on error
+```js
+const pino = require('pino')
+
+const stream = pino.test.sink({ destroyOnError: true })
+stream.write('helloworld')
+stream.end()
+
+stream.once('close', () => {
+  console.log('close event') // "close event"
+})
+```
+
+Destroy and send error event on error
+```js
+const pino = require('pino')
+
+const stream = pino.test.sink({ destroyOnError = false, emitErrorEvent = false })
+stream.write('helloworld')
+stream.end()
+
+stream.on('error', (err) => {
+  console.log(err) // Unexpected token h in JSON at position 0
+})
+
+stream.on('close', () => {
+  console.log('close event') // "close event"
+})
+```
+
+Send error event on error
+```js
+const pino = require('pino')
+
+const stream = pino.test.sink({ emitErrorEvent = false })
+stream.write('helloworld')
+stream.end()
+
+stream.on('error', (err) => {
+  console.log(err) // Unexpected token h in JSON at position 0
+})
+```
+
+<a id="pino-test-once"></a>
+### `pino.test.once(stream, expected, is) => Promise<void>`
+Assert chunk is expected in the stream using the `stream.once` event listener. 
+
+```js
+const pino = require('pino')
+
+const stream = pino.test.sink()
+const instance = pino(stream)
+
+instance.info('hello world')
+
+const expected = { msg: 'hello world', level: 30 }
+await pino.test.once(stream, expected) // doesn't throw a diff error
+await pino.test.once(stream, { msg: 'bye world', level: 30 }) // throw a diff error
+
+// OR logging an object
+instance.info({ hello: 'world', hi: 'world' })
+await pino.test.once(stream, { hello: 'world', hi: 'world', level: 30 }) // doesn't throw a diff error
+await pino.test.once(stream, { hello: 'world', level: 30 }) // throw a diff error
+
+// OR using a custom assert function
+function is (received, expected, msg) {
+  if (received.msg !== expected.msg) {
+    throw new Error(`expected msg ${expected.msg} doesn't match the received one ${received.msg}`)
+  }
+}
+
+await pino.test.once(stream, expected, is) // doesn't throw an error
+await pino.test.once(stream, { msg: 'bye world', level: 30 }, is) // throw an error
+```
+
+<a id="pino-test-consecutive"></a>
+### `pino.test.consecutive(stream, expected, is) => Promise<void>`
+Assert consecutive chunks is expected in the stream using the `for await...of` loop. 
+
+```js
+const pino = require('pino')
+
+const stream = pino.test.sink()
+const instance = pino(stream)
+
+instance.info('hello world')
+instance.info('test')
+
+const expected = [
+  { msg: 'hello world', level: 30 },
+  { msg: 'hi world', level: 30 }
+]
+
+await pino.test.consecutive(stream, expected) // doesn't throw a diff error
+await pino.test.consecutive(stream, [{ msg: 'bye world', level: 30 }]) // throw a diff error
+
+// OR logging an object
+instance.info({ hello: 'world' })
+instance.info({ hi: 'world' })
+await pino.test.consecutive(stream, [
+  { hello: 'world', level: 30 },
+  { hi: 'world', level: 30 }
+])
+
+// OR using a custom assert function
+function is (received, expected, msg) {
+  if (received.msg !== expected.msg) {
+    throw new Error(`expected msg ${expected.msg} doesn't match the received one ${received.msg}`)
+  }
+}
+
+await pino.test.consecutive(stream, expected, is) // doesn't throw an error
+await pino.test.consecutive(stream, [{ msg: 'bye world', level: 30 }], is) // throw an error
+```
+
+Both `pino.test.once` and `pino.test.consecutive` use the internal `check` function
+- that asserts the `chunk.time`, `chunk.pid` and `chunk.hostname`, so that you is avoided to do it
+- that use the default `deepStrictEqual` assert function of the `node:assert` module.
+
+See
+* [Transform](https://nodejs.org/api/stream.html#class-streamtransform)
+* [split2](https://github.com/mcollina/split2#readme)
 
 ## Interfaces
 <a id="pino-multistreamres"></a>

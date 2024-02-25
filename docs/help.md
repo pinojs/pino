@@ -16,12 +16,12 @@
 * [Best performance for logging to `stdout`](#best-performance-for-stdout)
 
 ## Test
-Pino provides a test module with some utility functions. The default assert function is the `deepStrictEqual` of the `node:assert` module, which can be used with all the test frameworks that support it. However, a custom assert function can be used.
+Pino provides a test module with some utility functions; see also [`pino.test`](/docs/api.md#test) for more details.
 
 ```js
 const pino = require('pino')
 
-test('pino.test.once', async () => {
+test('pino instance should log a info message', async () => {
   const stream = pino.test.sink()
   const instance = pino(stream)
 
@@ -32,7 +32,7 @@ test('pino.test.once', async () => {
 })
 
 // using tap
-test('pino.test.once with own assert function', async ({ same }) => {
+test('pino instance should log a info message using a own assert function', async ({ same }) => {
   const stream = pino.test.sink()
   const instance = pino(stream)
 
@@ -42,54 +42,26 @@ test('pino.test.once with own assert function', async ({ same }) => {
   await pino.test.once(stream, expected, same)
 })
 
-test('pino.test.consecutive', async () => {
-  const stream = pino.test.sink()
-  const instance = pino(stream)
-
-  instance.info('test')
-  instance.info('hello world')
-
-  const expected = [
-    { msg: 'test', level: 30 },
-    { msg: 'hello world', level: 30 }
-  ]
-  await pino.test.consecutive(stream, expected)
-})
-
-// using tap
-test('pino.test.consecutive with own assert function', async ({ same }) => {
-  const stream = pino.test.sink()
-  const instance = pino(stream)
-
-  instance.info('test')
-  instance.info('hello world')
-
-  const expected = [
-    { msg: 'test', level: 30 },
-    { msg: 'hello world', level: 30 }
-  ]
-  await pino.test.consecutive(stream, expected, same)
-})
-
 // using jest
 function is (received, expected, msg) {
   expect(received).toStrictEqual(expected)
 }
 
-test('pino.test.consecutive with own assert function on jest', async () => {
+test('pino instance should log a info message using a own assert function on jest', async () => {
   const stream = pino.test.sink()
   const instance = pino(stream)
 
-  instance.info('test')
   instance.info('hello world')
+  instance.info('hi world')
 
   const expected = [
-    { msg: 'test', level: 30 },
-    { msg: 'hello world', level: 30 }
+    { msg: 'hello world', level: 30 },
+    { msg: 'hi world', level: 30 }
   ]
   await pino.test.consecutive(stream, expected, is)
 })
 ```
+See [`pino.test`](/docs/api.md#test).
 
 If a complete mock of the pino module is needed, a library as `proxyquire` should be used.
 
