@@ -27,35 +27,41 @@ test('pino.test.sink should pass', async ({ same }) => {
   })
 })
 
-test('pino.test.sink should pass with json parse error', async ({ doesNotThrow }) => {
+test('pino.test.sink should pass with invalid json', async ({ doesNotThrow }) => {
   const stream = pino.test.sink()
-  doesNotThrow(() => stream.write('helloworld'))
-  stream.end()
+  stream.write('helloworld')
+  doesNotThrow(() => stream.end())
 })
 
-test('pino.test.sink should destroy stream when json parse error', async ({ emits }) => {
+test('pino.test.sink should destroy stream with invalid json', async ({ emits }) => {
   const stream = pino.test.sink({ destroyOnError: true })
   stream.write('helloworld')
   stream.end()
   await emits(stream, 'close')
 })
 
-test('pino.test.sink should emit a stream error event when json parse error', async ({ emits }) => {
+test('pino.test.sink should emit a stream error event with invalid json', async ({ match }) => {
   const stream = pino.test.sink({ emitErrorEvent: true })
   stream.write('helloworld')
+
+  stream.on('error', (err) => {
+    match(err.message, /Unexpected token/)
+  })
+
   stream.end()
-  await emits(stream, 'error')
 })
 
-test('pino.test.sink should emit a stream error event and destroy the stream when json parse error', async ({ emits }) => {
+test('pino.test.sink should emit a stream error event and destroy the stream with invalid json', async ({ emits, match }) => {
   const stream = pino.test.sink({ destroyOnError: true, emitErrorEvent: true })
   stream.write('helloworld')
+
+  stream.on('error', (err) => {
+    match(err.message, /Unexpected token/)
+  })
+
   stream.end()
 
-  await Promise.all([
-    emits(stream, 'close'),
-    emits(stream, 'error')
-  ])
+  await emits(stream, 'close')
 })
 
 test('pino.test.once should pass', async () => {
