@@ -1400,11 +1400,13 @@ Create a stream using `split2` so that each line is a chunk and each chunk is JS
 const pino = require('pino')
 
 const stream = pino.test.sink()
-stream.write('{"hello":"world"}\n')
-stream.end()
+const logger = pino(stream)
+
+logger.info('hello world')
 
 stream.once('data', (data) => {
-  console.log(data.hello) // "world"
+  console.log(chunk.msg) // 'hello world'
+  console.log(chunk.level) // 30
 })
 ```
 
@@ -1494,7 +1496,7 @@ const stream = pino.test.sink()
 const instance = pino(stream)
 
 instance.info('hello world')
-instance.info('test')
+instance.info('hi world')
 
 const expected = [
   { msg: 'hello world', level: 30 },

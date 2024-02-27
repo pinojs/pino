@@ -769,8 +769,55 @@ declare namespace pino {
     };
 
     export const test: {
-        sink: (cb: (chunk: unknown) => void) => Transform
+        /**
+         * Create a stream using `split2` so that each line is a chunk and each chunk is JSON parsed.
+         * @param [options]: The object options to control the behavior of the stream when an error happen. Default: { destroyOnError: false, emitErrorEvent: false }
+         * @returns A Transform stream to be used as destination for the pino function
+         * @example
+         * const stream = pino.test.sink()
+         * const logger = pino(stream)
+         * logger.info('hello world')
+         * stream.once('data', (chunk) => {
+         *  console.log(chunk.msg) // 'hello world'
+         *  console.log(chunk.level) // 30
+         * })
+         */
+        sink: ({ destroyOnError, emitErrorEvent }?: { destroyOnError?: boolean, emitErrorEvent?: boolean }) => Transform
+
+        /**
+         * Assert chunk is expected in the stream using the `stream.once` event listener.
+         * @param stream: The stream to be tested
+         * @param expected: The expected value to be tested
+         * @param [assert]: The assert function to be used. Default: deepStrictEqual
+         * @returns A promise that resolves when the expected value is equal to the stream value
+         * @throws If the expected value is not equal to the stream value
+         * @example
+         * const stream = pino.test.sink()
+         * const logger = pino(stream)
+         * logger.info('hello world')
+         * const expected = { msg: 'hello world', level: 30 }
+         * await pino.test.once(stream, expected)
+         */
         once: (stream: Transform, expected: unknown, assert?: typeof deepStrictEqual) => Promise<void>
+
+        /**
+         * Assert consecutive chunks is expected in the stream using the `for await...of` loop.
+         * @param stream: The stream to be tested
+         * @param expected: The expected value to be tested
+         * @param [assert]: The assert function to be used. Default: deepStrictEqual
+         * @returns A promise that resolves when the expected value is equal to the stream value
+         * @throws If the expected value is not equal to the stream value
+         * @example
+         * const stream = pino.test.sink()
+         * const logger = pino(stream)
+         * logger.info('hello world')
+         * logger.info('hi world')
+         * const expected = [
+         *   { msg: 'hello world', level: 30 },
+         *   { msg: 'hi world', level: 30 }
+         * ]
+         * await pino.test.consecutive(stream, expected)
+         */
         consecutive: (stream: Transform, expected: unknown[], assert?: typeof deepStrictEqual) => Promise<void>
     };
 
