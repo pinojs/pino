@@ -1394,7 +1394,7 @@ const { test } = require('pino')
 
 <a id="pino-test-sink"></a>
 ### `pino.test.sink({ destroyOnError = false, emitErrorEvent = false }) => Transform`
-Create a stream using `split2` so that each line is a chunk and each chunk is JSON parsed.
+Create a pino destination stream to easily spy on over the logs created by pino.
 
 ```js
 const pino = require('pino')
@@ -1455,7 +1455,7 @@ stream.on('error', (err) => {
 
 <a id="pino-test-once"></a>
 ### `pino.test.once(stream, expected, is) => Promise<void>`
-Assert chunk is expected in the stream using the `stream.once` event listener. 
+Assert that a single pino log is expected.
 
 ```js
 const pino = require('pino')
@@ -1487,7 +1487,7 @@ await pino.test.once(stream, { msg: 'bye world', level: 30 }, is) // throw an er
 
 <a id="pino-test-consecutive"></a>
 ### `pino.test.consecutive(stream, expected, is) => Promise<void>`
-Assert consecutive chunks is expected in the stream using the `for await...of` loop. 
+Assert that consecutive pino's logs are expected.
 
 ```js
 const pino = require('pino')

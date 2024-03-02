@@ -770,7 +770,7 @@ declare namespace pino {
 
     export const test: {
         /**
-         * Create a stream using `split2` so that each line is a chunk and each chunk is JSON parsed.
+         * Create a pino destination stream to easily spy on over the logs created by pino.
          * @param [options]: The object options to control the behavior of the stream when an error happen. Default: { destroyOnError: false, emitErrorEvent: false }
          * @returns A Transform stream to be used as destination for the pino function
          * @example
@@ -785,7 +785,7 @@ declare namespace pino {
         sink: ({ destroyOnError, emitErrorEvent }?: { destroyOnError?: boolean, emitErrorEvent?: boolean }) => Transform
 
         /**
-         * Assert chunk is expected in the stream using the `stream.once` event listener.
+         * Assert that a single pino log is expected.
          * @param stream: The stream to be tested
          * @param expected: The expected value to be tested
          * @param [assert]: The assert function to be used. Default: deepStrictEqual
@@ -801,7 +801,7 @@ declare namespace pino {
         once: (stream: Transform, expected: unknown, assert?: typeof deepStrictEqual) => Promise<void>
 
         /**
-         * Assert consecutive chunks is expected in the stream using the `for await...of` loop.
+         * Assert that consecutive pino's logs are expected.
          * @param stream: The stream to be tested
          * @param expected: The expected value to be tested
          * @param [assert]: The assert function to be used. Default: deepStrictEqual
