@@ -770,7 +770,7 @@ declare namespace pino {
 
     export const test: {
         /**
-         * Create a pino destination stream to easily spy on over the logs created by pino.
+         * Create a Pino destination stream to easily inspect the logs processed by Pino.
          * @param [options]: The object options to control the behavior of the stream when an error happen. Default: { destroyOnError: false, emitErrorEvent: false }
          * @returns A Transform stream to be used as destination for the pino function
          * @example
@@ -785,7 +785,7 @@ declare namespace pino {
         sink: ({ destroyOnError, emitErrorEvent }?: { destroyOnError?: boolean, emitErrorEvent?: boolean }) => Transform
 
         /**
-         * Assert that a single pino log is expected.
+         * Assert that a single log is expected.
          * @param stream: The stream to be tested
          * @param expected: The expected value to be tested
          * @param [assert]: The assert function to be used. Default: deepStrictEqual
@@ -801,7 +801,7 @@ declare namespace pino {
         once: (stream: Transform, expected: unknown, assert?: typeof deepStrictEqual) => Promise<void>
 
         /**
-         * Assert that consecutive pino's logs are expected.
+         * Assert that consecutive logs are expected.
          * @param stream: The stream to be tested
          * @param expected: The expected value to be tested
          * @param [assert]: The assert function to be used. Default: deepStrictEqual

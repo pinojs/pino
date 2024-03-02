@@ -1394,7 +1394,7 @@ const { test } = require('pino')
 
 <a id="pino-test-sink"></a>
 ### `pino.test.sink({ destroyOnError = false, emitErrorEvent = false }) => Transform`
-Create a pino destination stream to easily spy on over the logs created by pino.
+Create a Pino destination stream to easily inspect the logs processed by Pino.
 
 ```js
 const pino = require('pino')
@@ -1455,7 +1455,7 @@ stream.on('error', (err) => {
 
 <a id="pino-test-once"></a>
 ### `pino.test.once(stream, expected, is) => Promise<void>`
-Assert that a single pino log is expected.
+Assert that a single log is expected.
 
 ```js
 const pino = require('pino')
@@ -1487,7 +1487,7 @@ await pino.test.once(stream, { msg: 'bye world', level: 30 }, is) // throw an er
 
 <a id="pino-test-consecutive"></a>
 ### `pino.test.consecutive(stream, expected, is) => Promise<void>`
-Assert that consecutive pino's logs are expected.
+Assert that consecutive logs are expected.
 
 ```js
 const pino = require('pino')
@@ -1525,9 +1525,11 @@ await pino.test.consecutive(stream, expected, is) // doesn't throw an error
 await pino.test.consecutive(stream, [{ msg: 'bye world', level: 30 }], is) // throw an error
 ```
 
-Both `pino.test.once` and `pino.test.consecutive` use the internal `check` function
-- that asserts the `chunk.time`, `chunk.pid` and `chunk.hostname`, so that you is avoided to do it
-- that use the default `deepStrictEqual` assert function of the `node:assert` module.
+Both `pino.test.once` and `pino.test.consecutive` internally
+- assert log message `time` is less than or equal to the current time
+- assert log message `pid` matches the current process id
+- assert log message `hostname` matches the current hostname
+- uses the default `deepStrictEqual` assert function of the `node:assert` module.
 
 See
 * [Transform](https://nodejs.org/api/stream.html#class-streamtransform)

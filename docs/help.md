@@ -62,8 +62,6 @@ test('pino instance should log a info message using a own assert function on jes
 })
 ```
 
-If a complete mock of the pino module is needed, a library as `proxyquire` should be used.
-
 <a id="rotate"></a>
 ## Log rotation
 
