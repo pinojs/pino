@@ -1457,6 +1457,12 @@ stream.on('error', (err) => {
 ### `pino.test.once(stream, expected, is) => Promise<void>`
 Assert that a single log is expected.
 
+The function internally
+- assert log message `time` is less than or equal to the current time
+- assert log message `pid` matches the current process id
+- assert log message `hostname` matches the current hostname
+- uses the default `deepStrictEqual` assert function of the `node:assert` module.
+
 ```js
 const pino = require('pino')
 
@@ -1488,6 +1494,12 @@ await pino.test.once(stream, { msg: 'bye world', level: 30 }, is) // throw an er
 <a id="pino-test-consecutive"></a>
 ### `pino.test.consecutive(stream, expected, is) => Promise<void>`
 Assert that consecutive logs are expected.
+
+The function internally
+- assert log message `time` is less than or equal to the current time
+- assert log message `pid` matches the current process id
+- assert log message `hostname` matches the current hostname
+- uses the default `deepStrictEqual` assert function of the `node:assert` module.
 
 ```js
 const pino = require('pino')
@@ -1524,16 +1536,6 @@ function is (received, expected, msg) {
 await pino.test.consecutive(stream, expected, is) // doesn't throw an error
 await pino.test.consecutive(stream, [{ msg: 'bye world', level: 30 }], is) // throw an error
 ```
-
-Both `pino.test.once` and `pino.test.consecutive` internally
-- assert log message `time` is less than or equal to the current time
-- assert log message `pid` matches the current process id
-- assert log message `hostname` matches the current hostname
-- uses the default `deepStrictEqual` assert function of the `node:assert` module.
-
-See
-* [Transform](https://nodejs.org/api/stream.html#class-streamtransform)
-* [split2](https://github.com/mcollina/split2#readme)
 
 ## Interfaces
 <a id="pino-multistreamres"></a>

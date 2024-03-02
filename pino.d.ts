@@ -771,26 +771,25 @@ declare namespace pino {
     export const test: {
         /**
          * Create a Pino destination stream to easily inspect the logs processed by Pino.
-         * @param [options]: The object options to control the behavior of the stream when an error happen. Default: { destroyOnError: false, emitErrorEvent: false }
-         * @returns A Transform stream to be used as destination for the pino function
-         * @example
-         * const stream = pino.test.sink()
-         * const logger = pino(stream)
-         * logger.info('hello world')
-         * stream.once('data', (chunk) => {
-         *  console.log(chunk.msg) // 'hello world'
-         *  console.log(chunk.level) // 30
-         * })
+         *
+         * @param {object} options The options to be used.
+         * @param {boolean} [options.destroyOnError=false] If true, the stream will be destroyed on error.
+         * @param {boolean} [options.emitErrorEvent=false] If true, the stream eill emit an error event on error.
+         *
+         * @returns A stream.
          */
         sink: ({ destroyOnError, emitErrorEvent }?: { destroyOnError?: boolean, emitErrorEvent?: boolean }) => Transform
 
         /**
          * Assert that a single log is expected.
-         * @param stream: The stream to be tested
-         * @param expected: The expected value to be tested
-         * @param [assert]: The assert function to be used. Default: deepStrictEqual
-         * @returns A promise that resolves when the expected value is equal to the stream value
-         * @throws If the expected value is not equal to the stream value
+         *
+         * @param {Transform} stream The stream to be tested.
+         * @param {object} expected The expected value to be tested.
+         * @param {function} [assert=deepStrictEqual] The assert function to be used.
+         *
+         * @returns A promise that resolves when the expected value is equal to the stream value.
+         * @throws If the expected value is not equal to the stream value.
+         *
          * @example
          * const stream = pino.test.sink()
          * const logger = pino(stream)
@@ -802,11 +801,14 @@ declare namespace pino {
 
         /**
          * Assert that consecutive logs are expected.
-         * @param stream: The stream to be tested
-         * @param expected: The expected value to be tested
-         * @param [assert]: The assert function to be used. Default: deepStrictEqual
-         * @returns A promise that resolves when the expected value is equal to the stream value
-         * @throws If the expected value is not equal to the stream value
+         *
+         * @param {Transform} stream The stream to be tested.
+         * @param {object} expected The expected value to be tested.
+         * @param {function} [assert=deepStrictEqual] The assert function to be used.
+         *
+         * @returns A promise that resolves when the expected value is equal to the stream value.
+         * @throws If the expected value is not equal to the stream value.
+         *
          * @example
          * const stream = pino.test.sink()
          * const logger = pino(stream)
