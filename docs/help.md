@@ -244,7 +244,6 @@ const PinoLevelToSeverityLookup = {
 const defaultPinoConf = {
   messageKey: 'message',
   formatters: {
-    messageKey: 'message',
     level(label, number) {
       return {
         severity: PinoLevelToSeverityLookup[label] || PinoLevelToSeverityLookup['info'],
