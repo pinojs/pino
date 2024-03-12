@@ -356,7 +356,7 @@ declare namespace pino {
         customLevels?: { [level in CustomLevels]: number };
         /**
          *  Use this option to define custom comparison of log levels.
-         *  Usefull to compare custom log levels or non-standard level values.
+         *  Useful to compare custom log levels or non-standard level values.
          *  Default: "ASC"
          */
         levelComparison?: "ASC" | "DESC" | ((current: number, expected: number) => boolean);

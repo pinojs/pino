@@ -326,7 +326,7 @@ const transport = pino.transport({
 pino(transport)
 ```
 
-The `options.destination` property may also be a number to represent a filedescriptor. Typically this would be `1` to write to STDOUT or `2` to write to STDERR. If `options.destination` is not set, it defaults to `1` which means logs will be written to STDOUT. If `options.destination` is a string integer, e.g. `'1'`, it will be coerced to a number and used as a file descriptor. If this is not desired, provide a full path, e.g. `/tmp/1`.
+The `options.destination` property may also be a number to represent a file descriptor. Typically this would be `1` to write to STDOUT or `2` to write to STDERR. If `options.destination` is not set, it defaults to `1` which means logs will be written to STDOUT. If `options.destination` is a string integer, e.g. `'1'`, it will be coerced to a number and used as a file descriptor. If this is not desired, provide a full path, e.g. `/tmp/1`.
 
 The difference between using the `pino/file` transport builtin and using `pino.destination` is that `pino.destination` runs in the main thread, whereas `pino/file` sets up `pino.destination` in a worker thread.
 
@@ -466,7 +466,7 @@ Given an application `foo` that logs via pino, you would use `pino-applicationin
 $ node foo | pino-applicationinsights --key blablabla
 ```
 
-For full documentation of command line switches read [readme](https://github.com/ovhemert/pino-applicationinsights#readme)
+For full documentation of command line switches read [README](https://github.com/ovhemert/pino-applicationinsights#readme)
 
 <a id="pino-azuretable"></a>
 ### pino-azuretable
@@ -478,7 +478,7 @@ Given an application `foo` that logs via pino, you would use `pino-azuretable` l
 $ node foo | pino-azuretable --account storageaccount --key blablabla
 ```
 
-For full documentation of command line switches read [readme](https://github.com/ovhemert/pino-azuretable#readme)
+For full documentation of command line switches read [README](https://github.com/ovhemert/pino-azuretable#readme)
 
 <a id="pino-cloudwatch"></a>
 ### pino-cloudwatch
@@ -514,7 +514,7 @@ Given an application `foo` that logs via pino, you would use `pino-datadog` like
 $ node foo | pino-datadog --key blablabla
 ```
 
-For full documentation of command line switches read [readme](https://github.com/ovhemert/pino-datadog#readme)
+For full documentation of command line switches read [README](https://github.com/ovhemert/pino-datadog#readme)
 
 <a id="pino-elasticsearch"></a>
 ### pino-elasticsearch
@@ -530,9 +530,9 @@ $ node app.js | pino-elasticsearch
 
 Assuming Elasticsearch is running on localhost.
 
-To connect to an external elasticsearch instance (recommended for production):
+To connect to an external Elasticsearch instance (recommended for production):
 
-* Check that `network.host` is defined in the `elasticsearch.yml` configuration file. See [elasticsearch Network Settings documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-network.html#common-network-settings) for more details.
+* Check that `network.host` is defined in the `elasticsearch.yml` configuration file. See [Elasticsearch Network Settings documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-network.html#common-network-settings) for more details.
 * Launch:
 
 ```sh
@@ -594,7 +594,7 @@ $ node index.js | pino-kafka -b 10.10.10.5:9200 -d mytopic
 $ node index.js | pino-logdna --key YOUR_INGESTION_KEY
 ```
 
-Tags and other metadata can be included using the available command line options. See the [pino-logdna readme](https://github.com/logdna/pino-logdna#options) for a full list.
+Tags and other metadata can be included using the available command line options. See the [pino-logdna README](https://github.com/logdna/pino-logdna#options) for a full list.
 
 <a id="pino-logflare"></a>
 ### pino-logflare
@@ -631,7 +631,7 @@ A base configuration file can be initialized with:
 pino-mq -g
 ```
 
-For full documentation of command line switches and configuration see [the `pino-mq` readme](https://github.com/itavy/pino-mq#readme)
+For full documentation of command line switches and configuration see [the `pino-mq` README](https://github.com/itavy/pino-mq#readme)
 
 <a id="pino-loki"></a>
 ### pino-loki
@@ -653,7 +653,7 @@ const transport = pino.transport({
 pino(transport)
 ```
 
-For full documentation and configuration, see the [readme](https://github.com/Julien-R44/pino-loki).
+For full documentation and configuration, see the [README](https://github.com/Julien-R44/pino-loki).
 
 <a id="pino-papertrail"></a>
 ### pino-papertrail
@@ -667,12 +667,12 @@ node yourapp.js | pino-papertrail --host bar.papertrailapp.com --port 12345 --ap
 ```
 
 
-for full documentation of command line switches read [readme](https://github.com/ovhemert/pino-papertrail#readme)
+for full documentation of command line switches read [README](https://github.com/ovhemert/pino-papertrail#readme)
 
 <a id="pino-pg"></a>
 ### pino-pg
 [pino-pg](https://www.npmjs.com/package/pino-pg) stores logs into PostgreSQL.
-Full documentation in the [readme](https://github.com/Xstoudi/pino-pg).
+Full documentation in the [README](https://github.com/Xstoudi/pino-pg).
 
 <a id="pino-mysql"></a>
 ### pino-mysql
@@ -686,7 +686,7 @@ $ node app.js | pino-mysql -c db-configuration.json
 `pino-mysql` can extract and save log fields into corresponding database fields
 and/or save the entire log stream as a [JSON Data Type][JSONDT].
 
-For full documentation and command line switches read the [readme][pino-mysql].
+For full documentation and command line switches read the [README][pino-mysql].
 
 [pino-mysql]: https://www.npmjs.com/package/pino-mysql
 [MySQL]: https://www.mysql.com/
@@ -714,7 +714,7 @@ $ node app.js | pino-redis -U redis://username:password@localhost:6379
 $ node app.js | pino-sentry --dsn=https://******@sentry.io/12345
 ```
 
-For full documentation of command line switches see the [pino-sentry readme](https://github.com/aandrewww/pino-sentry/blob/master/README.md).
+For full documentation of command line switches see the [pino-sentry README](https://github.com/aandrewww/pino-sentry/blob/master/README.md).
 
 [pino-sentry]: https://www.npmjs.com/package/pino-sentry
 [Sentry]: https://sentry.io/
@@ -896,7 +896,7 @@ like so:
 $ node foo | pino-stackdriver --project bar --credentials /credentials.json
 ```
 
-For full documentation of command line switches read [readme](https://github.com/ovhemert/pino-stackdriver#readme)
+For full documentation of command line switches read [README](https://github.com/ovhemert/pino-stackdriver#readme)
 
 <a id="pino-syslog"></a>
 ### pino-syslog

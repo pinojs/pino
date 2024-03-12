@@ -94,7 +94,7 @@ See [`pino.multistream`](/docs/api.md#pino-multistream).
 
 <a id="filter-logs"></a>
 ## Log Filtering
-The Pino philosophy advocates common, pre-existing, system utilities.
+The Pino philosophy advocates common, preexisting, system utilities.
 
 Some recommendations in line with this philosophy are:
 
@@ -153,7 +153,7 @@ for information on this is handled.
 
 <a id="level-string"></a>
 ## Log levels as labels instead of numbers
-Pino log lines are meant to be parseable. Thus, Pino's default mode of operation
+Pino log lines are meant to be parsable. Thus, Pino's default mode of operation
 is to print the level value instead of the string name. 
 However, you can use the [`formatters`](/docs/api.md#formatters-object) option 
 with a [`level`](/docs/api.md#level) function to print the string name instead of the level value :
