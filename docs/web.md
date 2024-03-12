@@ -76,8 +76,6 @@ npm install hapi-pino
 ```js
 'use strict'
 
-require('make-promises-safe')
-
 const Hapi = require('@hapi/hapi')
 const Pino = require('hapi-pino');
 
