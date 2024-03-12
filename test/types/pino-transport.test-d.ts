@@ -74,6 +74,23 @@ expectType<pino.Logger>(pino({
     },
 }))
 
+const transportsWithoutOptions = pino.transport({
+    targets: [
+        { target: '#pino/pretty' },
+        { target: '#pino/file' }
+    ], levels: { foo: 35 }
+})
+pino(transports)
+
+expectType<pino.Logger>(pino({
+    transport: {
+        targets: [
+            { target: '#pino/pretty' },
+            { target: '#pino/file' }
+        ], levels: { foo: 35 }
+    },
+}))
+
 const pipelineTransport = pino.transport({
     pipeline: [{
         target: './my-transform.js'

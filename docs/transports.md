@@ -193,6 +193,25 @@ To consume async iterators in batches, consider using the [hwp](https://github.c
 The `close()` function is needed to make sure that the stream is closed and flushed when its
 callback is called or the returned promise resolves. Otherwise, log lines will be lost.
 
+### Writing to a custom transport & stdout
+
+In case you want to both use a custom transport, and output the log entries with default processing to STDOUT, you can use 'pino/file' transport configured with `destination: 1`:
+
+```js
+    const transports = [
+      {
+        target: 'pino/file',
+        options: { destination: 1 } // this writes to STDOUT
+      },
+      {
+        target: 'my-custom-transport',
+        options: { someParameter: true } 
+      }
+    ]
+
+    const logger = pino(pino.transport({ targets: transports })
+```
+
 ### Creating a transport pipeline
 
 As an example, the following transport returns a `Transform` stream:
@@ -238,9 +257,10 @@ const logger = pino({
     pipeline: [{
       target: './my-transform.js'
     }, {
-      // Use target: 'pino/file' to write to stdout
-      // without any change.
-      target: 'pino-pretty'
+      // Use target: 'pino/file' with STDOUT descriptor 1 to write
+      // logs without any change.
+      target: 'pino/file',
+      options: { destination: 1 }
     }]
   }
 })
@@ -363,7 +383,7 @@ const split = require('split2')
 
 const myTransportStream = new Writable({
   write (chunk, enc, cb) {
-  // apply a transform and send to stdout
+  // apply a transform and send to STDOUT
   console.log(chunk.toString().toUpperCase())
   cb()
   }
@@ -401,6 +421,7 @@ PRs to this document are welcome for any new transports!
 + [pino-slack-webhook](#pino-slack-webhook) 
 + [pino-axiom](#pino-axiom)
 + [pino-opentelemetry-transport](#pino-opentelemetry-transport)
++ [@axiomhq/pino](#@axiomhq/pino)
 
 ### Legacy
 
@@ -978,6 +999,35 @@ pino(transport)
 ```
 
 Documentation on running a minimal example is available in the [README](https://github.com/Vunovati/pino-opentelemetry-transport#minimalistic-example).
+
+<a id="@axiomhq/pino"></a>
+### @axiomhq/pino
+
+[@axiomhq/pino](https://www.npmjs.com/package/@axiomhq/pino) is the official [Axiom](https://axiom.co/) transport for Pino, using [axiom-js](https://github.com/axiomhq/axiom-js).
+
+```javascript
+import pino from 'pino';
+
+const logger = pino(
+  { level: 'info' },
+  pino.transport({
+    target: '@axiomhq/pino',
+    options: {
+      dataset: process.env.AXIOM_DATASET,
+      token: process.env.AXIOM_TOKEN,
+    },
+  }),
+);
+```
+
+then you can use the logger as usual:
+
+```js
+logger.info('Hello from pino!');
+```
+
+For further examples, head over to the [examples](https://github.com/axiomhq/axiom-js/tree/main/examples/pino) directory.
+
 
 <a id="communication-between-pino-and-transport"></a>
 ## Communication between Pino and Transports

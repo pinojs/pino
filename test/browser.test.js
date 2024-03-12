@@ -166,6 +166,53 @@ test('opts.browser.asObject logs pino-like object to console', ({ end, ok, is })
   end()
 })
 
+test('opts.browser.formatters logs pino-like object to console', ({ end, ok, is }) => {
+  const info = console.info
+  console.info = function (o) {
+    is(o.level, 30)
+    is(o.label, 'info')
+    is(o.msg, 'test')
+    ok(o.time)
+    console.info = info
+  }
+  const instance = require('../browser')({
+    browser: {
+      formatters: {
+        level (label, number) {
+          return { label, level: number }
+        }
+      }
+    }
+  })
+
+  instance.info('test')
+  end()
+})
+
+test('opts.browser.formatters logs pino-like object to console', ({ end, ok, is }) => {
+  const info = console.info
+  console.info = function (o) {
+    is(o.level, 30)
+    is(o.msg, 'test')
+    is(o.hello, 'world')
+    is(o.newField, 'test')
+    ok(o.time, `Logged at ${o.time}`)
+    console.info = info
+  }
+  const instance = require('../browser')({
+    browser: {
+      formatters: {
+        log (o) {
+          return { ...o, newField: 'test', time: `Logged at ${o.time}` }
+        }
+      }
+    }
+  })
+
+  instance.info({ hello: 'world' }, 'test')
+  end()
+})
+
 test('opts.browser.write func log single string', ({ end, ok, is }) => {
   const instance = pino({
     browser: {

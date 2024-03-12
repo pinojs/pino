@@ -8,7 +8,8 @@ const time = require('./lib/time')
 const proto = require('./lib/proto')
 const symbols = require('./lib/symbols')
 const { configure } = require('safe-stable-stringify')
-const { assertDefaultLevelFound, mappings, genLsCache, levels } = require('./lib/levels')
+const { assertDefaultLevelFound, mappings, genLsCache, genLevelComparison, assertLevelComparison } = require('./lib/levels')
+const { DEFAULT_LEVELS, SORTING_ORDER } = require('./lib/constants')
 const {
   createArgsNormalizer,
   asChindings,
@@ -36,6 +37,7 @@ const {
   errorKeySym,
   nestedKeySym,
   mixinSym,
+  levelCompSym,
   useOnlyCustomLevelsSym,
   formattersSym,
   hooksSym,
@@ -49,7 +51,8 @@ const hostname = os.hostname()
 const defaultErrorSerializer = stdSerializers.err
 const defaultOptions = {
   level: 'info',
-  levels,
+  levelComparison: SORTING_ORDER.ASC,
+  levels: DEFAULT_LEVELS,
   messageKey: 'msg',
   errorKey: 'err',
   nestedKey: null,
@@ -97,6 +100,7 @@ function pino (...args) {
     name,
     level,
     customLevels,
+    levelComparison,
     mixin,
     mixinMergeStrategy,
     useOnlyCustomLevels,
@@ -157,8 +161,12 @@ function pino (...args) {
   assertDefaultLevelFound(level, customLevels, useOnlyCustomLevels)
   const levels = mappings(customLevels, useOnlyCustomLevels)
 
+  assertLevelComparison(levelComparison)
+  const levelCompFunc = genLevelComparison(levelComparison)
+
   Object.assign(instance, {
     levels,
+    [levelCompSym]: levelCompFunc,
     [useOnlyCustomLevelsSym]: useOnlyCustomLevels,
     [streamSym]: stream,
     [timeSym]: time,

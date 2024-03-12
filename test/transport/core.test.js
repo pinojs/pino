@@ -485,6 +485,7 @@ test('log and exit before ready', async ({ not }) => {
     cb()
   }))
   await once(child, 'close')
+  await immediate()
   not(strip(actual).match(/Hello/), null)
 })
 
@@ -508,6 +509,7 @@ test('string integer destination', async ({ not }) => {
     cb()
   }))
   await once(child, 'close')
+  await immediate()
   not(strip(actual).match(/Hello/), null)
 })
 

@@ -527,6 +527,177 @@ test('changing level from info to silent and back to info in child logger', asyn
   check(equal, result, expected.level, expected.msg)
 })
 
+test('changing level respects level comparison set to', async ({ test, end }) => {
+  const ascLevels = {
+    debug: 1,
+    info: 2,
+    warn: 3
+  }
+
+  const descLevels = {
+    debug: 3,
+    info: 2,
+    warn: 1
+  }
+
+  const expected = {
+    level: 2,
+    msg: 'hello world'
+  }
+
+  test('ASC in parent logger', async ({ equal }) => {
+    const customLevels = ascLevels
+    const levelComparison = 'ASC'
+
+    const stream = sink()
+    const logger = pino({ levelComparison, customLevels, useOnlyCustomLevels: true, level: 'info' }, stream)
+
+    logger.level = 'warn'
+    logger.info('hello world')
+    let result = stream.read()
+    equal(result, null)
+
+    logger.level = 'debug'
+    logger.info('hello world')
+    result = await once(stream, 'data')
+    check(equal, result, expected.level, expected.msg)
+  })
+
+  test('DESC in parent logger', async ({ equal }) => {
+    const customLevels = descLevels
+    const levelComparison = 'DESC'
+
+    const stream = sink()
+    const logger = pino({ levelComparison, customLevels, useOnlyCustomLevels: true, level: 'info' }, stream)
+
+    logger.level = 'warn'
+    logger.info('hello world')
+    let result = stream.read()
+    equal(result, null)
+
+    logger.level = 'debug'
+    logger.info('hello world')
+    result = await once(stream, 'data')
+    check(equal, result, expected.level, expected.msg)
+  })
+
+  test('custom function in parent logger', async ({ equal }) => {
+    const customLevels = {
+      info: 2,
+      debug: 345,
+      warn: 789
+    }
+    const levelComparison = (current, expected) => {
+      if (expected === customLevels.warn) return false
+      return true
+    }
+
+    const stream = sink()
+    const logger = pino({ levelComparison, customLevels, useOnlyCustomLevels: true, level: 'info' }, stream)
+
+    logger.level = 'warn'
+    logger.info('hello world')
+    let result = stream.read()
+    equal(result, null)
+
+    logger.level = 'debug'
+    logger.info('hello world')
+    result = await once(stream, 'data')
+    check(equal, result, expected.level, expected.msg)
+  })
+
+  test('ASC in child logger', async ({ equal }) => {
+    const customLevels = ascLevels
+    const levelComparison = 'ASC'
+
+    const stream = sink()
+    const logger = pino({ levelComparison, customLevels, useOnlyCustomLevels: true, level: 'info' }, stream).child({ })
+
+    logger.level = 'warn'
+    logger.info('hello world')
+    let result = stream.read()
+    equal(result, null)
+
+    logger.level = 'debug'
+    logger.info('hello world')
+    result = await once(stream, 'data')
+    check(equal, result, expected.level, expected.msg)
+  })
+
+  test('DESC in parent logger', async ({ equal }) => {
+    const customLevels = descLevels
+    const levelComparison = 'DESC'
+
+    const stream = sink()
+    const logger = pino({ levelComparison, customLevels, useOnlyCustomLevels: true, level: 'info' }, stream).child({ })
+
+    logger.level = 'warn'
+    logger.info('hello world')
+    let result = stream.read()
+    equal(result, null)
+
+    logger.level = 'debug'
+    logger.info('hello world')
+    result = await once(stream, 'data')
+    check(equal, result, expected.level, expected.msg)
+  })
+
+  test('custom function in child logger', async ({ equal }) => {
+    const customLevels = {
+      info: 2,
+      debug: 345,
+      warn: 789
+    }
+    const levelComparison = (current, expected) => {
+      if (expected === customLevels.warn) return false
+      return true
+    }
+
+    const stream = sink()
+    const logger = pino({ levelComparison, customLevels, useOnlyCustomLevels: true, level: 'info' }, stream).child({ })
+
+    logger.level = 'warn'
+    logger.info('hello world')
+    let result = stream.read()
+    equal(result, null)
+
+    logger.level = 'debug'
+    logger.info('hello world')
+    result = await once(stream, 'data')
+    check(equal, result, expected.level, expected.msg)
+  })
+
+  end()
+})
+
+test('changing level respects level comparison DESC', async ({ equal }) => {
+  const customLevels = {
+    warn: 1,
+    info: 2,
+    debug: 3
+  }
+
+  const levelComparison = 'DESC'
+
+  const expected = {
+    level: 2,
+    msg: 'hello world'
+  }
+
+  const stream = sink()
+  const logger = pino({ levelComparison, customLevels, useOnlyCustomLevels: true, level: 'info' }, stream)
+
+  logger.level = 'warn'
+  logger.info('hello world')
+  let result = stream.read()
+  equal(result, null)
+
+  logger.level = 'debug'
+  logger.info('hello world')
+  result = await once(stream, 'data')
+  check(equal, result, expected.level, expected.msg)
+})
+
 // testing for potential loss of Pino constructor scope from serializers - an edge case with circular refs see:  https://github.com/pinojs/pino/issues/833
 test('trying to get levels when `this` is no longer a Pino instance returns an empty string', async ({ equal }) => {
   const notPinoInstance = { some: 'object', getLevel: levelsLib.getLevel }

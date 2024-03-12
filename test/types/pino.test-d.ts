@@ -1,7 +1,7 @@
-import P, { pino } from "../../";
 import { IncomingMessage, ServerResponse } from "http";
 import { Socket } from "net";
-import { expectError, expectType } from 'tsd'
+import { expectError, expectType } from 'tsd';
+import P, { pino } from "../../";
 import Logger = P.Logger;
 
 const log = pino();
@@ -107,10 +107,13 @@ pino({
     },
 });
 
+pino({}, undefined);
+
 pino({ base: null });
-// @ts-expect-error
 if ("pino" in log) console.log(`pino version: ${log.pino}`);
 
+expectType<void>(log.flush());
+log.flush((err?: Error) => undefined);
 log.child({ a: "property" }).info("hello child!");
 log.level = "error";
 log.info("nope");
@@ -320,6 +323,9 @@ cclog3.childLevel('')
 // child itself
 cclog3.childLevel2('')
 
+const ccclog3 = clog3.child({})
+expectError(ccclog3.nonLevel(''))
+
 const withChildCallback = pino({
     onChild: (child: Logger) => {}
 })
@@ -329,7 +335,7 @@ pino({
     crlf: true,
 });
 
-const customLevels = { foo: 99 };
+const customLevels = { foo: 99, bar: 42 }
 
 const customLevelLogger = pino({ customLevels });
 
@@ -341,3 +347,95 @@ const fn = (logger: Pick<CustomLevelLogger, CustomLevelLoggerLevels>) => {}
 const customLevelChildLogger = customLevelLogger.child({ name: "child" })
 
 fn(customLevelChildLogger); // missing foo typing
+
+// unknown option
+expectError(
+  pino({
+    hello: 'world'
+  })
+);
+
+// unknown option
+expectError(
+  pino({
+    hello: 'world',
+    customLevels: {
+      'log': 30
+    }
+  })
+);
+
+function dangerous () {
+  throw Error('foo')
+}
+
+try {
+  dangerous()
+} catch (err) {
+  log.error(err)
+}
+
+try {
+  dangerous()
+} catch (err) {
+  log.error({ err })
+}
+
+const bLogger = pino({
+  customLevels: {
+    log: 5,
+  },
+  level: 'log',
+  transport: {
+    target: 'pino-pretty',
+    options: {
+      colorize: true,
+    },
+  },
+});
+
+expectType<Logger<'log'>>(pino({
+  customLevels: {
+    log: 5,
+  },
+  level: 'log',
+  transport: {
+    target: 'pino-pretty',
+    options: {
+      colorize: true,
+    },
+  },
+}))
+
+const parentLogger1 = pino({
+  customLevels: { myLevel: 90 },
+  onChild: (child) => { const a = child.myLevel; }
+}, process.stdout)
+parentLogger1.onChild = (child) => { child.myLevel(''); }
+
+const childLogger1 = parentLogger1.child({});
+childLogger1.myLevel('');
+expectError(childLogger1.doesntExist(''));
+
+const parentLogger2 = pino({}, process.stdin);
+expectError(parentLogger2.onChild = (child) => { const b = child.doesntExist; });
+
+const childLogger2 = parentLogger2.child({});
+expectError(childLogger2.doesntExist);
+
+expectError(pino({
+  onChild: (child) => { const a = child.doesntExist; }
+}, process.stdout));
+
+const pinoWithoutLevelsSorting = pino({});
+const pinoWithDescSortingLevels = pino({ levelComparison: 'DESC' });
+const pinoWithAscSortingLevels = pino({ levelComparison: 'ASC' });
+const pinoWithCustomSortingLevels = pino({ levelComparison: () => false });
+// with wrong level comparison direction
+expectError(pino({ levelComparison: 'SOME'}), process.stdout);
+// with wrong level comparison type
+expectError(pino({ levelComparison: 123}), process.stdout);
+// with wrong custom level comparison return type
+expectError(pino({ levelComparison: () => null }), process.stdout);
+expectError(pino({ levelComparison: () => 1 }), process.stdout);
+expectError(pino({ levelComparison: () => 'string' }), process.stdout);

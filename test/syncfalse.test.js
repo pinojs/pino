@@ -1,14 +1,28 @@
 'use strict'
 
 const os = require('os')
-const { createWriteStream } = require('fs')
+const {
+  createWriteStream
+} = require('fs')
+const { readFile } = require('fs').promises
 const { join } = require('path')
 const { test } = require('tap')
 const { fork } = require('child_process')
 const writer = require('flush-write-stream')
-const { once, getPathToNull } = require('./helper')
+const {
+  once,
+  getPathToNull,
+  file,
+  watchFileCreated
+} = require('./helper')
+const { promisify } = require('util')
 
-test('asynchronous logging', async ({ equal, teardown }) => {
+const sleep = promisify(setTimeout)
+
+test('asynchronous logging', async ({
+  equal,
+  teardown
+}) => {
   const now = Date.now
   const hostname = os.hostname
   const proc = process
@@ -48,6 +62,8 @@ test('asynchronous logging', async ({ equal, teardown }) => {
     cb()
   }))
   await once(child, 'close')
+  // Wait for the last write to be flushed
+  await sleep(100)
   equal(actual, expected)
   equal(actual2.trim(), expected2)
 
@@ -58,7 +74,10 @@ test('asynchronous logging', async ({ equal, teardown }) => {
   })
 })
 
-test('sync false with child', async ({ equal, teardown }) => {
+test('sync false with child', async ({
+  equal,
+  teardown
+}) => {
   const now = Date.now
   const hostname = os.hostname
   const proc = process
@@ -82,7 +101,9 @@ test('sync false with child', async ({ equal, teardown }) => {
   })).child({ hello: 'world' })
 
   const dest = createWriteStream(getPathToNull())
-  dest.write = function (s) { actual += s }
+  dest.write = function (s) {
+    actual += s
+  }
   const asyncLogger = pino(dest).child({ hello: 'world' })
 
   let i = 500
@@ -112,7 +133,59 @@ test('sync false with child', async ({ equal, teardown }) => {
   })
 })
 
-test('flush does nothing with sync true (default)', async () => {
+test('flush does nothing with sync true (default)', async ({ equal }) => {
   const instance = require('..')()
-  instance.flush()
+  equal(instance.flush(), undefined)
+})
+
+test('should still call flush callback even when does nothing with sync true (default)', (t) => {
+  t.plan(3)
+  const instance = require('..')()
+  instance.flush((...args) => {
+    t.ok('flush called')
+    t.same(args, [])
+
+    // next tick to make flush not called more than once
+    process.nextTick(() => {
+      t.ok('flush next tick called')
+    })
+  })
+})
+
+test('should call the flush callback when flushed the data for async logger', async (t) => {
+  const outputPath = file()
+  async function getOutputLogLines () {
+    return (await readFile(outputPath)).toString().trim().split('\n').map(JSON.parse)
+  }
+
+  const pino = require('../')
+
+  const instance = pino({}, pino.destination({
+    dest: outputPath,
+
+    // to make sure it does not flush on its own
+    minLength: 4096
+  }))
+  const flushPromise = promisify(instance.flush).bind(instance)
+
+  instance.info('hello')
+  await flushPromise()
+  await watchFileCreated(outputPath)
+
+  const [firstFlushData] = await getOutputLogLines()
+
+  t.equal(firstFlushData.msg, 'hello')
+
+  // should not flush this as no data accumulated that's bigger than min length
+  instance.info('world')
+
+  // Making sure data is not flushed yet
+  const afterLogData = await getOutputLogLines()
+  t.equal(afterLogData.length, 1)
+
+  await flushPromise()
+
+  // Making sure data is not flushed yet
+  const afterSecondFlush = (await getOutputLogLines())[1]
+  t.equal(afterSecondFlush.msg, 'world')
 })
