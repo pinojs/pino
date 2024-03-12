@@ -422,6 +422,7 @@ PRs to this document are welcome for any new transports!
 + [pino-axiom](#pino-axiom)
 + [pino-opentelemetry-transport](#pino-opentelemetry-transport)
 + [@axiomhq/pino](#@axiomhq/pino)
++ [pino-discord-webhook](#pino-discord-webhook)
 
 ### Legacy
 
@@ -1028,6 +1029,23 @@ logger.info('Hello from pino!');
 
 For further examples, head over to the [examples](https://github.com/axiomhq/axiom-js/tree/main/examples/pino) directory.
 
+<a id="pino-discord-webhook"></a>
+### pino-discord-webhook
+
+[pino-discord-webhook](https://github.com/fabulousgk/pino-discord-webhook) is a  Pino v7+ compatible transport to forward log events to a [Discord](http://discord.com) webhook from a dedicated worker. 
+
+```js
+import pino from 'pino'
+
+const logger = pino({
+  transport: {
+    target: 'pino-discord-webhook',
+    options: {
+      webhookUrl: 'https://discord.com/api/webhooks/xxxx/xxxx',
+    }
+  }
+})
+```
 
 <a id="communication-between-pino-and-transport"></a>
 ## Communication between Pino and Transports
@@ -1035,7 +1053,6 @@ Here we discuss some technical details of how Pino communicates with its [worker
 
 Pino uses [`thread-stream`](https://github.com/pinojs/thread-stream) to create a stream for transports.
 When we create a stream with `thread-stream`, `thread-stream` spawns a [worker](https://github.com/pinojs/thread-stream/blob/f19ac8dbd602837d2851e17fbc7dfc5bbc51083f/index.js#L50-L60) (an independent JavaScript execution thread).
-
 
 ### Error messages
 How are error messages propagated from a transport worker to Pino?
