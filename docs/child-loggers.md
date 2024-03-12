@@ -71,7 +71,7 @@ $ cat my-log
 {"pid":95469,"hostname":"MacBook-Pro-3.home","level":30,"msg":"howdy","time":1459534114473,"a":"property","a":"prop"}
 ```
 
-Notice how there are two keys named `a` in the JSON output. The sub-childs properties
+Notice how there are two keys named `a` in the JSON output. The sub-child's properties
 appear after the parent child properties.
 
 At some point, the logs will most likely be processed (for instance with a [transport](transports.md)),
@@ -83,7 +83,7 @@ $ cat my-log | node -e "process.stdin.once('data', (line) => console.log(JSON.st
 {"pid":95469,"hostname":"MacBook-Pro-3.home","level":30,"msg":"howdy","time":"2016-04-01T18:08:34.473Z","a":"prop"}
 ```
 
-Ultimately the conflict is resolved by taking the last value, which aligns with Bunyans child logging
+Ultimately the conflict is resolved by taking the last value, which aligns with Bunyan's child logging
 behavior.
 
 There may be cases where this edge case becomes problematic if a JSON parser with alternative behavior
