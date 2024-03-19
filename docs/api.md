@@ -13,7 +13,8 @@
   * [logger.fatal()](#fatal)
   * [logger.silent()](#silent)
   * [logger.child()](#child)
-  * [logger.bindings()](#bindings)
+  * [logger.bindings()](#logger-bindings)
+  * [logger.setBindings()](#logger-set-bindings)
   * [logger.flush()](#flush)
   * [logger.level](#logger-level)
   * [logger.isLevelEnabled()](#islevelenabled)
@@ -888,6 +889,7 @@ The log level of a child is mutable. It can be set independently
 of the parent either by setting the [`level`](#level) accessor after creating
 the child logger or using the [`options.level`](#optionslevel-string) key.
 
+<a id="logger-child-bindings"></a>
 #### `bindings` (Object)
 
 An object of key-value pairs to include in every log line output
@@ -978,7 +980,7 @@ child.info({test: 'will be overwritten'})
 * See [`serializers` option](#opt-serializers)
 * See [pino.stdSerializers](#pino-stdSerializers)
 
-<a id="bindings"></a>
+<a id="logger-bindings"></a>
 ### `logger.bindings()`
 
 Returns an object containing all the current bindings, cloned from the ones passed in via `logger.child()`.
@@ -990,6 +992,16 @@ const anotherChild = child.child({ MIX: { IN: 'always' } })
 console.log(anotherChild.bindings())
 // { foo: 'bar', MIX: { IN: 'always' } }
 ```
+
+<a id="logger-set-bindings"></a>
+### `logger.setBindings(bindings)`
+
+Adds to the bindings of this logger instance.
+
+**Note:** Does not overwrite bindings. Can potentially result in duplicate keys in
+log lines.
+
+* See [`bindings` parameter in `logger.child`](#logger-child-bindings)     
 
 <a id="flush"></a>
 ### `logger.flush([cb])`
