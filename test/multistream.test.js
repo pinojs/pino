@@ -8,7 +8,7 @@ const pino = require('../')
 const multistream = pino.multistream
 const proxyquire = require('proxyquire')
 const strip = require('strip-ansi')
-const { file } = require('./helper')
+const { file, sink } = require('./helper')
 
 test('sends to multiple streams using string levels', function (t) {
   let messageCount = 0
@@ -244,6 +244,19 @@ test('supports pretty print', function (t) {
   ]))
 
   log.info('pretty print')
+})
+
+test('emit propagates events to each stream', function (t) {
+  t.plan(3)
+  const handler = function (data) {
+    t.equal(data.msg, 'world')
+  }
+  const streams = [sink(), sink(), sink()]
+  streams.forEach(function (s) {
+    s.once('hello', handler)
+  })
+  const stream = multistream(streams)
+  stream.emit('hello', { msg: 'world' })
 })
 
 test('children support custom levels', function (t) {

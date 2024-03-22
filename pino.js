@@ -161,6 +161,10 @@ function pino (...args) {
   assertDefaultLevelFound(level, customLevels, useOnlyCustomLevels)
   const levels = mappings(customLevels, useOnlyCustomLevels)
 
+  if (typeof stream.emit === 'function') {
+    stream.emit('message', { code: 'PINO_CONFIG', config: { levels, messageKey, errorKey } })
+  }
+
   assertLevelComparison(levelComparison)
   const levelCompFunc = genLevelComparison(levelComparison)
 

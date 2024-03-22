@@ -229,6 +229,39 @@ test('serializers can return undefined to strip field', async ({ equal }) => {
   equal('test' in result, false)
 })
 
+test('streams receive a message event with PINO_CONFIG', ({ match, end }) => {
+  const stream = sink()
+  stream.once('message', (message) => {
+    match(message, {
+      code: 'PINO_CONFIG',
+      config: {
+        errorKey: 'err',
+        levels: {
+          labels: {
+            10: 'trace',
+            20: 'debug',
+            30: 'info',
+            40: 'warn',
+            50: 'error',
+            60: 'fatal'
+          },
+          values: {
+            debug: 20,
+            error: 50,
+            fatal: 60,
+            info: 30,
+            trace: 10,
+            warn: 40
+          }
+        },
+        messageKey: 'msg'
+      }
+    })
+    end()
+  })
+  pino(stream)
+})
+
 test('does not explode with a circular ref', async ({ doesNotThrow }) => {
   const stream = sink()
   const instance = pino(stream)
