@@ -13,6 +13,7 @@
 * [Mapping Pino Log Levels to Google Cloud Logging (Stackdriver) Severity Levels](#stackdriver)
 * [Avoid Message Conflict](#avoid-message-conflict)
 * [Best performance for logging to `stdout`](#best-performance-for-stdout)
+* [Testing](#testing)
 
 <a id="rotate"></a>
 ## Log rotation
@@ -301,3 +302,8 @@ const log = require('pino')();
 
 You should only have to configure custom transports or other settings
 if you have broader logging requirements.
+
+<a id="testing"></a>
+## Testing
+
+See [`pino-test`](https://github.com/pinojs/pino-test).
