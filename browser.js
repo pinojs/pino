@@ -264,13 +264,13 @@ function getBindingChain (logger) {
 function set (self, opts, rootLogger, level) {
   // override the current log functions with either `noop` or the base log function
   Object.defineProperty(self, level, {
-    value: levelToValue(self.level, rootLogger) > levelToValue(level, rootLogger)
+    value: (levelToValue(self.level, rootLogger) > levelToValue(level, rootLogger)
       ? noop
-      : rootLogger[baseLogFunctionSymbol][level],
+      : rootLogger[baseLogFunctionSymbol][level]),
     writable: true,
     enumerable: true,
-    configurable: true,
-  });
+    configurable: true
+  })
 
   if (!opts.transmit && self[level] === noop) {
     return
