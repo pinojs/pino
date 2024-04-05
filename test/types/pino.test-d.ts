@@ -311,14 +311,14 @@ log3.on('level-change', (lvl, val, prevLvl, prevVal, instance) => {
 });
 
 const clog3 = log3.child({}, { customLevels: { childLevel: 120 } })
-// child inherit parant
+// child inherit parent
 clog3.myLevel('')
 // child itself
 clog3.childLevel('')
 const cclog3 = clog3.child({}, { customLevels: { childLevel2: 130 } })
 // child inherit root
 cclog3.myLevel('')
-// child inherit parant
+// child inherit parent
 cclog3.childLevel('')
 // child itself
 cclog3.childLevel2('')
