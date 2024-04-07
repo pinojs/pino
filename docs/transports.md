@@ -423,6 +423,7 @@ PRs to this document are welcome for any new transports!
 + [pino-opentelemetry-transport](#pino-opentelemetry-transport)
 + [@axiomhq/pino](#@axiomhq/pino)
 + [pino-discord-webhook](#pino-discord-webhook)
++ [pino-logfmt](#pino-logfmt)
 
 ### Legacy
 
@@ -1043,6 +1044,21 @@ const logger = pino({
     options: {
       webhookUrl: 'https://discord.com/api/webhooks/xxxx/xxxx',
     }
+  }
+})
+```
+
+<a id="pino-logfmt"></a>
+### pino-logfmt
+
+[pino-logfmt](https://github.com/botflux/pino-logfmt) is a Pino v7+ transport that formats logs into [logfmt](https://brandur.org/logfmt). This transport can output the formatted logs to stdout or file.
+
+```js
+import pino from 'pino'
+
+const logger = pino({
+  transport: {
+    target: 'pino-logfmt'
   }
 })
 ```
