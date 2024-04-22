@@ -11,8 +11,10 @@
 * [Pino with `debug`](#debug)
 * [Unicode and Windows terminal](#windows)
 * [Mapping Pino Log Levels to Google Cloud Logging (Stackdriver) Severity Levels](#stackdriver)
+* [Using Grafana Loki to evaluate pino logs in a kubernetes cluster](#grafana-loki)
 * [Avoid Message Conflict](#avoid-message-conflict)
 * [Best performance for logging to `stdout`](#best-performance-for-stdout)
+* [Testing](#testing)
 
 <a id="rotate"></a>
 ## Log rotation
@@ -258,6 +260,15 @@ module.exports = function createLogger(options) {
 }
 ```
 
+<a id="grafana-loki"></a>
+## Using Grafana Loki to evaluate pino logs in a kubernetes cluster
+
+To get pino logs into Grafana Loki there are two options:
+
+1. **Push:** Use [pino-loki](https://github.com/Julien-R44/pino-loki) to send logs directly to Loki.
+1. **Pull:** Configure Grafana Promtail to read and properly parse the logs before sending them to Loki.  
+   Similar to Google Cloud logging, this involves remapping the log levels. See this [article](https://medium.com/@janpaepke/structured-logging-in-the-grafana-monitoring-stack-8aff0a5af2f5) for details.
+
 <a id="avoid-message-conflict"></a>
 ## Avoid Message Conflict
 
@@ -301,3 +312,8 @@ const log = require('pino')();
 
 You should only have to configure custom transports or other settings
 if you have broader logging requirements.
+
+<a id="testing"></a>
+## Testing
+
+See [`pino-test`](https://github.com/pinojs/pino-test).
