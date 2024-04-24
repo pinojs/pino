@@ -200,6 +200,45 @@ test('Formatters in child logger', async ({ match }) => {
   })
 })
 
+test('Formatters with keepParentBindings option', async ({ match }) => {
+  const stream = sink()
+
+  const logger = pino({
+    formatters: {
+      options: {
+        keepParentBindings: true
+      },
+      bindings (bindings) {
+        if (bindings.foobar) bindings.foobar = bindings.foobar.toUpperCase()
+        if (bindings.faz) bindings.faz = bindings.faz.toUpperCase()
+        if (bindings.foobat) bindings.foobat = bindings.foobat.toUpperCase()
+        if (bindings.foobaz) bindings.foobaz = bindings.foobaz.toUpperCase()
+        return bindings
+      }
+    }
+  }, stream)
+  logger.setBindings({ foobar: 'foobar' })
+
+  const child = logger.child({
+    faz: 'baz',
+    nested: { object: true }
+  })
+  child.setBindings({ foobat: 'foobat' })
+
+  const childChild = child.child({ foobaz: 'foobaz' })
+
+  const o = once(stream, 'data')
+  childChild.info({ foo: 'bar', nested: { object: true } }, 'hello world')
+  match(await o, {
+    foobar: 'FOOBAR',
+    faz: 'BAZ',
+    foobat: 'FOOBAT',
+    foobaz: 'FOOBAZ',
+    foo: 'bar',
+    nested: { object: true }
+  })
+})
+
 test('Formatters without bindings in child logger', async ({ match }) => {
   const stream = sink()
   const logger = pino({
