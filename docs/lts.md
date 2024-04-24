@@ -43,6 +43,7 @@ A "month" is defined as 30 consecutive days.
 
 | Version | Release Date | End Of LTS Date | Node.js              |
 | :------ | :----------- | :-------------- | :------------------- |
+| 9.x     | TBD.         | TBD             | 18, 20               |
 | 8.x     | 2022-06-01   | TBD             | 14, 16, 18           |
 | 7.x     | 2021-10-14   | 2023-06-01      | 12, 14, 16           |
 | 6.x     | 2020-03-07   | 2022-04-14      | 10, 12, 14, 16       |
@@ -58,6 +59,6 @@ the YAML workflow labels below:
 
 | OS      | YAML Workflow Label    | Node.js      |
 |---------|------------------------|--------------|
-| Linux   | `ubuntu-latest`        | 14,16,18     |
-| Windows | `windows-latest`       | 14,16,18     |
-| MacOS   | `macos-latest`         | 14,16,18     |
+| Linux   | `ubuntu-latest`        | 18, 20, 21   |
+| Windows | `windows-latest`       | 18, 20, 21   |
+| MacOS   | `macos-latest`         | 18, 20, 21   |
