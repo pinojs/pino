@@ -11,8 +11,10 @@
 * [Pino with `debug`](#debug)
 * [Unicode and Windows terminal](#windows)
 * [Mapping Pino Log Levels to Google Cloud Logging (Stackdriver) Severity Levels](#stackdriver)
+* [Using Grafana Loki to evaluate pino logs in a kubernetes cluster](#grafana-loki)
 * [Avoid Message Conflict](#avoid-message-conflict)
 * [Best performance for logging to `stdout`](#best-performance-for-stdout)
+* [Testing](#testing)
 
 <a id="rotate"></a>
 ## Log rotation
@@ -94,7 +96,7 @@ See [`pino.multistream`](/docs/api.md#pino-multistream).
 
 <a id="filter-logs"></a>
 ## Log Filtering
-The Pino philosophy advocates common, pre-existing, system utilities.
+The Pino philosophy advocates common, preexisting, system utilities.
 
 Some recommendations in line with this philosophy are:
 
@@ -153,7 +155,7 @@ for information on this is handled.
 
 <a id="level-string"></a>
 ## Log levels as labels instead of numbers
-Pino log lines are meant to be parseable. Thus, Pino's default mode of operation
+Pino log lines are meant to be parsable. Thus, Pino's default mode of operation
 is to print the level value instead of the string name. 
 However, you can use the [`formatters`](/docs/api.md#formatters-object) option 
 with a [`level`](/docs/api.md#level) function to print the string name instead of the level value :
@@ -258,6 +260,15 @@ module.exports = function createLogger(options) {
 }
 ```
 
+<a id="grafana-loki"></a>
+## Using Grafana Loki to evaluate pino logs in a kubernetes cluster
+
+To get pino logs into Grafana Loki there are two options:
+
+1. **Push:** Use [pino-loki](https://github.com/Julien-R44/pino-loki) to send logs directly to Loki.
+1. **Pull:** Configure Grafana Promtail to read and properly parse the logs before sending them to Loki.  
+   Similar to Google Cloud logging, this involves remapping the log levels. See this [article](https://medium.com/@janpaepke/structured-logging-in-the-grafana-monitoring-stack-8aff0a5af2f5) for details.
+
 <a id="avoid-message-conflict"></a>
 ## Avoid Message Conflict
 
@@ -301,3 +312,8 @@ const log = require('pino')();
 
 You should only have to configure custom transports or other settings
 if you have broader logging requirements.
+
+<a id="testing"></a>
+## Testing
+
+See [`pino-test`](https://github.com/pinojs/pino-test).

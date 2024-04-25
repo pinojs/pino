@@ -1,6 +1,6 @@
 {
   "name": "pino",
-  "version": "8.19.0",
+  "version": "9.0.0",
   "description": "super fast, all natural json logger",
   "main": "pino.js",
   "type": "commonjs",
@@ -104,14 +104,14 @@
     "atomic-sleep": "^1.0.0",
     "fast-redact": "^3.1.1",
     "on-exit-leak-free": "^2.1.0",
-    "pino-abstract-transport": "v1.1.0",
+    "pino-abstract-transport": "^1.2.0",
     "pino-std-serializers": "^6.0.0",
     "process-warning": "^3.0.0",
     "quick-format-unescaped": "^4.0.3",
     "real-require": "^0.2.0",
     "safe-stable-stringify": "^2.3.1",
     "sonic-boom": "^3.7.0",
-    "thread-stream": "^2.0.0"
+    "thread-stream": "^2.6.0"
   },
   "tsd": {
     "directory": "test/types"

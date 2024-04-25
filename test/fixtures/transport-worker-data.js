@@ -1,13 +1,17 @@
 'use strict'
 
+const { parentPort, workerData } = require('worker_threads')
 const { Writable } = require('stream')
-const fs = require('fs')
+
 module.exports = (options) => {
   const myTransportStream = new Writable({
     autoDestroy: true,
     write (chunk, enc, cb) {
-      // Bypass console.log() to avoid flakiness
-      fs.writeSync(1, chunk.toString())
+      parentPort.postMessage({
+        code: 'EVENT',
+        name: 'workerData',
+        args: [workerData]
+      })
       cb()
     }
   })

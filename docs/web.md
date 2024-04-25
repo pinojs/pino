@@ -64,7 +64,7 @@ app.get('/', function (req, res) {
 app.listen(3000)
 ```
 
-See the [pino-http readme](https://npm.im/pino-http) for more info.
+See the [pino-http README](https://npm.im/pino-http) for more info.
 
 <a id="hapi"></a>
 ## Pino with Hapi
@@ -75,8 +75,6 @@ npm install hapi-pino
 
 ```js
 'use strict'
-
-require('make-promises-safe')
 
 const Hapi = require('@hapi/hapi')
 const Pino = require('hapi-pino');
@@ -122,7 +120,7 @@ start().catch((err) => {
 })
 ```
 
-See the [hapi-pino readme](https://npm.im/hapi-pino) for more info.
+See the [hapi-pino README](https://npm.im/hapi-pino) for more info.
 
 <a id="restify"></a>
 ## Pino with Restify
@@ -145,7 +143,7 @@ server.get('/', function (req, res) {
 server.listen(3000)
 ```
 
-See the [restify-pino-logger readme](https://npm.im/restify-pino-logger) for more info.
+See the [restify-pino-logger README](https://npm.im/restify-pino-logger) for more info.
 
 <a id="koa"></a>
 ## Pino with Koa
@@ -169,7 +167,7 @@ app.use((ctx) => {
 app.listen(3000)
 ```
 
-See the [koa-pino-logger readme](https://github.com/pinojs/koa-pino-logger) for more info.
+See the [koa-pino-logger README](https://github.com/pinojs/koa-pino-logger) for more info.
 
 <a id="http"></a>
 ## Pino with Node core `http`
@@ -192,7 +190,7 @@ function handle (req, res) {
 server.listen(3000)
 ```
 
-See the [pino-http readme](https://npm.im/pino-http) for more info.
+See the [pino-http README](https://npm.im/pino-http) for more info.
 
 
 <a id="nest"></a>
@@ -231,7 +229,7 @@ async function bootstrap() {
 bootstrap()
 ```
 
-See the [nestjs-pino readme](https://npm.im/nestjs-pino) for more info.
+See the [nestjs-pino README](https://npm.im/nestjs-pino) for more info.
 
 
 <a id="h3"></a>
@@ -258,4 +256,4 @@ app.use('/', (req) => {
 createServer(app).listen(process.env.PORT || 3000)
 ```
 
-See the [pino-http readme](https://npm.im/pino-http) for more info.
+See the [pino-http README](https://npm.im/pino-http) for more info.

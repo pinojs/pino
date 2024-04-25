@@ -100,7 +100,7 @@ See [pino options in API](/docs/api.md#redact-array-object) for `redact` API det
 ## Path Syntax
 
 The syntax for paths supplied to the `redact` option conform to the syntax in path lookups
-in standard EcmaScript, with two additions:
+in standard ECMAScript, with two additions:
 
 * paths may start with bracket notation
 * paths may contain the asterisk `*` to denote a wildcard

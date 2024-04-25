@@ -453,6 +453,19 @@ test('pino.transport with target pino-pretty', async ({ match, teardown }) => {
   match(strip(actual), /\[.*\] INFO.*hello/)
 })
 
+test('sets worker data informing the transport that pino will send its config', ({ match, plan, teardown }) => {
+  plan(1)
+  const transport = pino.transport({
+    target: join(__dirname, '..', 'fixtures', 'transport-worker-data.js')
+  })
+  teardown(transport.end.bind(transport))
+  const instance = pino(transport)
+  transport.once('workerData', (workerData) => {
+    match(workerData.workerData, { pinoWillSendConfig: true })
+  })
+  instance.info('hello')
+})
+
 test('stdout in worker', async ({ not }) => {
   let actual = ''
   const child = execa(process.argv[0], [join(__dirname, '..', 'fixtures', 'transport-main.js')])
