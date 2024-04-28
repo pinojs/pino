@@ -427,6 +427,17 @@ declare namespace pino {
              * pino.info('hi') // creates and logs {msg: 'hi', level: 30, time: <ts>}
              */
             asObject?: boolean;
+            formatters?: {
+                /**
+                 * Changes the shape of the log level.
+                 * The default shape is { level: number }.
+                 */
+                level?: (label: string, number: number) => object;
+                /**
+                 * Changes the shape of the log object.
+                 */
+                log?: (object: Record<string, unknown>) => Record<string, unknown>;
+            }
             /**
              * Instead of passing log messages to `console.log` they can be passed to a supplied function. If `write` is
              * set to a single function, all logging objects are passed to this function. If `write` is an object, it

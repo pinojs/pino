@@ -1,7 +1,7 @@
 import { expectAssignable, expectType, expectNotAssignable } from "tsd";
 
 import pino from "../../";
-import type {LevelWithSilent, Logger, LogFn, P, DestinationStreamWithMetadata,  Level, LevelOrString, LevelWithSilentOrString, LoggerExtras } from "../../pino";
+import type {LevelWithSilent, Logger, LogFn, P, DestinationStreamWithMetadata,  Level, LevelOrString, LevelWithSilentOrString, LoggerExtras, LoggerOptions } from "../../pino";
 
 // NB: can also use `import * as pino`, but that form is callable as `pino()`
 // under `esModuleInterop: false` or `pino.default()` under `esModuleInterop: true`.
@@ -46,3 +46,19 @@ const needsMetadata: typeof pino.symbols.needsMetadataGsym = pino.symbols.needsM
 if (stream[needsMetadata]) {
     expectType<number>(stream.lastLevel);
 }
+
+const loggerOptions:LoggerOptions = {
+    browser: {
+        formatters: {
+            log(obj) {
+                return obj
+            },
+            level(label, number) {
+                return { label, number}
+            }
+
+        }
+    }
+}
+
+expectType<LoggerOptions>(loggerOptions)
