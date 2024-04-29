@@ -111,7 +111,7 @@
     "quick-format-unescaped": "^4.0.3",
     "real-require": "^0.2.0",
     "safe-stable-stringify": "^2.3.1",
-    "sonic-boom": "^3.7.0",
+    "sonic-boom": "^4.0.1",
     "thread-stream": "^2.6.0"
   },
   "tsd": {
