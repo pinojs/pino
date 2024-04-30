@@ -134,7 +134,7 @@ test('pino.transport with two files', async ({ same, teardown }) => {
   const transport = pino.transport({
     targets: [{
       level: 'info',
-      target: join(__dirname, '..', 'fixtures', 'to-file-transport.js'),
+      target: 'file://' + join(__dirname, '..', 'fixtures', 'to-file-transport.js'),
       options: { destination: dest1 }
     }, {
       level: 'info',
