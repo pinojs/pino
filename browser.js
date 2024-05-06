@@ -340,7 +340,8 @@ function asObject (logger, level, args, ts, formatters = {}) {
   if (ts) {
     logObject.time = ts
   }
-  logObject.level = levelFormatter(level, logger.levels.values[level])
+  let levelObj = levelFormatter(level, logger.levels.values[level])
+  Object.assign(logObject, levelObj);
 
   let lvl = (logger._childLevel | 0) + 1
   if (lvl < 1) lvl = 1
