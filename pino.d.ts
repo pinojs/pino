@@ -259,6 +259,7 @@ declare namespace pino {
 
     interface TransportPipelineOptions<TransportOptions = Record<string, any>> extends TransportBaseOptions<TransportOptions>{
         pipeline: TransportSingleOptions<TransportOptions>[]
+        level?: LevelWithSilentOrString
     }
 
     interface TransportMultiOptions<TransportOptions = Record<string, any>> extends TransportBaseOptions<TransportOptions>{
