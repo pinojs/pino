@@ -284,7 +284,6 @@ test('children inherit parent serializers', ({ end, is }) => {
 
 test('children serializers get called', ({ end, is }) => {
   const parent = pino({
-    test: 'this',
     browser: {
       serialize: true,
       write (o) {
@@ -301,7 +300,6 @@ test('children serializers get called', ({ end, is }) => {
 
 test('children serializers get called when inherited from parent', ({ end, is }) => {
   const parent = pino({
-    test: 'this',
     serializers: parentSerializers,
     browser: {
       serialize: true,

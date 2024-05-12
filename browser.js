@@ -302,7 +302,7 @@ function createWrap (self, opts, rootLogger, level) {
       const proto = (Object.getPrototypeOf && Object.getPrototypeOf(this) === _console) ? _console : this
       for (var i = 0; i < args.length; i++) args[i] = arguments[i]
 
-      if (opts.serialize && !opts.asObject) {
+      if (opts.serialize && !opts.transmit) {
         applySerializers(args, this._serialize, this.serializers, this._stdErrSerialize)
       }
       if (opts.asObject || opts.formatters) {
@@ -330,17 +330,22 @@ function createWrap (self, opts, rootLogger, level) {
 
 function asObject (logger, level, args, ts, formatters = {}) {
   const {
-    level: levelFormatter = () => logger.levels.values[level],
+    level: levelFormatter,
     log: logObjectFormatter = (obj) => obj
   } = formatters
-  if (logger._serialize) applySerializers(args, logger._serialize, logger.serializers, logger._stdErrSerialize)
   const argsCloned = args.slice()
   let msg = argsCloned[0]
   const logObject = {}
   if (ts) {
     logObject.time = ts
   }
-  logObject.level = levelFormatter(level, logger.levels.values[level])
+
+  if (levelFormatter) {
+    const formattedLevel = levelFormatter(level, logger.levels.values[level])
+    Object.assign(logObject, formattedLevel)
+  } else {
+    logObject.level = logger.levels.values[level]
+  }
 
   let lvl = (logger._childLevel | 0) + 1
   if (lvl < 1) lvl = 1
@@ -361,9 +366,9 @@ function applySerializers (args, serialize, serializers, stdErrSerialize) {
   for (const i in args) {
     if (stdErrSerialize && args[i] instanceof Error) {
       args[i] = pino.stdSerializers.err(args[i])
-    } else if (typeof args[i] === 'object' && !Array.isArray(args[i])) {
+    } else if (typeof args[i] === 'object' && !Array.isArray(args[i]) && serialize) {
       for (const k in args[i]) {
-        if (serialize && serialize.indexOf(k) > -1 && k in serializers) {
+        if (serialize.indexOf(k) > -1 && k in serializers) {
           args[i][k] = serializers[k](args[i][k])
         }
       }
@@ -385,6 +390,7 @@ function transmit (logger, opts, args) {
     logger.serializers,
     logger._stdErrSerialize === undefined ? true : logger._stdErrSerialize
   )
+
   logger._logEvent.ts = ts
   logger._logEvent.messages = args.filter(function (arg) {
     // bindings can only be objects, so reference equality check via indexOf is fine
