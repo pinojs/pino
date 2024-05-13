@@ -6,6 +6,8 @@ on:
       - package-manager-load
 permissions:
   contents: read
+env:
+  PNPM_CI: true
 jobs:
   pnpm:
     name: pnpm package manager on ${{ matrix.node-version }} ${{ matrix.os }}

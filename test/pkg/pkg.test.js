@@ -18,7 +18,7 @@ const exec = promisify(require('child_process').exec)
  */
 const deprecationWarningRegex = /^\(\w+:\d+\)\s\[[\w|\d]+\]\sDeprecationWarning: The `punycode` module is deprecated\.\s+Please use a userland alternative instead\.\s+\(Use `node --trace-deprecation \.\.\.` to show where the warning was created\)\s+$/
 
-test('worker test when packaged into executable using pkg', async (t) => {
+test('worker test when packaged into executable using pkg', { skip: !!process.env.PNPM_CI }, async (t) => {
   const packageName = 'index'
 
   // package the app into several node versions, check config for more info
