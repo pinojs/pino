@@ -466,6 +466,26 @@ test('sets worker data informing the transport that pino will send its config', 
   instance.info('hello')
 })
 
+test('sets worker data informing the transport that pino will send its config (frozen file)', ({ match, plan, teardown }) => {
+  plan(1)
+  const config = {
+    transport: {
+      target: join(__dirname, '..', 'fixtures', 'transport-worker-data.js'),
+      options: {}
+    }
+  }
+  Object.freeze(config)
+  Object.freeze(config.transport)
+  Object.freeze(config.transport.options)
+  const instance = pino(config)
+  const transport = instance[pino.symbols.streamSym]
+  teardown(transport.end.bind(transport))
+  transport.once('workerData', (workerData) => {
+    match(workerData.workerData, { pinoWillSendConfig: true })
+  })
+  instance.info('hello')
+})
+
 test('stdout in worker', async ({ not }) => {
   let actual = ''
   const child = execa(process.argv[0], [join(__dirname, '..', 'fixtures', 'transport-main.js')])
