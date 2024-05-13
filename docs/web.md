@@ -236,24 +236,34 @@ See the [nestjs-pino README](https://npm.im/nestjs-pino) for more info.
 ## Pino with H3
 
 ```sh
-npm install pino-http
+npm install pino-http h3
 ```
+
+Save as `server.mjs`:
 
 ```js
-import { createServer } from 'http'
-import { createApp } from 'h3'
+import { createApp, createRouter, eventHandler, fromNodeMiddleware } from "h3";
 import pino from 'pino-http'
 
-const app = createApp()
+export const app = createApp();
 
-app.use(pino())
+const router = createRouter();
+app.use(router);
+app.use(fromNodeMiddleware(pino()))
 
-app.use('/', (req) => {
-  req.log.info('something')
+app.use(eventHandler((event) => {
+  event.node.req.log.info('something')
   return 'hello world'
-})
+}))
 
-createServer(app).listen(process.env.PORT || 3000)
+router.get(
+  "/",
+  eventHandler((event) => {
+    return { path: event.path, message: "Hello World!" };
+  }),
+);
 ```
+
+Execute `npx --yes listhen -w --open ./server.mjs`.
 
 See the [pino-http README](https://npm.im/pino-http) for more info.

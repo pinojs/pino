@@ -95,33 +95,3 @@ test('pino.transport with worker destination overridden by bundler and mjs trans
 
   globalThis.__bundlerPathsOverrides = undefined
 })
-
-test('pino.transport with worker-pipeline destination overridden by bundler', async ({ same, teardown }) => {
-  globalThis.__bundlerPathsOverrides = {
-    'pino-pipeline-worker': join(__dirname, '..', '..', 'lib/worker-pipeline.js')
-  }
-
-  const destination = file()
-  const transport = pino.transport({
-    pipeline: [
-      {
-        target: join(__dirname, '..', 'fixtures', 'to-file-transport.js'),
-        options: { destination }
-      }
-    ]
-  })
-  teardown(transport.end.bind(transport))
-  const instance = pino(transport)
-  instance.info('hello')
-  await watchFileCreated(destination)
-  const result = JSON.parse(await readFile(destination))
-  delete result.time
-  same(result, {
-    pid,
-    hostname,
-    level: 30,
-    msg: 'hello'
-  })
-
-  globalThis.__bundlerPathsOverrides = undefined
-})

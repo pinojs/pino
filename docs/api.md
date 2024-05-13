@@ -241,13 +241,13 @@ child.info('this will have both `foo: 1` and `bar: 2`')
 logger.info('this will still only have `foo: 1`')
 ```
 
-As of pino 7.x, when the `mixin` is used with the [`nestedKey` option](#opt-nestedkey), 
-the object returned from the `mixin` method will also be nested. Prior versions would mix 
-this object into the root. 
+As of pino 7.x, when the `mixin` is used with the [`nestedKey` option](#opt-nestedkey),
+the object returned from the `mixin` method will also be nested. Prior versions would mix
+this object into the root.
 
 ```js
 const logger = pino({
-    nestedKey: 'payload', 
+    nestedKey: 'payload',
     mixin() {
         return { requestId: requestId.currentId() }
     }
@@ -590,7 +590,7 @@ when using the `transport` option. In this case, an `Error` will be thrown.
 
 #### `onChild` (Function)
 
-The `onChild` function is a synchronous callback that will be called on each creation of a new child, passing the child instance as its first argument.  
+The `onChild` function is a synchronous callback that will be called on each creation of a new child, passing the child instance as its first argument.
 Any error thrown inside the callback will be uncaught and should be handled inside the callback.
 ```js
 const parent = require('pino')({ onChild: (instance) => {
@@ -609,7 +609,7 @@ Default: `pino.destination(1)` (STDOUT)
 The `destination` parameter can be a file descriptor, a file path, or an
 object with `dest` property pointing to a fd or path.
 An ordinary Node.js `stream` file descriptor can be passed as the
-destination (such as the result 
+destination (such as the result
 of `fs.createWriteStream`) but for peak log writing performance, it is strongly
 recommended to use `pino.destination` to create the destination stream.
 Note that the `destination` parameter can be the result of `pino.transport()`.
@@ -1001,7 +1001,7 @@ Adds to the bindings of this logger instance.
 **Note:** Does not overwrite bindings. Can potentially result in duplicate keys in
 log lines.
 
-* See [`bindings` parameter in `logger.child`](#logger-child-bindings)     
+* See [`bindings` parameter in `logger.child`](#logger-child-bindings)
 
 <a id="flush"></a>
 ### `logger.flush([cb])`
@@ -1239,6 +1239,30 @@ const transport = pino.transport({
 pino(transport)
 ```
 
+Multiple transports can now be defined to include pipelines:
+
+```js
+const pino = require('pino')
+const transport = pino.transport({
+  targets: [{
+    level: 'info',
+    target: 'pino-pretty' // must be installed separately
+  }, {
+    level: 'trace',
+    target: 'pino/file',
+    options: { destination: '/path/to/store/logs' }
+  }, {
+    pipeline: [{
+      target: 'pino-syslog' // must be installed separately
+    }, {
+      target: 'pino-socket' // must be installed separately
+    }]
+  }
+  ]
+})
+pino(transport)
+```
+
 If `WeakRef`, `WeakMap`, and `FinalizationRegistry` are available in the current runtime (v14.5.0+), then the thread
 will be automatically terminated in case the stream or logger goes out of scope.
 The `transport()` function adds a listener to `process.on('beforeExit')` and `process.on('exit')` to ensure the worker
@@ -1276,7 +1300,7 @@ For more on transports, how they work, and how to create them see the [`Transpor
 * `target`:  The transport to pass logs through. This may be an installed module name or an absolute path.
 * `options`:  An options object which is serialized (see [Structured Clone Algorithm](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm)), passed to the worker thread, parsed and then passed to the exported transport function.
 * `worker`: [Worker thread](https://nodejs.org/api/worker_threads.html#worker_threads_new_worker_filename_options) configuration options. Additionally, the `worker` option supports `worker.autoEnd`. If this is set to `false` logs will not be flushed on process exit. It is then up to the developer to call `transport.end()` to flush logs.
-* `targets`: May be specified instead of `target`. Must be an array of transport configurations. Transport configurations include the aforementioned `options` and `target` options plus a `level` option which will send only logs above a specified level to a transport.
+* `targets`: May be specified instead of `target`. Must be an array of transport configurations and/or pipelines. Transport configurations include the aforementioned `options` and `target` options plus a `level` option which will send only logs above a specified level to a transport.
 * `pipeline`: May be specified instead of `target`. Must be an array of transport configurations. Transport configurations include the aforementioned `options` and `target` options. All intermediate steps in the pipeline _must_ be `Transform` streams and not `Writable`.
 * `dedupe`: See [pino.multistream options](#pino-multistream)
 

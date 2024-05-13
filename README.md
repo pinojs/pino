@@ -143,12 +143,13 @@ Pino is an **OPEN Open Source Project**. This means that:
 
 > Individuals making significant and valuable contributions are given commit-access to the project to contribute as they see fit. This project is more like an open wiki than a standard guarded open source project.
 
-See the [CONTRIBUTING.md](https://github.com/pinojs/pino/blob/master/CONTRIBUTING.md) file for more details.
+See the [CONTRIBUTING.md](https://github.com/pinojs/pino/blob/main/CONTRIBUTING.md) file for more details.
 
 <a name="acknowledgments"></a>
 ## Acknowledgments
 
 This project was kindly sponsored by [nearForm](https://nearform.com).
+This project is kindly sponsored by [Platformatic](https://platformatic.dev).
 
 Logo and identity designed by Cosmic Fox Design: https://www.behance.net/cosmicfox.
 
