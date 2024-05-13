@@ -1,6 +1,6 @@
 {
   "name": "pino",
-  "version": "9.0.0",
+  "version": "9.1.0",
   "description": "super fast, all natural json logger",
   "main": "pino.js",
   "type": "commonjs",
@@ -63,7 +63,7 @@
     "@types/flush-write-stream": "^1.0.0",
     "@types/node": "^20.2.3",
     "@types/tap": "^15.0.6",
-    "@yao-pkg/pkg": "^5.11.5",
+    "@yao-pkg/pkg": "5.11.5",
     "airtap": "4.0.4",
     "benchmark": "^2.1.4",
     "bole": "^5.0.5",
