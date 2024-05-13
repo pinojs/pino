@@ -112,7 +112,7 @@
     "real-require": "^0.2.0",
     "safe-stable-stringify": "^2.3.1",
     "sonic-boom": "^4.0.1",
-    "thread-stream": "^2.6.0"
+    "thread-stream": "^3.0.0"
   },
   "tsd": {
     "directory": "test/types"
