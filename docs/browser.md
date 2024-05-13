@@ -144,7 +144,7 @@ Unlike server pino the serializers apply to every object passed to the logger me
 if the `asObject` option is `true`, this results in the serializers applying to the
 first object (as in server pino).
 
-For more info on serializers see https://github.com/pinojs/pino/blob/master/docs/api.md#parameters.
+For more info on serializers see https://github.com/pinojs/pino/blob/master/docs/api.md#mergingobject.
 
 ### `transmit` (Object)
 

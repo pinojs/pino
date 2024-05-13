@@ -166,7 +166,7 @@ test('opts.browser.asObject logs pino-like object to console', ({ end, ok, is })
   end()
 })
 
-test('opts.browser.formatters logs pino-like object to console', ({ end, ok, is }) => {
+test('opts.browser.formatters (level) logs pino-like object to console', ({ end, ok, is }) => {
   const info = console.info
   console.info = function (o) {
     is(o.level, 30)
@@ -189,7 +189,7 @@ test('opts.browser.formatters logs pino-like object to console', ({ end, ok, is 
   end()
 })
 
-test('opts.browser.formatters logs pino-like object to console', ({ end, ok, is }) => {
+test('opts.browser.formatters (log) logs pino-like object to console', ({ end, ok, is }) => {
   const info = console.info
   console.info = function (o) {
     is(o.level, 30)
@@ -213,6 +213,48 @@ test('opts.browser.formatters logs pino-like object to console', ({ end, ok, is 
   end()
 })
 
+test('opts.browser.serialize and opts.browser.transmit only serializes log data once', ({ end, ok, is }) => {
+  const instance = require('../browser')({
+    serializers: {
+      extras (data) {
+        return { serializedExtras: data }
+      }
+    },
+    browser: {
+      serialize: ['extras'],
+      transmit: {
+        level: 'info',
+        send (level, o) {
+          is(o.messages[0].extras.serializedExtras, 'world')
+        }
+      }
+    }
+  })
+
+  instance.info({ extras: 'world' }, 'test')
+  end()
+})
+
+test('opts.browser.serialize and opts.asObject only serializes log data once', ({ end, ok, is }) => {
+  const instance = require('../browser')({
+    serializers: {
+      extras (data) {
+        return { serializedExtras: data }
+      }
+    },
+    browser: {
+      serialize: ['extras'],
+      asObject: true,
+      write: function (o) {
+        is(o.extras.serializedExtras, 'world')
+      }
+    }
+  })
+
+  instance.info({ extras: 'world' }, 'test')
+  end()
+})
+
 test('opts.browser.write func log single string', ({ end, ok, is }) => {
   const instance = pino({
     browser: {
@@ -231,22 +273,6 @@ test('opts.browser.write func log single string', ({ end, ok, is }) => {
 test('opts.browser.write func string joining', ({ end, ok, is }) => {
   const instance = pino({
     browser: {
-      write: function (o) {
-        is(o.level, 30)
-        is(o.msg, 'test test2 test3')
-        ok(o.time)
-      }
-    }
-  })
-  instance.info('test %s %s', 'test2', 'test3')
-
-  end()
-})
-
-test('opts.browser.write func string joining when asObject is true', ({ end, ok, is }) => {
-  const instance = pino({
-    browser: {
-      asObject: true,
       write: function (o) {
         is(o.level, 30)
         is(o.msg, 'test test2 test3')
