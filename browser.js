@@ -302,8 +302,10 @@ function createWrap (self, opts, rootLogger, level) {
       const proto = (Object.getPrototypeOf && Object.getPrototypeOf(this) === _console) ? _console : this
       for (var i = 0; i < args.length; i++) args[i] = arguments[i]
 
-      if (opts.serialize && !opts.transmit) {
+      var argsIsSerialized = false
+      if (opts.serialize) {
         applySerializers(args, this._serialize, this.serializers, this._stdErrSerialize)
+        argsIsSerialized = true
       }
       if (opts.asObject || opts.formatters) {
         write.call(proto, asObject(this, level, args, ts, opts.formatters))
@@ -322,7 +324,7 @@ function createWrap (self, opts, rootLogger, level) {
           transmitValue: rootLogger.levels.values[opts.transmit.level || self._level],
           send: opts.transmit.send,
           val: levelToValue(self._level, rootLogger)
-        }, args)
+        }, args, argsIsSerialized)
       }
     }
   })(self[baseLogFunctionSymbol][level])
@@ -376,7 +378,7 @@ function applySerializers (args, serialize, serializers, stdErrSerialize) {
   }
 }
 
-function transmit (logger, opts, args) {
+function transmit (logger, opts, args, argsIsSerialized = false) {
   const send = opts.send
   const ts = opts.ts
   const methodLevel = opts.methodLevel
@@ -384,12 +386,14 @@ function transmit (logger, opts, args) {
   const val = opts.val
   const bindings = logger._logEvent.bindings
 
-  applySerializers(
-    args,
-    logger._serialize || Object.keys(logger.serializers),
-    logger.serializers,
-    logger._stdErrSerialize === undefined ? true : logger._stdErrSerialize
-  )
+  if (!argsIsSerialized) {
+    applySerializers(
+      args,
+      logger._serialize || Object.keys(logger.serializers),
+      logger.serializers,
+      logger._stdErrSerialize === undefined ? true : logger._stdErrSerialize
+    )
+  }
 
   logger._logEvent.ts = ts
   logger._logEvent.messages = args.filter(function (arg) {
