@@ -28,7 +28,7 @@ import type { WorkerOptions } from "worker_threads";
 type ThreadStream = any
 
 type TimeFn = () => string;
-type MixinFn = (mergeObject: object, level: number) => object;
+type MixinFn<CustomLevels extends string = never> = (mergeObject: object, level: number, logger:pino.Logger<CustomLevels>) => object;
 type MixinMergeStrategyFn = (mergeObject: object, mixinObject: object) => object;
 
 type CustomLevelLogger<CustomLevels extends string> = { [level in CustomLevels]: LogFn }
@@ -373,7 +373,7 @@ declare namespace pino {
          * is called. The function must synchronously return an object. The properties of the
          * returned object will be added to the logged JSON.
          */
-        mixin?: MixinFn;
+        mixin?: MixinFn<CustomLevels>;
 
         /**
          * If provided, the `mixinMergeStrategy` function is called each time one of the active
