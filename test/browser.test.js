@@ -255,6 +255,28 @@ test('opts.browser.serialize and opts.asObject only serializes log data once', (
   end()
 })
 
+test('opts.browser.serialize, opts.asObject and opts.browser.transmit only serializes log data once', ({ end, ok, is }) => {
+  const instance = require('../browser')({
+    serializers: {
+      extras (data) {
+        return { serializedExtras: data }
+      }
+    },
+    browser: {
+      serialize: ['extras'],
+      asObject: true,
+      transmit: {
+        send (level, o) {
+          is(o.messages[0].extras.serializedExtras, 'world')
+        }
+      }
+    }
+  })
+
+  instance.info({ extras: 'world' }, 'test')
+  end()
+})
+
 test('opts.browser.write func log single string', ({ end, ok, is }) => {
   const instance = pino({
     browser: {
