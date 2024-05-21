@@ -111,7 +111,8 @@ function pino (opts) {
     asObject: opts.browser.asObject,
     formatters: opts.browser.formatters,
     levels,
-    timestamp: getTimeFunction(opts)
+    timestamp: getTimeFunction(opts),
+    messageKey: opts.messageKey || 'msg'
   }
   logger.levels = getLevels(opts)
   logger.level = level
@@ -308,7 +309,7 @@ function createWrap (self, opts, rootLogger, level) {
         argsIsSerialized = true
       }
       if (opts.asObject || opts.formatters) {
-        write.call(proto, asObject(this, level, args, ts, opts.formatters))
+        write.call(proto, asObject(this, level, args, ts, opts))
       } else write.apply(proto, args)
 
       if (opts.transmit) {
@@ -330,11 +331,11 @@ function createWrap (self, opts, rootLogger, level) {
   })(self[baseLogFunctionSymbol][level])
 }
 
-function asObject (logger, level, args, ts, formatters = {}) {
+function asObject (logger, level, args, ts, opts) {
   const {
     level: levelFormatter,
     log: logObjectFormatter = (obj) => obj
-  } = formatters
+  } = opts.formatters || {}
   const argsCloned = args.slice()
   let msg = argsCloned[0]
   const logObject = {}
@@ -358,7 +359,7 @@ function asObject (logger, level, args, ts, formatters = {}) {
     }
     msg = argsCloned.length ? format(argsCloned.shift(), argsCloned) : undefined
   } else if (typeof msg === 'string') msg = format(argsCloned.shift(), argsCloned)
-  if (msg !== undefined) logObject.msg = msg
+  if (msg !== undefined) logObject[opts.messageKey] = msg
 
   const formattedLogObject = logObjectFormatter(logObject)
   return formattedLogObject

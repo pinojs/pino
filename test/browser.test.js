@@ -165,6 +165,23 @@ test('opts.browser.asObject logs pino-like object to console', ({ end, ok, is })
   instance.info('test')
   end()
 })
+test('opts.browser.asObject uses opts.messageKey in logs', ({ end, ok, is }) => {
+  const messageKey = 'message'
+  const instance = require('../browser')({
+    messageKey,
+    browser: {
+      asObject: true,
+      write: function (o) {
+        is(o.level, 30)
+        is(o[messageKey], 'test')
+        ok(o.time)
+      }
+    }
+  })
+
+  instance.info('test')
+  end()
+})
 
 test('opts.browser.formatters (level) logs pino-like object to console', ({ end, ok, is }) => {
   const info = console.info
