@@ -195,7 +195,7 @@ function pino (opts) {
     // must happen before the level is assigned
     appendChildLogger(this, newLogger)
     // required to actually initialize the logger functions for any given child
-    newLogger.level = this.level
+    newLogger.level = childOptions.level || this.level // allow level to be set by childOptions
 
     return newLogger
   }
