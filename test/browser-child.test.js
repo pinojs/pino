@@ -14,6 +14,18 @@ test('child has parent level', ({ end, same, is }) => {
   end()
 })
 
+test('child can set level at creation time', ({ end, same, is }) => {
+  const instance = pino({
+    level: 'error',
+    browser: {}
+  })
+
+  const child = instance.child({}, { level: 'info' }) // first bindings, then options
+
+  same(child.level, 'info')
+  end()
+})
+
 test('changing child level does not affect parent', ({ end, same, is }) => {
   const instance = pino({
     level: 'error',
