@@ -1,8 +1,10 @@
 'use strict'
 
 const { test } = require('tap')
+const { join } = require('path')
 const proxyquire = require('proxyquire')
 const Writable = require('stream').Writable
+const pino = require('../../pino')
 
 test('file-target mocked', async function ({ equal, same, plan, pass }) {
   plan(1)
@@ -25,4 +27,18 @@ test('file-target mocked', async function ({ equal, same, plan, pass }) {
   })
 
   await fileTarget()
+})
+
+test('pino.transport with syntax error', ({ same, teardown, plan }) => {
+  plan(1)
+  const transport = pino.transport({
+    targets: [{
+      target: join(__dirname, '..', 'fixtures', 'syntax-error-esm.mjs')
+    }]
+  })
+  teardown(transport.end.bind(transport))
+
+  transport.on('error', (err) => {
+    same(err, new SyntaxError('Unexpected end of input'))
+  })
 })
