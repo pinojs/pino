@@ -1067,7 +1067,7 @@ const logger = pino({
 <a id="pino-telegram-webhook"></a>
 ### pino-telegram-webhook
 
-[pino-telegram-webhook](https://github.com/Jhon-Mosk/pino-telegram-webhook) is a Pino v7+ transport for send message to [Telegram](https://telegram.org/). 
+[pino-telegram-webhook](https://github.com/Jhon-Mosk/pino-telegram-webhook) is a Pino v7+ transport for sending messages to [Telegram](https://telegram.org/). 
 
 ```js
 const pino = require('pino');
@@ -1089,7 +1089,7 @@ const logger = pino({
 logger.error('<b>test log!</b>');
 ```
 
-The extra parameter is optional. Parameters that the method [sendMessage](https://core.telegram.org/bots/api#sendmessage) supports can be passed to it
+The `extra` parameter is optional. Parameters that the method [`sendMessage`](https://core.telegram.org/bots/api#sendmessage) supports can be passed to it.
 
 <a id="communication-between-pino-and-transport"></a>
 ## Communication between Pino and Transports
