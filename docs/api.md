@@ -378,11 +378,30 @@ const hooks = {
 <a id=opt-formatters></a>
 #### `formatters` (Object)
 
-An object containing functions for formatting the shape of the log lines.
+An object containing an `options` object and functions for formatting
+the shape of the log lines.
 These functions should return a JSONifiable object and
 should never throw. These functions allow for full customization of
 the resulting log lines. For example, they can be used to change
 the level key name or to enrich the default metadata.
+
+##### `options`
+
+The formatters `options` object is passed to the child loggers, except if a new formatters `options` object is passed to the `child()` method.
+
+###### `keepParentBindings`
+
+If `true`, child loggers will keep their parent `bindings` formatters function.
+
+If `false` or `undefined`, child loggers will have their `bindings` formatters function reset to a "no-op" formatter function.
+
+```js
+const formatters = {
+  options: {
+    keepParentBindings: true
+  }
+}
+```
 
 ##### `level`
 

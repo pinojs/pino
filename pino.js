@@ -118,6 +118,7 @@ function pino (...args) {
   })
 
   const allFormatters = buildFormatters(
+    formatters.options,
     formatters.level,
     formatters.bindings,
     formatters.log
