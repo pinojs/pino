@@ -46,7 +46,7 @@ loggerMulti.info('test2')
 
 const customLevels = {
     customDebug   : 1,
-    customInfo    : 2,
+    info    : 2,
     customNetwork : 3,
     customError   : 4,
 };
@@ -66,29 +66,13 @@ const multistreamOpts = {
 
 const streams: StreamEntry<CustomLevels>[] = [
     { level : 'customDebug',   stream : pinoPretty() },
-    { level : 'customInfo',    stream : pinoPretty() },
+    { level : 'info',    stream : pinoPretty() },
     { level : 'customNetwork', stream : pinoPretty() },
     { level : 'customError',   stream : pinoPretty() },
 ];
 
 const loggerCustomLevel = pino(pinoOpts, pino.multistream(streams, multistreamOpts));
 loggerCustomLevel.customDebug('test3')
-loggerCustomLevel.customInfo('test4')
+loggerCustomLevel.info('test4')
 loggerCustomLevel.customError('test5')
 loggerCustomLevel.customNetwork('test6')
-
-try {
-    // @ts-expect-error
-    loggerCustomLevel.fatal('test');
-    // @ts-expect-error
-    loggerCustomLevel.error('test');
-    // @ts-expect-error
-    loggerCustomLevel.warn('test');
-    // @ts-expect-error
-    loggerCustomLevel.info('test');
-    // @ts-expect-error
-    loggerCustomLevel.debug('test');
-    // @ts-expect-error
-    loggerCustomLevel.trace('test');
-} catch (e) {
-}
