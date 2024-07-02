@@ -41,10 +41,10 @@ type CustomLevelLogger<CustomLevels extends string, UseOnlyCustomLevels extends 
      */
     useOnlyCustomLevels: UseOnlyCustomLevels;
  } & {
-    [level in CustomLevels]: pino.LogFn;
- } & {
     // This will override default log methods
-    [K in pino.Level]: UseOnlyCustomLevels extends true ? never : pino.LogFn;
+    [K in Exclude<pino.Level, CustomLevels>]: UseOnlyCustomLevels extends true ? never : pino.LogFn;
+ } & {
+    [level in CustomLevels]: pino.LogFn;
  };
 
 /**
