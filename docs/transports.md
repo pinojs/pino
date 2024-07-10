@@ -378,7 +378,7 @@ A legacy Pino "transport" is a supplementary tool that consumes Pino logs.
 Consider the following example for creating a transport:
 
 ```js
-const { pipeline, Writable } = require('stream')
+const { pipeline, Writable } = require('node:stream')
 const split = require('split2')
 
 const myTransportStream = new Writable({

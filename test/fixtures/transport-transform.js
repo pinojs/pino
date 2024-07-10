@@ -1,7 +1,7 @@
 'use strict'
 
 const build = require('pino-abstract-transport')
-const { pipeline, Transform } = require('stream')
+const { pipeline, Transform } = require('node:stream')
 module.exports = (options) => {
   return build(function (source) {
     const myTransportStream = new Transform({

@@ -1,9 +1,9 @@
 'use strict'
 /* eslint no-prototype-builtins: 0 */
 
-const { hostname } = require('os')
-const { join } = require('path')
-const { readFile } = require('fs').promises
+const { hostname } = require('node:os')
+const { join } = require('node:path')
+const { readFile } = require('node:fs').promises
 const { test } = require('tap')
 const { sink, once, watchFileCreated, file } = require('./helper')
 const pino = require('../')

@@ -1,11 +1,11 @@
 'use strict'
 
-const os = require('os')
-const { join } = require('path')
-const { readFile, symlink, unlink, mkdir, writeFile } = require('fs').promises
+const os = require('node:os')
+const { join } = require('node:path')
+const { readFile, symlink, unlink, mkdir, writeFile } = require('node:fs').promises
 const { test } = require('tap')
 const { isWin, isYarnPnp, watchFileCreated, file } = require('../helper')
-const { once } = require('events')
+const { once } = require('node:events')
 const execa = require('execa')
 const pino = require('../../')
 const rimraf = require('rimraf')

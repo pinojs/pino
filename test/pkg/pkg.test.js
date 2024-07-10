@@ -2,11 +2,11 @@
 
 const { test } = require('tap')
 const config = require('./pkg.config.json')
-const { promisify } = require('util')
-const { unlink } = require('fs/promises')
-const { join } = require('path')
-const { platform } = require('process')
-const exec = promisify(require('child_process').exec)
+const { promisify } = require('node:util')
+const { unlink } = require('node:fs/promises')
+const { join } = require('node:path')
+const { platform } = require('node:process')
+const exec = promisify(require('node:child_process').exec)
 
 /**
  * The following regex is for tesintg the deprecation warning that is thrown by the `punycode` module.

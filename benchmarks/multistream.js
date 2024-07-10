@@ -3,7 +3,7 @@
 const bench = require('fastbench')
 const bunyan = require('bunyan')
 const pino = require('../')
-const fs = require('fs')
+const fs = require('node:fs')
 const dest = fs.createWriteStream('/dev/null')
 
 const tenStreams = [

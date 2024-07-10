@@ -2,7 +2,7 @@
 
 const bench = require('fastbench')
 const pino = require('../../')
-const fs = require('fs')
+const fs = require('node:fs')
 const dest = fs.createWriteStream('/dev/null')
 const plog = pino(dest)
 delete require.cache[require.resolve('../../')]

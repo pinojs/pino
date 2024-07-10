@@ -1,6 +1,6 @@
 'use strict'
-/* eslint no-prototype-builtins: 0 */
-const os = require('os')
+
+const os = require('node:os')
 const stdSerializers = require('pino-std-serializers')
 const caller = require('./lib/caller')
 const redaction = require('./lib/redaction')

@@ -1312,7 +1312,7 @@ Create a stream composed by multiple destination streams and returns an
 object implementing the [MultiStreamRes](#multistreamres) interface.
 
 ```js
-var fs = require('fs')
+var fs = require('node:fs')
 var pino = require('pino')
 var pretty = require('pino-pretty')
 var streams = [

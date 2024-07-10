@@ -1,6 +1,6 @@
 'use strict'
-const os = require('os')
-const { readFileSync } = require('fs')
+const os = require('node:os')
+const { readFileSync } = require('node:fs')
 const { test } = require('tap')
 const { sink, check, once, watchFileCreated, file } = require('./helper')
 const pino = require('../')
