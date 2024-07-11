@@ -1,5 +1,5 @@
 import pino from '../../..'
-import { join } from 'path'
+import { join } from 'node:path'
 
 const transport = pino.transport({
   target: join(__dirname, 'to-file-transport-with-transform.ts'),

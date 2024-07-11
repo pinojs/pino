@@ -1,14 +1,10 @@
-import * as os from 'os'
-import { join } from 'path'
-import { once } from 'events'
-import fs from 'fs'
+import * as os from 'node:os'
+import { join } from 'node:path'
+import fs from 'node:fs'
 import { watchFileCreated } from '../helper'
 import { test } from 'tap'
 import pino from '../../'
-import * as url from 'url'
-import { default as strip } from 'strip-ansi'
-import execa from 'execa'
-import writer from 'flush-write-stream'
+import * as url from 'node:url'
 
 const readFile = fs.promises.readFile
 
