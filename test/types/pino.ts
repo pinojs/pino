@@ -1,6 +1,6 @@
 import { StreamEntry, pino } from '../../pino'
-import { join } from 'path'
-import { tmpdir } from 'os'
+import { join } from 'node:path'
+import { tmpdir } from 'node:os'
 import pinoPretty from 'pino-pretty'
 
 const destination = join(

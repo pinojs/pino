@@ -1,9 +1,9 @@
 'use strict'
 
-const os = require('os')
-const { join } = require('path')
-const { once } = require('events')
-const { readFile, writeFile } = require('fs').promises
+const os = require('node:os')
+const { join } = require('node:path')
+const { once } = require('node:events')
+const { readFile, writeFile } = require('node:fs').promises
 const { watchFileCreated, watchForWrite, file } = require('../helper')
 const { test } = require('tap')
 const pino = require('../../')
@@ -12,7 +12,7 @@ const strip = require('strip-ansi')
 const execa = require('execa')
 const writer = require('flush-write-stream')
 const rimraf = require('rimraf')
-const { promisify } = require('util')
+const { promisify } = require('node:util')
 const { tmpdir } = os
 
 const immediate = promisify(setImmediate)

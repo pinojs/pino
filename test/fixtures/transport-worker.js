@@ -1,7 +1,7 @@
 'use strict'
 
-const { Writable } = require('stream')
-const fs = require('fs')
+const { Writable } = require('node:stream')
+const fs = require('node:fs')
 module.exports = (options) => {
   const myTransportStream = new Writable({
     autoDestroy: true,

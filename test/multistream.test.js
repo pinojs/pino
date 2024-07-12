@@ -1,8 +1,8 @@
 'use strict'
 
 const writeStream = require('flush-write-stream')
-const { readFileSync } = require('fs')
-const { join } = require('path')
+const { readFileSync } = require('node:fs')
+const { join } = require('node:path')
 const test = require('tap').test
 const pino = require('../')
 const multistream = pino.multistream

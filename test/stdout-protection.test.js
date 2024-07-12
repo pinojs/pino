@@ -1,8 +1,8 @@
 'use strict'
 
 const { test } = require('tap')
-const { join } = require('path')
-const { fork } = require('child_process')
+const { join } = require('node:path')
+const { fork } = require('node:child_process')
 const { once } = require('./helper')
 const writer = require('flush-write-stream')
 const pino = require('..')

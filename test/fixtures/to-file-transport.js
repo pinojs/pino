@@ -1,7 +1,7 @@
 'use strict'
 
-const fs = require('fs')
-const { once } = require('events')
+const fs = require('node:fs')
+const { once } = require('node:events')
 
 async function run (opts) {
   if (!opts.destination) throw new Error('kaboom')

@@ -1,8 +1,8 @@
 'use strict'
 
-const os = require('os')
-const { join } = require('path')
-const { readFile } = require('fs').promises
+const os = require('node:os')
+const { join } = require('node:path')
+const { readFile } = require('node:fs').promises
 const writeStream = require('flush-write-stream')
 const { watchFileCreated, file } = require('../helper')
 const { test } = require('tap')

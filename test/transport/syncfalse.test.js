@@ -1,12 +1,12 @@
 'use strict'
 
-const os = require('os')
+const os = require('node:os')
 const pino = require('../..')
-const { join } = require('path')
+const { join } = require('node:path')
 const { test } = require('tap')
-const { readFile } = require('fs').promises
+const { readFile } = require('node:fs').promises
 const { watchFileCreated, file } = require('../helper')
-const { promisify } = require('util')
+const { promisify } = require('node:util')
 
 const { pid } = process
 const hostname = os.hostname()

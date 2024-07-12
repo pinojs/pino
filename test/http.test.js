@@ -1,7 +1,7 @@
 'use strict'
 
 const http = require('http')
-const os = require('os')
+const os = require('node:os')
 const semver = require('semver')
 const { test, skip } = require('tap')
 const { sink, once } = require('./helper')

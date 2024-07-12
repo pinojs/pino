@@ -1,9 +1,9 @@
 'use strict'
 
 const { test } = require('tap')
-const { join } = require('path')
+const { join } = require('node:path')
 const proxyquire = require('proxyquire')
-const Writable = require('stream').Writable
+const Writable = require('node:stream').Writable
 const pino = require('../../pino')
 
 test('file-target mocked', async function ({ equal, same, plan, pass }) {

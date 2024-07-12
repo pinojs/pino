@@ -1,13 +1,10 @@
 'use strict'
 
-const os = require('os')
-const {
-  createWriteStream
-} = require('fs')
-const { readFile } = require('fs').promises
-const { join } = require('path')
+const os = require('node:os')
+const { promises: { readFile }, createWriteStream } = require('node:fs')
+const { join } = require('node:path')
 const { test } = require('tap')
-const { fork } = require('child_process')
+const { fork } = require('node:child_process')
 const writer = require('flush-write-stream')
 const {
   once,
@@ -15,7 +12,7 @@ const {
   file,
   watchFileCreated
 } = require('./helper')
-const { promisify } = require('util')
+const { promisify } = require('node:util')
 
 const sleep = promisify(setTimeout)
 

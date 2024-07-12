@@ -1,8 +1,8 @@
 'use strict'
 
-const { readFileSync } = require('fs')
+const { readFileSync } = require('node:fs')
 const vm = require('vm')
-const { join } = require('path')
+const { join } = require('node:path')
 const code = readFileSync(
   join(__dirname, '..', '..', 'node_modules', 'loglevel', 'lib', 'loglevel.js')
 )
