@@ -276,8 +276,13 @@ function set (self, opts, rootLogger, level) {
     configurable: true
   })
 
-  if (!opts.transmit && self[level] === noop) {
-    return
+  if (self[level] === noop) {
+    if (!opts.transmit) return
+
+    const transmitLevel = opts.transmit.level || self.level
+    const transmitValue = rootLogger.levels.values[transmitLevel]
+    const methodValue = rootLogger.levels.values[level]
+    if (methodValue < transmitValue) return
   }
 
   // make sure the log format is correct
