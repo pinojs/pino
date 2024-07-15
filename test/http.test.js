@@ -1,6 +1,6 @@
 'use strict'
 
-const http = require('http')
+const http = require('node:http')
 const os = require('node:os')
 const semver = require('semver')
 const { test, skip } = require('tap')

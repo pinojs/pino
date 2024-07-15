@@ -13,7 +13,7 @@ const plogDest = require('../')(pino.destination('/dev/null'))
 delete require.cache[require.resolve('../')]
 const plogMinLength = require('../')(pino.destination({ dest: '/dev/null', sync: false, minLength: 4096 }))
 
-const crypto = require('crypto')
+const crypto = require('node:crypto')
 
 const longStr = crypto.randomBytes(2000).toString()
 

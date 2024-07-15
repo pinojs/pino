@@ -1,2 +1,3 @@
 pino.d.ts
 test/types/pino.test-d.ts
+test/fixtures/syntax-error-esm.mjs

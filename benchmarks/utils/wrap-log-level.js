@@ -1,12 +1,12 @@
 'use strict'
 
 const { readFileSync } = require('node:fs')
-const vm = require('vm')
+const vm = require('node:vm')
 const { join } = require('node:path')
 const code = readFileSync(
   join(__dirname, '..', '..', 'node_modules', 'loglevel', 'lib', 'loglevel.js')
 )
-const { Console } = require('console')
+const { Console } = require('node:console')
 
 function build (dest) {
   const sandbox = {

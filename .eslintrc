@@ -1,8 +1,17 @@
 {
+    "parserOptions": {
+        "ecmaVersion": 2021      
+    },
     "extends": [
-        "standard"
+        "standard",
+        "plugin:n/recommended"
     ],
     "rules": {
-        "no-var": "off"
+        "no-var": "off",
+        "n/prefer-node-protocol": "error",
+        "n/no-unpublished-require": "off",
+        "n/no-unpublished-import": "off",
+        "n/no-process-exit": "off",
+        "n/hashbang": "off"
     }
 }
