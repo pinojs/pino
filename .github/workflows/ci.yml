@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-     - 'v*'
+      - 'v*'
     paths-ignore:
       - 'docs/**'
       - '*.md'
