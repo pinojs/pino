@@ -84,8 +84,8 @@ is serialized and injected into the transport worker thread, then passed to the 
 This means that the options object can only contain types that are supported by the
 [Structured Clone Algorithm][sca] which is used to (de)serialize objects between threads.
 
-What if we wanted to use both transports, but send only error logs to `some-file-transport` while
-sending all logs to `my-transport.mjs`? We can use the `pino.transport` function's `destinations` option:
+What if we wanted to use both transports, but send only error logs to `my-transport.mjs` while
+sending all logs to `some-file-transport`? We can use the `pino.transport` function's `level` option:
 
 ```js
 const pino = require('pino')
