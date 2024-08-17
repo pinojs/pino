@@ -116,5 +116,11 @@
   },
   "tsd": {
     "directory": "test/types"
-  }
+  },
+  "files": [
+    "lib",
+    "*.js",
+    "*.d.ts",
+    "SECURITY.md"
+  ]
 }
