@@ -1,12 +1,12 @@
 'use strict'
 
 const { test } = require('tap')
-const { join } = require('path')
-const { createReadStream } = require('fs')
-const { promisify } = require('util')
+const { join } = require('node:path')
+const { createReadStream } = require('node:fs')
+const { promisify } = require('node:util')
 const execa = require('execa')
 const split = require('split2')
-const stream = require('stream')
+const stream = require('node:stream')
 const { file } = require('../helper')
 
 const pipeline = promisify(stream.pipeline)

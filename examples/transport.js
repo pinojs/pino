@@ -1,8 +1,8 @@
 'use strict'
 
 const pino = require('..')
-const { tmpdir } = require('os')
-const { join } = require('path')
+const { tmpdir } = require('node:os')
+const { join } = require('node:path')
 
 const file = join(tmpdir(), `pino-${process.pid}-example`)
 

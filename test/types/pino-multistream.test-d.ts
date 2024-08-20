@@ -1,6 +1,6 @@
 import { expectType } from 'tsd'
 
-import { createWriteStream } from 'fs'
+import { createWriteStream } from 'node:fs'
 
 import pino, { multistream } from '../../pino'
 

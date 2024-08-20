@@ -34,3 +34,7 @@ If you are a Webpack user, you can achieve this with [pino-webpack-plugin](https
 ## Esbuild Plugin
 
 [esbuild-plugin-pino](https://github.com/davipon/esbuild-plugin-pino) is the esbuild plugin to generate extra pino files for bundling.
+
+## Bun Plugin
+
+[bun-plugin-pino](https://github.com/vktrl/bun-plugin-pino) is the Bun plugin to generate extra pino files for bundling.

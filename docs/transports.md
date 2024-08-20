@@ -25,7 +25,7 @@ flushed as quickly as possible (there is nothing to do).
 A transport is a module that exports a default function that returns a writable stream:
 
 ```js
-import { createWriteStream } from 'fs'
+import { createWriteStream } from 'node:fs'
 
 export default (options) => {
   return createWriteStream(options.destination)
@@ -54,7 +54,7 @@ The exported function can also be async. If we use an async function we can thro
 if the transform could not be opened. As an example:
 
 ```js
-import fs from 'fs'
+import fs from 'node:fs'
 import { once } from 'events'
 export default async (options) => {
   const stream = fs.createWriteStream(options.destination)
@@ -84,8 +84,8 @@ is serialized and injected into the transport worker thread, then passed to the 
 This means that the options object can only contain types that are supported by the
 [Structured Clone Algorithm][sca] which is used to (de)serialize objects between threads.
 
-What if we wanted to use both transports, but send only error logs to `some-file-transport` while
-sending all logs to `my-transport.mjs`? We can use the `pino.transport` function's `destinations` option:
+What if we wanted to use both transports, but send only error logs to `my-transport.mjs` while
+sending all logs to `some-file-transport`? We can use the `pino.transport` function's `level` option:
 
 ```js
 const pino = require('pino')
@@ -218,7 +218,7 @@ As an example, the following transport returns a `Transform` stream:
 
 ```js
 import build from 'pino-abstract-transport'
-import { pipeline, Transform } from 'stream'
+import { pipeline, Transform } from 'node:stream'
 export default async function (options) {
   return build(function (source) {
     const myTransportStream = new Transform({
@@ -378,7 +378,7 @@ A legacy Pino "transport" is a supplementary tool that consumes Pino logs.
 Consider the following example for creating a transport:
 
 ```js
-const { pipeline, Writable } = require('stream')
+const { pipeline, Writable } = require('node:stream')
 const split = require('split2')
 
 const myTransportStream = new Writable({

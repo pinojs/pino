@@ -2,7 +2,7 @@
 
 const { test } = require('tap')
 const { sink, once } = require('./helper')
-const { PassThrough } = require('stream')
+const { PassThrough } = require('node:stream')
 const pino = require('../')
 
 test('Proxy and stream objects', async ({ equal }) => {

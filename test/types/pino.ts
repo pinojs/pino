@@ -1,5 +1,5 @@
-import { tmpdir } from 'os'
-import { join } from 'path'
+import { join } from 'node:path'
+import { tmpdir } from 'node:os'
 import pinoPretty from 'pino-pretty'
 import { LoggerOptions, StreamEntry, pino } from '../../pino'
 

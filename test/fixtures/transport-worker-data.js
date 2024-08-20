@@ -1,7 +1,7 @@
 'use strict'
 
 const { parentPort, workerData } = require('worker_threads')
-const { Writable } = require('stream')
+const { Writable } = require('node:stream')
 
 module.exports = (options) => {
   const myTransportStream = new Writable({

@@ -3,7 +3,7 @@
 const bench = require('fastbench')
 const pino = require('../')
 const bunyan = require('bunyan')
-const fs = require('fs')
+const fs = require('node:fs')
 const dest = fs.createWriteStream('/dev/null')
 const plogNodeStream = pino(dest).child({ a: 'property' }).child({ sub: 'child' })
 delete require.cache[require.resolve('../')]

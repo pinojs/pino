@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const execa = require('execa')
-const fs = require('fs')
+const fs = require('node:fs')
 
 const existsSync = fs.existsSync
 const stat = fs.promises.stat

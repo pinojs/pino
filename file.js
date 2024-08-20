@@ -1,7 +1,7 @@
 'use strict'
 
 const pino = require('./pino')
-const { once } = require('events')
+const { once } = require('node:events')
 
 module.exports = async function (opts = {}) {
   const destOpts = Object.assign({}, opts, { dest: opts.destination || 1, sync: false })

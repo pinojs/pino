@@ -1,6 +1,6 @@
-import * as fs from 'fs'
-import { once } from 'events'
-import { Transform } from 'stream'
+import * as fs from 'node:fs'
+import { once } from 'node:events'
+import { Transform } from 'node:stream'
 
 async function run (opts: {  destination?: fs.PathLike }): Promise<Transform> {
   if (!opts.destination) throw new Error('kaboom')

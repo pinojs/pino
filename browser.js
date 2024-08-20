@@ -112,7 +112,8 @@ function pino (opts) {
     formatters: opts.browser.formatters,
     levels,
     timestamp: getTimeFunction(opts),
-    messageKey: opts.messageKey || 'msg'
+    messageKey: opts.messageKey || 'msg',
+    onChild: opts.onChild || noop
   }
   logger.levels = getLevels(opts)
   logger.level = level
@@ -127,7 +128,7 @@ function pino (opts) {
   logger.serializers = serializers
   logger._serialize = serialize
   logger._stdErrSerialize = stdErrSerialize
-  logger.child = child
+  logger.child = function (...args) { return child.call(this, setOpts, ...args) }
 
   if (transmit) logger._logEvent = createLogEventShape()
 
@@ -156,7 +157,7 @@ function pino (opts) {
     })
   }
 
-  function child (bindings, childOptions) {
+  function child (setOpts, bindings, childOptions) {
     if (!bindings) {
       throw new Error('missing bindings for child Pino')
     }
@@ -194,8 +195,10 @@ function pino (opts) {
 
     // must happen before the level is assigned
     appendChildLogger(this, newLogger)
+    newLogger.child = function (...args) { return child.call(this, setOpts, ...args) }
     // required to actually initialize the logger functions for any given child
     newLogger.level = childOptions.level || this.level // allow level to be set by childOptions
+    setOpts.onChild(newLogger)
 
     return newLogger
   }
@@ -273,8 +276,13 @@ function set (self, opts, rootLogger, level) {
     configurable: true
   })
 
-  if (!opts.transmit && self[level] === noop) {
-    return
+  if (self[level] === noop) {
+    if (!opts.transmit) return
+
+    const transmitLevel = opts.transmit.level || self.level
+    const transmitValue = rootLogger.levels.values[transmitLevel]
+    const methodValue = rootLogger.levels.values[level]
+    if (methodValue < transmitValue) return
   }
 
   // make sure the log format is correct

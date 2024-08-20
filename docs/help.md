@@ -60,7 +60,7 @@ somewhere so the log rotation tool knows where to send the signal.
 
 ```js
 // write the process pid to a well known location for later
-const fs = require('fs')
+const fs = require('node:fs')
 fs.writeFileSync('/var/run/myapp.pid', process.pid)
 
 const dest = pino.destination('/log/file')

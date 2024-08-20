@@ -1,8 +1,8 @@
 'use strict'
 
-const fs = require('fs')
-const { once } = require('events')
-const { Transform } = require('stream')
+const fs = require('node:fs')
+const { once } = require('node:events')
+const { Transform } = require('node:stream')
 
 async function run (opts) {
   if (!opts.destination) throw new Error('kaboom')

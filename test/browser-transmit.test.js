@@ -347,3 +347,23 @@ test('extracts correct bindings and raw messages over multiple transmits', ({ en
 
   end()
 })
+
+test('does not log below configured level', ({ end, is }) => {
+  let message = null
+  const logger = pino({
+    level: 'info',
+    browser: {
+      write (o) {
+        message = o.msg
+      },
+      transmit: {
+        send () { }
+      }
+    }
+  })
+
+  logger.debug('this message is silent')
+  is(message, null)
+
+  end()
+})

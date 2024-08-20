@@ -106,6 +106,20 @@ test('changing child log level should not affect parent log behavior', ({ end, s
   end()
 })
 
+test('onChild callback should be called when new child is created', ({ end, pass, plan }) => {
+  plan(1)
+  const instance = pino({
+    level: 'error',
+    browser: {},
+    onChild: (_child) => {
+      pass('onChild callback was called')
+      end()
+    }
+  })
+
+  instance.child({})
+})
+
 function checkLogObjects (is, same, actual, expected) {
   is(actual.time <= Date.now(), true, 'time is greater than Date.now()')
 

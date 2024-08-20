@@ -1,8 +1,8 @@
 'use strict'
 
-const { type, platform, arch, release, cpus } = require('os')
-const { resolve, join } = require('path')
-const spawn = require('child_process').spawn
+const { type, platform, arch, release, cpus } = require('node:os')
+const { resolve, join } = require('node:path')
+const spawn = require('node:child_process').spawn
 const pump = require('pump')
 const split = require('split2')
 const through = require('through2')

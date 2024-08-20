@@ -1,4 +1,4 @@
-const { Writable } = require('stream')
+const { Writable } = require('node:stream')
 
 module.exports = () => {
   return new Writable({

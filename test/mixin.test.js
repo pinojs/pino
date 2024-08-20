@@ -1,6 +1,6 @@
 'use strict'
 
-const os = require('os')
+const os = require('node:os')
 const { test } = require('tap')
 const { sink, once } = require('./helper')
 const pino = require('../')

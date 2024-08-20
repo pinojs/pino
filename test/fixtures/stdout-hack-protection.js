@@ -6,6 +6,6 @@ process.stdout.write = function (chunk) {
 }
 
 Date.now = function () { return 1459875739796 }
-require('os').hostname = function () { return 'abcdefghijklmnopqr' }
+require('node:os').hostname = function () { return 'abcdefghijklmnopqr' }
 const pino = require(require.resolve('../../'))()
 pino.info('me')

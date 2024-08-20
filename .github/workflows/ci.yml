@@ -4,13 +4,14 @@ on:
   push:
     branches:
       - main
+      - 'v*'
     paths-ignore:
-        - 'docs/**'
-        - '*.md'
+      - 'docs/**'
+      - '*.md'
   pull_request:
     paths-ignore:
-        - 'docs/**'
-        - '*.md'
+      - 'docs/**'
+      - '*.md'
 
 # This allows a subsequently queued workflow run to interrupt previous runs
 concurrency:
@@ -43,9 +44,9 @@ jobs:
       matrix:
         os: [macOS-latest, windows-latest, ubuntu-latest]
         node-version: [18, 20, 22]
-      exclude:
-        - os: windows-latest
-          node-version: 22
+        exclude:
+          - os: windows-latest
+            node-version: 22
 
     steps:
       - name: Check out repo

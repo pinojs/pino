@@ -6,6 +6,10 @@ Individuals making significant and valuable contributions are given commit-acces
 
 ## Rules
 
+Before you start coding, please read [Contributing to projects with git](https://jrfom.com/posts/2017/03/08/a-primer-on-contributing-to-projects-with-git/). 
+
+Notice that as long as you don't have commit-access to the project, you have to fork the project and open PRs from the feature branches of the forked project.
+
 There are a few basic ground-rules for contributors:
 
 1. **No `--force` pushes** on `master` or modifying the Git history in any way after a PR has been merged.
