@@ -1,7 +1,7 @@
 import { IncomingMessage, ServerResponse } from "http";
 import { Socket } from "net";
 import { expectError, expectType } from 'tsd';
-import P, { pino } from "../../";
+import P, { LoggerOptions, pino } from "../../";
 import Logger = P.Logger;
 
 const log = pino();
@@ -439,3 +439,26 @@ expectError(pino({ levelComparison: 123}), process.stdout);
 expectError(pino({ levelComparison: () => null }), process.stdout);
 expectError(pino({ levelComparison: () => 1 }), process.stdout);
 expectError(pino({ levelComparison: () => 'string' }), process.stdout);
+
+const customLevelsOnlyOpts = {
+    useOnlyCustomLevels: true,
+    customLevels: {
+        customDebug: 10,
+        info: 20, // to make sure the default names are also available for override
+        customNetwork: 30,
+        customError: 40,
+    },
+    level: 'customDebug',
+} satisfies LoggerOptions;
+
+const loggerWithCustomLevelOnly = pino(customLevelsOnlyOpts);
+loggerWithCustomLevelOnly.customDebug('test3')
+loggerWithCustomLevelOnly.info('test4')
+loggerWithCustomLevelOnly.customError('test5')
+loggerWithCustomLevelOnly.customNetwork('test6')
+
+expectError(loggerWithCustomLevelOnly.fatal('test'));
+expectError(loggerWithCustomLevelOnly.error('test'));
+expectError(loggerWithCustomLevelOnly.warn('test'));
+expectError(loggerWithCustomLevelOnly.debug('test'));
+expectError(loggerWithCustomLevelOnly.trace('test'));

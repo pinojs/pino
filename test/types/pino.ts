@@ -1,7 +1,7 @@
-import { StreamEntry, pino } from '../../pino'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import pinoPretty from 'pino-pretty'
+import { LoggerOptions, StreamEntry, pino } from '../../pino'
 
 const destination = join(
     tmpdir(),
@@ -45,19 +45,19 @@ loggerMulti.info('test2')
 // custom levels
 
 const customLevels = {
-    debug   : 1,
+    customDebug   : 1,
     info    : 2,
-    network : 3,
-    error   : 4,
+    customNetwork : 3,
+    customError   : 4,
 };
 
 type CustomLevels = keyof typeof customLevels;
 
 const pinoOpts = {
-    level: 'debug',
     useOnlyCustomLevels: true,
     customLevels: customLevels,
-};
+    level: 'customDebug',
+} satisfies LoggerOptions;
 
 const multistreamOpts = {
     dedupe: true,
@@ -65,14 +65,14 @@ const multistreamOpts = {
 };
 
 const streams: StreamEntry<CustomLevels>[] = [
-    { level : 'debug',   stream : pinoPretty() },
+    { level : 'customDebug',   stream : pinoPretty() },
     { level : 'info',    stream : pinoPretty() },
-    { level : 'network', stream : pinoPretty() },
-    { level : 'error',   stream : pinoPretty() },
+    { level : 'customNetwork', stream : pinoPretty() },
+    { level : 'customError',   stream : pinoPretty() },
 ];
 
 const loggerCustomLevel = pino(pinoOpts, pino.multistream(streams, multistreamOpts));
-loggerCustomLevel.debug('test3')
+loggerCustomLevel.customDebug('test3')
 loggerCustomLevel.info('test4')
-loggerCustomLevel.error('test5')
-loggerCustomLevel.network('test6')
+loggerCustomLevel.customError('test5')
+loggerCustomLevel.customNetwork('test6')
