@@ -704,3 +704,69 @@ test('trying to get levels when `this` is no longer a Pino instance returns an e
   const blankedLevelValue = notPinoInstance.getLevel()
   equal(blankedLevelValue, '')
 })
+
+test('accepts capital letter for INFO level', async ({ equal }) => {
+  const stream = sink()
+  const logger = pino({
+    level: 'INFO'
+  }, stream)
+
+  logger.info('test')
+  const { level } = await once(stream, 'data')
+  equal(level, 30)
+})
+
+test('accepts capital letter for FATAL level', async ({ equal }) => {
+  const stream = sink()
+  const logger = pino({
+    level: 'FATAL'
+  }, stream)
+
+  logger.fatal('test')
+  const { level } = await once(stream, 'data')
+  equal(level, 60)
+})
+
+test('accepts capital letter for ERROR level', async ({ equal }) => {
+  const stream = sink()
+  const logger = pino({
+    level: 'ERROR'
+  }, stream)
+
+  logger.error('test')
+  const { level } = await once(stream, 'data')
+  equal(level, 50)
+})
+
+test('accepts capital letter for WARN level', async ({ equal }) => {
+  const stream = sink()
+  const logger = pino({
+    level: 'WARN'
+  }, stream)
+
+  logger.warn('test')
+  const { level } = await once(stream, 'data')
+  equal(level, 40)
+})
+
+test('accepts capital letter for DEBUG level', async ({ equal }) => {
+  const stream = sink()
+  const logger = pino({
+    level: 'DEBUG'
+  }, stream)
+
+  logger.debug('test')
+  const { level } = await once(stream, 'data')
+  equal(level, 20)
+})
+
+test('accepts capital letter for TRACE level', async ({ equal }) => {
+  const stream = sink()
+  const logger = pino({
+    level: 'TRACE'
+  }, stream)
+
+  logger.trace('test')
+  const { level } = await once(stream, 'data')
+  equal(level, 10)
+})
