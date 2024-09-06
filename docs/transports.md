@@ -1090,6 +1090,8 @@ const logger = pino({
 logger.error('<b>test log!</b>');
 ```
 
+The `extra` parameter is optional. Parameters that the method [`sendMessage`](https://core.telegram.org/bots/api#sendmessage) supports can be passed to it.
+
 <a id="pino-yc-transport"></a>
 ### pino-yc-transport
 
@@ -1116,8 +1118,6 @@ logger.error("error");
 logger.error(new Error("error"));
 logger.fatal("fatal");
 ```
-
-The `extra` parameter is optional. Parameters that the method [`sendMessage`](https://core.telegram.org/bots/api#sendmessage) supports can be passed to it.
 
 <a id="communication-between-pino-and-transport"></a>
 ## Communication between Pino and Transports
