@@ -425,6 +425,7 @@ PRs to this document are welcome for any new transports!
 + [pino-discord-webhook](#pino-discord-webhook)
 + [pino-logfmt](#pino-logfmt)
 + [pino-telegram-webhook](#pino-telegram-webhook)
++ [pino-yc-transport](#pino-yc-transport)
 
 ### Legacy
 
@@ -1087,6 +1088,33 @@ const logger = pino({
 })
 
 logger.error('<b>test log!</b>');
+```
+
+<a id="pino-yc-transport"></a>
+### pino-yc-transport
+
+[pino-yc-transport](https://github.com/Jhon-Mosk/pino-yc-transport) is a Pino v7+ transport for writing to [Yandex Cloud Logging](https://yandex.cloud/ru/services/logging) from serveless functions or containers.
+
+```js
+const pino = require("pino");
+
+const config = {
+  level: "debug",
+  transport: {
+    target: "pino-yc-transport",
+  },
+};
+
+const logger = pino(config);
+
+logger.debug("some message")
+logger.debug({ foo: "bar" });
+logger.debug("some message %o, %s", { foo: "bar" }, "baz");
+logger.info("info");
+logger.warn("warn");
+logger.error("error");
+logger.error(new Error("error"));
+logger.fatal("fatal");
 ```
 
 The `extra` parameter is optional. Parameters that the method [`sendMessage`](https://core.telegram.org/bots/api#sendmessage) supports can be passed to it.
