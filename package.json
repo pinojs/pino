@@ -105,7 +105,7 @@
     "atomic-sleep": "^1.0.0",
     "fast-redact": "^3.1.1",
     "on-exit-leak-free": "^2.1.0",
-    "pino-abstract-transport": "^1.2.0",
+    "pino-abstract-transport": "^2.0.0",
     "pino-std-serializers": "^7.0.0",
     "process-warning": "^4.0.0",
     "quick-format-unescaped": "^4.0.3",
