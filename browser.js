@@ -280,8 +280,8 @@ function set (self, opts, rootLogger, level) {
     if (!opts.transmit) return
 
     const transmitLevel = opts.transmit.level || self.level
-    const transmitValue = rootLogger.levels.values[transmitLevel]
-    const methodValue = rootLogger.levels.values[level]
+    const transmitValue = levelToValue(transmitLevel, rootLogger)
+    const methodValue = levelToValue(level, rootLogger)
     if (methodValue < transmitValue) return
   }
 
@@ -322,8 +322,8 @@ function createWrap (self, opts, rootLogger, level) {
 
       if (opts.transmit) {
         const transmitLevel = opts.transmit.level || self._level
-        const transmitValue = rootLogger.levels.values[transmitLevel]
-        const methodValue = rootLogger.levels.values[level]
+        const transmitValue = levelToValue(transmitLevel, rootLogger)
+        const methodValue = levelToValue(level, rootLogger)
         if (methodValue < transmitValue) return
         transmit(this, {
           ts,
