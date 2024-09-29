@@ -367,3 +367,51 @@ test('does not log below configured level', ({ end, is }) => {
 
   end()
 })
+
+test('silent level prevents logging even with transmit', ({ end, fail }) => {
+  const logger = pino({
+    level: 'silent',
+    browser: {
+      write () {
+        fail('no data should be logged by the write method')
+      },
+      transmit: {
+        send () {
+          fail('no data should be logged by the send method')
+        }
+      }
+    }
+  })
+
+  Object.keys(pino.levels.values).forEach((level) => {
+    logger[level]('ignored')
+  })
+
+  end()
+})
+
+test('does not call send when transmit.level is set to silent', ({ end, fail, is }) => {
+  let c = 0
+  const logger = pino({
+    level: 'trace',
+    browser: {
+      write () {
+        c++
+      },
+      transmit: {
+        level: 'silent',
+        send () {
+          fail('no data should be logged by the transmit method')
+        }
+      }
+    }
+  })
+
+  const levels = Object.keys(pino.levels.values)
+  levels.forEach((level) => {
+    logger[level]('message')
+  })
+
+  is(c, levels.length, 'write must be called exactly once per level')
+  end()
+})
