@@ -410,24 +410,24 @@ PRs to this document are welcome for any new transports!
 
 ### Pino v7+ Compatible
 
++ [@axiomhq/pino](#@axiomhq/pino)
 + [@logtail/pino](#@logtail/pino)
++ [@macfja/pino-fingers-crossed](#macfja-pino-fingers-crossed)
++ [pino-airbrake-transport](#pino-airbrake-transport)
++ [pino-axiom](#pino-axiom)
++ [pino-datadog-transport](#pino-datadog-transport)
++ [pino-discord-webhook](#pino-discord-webhook)
 + [pino-elasticsearch](#pino-elasticsearch)
-+ [pino-pretty](#pino-pretty)
++ [pino-hana](#pino-hana)
++ [pino-logfmt](#pino-logfmt)
 + [pino-loki](#pino-loki)
++ [pino-opentelemetry-transport](#pino-opentelemetry-transport)
++ [pino-pretty](#pino-pretty)
 + [pino-seq-transport](#pino-seq-transport)
 + [pino-sentry-transport](#pino-sentry-transport)
-+ [pino-airbrake-transport](#pino-airbrake-transport)
-+ [pino-datadog-transport](#pino-datadog-transport)
-+ [pino-slack-webhook](#pino-slack-webhook) 
-+ [pino-axiom](#pino-axiom)
-+ [pino-opentelemetry-transport](#pino-opentelemetry-transport)
-+ [@axiomhq/pino](#@axiomhq/pino)
-+ [pino-discord-webhook](#pino-discord-webhook)
-+ [pino-logfmt](#pino-logfmt)
++ [pino-slack-webhook](#pino-slack-webhook)
 + [pino-telegram-webhook](#pino-telegram-webhook)
 + [pino-yc-transport](#pino-yc-transport)
-+ [@macfja/pino-fingers-crossed](#macfja-pino-fingers-crossed)
-+ [pino-hana](#pino-hana)
 
 ### Legacy
 
@@ -455,12 +455,90 @@ PRs to this document are welcome for any new transports!
 + [pino-websocket](#pino-websocket)
 
 
+<a id="@axiomhq/pino"></a>
+### @axiomhq/pino
+
+[@axiomhq/pino](https://www.npmjs.com/package/@axiomhq/pino) is the official [Axiom](https://axiom.co/) transport for Pino, using [axiom-js](https://github.com/axiomhq/axiom-js).
+
+```javascript
+import pino from 'pino';
+
+const logger = pino(
+  { level: 'info' },
+  pino.transport({
+    target: '@axiomhq/pino',
+    options: {
+      dataset: process.env.AXIOM_DATASET,
+      token: process.env.AXIOM_TOKEN,
+    },
+  }),
+);
+```
+
+then you can use the logger as usual:
+
+```js
+logger.info('Hello from pino!');
+```
+
+For further examples, head over to the [examples](https://github.com/axiomhq/axiom-js/tree/main/examples/pino) directory.
+
 <a id="@logtail/pino"></a>
 ### @logtail/pino
 
 The [@logtail/pino](https://www.npmjs.com/package/@logtail/pino) NPM package is a transport that forwards logs to [Logtail](https://logtail.com) by [Better Stack](https://betterstack.com).
 
 [Quick start guide ⇗](https://betterstack.com/docs/logs/javascript/pino)
+
+<a id="macfja-pino-fingers-crossed"></a>
+### @macfja/pino-fingers-crossed
+
+[@macfja/pino-fingers-crossed](https://github.com/MacFJA/js-pino-fingers-crossed) is a Pino v7+ transport that holds logs until a log level is reached, allowing to only have logs when it matters.
+
+```js
+const pino = require('pino');
+const { default: fingersCrossed, enable } = require('@macfja/pino-fingers-crossed')
+
+const logger = pino(fingersCrossed());
+
+logger.info('Will appear immedialty')
+logger.error('Will appear immedialty')
+
+logger.setBindings({ [enable]: 50 })
+logger.info('Will NOT appear immedialty')
+logger.info('Will NOT appear immedialty')
+logger.error('Will appear immedialty as well as the 2 previous messages') // error log are level 50
+logger.info('Will NOT appear')
+logger.info({ [enable]: false }, 'Will appear immedialty')
+logger.info('Will NOT appear')
+```
+
+<a id="pino-airbrake-transport"></a>
+### pino-airbrake-transport
+
+[pino-airbrake-transport][pino-airbrake-transport] is a Pino v7+ compatible transport to forward log events to [Airbrake][Airbrake]
+from a dedicated worker:
+
+```js
+const pino = require('pino')
+const transport = pino.transport({
+  target: 'pino-airbrake-transport',
+  options: {
+    airbrake: {
+      projectId: 1,
+      projectKey: "REPLACE_ME",
+      environment: "production",
+      // additional options for airbrake
+      performanceStats: false,
+    },
+  },
+  level: "error", // minimum log level that should be sent to airbrake
+})
+pino(transport)
+```
+
+[pino-airbrake-transport]: https://github.com/enricodeleo/pino-airbrake-transport
+[Airbrake]: https://airbrake.io/
 
 <a id="pino-applicationinsights"></a>
 ### pino-applicationinsights
@@ -473,6 +551,24 @@ $ node foo | pino-applicationinsights --key blablabla
 ```
 
 For full documentation of command line switches read [README](https://github.com/ovhemert/pino-applicationinsights#readme)
+
+<a id="pino-axiom"></a>
+### pino-axiom
+
+[pino-axiom](https://www.npmjs.com/package/pino-axiom) is a transport that will forward logs to [Axiom](https://axiom.co).
+
+```javascript
+const pino = require('pino')
+const transport = pino.transport({
+  target: 'pino-axiom',
+  options: {
+    orgId: 'YOUR-ORG-ID', 
+    token: 'YOUR-TOKEN', 
+    dataset: 'YOUR-DATASET', 
+  },
+})
+pino(transport)
+```
 
 <a id="pino-azuretable"></a>
 ### pino-azuretable
@@ -521,312 +617,6 @@ $ node foo | pino-datadog --key blablabla
 ```
 
 For full documentation of command line switches read [README](https://github.com/ovhemert/pino-datadog#readme)
-
-<a id="pino-elasticsearch"></a>
-### pino-elasticsearch
-
-[pino-elasticsearch][pino-elasticsearch] uploads the log lines in bulk
-to [Elasticsearch][elasticsearch], to be displayed in [Kibana][kibana].
-
-It is extremely simple to use and setup
-
-```sh
-$ node app.js | pino-elasticsearch
-```
-
-Assuming Elasticsearch is running on localhost.
-
-To connect to an external Elasticsearch instance (recommended for production):
-
-* Check that `network.host` is defined in the `elasticsearch.yml` configuration file. See [Elasticsearch Network Settings documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-network.html#common-network-settings) for more details.
-* Launch:
-
-```sh
-$ node app.js | pino-elasticsearch --node http://192.168.1.42:9200
-```
-
-Assuming Elasticsearch is running on `192.168.1.42`.
-
-To connect to AWS Elasticsearch:
-
-```sh
-$ node app.js | pino-elasticsearch --node https://es-url.us-east-1.es.amazonaws.com --es-version 6
-```
-
-Then [create an index pattern](https://www.elastic.co/guide/en/kibana/current/setup.html) on `'pino'` (the default index key for `pino-elasticsearch`) on the Kibana instance.
-
-[pino-elasticsearch]: https://github.com/pinojs/pino-elasticsearch
-[elasticsearch]: https://www.elastic.co/products/elasticsearch
-[kibana]: https://www.elastic.co/products/kibana
-
-<a id="pino-gelf"></a>
-### pino-gelf
-
-Pino GELF ([pino-gelf]) is a transport for the Pino logger. Pino GELF receives Pino logs from stdin and transforms them into [GELF format][gelf] before sending them to a remote [Graylog server][graylog] via UDP.
-
-```sh
-$ node your-app.js | pino-gelf log
-```
-
-[pino-gelf]: https://github.com/pinojs/pino-gelf
-[gelf]: https://docs.graylog.org/en/2.1/pages/gelf.html
-[graylog]: https://www.graylog.org/
-
-<a id="pino-http-send"></a>
-### pino-http-send
-
-[pino-http-send](https://npmjs.com/package/pino-http-send) is a configurable and low overhead
-transport that will batch logs and send to a specified URL.
-
-```console
-$ node app.js | pino-http-send -u http://localhost:8080/logs
-```
-
-<a id="pino-kafka"></a>
-### pino-kafka
-
-[pino-kafka](https://github.com/ayZagen/pino-kafka) transport to send logs to [Apache Kafka](https://kafka.apache.org/).
-
-```sh
-$ node index.js | pino-kafka -b 10.10.10.5:9200 -d mytopic
-```
-
-<a id="pino-logdna"></a>
-### pino-logdna
-
-[pino-logdna](https://github.com/logdna/pino-logdna) transport to send logs to [LogDNA](https://logdna.com).
-
-```sh
-$ node index.js | pino-logdna --key YOUR_INGESTION_KEY
-```
-
-Tags and other metadata can be included using the available command line options. See the [pino-logdna README](https://github.com/logdna/pino-logdna#options) for a full list.
-
-<a id="pino-logflare"></a>
-### pino-logflare
-
-[pino-logflare](https://github.com/Logflare/pino-logflare) transport to send logs to a [Logflare](https://logflare.app) `source`.
-
-```sh
-$ node index.js | pino-logflare --key YOUR_KEY --source YOUR_SOURCE
-```
-
-<a id="pino-mq"></a>
-### pino-mq
-
-The `pino-mq` transport will take all messages received on `process.stdin` and send them over a message bus using JSON serialization.
-
-This is useful for:
-
-* moving backpressure from application to broker
-* transforming messages pressure to another component
-
-```
-node app.js | pino-mq -u "amqp://guest:guest@localhost/" -q "pino-logs"
-```
-
-Alternatively, a configuration file can be used:
-
-```
-node app.js | pino-mq -c pino-mq.json
-```
-
-A base configuration file can be initialized with:
-
-```
-pino-mq -g
-```
-
-For full documentation of command line switches and configuration see [the `pino-mq` README](https://github.com/itavy/pino-mq#readme)
-
-<a id="pino-loki"></a>
-### pino-loki
-pino-loki is a transport that will forwards logs into [Grafana Loki](https://grafana.com/oss/loki/).
-Can be used in CLI version in a separate process or in a dedicated worker:
-
-CLI :
-```console
-node app.js | pino-loki --hostname localhost:3100 --labels='{ "application": "my-application"}' --user my-username --password my-password
-```
-
-Worker :
-```js
-const pino = require('pino')
-const transport = pino.transport({
-  target: 'pino-loki',
-  options: { host: 'localhost:3100' }
-})
-pino(transport)
-```
-
-For full documentation and configuration, see the [README](https://github.com/Julien-R44/pino-loki).
-
-<a id="pino-papertrail"></a>
-### pino-papertrail
-pino-papertrail is a transport that will forward logs to the [papertrail](https://papertrailapp.com) log service through an UDPv4 socket.
-
-Given an application `foo` that logs via pino, and a papertrail destination that collects logs on port UDP `12345` on address `bar.papertrailapp.com`, you would use `pino-papertrail`
-like so:
-
-```
-node yourapp.js | pino-papertrail --host bar.papertrailapp.com --port 12345 --appname foo
-```
-
-
-for full documentation of command line switches read [README](https://github.com/ovhemert/pino-papertrail#readme)
-
-<a id="pino-pg"></a>
-### pino-pg
-[pino-pg](https://www.npmjs.com/package/pino-pg) stores logs into PostgreSQL.
-Full documentation in the [README](https://github.com/Xstoudi/pino-pg).
-
-<a id="pino-mysql"></a>
-### pino-mysql
-
-[pino-mysql][pino-mysql] loads pino logs into [MySQL][MySQL] and [MariaDB][MariaDB].
-
-```sh
-$ node app.js | pino-mysql -c db-configuration.json
-```
-
-`pino-mysql` can extract and save log fields into corresponding database fields
-and/or save the entire log stream as a [JSON Data Type][JSONDT].
-
-For full documentation and command line switches read the [README][pino-mysql].
-
-[pino-mysql]: https://www.npmjs.com/package/pino-mysql
-[MySQL]: https://www.mysql.com/
-[MariaDB]: https://mariadb.org/
-[JSONDT]: https://dev.mysql.com/doc/refman/8.0/en/json.html
-
-<a id="pino-redis"></a>
-### pino-redis
-
-[pino-redis][pino-redis] loads pino logs into [Redis][Redis].
-
-```sh
-$ node app.js | pino-redis -U redis://username:password@localhost:6379
-```
-
-[pino-redis]: https://github.com/buianhthang/pino-redis
-[Redis]: https://redis.io/
-
-<a id="pino-sentry"></a>
-### pino-sentry
-
-[pino-sentry][pino-sentry] loads pino logs into [Sentry][Sentry].
-
-```sh
-$ node app.js | pino-sentry --dsn=https://******@sentry.io/12345
-```
-
-For full documentation of command line switches see the [pino-sentry README](https://github.com/aandrewww/pino-sentry/blob/master/README.md).
-
-[pino-sentry]: https://www.npmjs.com/package/pino-sentry
-[Sentry]: https://sentry.io/
-
-
-<a id="pino-seq"></a>
-### pino-seq
-
-[pino-seq][pino-seq] supports both out-of-process and in-process log forwarding to [Seq][Seq].
-
-```sh
-$ node app.js | pino-seq --serverUrl http://localhost:5341 --apiKey 1234567890 --property applicationName=MyNodeApp
-```
-
-[pino-seq]: https://www.npmjs.com/package/pino-seq
-[Seq]: https://datalust.co/seq
-
-<a id="pino-seq-transport"></a>
-### pino-seq-transport
-
-[pino-seq-transport][pino-seq-transport] is a Pino v7+ compatible transport to forward log events to [Seq][Seq]
-from a dedicated worker:
-
-```js
-const pino = require('pino')
-const transport = pino.transport({
-  target: '@autotelic/pino-seq-transport',
-  options: { serverUrl: 'http://localhost:5341' }
-})
-pino(transport)
-```
-
-[pino-seq-transport]: https://github.com/autotelic/pino-seq-transport
-[Seq]: https://datalust.co/seq
-
-<a id="pino-sentry-transport"></a>
-### pino-sentry-transport
-
-[pino-sentry-transport][pino-sentry-transport] is a Pino v7+ compatible transport to forward log events to [Sentry][Sentry]
-from a dedicated worker:
-
-```js
-const pino = require('pino')
-const transport = pino.transport({
-  target: 'pino-sentry-transport',
-  options: {
-    sentry: {
-      dsn: 'https://******@sentry.io/12345',
-    }
-  }
-})
-pino(transport)
-```
-
-[pino-sentry-transport]: https://github.com/tomer-yechiel/pino-sentry-transport
-[Sentry]: https://sentry.io/
-
-
-<a id="pino-airbrake-transport"></a>
-### pino-airbrake-transport
-
-[pino-airbrake-transport][pino-airbrake-transport] is a Pino v7+ compatible transport to forward log events to [Airbrake][Airbrake]
-from a dedicated worker:
-
-```js
-const pino = require('pino')
-const transport = pino.transport({
-  target: 'pino-airbrake-transport',
-  options: {
-    airbrake: {
-      projectId: 1,
-      projectKey: "REPLACE_ME",
-      environment: "production",
-      // additional options for airbrake
-      performanceStats: false,
-    },
-  },
-  level: "error", // minimum log level that should be sent to airbrake
-})
-pino(transport)
-```
-
-[pino-airbrake-transport]: https://github.com/enricodeleo/pino-airbrake-transport
-[Airbrake]: https://airbrake.io/
-
-<a id="pino-socket"></a>
-### pino-socket
-
-[pino-socket][pino-socket] is a transport that will forward logs to an IPv4
-UDP or TCP socket.
-
-As an example, use `socat` to fake a listener:
-
-```sh
-$ socat -v udp4-recvfrom:6000,fork exec:'/bin/cat'
-```
-
-Then run an application that uses `pino` for logging:
-
-```sh
-$ node app.js | pino-socket -p 6000
-```
-
-Logs from the application should be observed on both consoles.
-
-[pino-socket]: https://www.npmjs.com/package/pino-socket
 
 <a id="pino-datadog-transport"></a>
 ### pino-datadog-transport
@@ -891,6 +681,391 @@ how to setup [Kibana][kibana].
 For Docker users, see
 https://github.com/deviantony/docker-elk to setup an ELK stack.
 
+<a id="pino-discord-webhook"></a>
+### pino-discord-webhook
+
+[pino-discord-webhook](https://github.com/fabulousgk/pino-discord-webhook) is a  Pino v7+ compatible transport to forward log events to a [Discord](http://discord.com) webhook from a dedicated worker. 
+
+```js
+import pino from 'pino'
+
+const logger = pino({
+  transport: {
+    target: 'pino-discord-webhook',
+    options: {
+      webhookUrl: 'https://discord.com/api/webhooks/xxxx/xxxx',
+    }
+  }
+})
+```
+
+<a id="pino-elasticsearch"></a>
+### pino-elasticsearch
+
+[pino-elasticsearch][pino-elasticsearch] uploads the log lines in bulk
+to [Elasticsearch][elasticsearch], to be displayed in [Kibana][kibana].
+
+It is extremely simple to use and setup
+
+```sh
+$ node app.js | pino-elasticsearch
+```
+
+Assuming Elasticsearch is running on localhost.
+
+To connect to an external Elasticsearch instance (recommended for production):
+
+* Check that `network.host` is defined in the `elasticsearch.yml` configuration file. See [Elasticsearch Network Settings documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-network.html#common-network-settings) for more details.
+* Launch:
+
+```sh
+$ node app.js | pino-elasticsearch --node http://192.168.1.42:9200
+```
+
+Assuming Elasticsearch is running on `192.168.1.42`.
+
+To connect to AWS Elasticsearch:
+
+```sh
+$ node app.js | pino-elasticsearch --node https://es-url.us-east-1.es.amazonaws.com --es-version 6
+```
+
+Then [create an index pattern](https://www.elastic.co/guide/en/kibana/current/setup.html) on `'pino'` (the default index key for `pino-elasticsearch`) on the Kibana instance.
+
+[pino-elasticsearch]: https://github.com/pinojs/pino-elasticsearch
+[elasticsearch]: https://www.elastic.co/products/elasticsearch
+[kibana]: https://www.elastic.co/products/kibana
+
+<a id="pino-gelf"></a>
+### pino-gelf
+
+Pino GELF ([pino-gelf]) is a transport for the Pino logger. Pino GELF receives Pino logs from stdin and transforms them into [GELF format][gelf] before sending them to a remote [Graylog server][graylog] via UDP.
+
+```sh
+$ node your-app.js | pino-gelf log
+```
+
+[pino-gelf]: https://github.com/pinojs/pino-gelf
+[gelf]: https://docs.graylog.org/en/2.1/pages/gelf.html
+[graylog]: https://www.graylog.org/
+
+<a id="pino-hana"></a>
+### pino-hana
+[pino-hana](https://github.com/HiImGiovi/pino-hana) is a Pino v7+ transport that save pino logs to a SAP HANA database.
+```js
+const pino = require('pino')
+const logger = pino({
+  transport: {
+    target: 'pino-hana',
+    options: {
+      connectionOptions: {
+        host: <hana db host>,
+        port: <hana db port>,
+        user: <hana db user>,
+        password: <hana db password>,
+      },
+      schema: <schema of the table in which you want to save the logs>,
+      table: <table in which you want to save the logs>,
+    },
+  },
+})
+
+logger.info('hi') // this log will be saved into SAP HANA
+```
+For more detailed information about its usage please check the official [documentation](https://github.com/HiImGiovi/pino-hana#readme).
+
+<a id="pino-http-send"></a>
+### pino-http-send
+
+[pino-http-send](https://npmjs.com/package/pino-http-send) is a configurable and low overhead
+transport that will batch logs and send to a specified URL.
+
+```console
+$ node app.js | pino-http-send -u http://localhost:8080/logs
+```
+
+<a id="pino-kafka"></a>
+### pino-kafka
+
+[pino-kafka](https://github.com/ayZagen/pino-kafka) transport to send logs to [Apache Kafka](https://kafka.apache.org/).
+
+```sh
+$ node index.js | pino-kafka -b 10.10.10.5:9200 -d mytopic
+```
+
+<a id="pino-logdna"></a>
+### pino-logdna
+
+[pino-logdna](https://github.com/logdna/pino-logdna) transport to send logs to [LogDNA](https://logdna.com).
+
+```sh
+$ node index.js | pino-logdna --key YOUR_INGESTION_KEY
+```
+
+Tags and other metadata can be included using the available command line options. See the [pino-logdna README](https://github.com/logdna/pino-logdna#options) for a full list.
+
+<a id="pino-logflare"></a>
+### pino-logflare
+
+[pino-logflare](https://github.com/Logflare/pino-logflare) transport to send logs to a [Logflare](https://logflare.app) `source`.
+
+```sh
+$ node index.js | pino-logflare --key YOUR_KEY --source YOUR_SOURCE
+```
+
+<a id="pino-logfmt"></a>
+### pino-logfmt
+
+[pino-logfmt](https://github.com/botflux/pino-logfmt) is a Pino v7+ transport that formats logs into [logfmt](https://brandur.org/logfmt). This transport can output the formatted logs to stdout or file.
+
+```js
+import pino from 'pino'
+
+const logger = pino({
+  transport: {
+    target: 'pino-logfmt'
+  }
+})
+```
+
+<a id="pino-loki"></a>
+### pino-loki
+pino-loki is a transport that will forwards logs into [Grafana Loki](https://grafana.com/oss/loki/).
+Can be used in CLI version in a separate process or in a dedicated worker:
+
+CLI :
+```console
+node app.js | pino-loki --hostname localhost:3100 --labels='{ "application": "my-application"}' --user my-username --password my-password
+```
+
+Worker :
+```js
+const pino = require('pino')
+const transport = pino.transport({
+  target: 'pino-loki',
+  options: { host: 'localhost:3100' }
+})
+pino(transport)
+```
+
+For full documentation and configuration, see the [README](https://github.com/Julien-R44/pino-loki).
+
+<a id="pino-mq"></a>
+### pino-mq
+
+The `pino-mq` transport will take all messages received on `process.stdin` and send them over a message bus using JSON serialization.
+
+This is useful for:
+
+* moving backpressure from application to broker
+* transforming messages pressure to another component
+
+```
+node app.js | pino-mq -u "amqp://guest:guest@localhost/" -q "pino-logs"
+```
+
+Alternatively, a configuration file can be used:
+
+```
+node app.js | pino-mq -c pino-mq.json
+```
+
+A base configuration file can be initialized with:
+
+```
+pino-mq -g
+```
+
+For full documentation of command line switches and configuration see [the `pino-mq` README](https://github.com/itavy/pino-mq#readme)
+
+<a id="pino-mysql"></a>
+### pino-mysql
+
+[pino-mysql][pino-mysql] loads pino logs into [MySQL][MySQL] and [MariaDB][MariaDB].
+
+```sh
+$ node app.js | pino-mysql -c db-configuration.json
+```
+
+`pino-mysql` can extract and save log fields into corresponding database fields
+and/or save the entire log stream as a [JSON Data Type][JSONDT].
+
+For full documentation and command line switches read the [README][pino-mysql].
+
+[pino-mysql]: https://www.npmjs.com/package/pino-mysql
+[MySQL]: https://www.mysql.com/
+[MariaDB]: https://mariadb.org/
+[JSONDT]: https://dev.mysql.com/doc/refman/8.0/en/json.html
+
+<a id="pino-opentelemetry-transport"></a>
+### pino-opentelemetry-transport
+
+[pino-opentelemetry-transport](https://www.npmjs.com/package/pino-opentelemetry-transport) is a transport that will forward logs to an [OpenTelemetry log collector](https://opentelemetry.io/docs/collector/) using [OpenTelemetry JS instrumentation](https://opentelemetry.io/docs/instrumentation/js/).
+
+```javascript
+const pino = require('pino')
+
+const transport = pino.transport({
+  target: 'pino-opentelemetry-transport',
+  options: {
+    resourceAttributes: {
+      'service.name': 'test-service',
+      'service.version': '1.0.0'
+    }
+  }
+})
+
+pino(transport)
+```
+
+Documentation on running a minimal example is available in the [README](https://github.com/Vunovati/pino-opentelemetry-transport#minimalistic-example).
+
+<a id="pino-papertrail"></a>
+### pino-papertrail
+pino-papertrail is a transport that will forward logs to the [papertrail](https://papertrailapp.com) log service through an UDPv4 socket.
+
+Given an application `foo` that logs via pino, and a papertrail destination that collects logs on port UDP `12345` on address `bar.papertrailapp.com`, you would use `pino-papertrail`
+like so:
+
+```
+node yourapp.js | pino-papertrail --host bar.papertrailapp.com --port 12345 --appname foo
+```
+
+
+for full documentation of command line switches read [README](https://github.com/ovhemert/pino-papertrail#readme)
+
+<a id="pino-pg"></a>
+### pino-pg
+[pino-pg](https://www.npmjs.com/package/pino-pg) stores logs into PostgreSQL.
+Full documentation in the [README](https://github.com/Xstoudi/pino-pg).
+
+<a id="pino-redis"></a>
+### pino-redis
+
+[pino-redis][pino-redis] loads pino logs into [Redis][Redis].
+
+```sh
+$ node app.js | pino-redis -U redis://username:password@localhost:6379
+```
+
+[pino-redis]: https://github.com/buianhthang/pino-redis
+[Redis]: https://redis.io/
+
+<a id="pino-sentry"></a>
+### pino-sentry
+
+[pino-sentry][pino-sentry] loads pino logs into [Sentry][Sentry].
+
+```sh
+$ node app.js | pino-sentry --dsn=https://******@sentry.io/12345
+```
+
+For full documentation of command line switches see the [pino-sentry README](https://github.com/aandrewww/pino-sentry/blob/master/README.md).
+
+[pino-sentry]: https://www.npmjs.com/package/pino-sentry
+[Sentry]: https://sentry.io/
+
+<a id="pino-sentry-transport"></a>
+### pino-sentry-transport
+
+[pino-sentry-transport][pino-sentry-transport] is a Pino v7+ compatible transport to forward log events to [Sentry][Sentry]
+from a dedicated worker:
+
+```js
+const pino = require('pino')
+const transport = pino.transport({
+  target: 'pino-sentry-transport',
+  options: {
+    sentry: {
+      dsn: 'https://******@sentry.io/12345',
+    }
+  }
+})
+pino(transport)
+```
+
+[pino-sentry-transport]: https://github.com/tomer-yechiel/pino-sentry-transport
+[Sentry]: https://sentry.io/
+
+<a id="pino-seq"></a>
+### pino-seq
+
+[pino-seq][pino-seq] supports both out-of-process and in-process log forwarding to [Seq][Seq].
+
+```sh
+$ node app.js | pino-seq --serverUrl http://localhost:5341 --apiKey 1234567890 --property applicationName=MyNodeApp
+```
+
+[pino-seq]: https://www.npmjs.com/package/pino-seq
+[Seq]: https://datalust.co/seq
+
+<a id="pino-seq-transport"></a>
+### pino-seq-transport
+
+[pino-seq-transport][pino-seq-transport] is a Pino v7+ compatible transport to forward log events to [Seq][Seq]
+from a dedicated worker:
+
+```js
+const pino = require('pino')
+const transport = pino.transport({
+  target: '@autotelic/pino-seq-transport',
+  options: { serverUrl: 'http://localhost:5341' }
+})
+pino(transport)
+```
+
+[pino-seq-transport]: https://github.com/autotelic/pino-seq-transport
+[Seq]: https://datalust.co/seq
+
+<a id="pino-slack-webhook"></a>
+### pino-slack-webhook
+
+[pino-slack-webhook][pino-slack-webhook] is a Pino v7+ compatible transport to forward log events to [Slack][Slack]
+from a dedicated worker:
+
+```js
+const pino = require('pino')
+const transport = pino.transport({
+  target: '@youngkiu/pino-slack-webhook',
+  options: {
+    webhookUrl: 'https://hooks.slack.com/services/xxx/xxx/xxx',
+    channel: '#pino-log',
+    username: 'webhookbot',
+    icon_emoji: ':ghost:'
+  }
+})
+pino(transport)
+```
+
+[pino-slack-webhook]: https://github.com/youngkiu/pino-slack-webhook
+[Slack]: https://slack.com/
+
+[pino-pretty]: https://github.com/pinojs/pino-pretty
+
+For full documentation of command line switches read the [README](https://github.com/abeai/pino-websocket#readme).
+
+<a id="pino-socket"></a>
+### pino-socket
+
+[pino-socket][pino-socket] is a transport that will forward logs to an IPv4
+UDP or TCP socket.
+
+As an example, use `socat` to fake a listener:
+
+```sh
+$ socat -v udp4-recvfrom:6000,fork exec:'/bin/cat'
+```
+
+Then run an application that uses `pino` for logging:
+
+```sh
+$ node app.js | pino-socket -p 6000
+```
+
+Logs from the application should be observed on both consoles.
+
+[pino-socket]: https://www.npmjs.com/package/pino-socket
+
 <a id="pino-stackdriver"></a>
 ### pino-stackdriver
 The [pino-stackdriver](https://www.npmjs.com/package/pino-stackdriver) module is a transport that will forward logs to the [Google Stackdriver](https://cloud.google.com/logging/) log service through its API.
@@ -926,147 +1101,6 @@ Example output for the "hello world" log:
 [rfc3164]: https://tools.ietf.org/html/rfc3164
 [logstash]: https://www.elastic.co/products/logstash
 
-
-<a id="pino-websocket"></a>
-### pino-websocket
-
-[pino-websocket](https://www.npmjs.com/package/@abeai/pino-websocket) is a transport that will forward each log line to a websocket server.
-
-```sh
-$ node app.js | pino-websocket -a my-websocket-server.example.com -p 3004
-```
-
-For full documentation of command line switches read the [README](https://github.com/abeai/pino-websocket#readme).
-
-<a id="pino-slack-webhook"></a>
-### pino-slack-webhook
-
-[pino-slack-webhook][pino-slack-webhook] is a Pino v7+ compatible transport to forward log events to [Slack][Slack]
-from a dedicated worker:
-
-```js
-const pino = require('pino')
-const transport = pino.transport({
-  target: '@youngkiu/pino-slack-webhook',
-  options: {
-    webhookUrl: 'https://hooks.slack.com/services/xxx/xxx/xxx',
-    channel: '#pino-log',
-    username: 'webhookbot',
-    icon_emoji: ':ghost:'
-  }
-})
-pino(transport)
-```
-
-[pino-slack-webhook]: https://github.com/youngkiu/pino-slack-webhook
-[Slack]: https://slack.com/
-
-[pino-pretty]: https://github.com/pinojs/pino-pretty
-
-For full documentation of command line switches read the [README](https://github.com/abeai/pino-websocket#readme).
-
-<a id="pino-axiom"></a>
-### pino-axiom
-
-[pino-axiom](https://www.npmjs.com/package/pino-axiom) is a transport that will forward logs to [Axiom](https://axiom.co).
-
-```javascript
-const pino = require('pino')
-const transport = pino.transport({
-  target: 'pino-axiom',
-  options: {
-    orgId: 'YOUR-ORG-ID', 
-    token: 'YOUR-TOKEN', 
-    dataset: 'YOUR-DATASET', 
-  },
-})
-pino(transport)
-```
-
-<a id="pino-opentelemetry-transport"></a>
-### pino-opentelemetry-transport
-
-[pino-opentelemetry-transport](https://www.npmjs.com/package/pino-opentelemetry-transport) is a transport that will forward logs to an [OpenTelemetry log collector](https://opentelemetry.io/docs/collector/) using [OpenTelemetry JS instrumentation](https://opentelemetry.io/docs/instrumentation/js/).
-
-```javascript
-const pino = require('pino')
-
-const transport = pino.transport({
-  target: 'pino-opentelemetry-transport',
-  options: {
-    resourceAttributes: {
-      'service.name': 'test-service',
-      'service.version': '1.0.0'
-    }
-  }
-})
-
-pino(transport)
-```
-
-Documentation on running a minimal example is available in the [README](https://github.com/Vunovati/pino-opentelemetry-transport#minimalistic-example).
-
-<a id="@axiomhq/pino"></a>
-### @axiomhq/pino
-
-[@axiomhq/pino](https://www.npmjs.com/package/@axiomhq/pino) is the official [Axiom](https://axiom.co/) transport for Pino, using [axiom-js](https://github.com/axiomhq/axiom-js).
-
-```javascript
-import pino from 'pino';
-
-const logger = pino(
-  { level: 'info' },
-  pino.transport({
-    target: '@axiomhq/pino',
-    options: {
-      dataset: process.env.AXIOM_DATASET,
-      token: process.env.AXIOM_TOKEN,
-    },
-  }),
-);
-```
-
-then you can use the logger as usual:
-
-```js
-logger.info('Hello from pino!');
-```
-
-For further examples, head over to the [examples](https://github.com/axiomhq/axiom-js/tree/main/examples/pino) directory.
-
-<a id="pino-discord-webhook"></a>
-### pino-discord-webhook
-
-[pino-discord-webhook](https://github.com/fabulousgk/pino-discord-webhook) is a  Pino v7+ compatible transport to forward log events to a [Discord](http://discord.com) webhook from a dedicated worker. 
-
-```js
-import pino from 'pino'
-
-const logger = pino({
-  transport: {
-    target: 'pino-discord-webhook',
-    options: {
-      webhookUrl: 'https://discord.com/api/webhooks/xxxx/xxxx',
-    }
-  }
-})
-```
-
-<a id="pino-logfmt"></a>
-### pino-logfmt
-
-[pino-logfmt](https://github.com/botflux/pino-logfmt) is a Pino v7+ transport that formats logs into [logfmt](https://brandur.org/logfmt). This transport can output the formatted logs to stdout or file.
-
-```js
-import pino from 'pino'
-
-const logger = pino({
-  transport: {
-    target: 'pino-logfmt'
-  }
-})
-```
-
 <a id="pino-telegram-webhook"></a>
 ### pino-telegram-webhook
 
@@ -1094,6 +1128,17 @@ logger.error('<b>test log!</b>');
 
 The `extra` parameter is optional. Parameters that the method [`sendMessage`](https://core.telegram.org/bots/api#sendmessage) supports can be passed to it.
 
+<a id="pino-websocket"></a>
+### pino-websocket
+
+[pino-websocket](https://www.npmjs.com/package/@abeai/pino-websocket) is a transport that will forward each log line to a websocket server.
+
+```sh
+$ node app.js | pino-websocket -a my-websocket-server.example.com -p 3004
+```
+
+For full documentation of command line switches read the [README](https://github.com/abeai/pino-websocket#readme).
+
 <a id="pino-yc-transport"></a>
 ### pino-yc-transport
 
@@ -1120,53 +1165,6 @@ logger.error("error");
 logger.error(new Error("error"));
 logger.fatal("fatal");
 ```
-
-<a id="macfja-pino-fingers-crossed"></a>
-### @macfja/pino-fingers-crossed
-
-[@macfja/pino-fingers-crossed](https://github.com/MacFJA/js-pino-fingers-crossed) is a Pino v7+ transport that holds logs until a log level is reached, allowing to only have logs when it matters.
-
-```js
-const pino = require('pino');
-const { default: fingersCrossed, enable } = require('@macfja/pino-fingers-crossed')
-
-const logger = pino(fingersCrossed());
-
-logger.info('Will appear immedialty')
-logger.error('Will appear immedialty')
-
-logger.setBindings({ [enable]: 50 })
-logger.info('Will NOT appear immedialty')
-logger.info('Will NOT appear immedialty')
-logger.error('Will appear immedialty as well as the 2 previous messages') // error log are level 50
-logger.info('Will NOT appear')
-logger.info({ [enable]: false }, 'Will appear immedialty')
-logger.info('Will NOT appear')
-```
-<a id="pino-hana"></a>
-### pino-hana
-[pino-hana](https://github.com/HiImGiovi/pino-hana) is a Pino v7+ transport that save pino logs to a SAP HANA database.
-```js
-const pino = require('pino')
-const logger = pino({
-  transport: {
-    target: 'pino-hana',
-    options: {
-      connectionOptions: {
-        host: <hana db host>,
-        port: <hana db port>,
-        user: <hana db user>,
-        password: <hana db password>,
-      },
-      schema: <schema of the table in which you want to save the logs>,
-      table: <table in which you want to save the logs>,
-    },
-  },
-})
-
-logger.info('hi') // this log will be saved into SAP HANA
-```
-For more detailed information about its usage please check the official [documentation](https://github.com/HiImGiovi/pino-hana#readme).
 
 <a id="communication-between-pino-and-transport"></a>
 ## Communication between Pino and Transports
