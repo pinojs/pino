@@ -15,7 +15,7 @@ test('thread-stream sync true should log synchronously', async (t) => {
 
   const transport = pino.transport({
     target: join(__dirname, '..', 'fixtures', 'to-file-transport.js'),
-    options: { destination: outputPath },
+    options: { destination: outputPath, flush: true },
     sync: true
   })
   const instance = pino(transport)
@@ -32,7 +32,7 @@ test('thread-stream sync true should log synchronously', async (t) => {
   let loopCounter = 0
 
   // Start a synchronous loop
-  while (!interrupt && loopCounter < (process.env.MAX_TEST_LOOP_ITERATION || 5000)) {
+  while (!interrupt && loopCounter < (process.env.MAX_TEST_LOOP_ITERATION || 10000)) {
     try {
       loopCounter++
       const data = getOutputLogLines()
