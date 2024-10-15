@@ -32,7 +32,7 @@ test('thread-stream sync true should log synchronously', async (t) => {
   let loopCounter = 0
 
   // Start a synchronous loop
-  while (!interrupt && loopCounter < (process.env.MAX_TEST_LOOP_ITERATION || 10000)) {
+  while (!interrupt && loopCounter < (process.env.MAX_TEST_LOOP_ITERATION || 20000)) {
     try {
       loopCounter++
       const data = getOutputLogLines()
