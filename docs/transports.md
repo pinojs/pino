@@ -15,7 +15,7 @@ now referred to as [Legacy Transports](#legacy-transports).
 
 From Pino v7 and upwards transports can also operate inside a [Worker Thread][worker-thread]
 and can be used or configured via the options object passed to `pino` on initialization.
-In this case the transports would always operate asynchronously, and logs would be
+In this case the transports would always operate asynchronously (unless `options.sync` is set to `true` in transport options), and logs would be
 flushed as quickly as possible (there is nothing to do).
 
 [worker-thread]: https://nodejs.org/dist/latest-v14.x/docs/api/worker_threads.html
@@ -122,6 +122,19 @@ const transport = pino.transport({
   dedupe: true
 })
 pino(transport)
+```
+
+To make pino log synchronously, pass `sync: true` to transport options.
+```js
+const pino = require('pino')
+const transport = pino.transport({
+  targets: [
+    { target: '/absolute/path/to/my-transport.mjs', level: 'error' },
+  ],
+  dedupe: true,
+  sync: true,
+});
+pino(transport);
 ```
 
 For more details on `pino.transport` see the [API docs for `pino.transport`][pino-transport].
