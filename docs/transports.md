@@ -471,17 +471,18 @@ PRs to this document are welcome for any new transports!
 <a id="@appsignal/nodejs-pino"></a>
 ### @appsignal/nodejs
 
-[@appsignal/nodejs](https://www.npmjs.com/package/@appsignal/nodejs) [`AppsignalPinoTransport`](https://github.com/appsignal/appsignal-nodejs/blob/0fffae87ebe269bb86b6adafba23388ecb802979/src/pino_transport.ts) is the official [AppSignal](https://appsignal.com/) transport for Pino.
+[@appsignal/nodejs](https://www.npmjs.com/package/@appsignal/nodejs) [`AppsignalPinoTransport`](https://github.com/appsignal/appsignal-nodejs/blob/337eed9b72194f9500a685410fbfc9197c4db911/src/pino_transport.ts) is the official [AppSignal](https://appsignal.com/) transport for Pino.
 
 ```javascript
-import pino from 'pino';
-import { Appsignal, AppsignalPinoTransport } from '@appsignal/nodejs';
+const pino = require('pino');
 
-const logger = pino({
-  AppsignalPinoTransport({
-    client: Appsignal.client,
-    group: "optional-group-name",
-  })
+pino({
+  transport: {
+    target: "@appsignal/nodejs/pino",
+    options: {
+      group: "optional-grou-name",
+    }
+  }
 });
 ```
 
