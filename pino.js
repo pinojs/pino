@@ -90,12 +90,11 @@ function pino (...args) {
   const { opts, stream } = normalize(instance, caller(), ...args)
 
   if (
-    opts.level && 
-    typeof opts.level === 'string' && 
-    DEFAULT_LEVELS[opts.level.toLowerCase()] !== undefined && 
+    opts.level &&
+    typeof opts.level === 'string' &&
+    DEFAULT_LEVELS[opts.level.toLowerCase()] !== undefined &&
     !opts.useOnlyCustomLevels
-  ) 
-    opts.level = opts.level.toLowerCase()
+  ) { opts.level = opts.level.toLowerCase() }
 
   const {
     redact,
