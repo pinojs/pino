@@ -653,7 +653,7 @@ const transport = pino.transport({
 pino(transport)
 ```
 
-[pino-datadog-transport]: https://github.com/theogravity/pino-datadog-transport
+[pino-datadog-transport]: https://github.com/theogravity/datadog-transports
 [Datadog]: https://www.datadoghq.com/
 
 #### Logstash
