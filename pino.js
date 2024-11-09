@@ -35,6 +35,8 @@ const {
   formatOptsSym,
   messageKeySym,
   errorKeySym,
+  requestKeySym,
+  responseKeySym,
   nestedKeySym,
   mixinSym,
   levelCompSym,
@@ -49,17 +51,23 @@ const { epochTime, nullTime } = time
 const { pid } = process
 const hostname = os.hostname()
 const defaultErrorSerializer = stdSerializers.err
+const defaultRequestSerializer = stdSerializers.req
+const defaultResponseSerializer = stdSerializers.res
 const defaultOptions = {
   level: 'info',
   levelComparison: SORTING_ORDER.ASC,
   levels: DEFAULT_LEVELS,
   messageKey: 'msg',
   errorKey: 'err',
+  requestKey: 'req',
+  responseKey: 'res',
   nestedKey: null,
   enabled: true,
   base: { pid, hostname },
   serializers: Object.assign(Object.create(null), {
-    err: defaultErrorSerializer
+    err: defaultErrorSerializer,
+    req: defaultRequestSerializer,
+    res: defaultResponseSerializer,
   }),
   formatters: Object.assign(Object.create(null), {
     bindings (bindings) {
@@ -99,6 +107,8 @@ function pino (...args) {
     timestamp,
     messageKey,
     errorKey,
+    requestKey,
+    responseKey,
     nestedKey,
     base,
     name,
@@ -186,6 +196,8 @@ function pino (...args) {
     [formatOptsSym]: formatOpts,
     [messageKeySym]: messageKey,
     [errorKeySym]: errorKey,
+    [requestKeySym]: requestKey,
+    [responseKeySym]: responseKey,
     [nestedKeySym]: nestedKey,
     // protect against injection
     [nestedKeyStrSym]: nestedKey ? `,${JSON.stringify(nestedKey)}:{` : '',

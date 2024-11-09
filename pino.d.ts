@@ -417,6 +417,14 @@ declare namespace pino {
          */
         errorKey?: string;
         /**
+         * The string key for the 'Request' in the JSON object. Default: "req".
+         */
+        requestKey?: string;
+        /**
+         * The string key for the 'Response' in the JSON object. Default: "res".
+         */
+        responseKey?: string;
+        /**
          * The string key to place any logged object under.
          */
         nestedKey?: string;
@@ -755,6 +763,8 @@ declare namespace pino {
         readonly formatOptsSym: unique symbol;
         readonly messageKeySym: unique symbol;
         readonly errorKeySym: unique symbol;
+        readonly responseKeySym: unique symbol;
+        readonly requestKeySym: unique symbol;
         readonly nestedKeySym: unique symbol;
         readonly wildcardFirstSym: unique symbol;
         readonly needsMetadataGsym: unique symbol;

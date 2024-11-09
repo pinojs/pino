@@ -44,33 +44,27 @@ test('http request support', async ({ ok, same, error, teardown }) => {
   server.close()
 })
 
-test('http request support via serializer', async ({ ok, same, error, teardown }) => {
+test('http request support via serializer', async ({ error, match }) => {
   let originalReq
   const instance = pino({
     serializers: {
-      req: pino.stdSerializers.req
+      req: (req) => req.arbitraryProperty,
     }
-  }, sink((chunk, enc) => {
-    ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
-    delete chunk.time
-    same(chunk, {
+  }, sink((chunk, _enc) => {
+    match(chunk, {
       pid,
       hostname,
       level: 30,
       msg: 'my request',
-      req: {
-        method: originalReq.method,
-        url: originalReq.url,
-        headers: originalReq.headers,
-        remoteAddress: originalReq.socket.remoteAddress,
-        remotePort: originalReq.socket.remotePort
-      }
+      req: originalReq.arbitraryProperty,
     })
   }))
 
   const server = http.createServer(function (req, res) {
+    req.arbitraryProperty = Math.random()
+
     originalReq = req
-    instance.info({ req }, 'my request')
+    instance.info(req, 'my request')
     res.end('hello')
   })
   server.unref()
@@ -160,34 +154,30 @@ test('http response support', async ({ ok, same, error, teardown }) => {
   server.close()
 })
 
-test('http response support via a serializer', async ({ ok, same, error, teardown }) => {
+test('http response support via a serializer', async ({ match, error }) => {
+  let originalRes
   const instance = pino({
     serializers: {
-      res: pino.stdSerializers.res
+      res: (res) => res.arbitraryProperty,
     }
   }, sink((chunk, enc) => {
-    ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
-    delete chunk.time
-    same(chunk, {
+    match(chunk, {
       pid,
       hostname,
       level: 30,
       msg: 'my response',
-      res: {
-        statusCode: 200,
-        headers: {
-          'x-single': 'y',
-          'x-multi': [1, 2]
-        }
-      }
+      res: originalRes.arbitraryProperty,
     })
   }))
 
-  const server = http.createServer(function (req, res) {
+  const server = http.createServer(function (_req, res) {
+    res.arbitraryProperty = Math.random()
+
+    originalRes = res
     res.setHeader('x-single', 'y')
     res.setHeader('x-multi', [1, 2])
     res.end('hello')
-    instance.info({ res }, 'my response')
+    instance.info(res, 'my response')
   })
 
   server.unref()

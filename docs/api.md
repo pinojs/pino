@@ -532,12 +532,26 @@ Default: `'msg'`
 
 The string key for the 'message' in the JSON object.
 
-<a id=opt-messagekey></a>
+<a id=opt-errorkey></a>
 #### `errorKey` (String)
 
 Default: `'err'`
 
 The string key for the 'error' in the JSON object.
+
+<a id=opt-requestkey></a>
+#### `requestKey` (String)
+
+Default: `'req'`
+
+The string key for the 'Request' in the JSON object.
+
+<a id=opt-responsekey></a>
+#### `responseKey` (String)
+
+Default: `'res'`
+
+The string key for the 'Response' in the JSON object.
 
 <a id=opt-nestedkey></a>
 #### `nestedKey` (String)
