@@ -130,15 +130,15 @@ test('Symbol.for(\'pino.serializers\')', async () => {
   assert.deepEqual(child[Symbol.for('pino.serializers')], expected)
   assert.equal(parent[Symbol.for('pino.serializers')], child[Symbol.for('pino.serializers')])
 
-  const child2 = parent.child({}, {
-    serializers: {
-      a
-    }
-  })
+    const child2 = parent.child({}, {
+      serializers: {
+        a
+      }
+    })
 
-  function a () {
-    return 'hello'
-  }
+    function a () {
+      return 'hello'
+    }
 
   // eslint-disable-next-line eqeqeq
   assert.equal(child2[Symbol.for('pino.serializers')] != parentSerializers, true)
@@ -168,20 +168,20 @@ test('children inherit parent Symbol serializers', async () => {
 
   assert.deepEqual(parent[Symbol.for('pino.serializers')], expected)
 
-  const child = parent.child({}, {
-    serializers: {
-      [Symbol.for('a')]: a,
-      a
+    const child = parent.child({}, {
+      serializers: {
+        [Symbol.for('a')]: a,
+        a
+      }
+    })
+
+    function a () {
+      return 'hello'
     }
-  })
 
-  function a () {
-    return 'hello'
-  }
-
-  function b () {
-    return 'world'
-  }
+    function b () {
+      return 'world'
+    }
 
   assert.deepEqual(child[Symbol.for('pino.serializers')].a, a)
   assert.deepEqual(child[Symbol.for('pino.serializers')][Symbol.for('b')], b)

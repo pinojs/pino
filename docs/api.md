@@ -31,6 +31,7 @@
   * [pino.stdTimeFunctions](#pino-stdtimefunctions)
   * [pino.symbols](#pino-symbols)
   * [pino.version](#pino-version)
+  * [pino.futures](#pino-version)
 * [Interfaces](#interfaces)
   * [MultiStreamRes](#multistreamres)
   * [StreamEntry](#streamentry)
@@ -536,12 +537,26 @@ Default: `'msg'`
 
 The string key for the 'message' in the JSON object.
 
-<a id=opt-messagekey></a>
+<a id=opt-errorkey></a>
 #### `errorKey` (String)
 
 Default: `'err'`
 
 The string key for the 'error' in the JSON object.
+
+<a id=opt-requestkey></a>
+#### `requestKey` (String)
+
+Default: `'req'`
+
+The string key for the 'Request' in the JSON object.
+
+<a id=opt-responsekey></a>
+#### `responseKey` (String)
+
+Default: `'res'`
+
+The string key for the 'Response' in the JSON object.
 
 <a id=opt-nestedkey></a>
 #### `nestedKey` (String)
@@ -619,6 +634,19 @@ const parent = require('pino')({ onChild: (instance) => {
 }})
 // `onChild` will now be executed with the new child.
 parent.child(bindings)
+```
+
+<a id=opt-future></a>
+#### `future` (Object)
+
+The `future` object contains _opt-in_ flags specific to a Pino major version. These flags are used to change behavior,
+anticipating breaking-changes that will be introduced in the next major version.
+```js
+const parent = require('pino')({
+  future: {
+    skipUnconditionalStdSerializers: true
+  }
+})
 ```
 
 

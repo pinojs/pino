@@ -30,21 +30,21 @@ declare namespace pino {
     type MixinFn<CustomLevels extends string = never> = (mergeObject: object, level: number, logger:Logger<CustomLevels>) => object;
     type MixinMergeStrategyFn = (mergeObject: object, mixinObject: object) => object;
 
-    type CustomLevelLogger<CustomLevels extends string, UseOnlyCustomLevels extends boolean = boolean> = { 
-        /**
-         * Define additional logging levels.
-         */
-        customLevels: { [level in CustomLevels]: number };
-        /**
-         * Use only defined `customLevels` and omit Pino's levels.
-         */
-        useOnlyCustomLevels: UseOnlyCustomLevels;
-    } & {
-        // This will override default log methods
-        [K in Exclude<Level, CustomLevels>]: UseOnlyCustomLevels extends true ? never : LogFn;
-    } & {
-        [level in CustomLevels]: LogFn;
-    };
+type CustomLevelLogger<CustomLevels extends string, UseOnlyCustomLevels extends boolean = boolean> = {
+    /**
+     * Define additional logging levels.
+     */
+    customLevels: { [level in CustomLevels]: number };
+    /**
+     * Use only defined `customLevels` and omit Pino's levels.
+     */
+    useOnlyCustomLevels: UseOnlyCustomLevels;
+ } & {
+    // This will override default log methods
+    [K in Exclude<pino.Level, CustomLevels>]: UseOnlyCustomLevels extends true ? never : pino.LogFn;
+ } & {
+    [level in CustomLevels]: pino.LogFn;
+ };
 
     /**
     * A synchronous callback that will run on each creation of a new child.
@@ -351,7 +351,10 @@ declare namespace pino {
         <T, TMsg extends string = string>(obj: T extends object ? T & LogFnFields : T, msg?: T extends string ? never : TMsg, ...args: ParseLogFnArgs<TMsg> extends [unknown, ...unknown[]] ? ParseLogFnArgs<TMsg> : unknown[]): void;
     }
 
-    export interface LoggerOptions<CustomLevels extends string = never, UseOnlyCustomLevels extends boolean = boolean> {
+    /** Future flags for Pino major-version 9. */
+    type FutureFlags = 'skipUnconditionalStdSerializers'
+
+    interface LoggerOptions<CustomLevels extends string = never, UseOnlyCustomLevels extends boolean = boolean> {
         transport?: TransportSingleOptions | TransportMultiOptions | TransportPipelineOptions
         /**
          * Avoid error causes by circular references in the object tree. Default: `true`.
@@ -440,6 +443,14 @@ declare namespace pino {
          * The string key for the 'error' in the JSON object. Default: "err".
          */
         errorKey?: string;
+        /**
+         * The string key for the 'Request' in the JSON object. Default: "req".
+         */
+        requestKey?: string;
+        /**
+         * The string key for the 'Response' in the JSON object. Default: "res".
+         */
+        responseKey?: string;
         /**
          * The string key to place any logged object under.
          */
@@ -702,6 +713,18 @@ declare namespace pino {
          * logs newline delimited JSON with `\r\n` instead of `\n`. Default: `false`.
          */
         crlf?: boolean;
+
+        /**
+         * The `future` object contains _opt-in_ flags specific to a Pino major version. These flags are used to change behavior,
+         * anticipating breaking-changes that will be introduced in the next major version.
+         * @example
+         * const parent = require('pino')({
+         *   future: {
+         *     skipUnconditionalStdSerializers: true
+         *   }
+         * })
+         */
+        future?: Partial<Record<FutureFlags, boolean>>
     }
 
     export interface ChildLoggerOptions<CustomLevels extends string = never> {
@@ -788,12 +811,15 @@ declare namespace pino {
         readonly formatOptsSym: unique symbol;
         readonly messageKeySym: unique symbol;
         readonly errorKeySym: unique symbol;
+        readonly responseKeySym: unique symbol;
+        readonly requestKeySym: unique symbol;
         readonly nestedKeySym: unique symbol;
         readonly wildcardFirstSym: unique symbol;
         readonly needsMetadataGsym: unique symbol;
         readonly useOnlyCustomLevelsSym: unique symbol;
         readonly formattersSym: unique symbol;
         readonly hooksSym: unique symbol;
+        readonly futureSym: unique symbol;
     };
 
     /**
