@@ -47,6 +47,7 @@ test('http request support', async ({ ok, same, error, teardown }) => {
 test('http request support via serializer', async ({ error, match }) => {
   let originalReq
   const instance = pino({
+    requestKey: 'myRequest',
     serializers: {
       req: (req) => req.arbitraryProperty,
     }
@@ -56,7 +57,7 @@ test('http request support via serializer', async ({ error, match }) => {
       hostname,
       level: 30,
       msg: 'my request',
-      req: originalReq.arbitraryProperty,
+      myRequest: originalReq.arbitraryProperty,
     })
   }))
 
@@ -70,7 +71,6 @@ test('http request support via serializer', async ({ error, match }) => {
   server.unref()
   server.listen()
   const err = await once(server, 'listening')
-  error(err)
 
   const res = await once(http.get('http://localhost:' + server.address().port), 'response')
   res.resume()
@@ -157,16 +157,17 @@ test('http response support', async ({ ok, same, error, teardown }) => {
 test('http response support via a serializer', async ({ match, error }) => {
   let originalRes
   const instance = pino({
+    responseKey: 'myResponse',
     serializers: {
       res: (res) => res.arbitraryProperty,
     }
-  }, sink((chunk, enc) => {
+  }, sink((chunk, _enc) => {
     match(chunk, {
       pid,
       hostname,
       level: 30,
       msg: 'my response',
-      res: originalRes.arbitraryProperty,
+      myResponse: originalRes.arbitraryProperty,
     })
   }))
 
@@ -196,7 +197,7 @@ test('http request support via serializer in a child', async ({ ok, same, error,
     serializers: {
       req: pino.stdSerializers.req
     }
-  }, sink((chunk, enc) => {
+  }, sink((chunk, _enc) => {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     same(chunk, {
@@ -224,7 +225,6 @@ test('http request support via serializer in a child', async ({ ok, same, error,
   server.unref()
   server.listen()
   const err = await once(server, 'listening')
-  error(err)
 
   const res = await once(http.get('http://localhost:' + server.address().port), 'response')
   res.resume()
