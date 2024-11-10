@@ -44,12 +44,54 @@ test('http request support', async ({ ok, same, error, teardown }) => {
   server.close()
 })
 
-test('http request support via serializer', async ({ error, match }) => {
+test('http request support via serializer', async ({ ok, same, error, teardown }) => {
+  let originalReq
+  const instance = pino({
+    serializers: {
+      req: pino.stdSerializers.req
+    }
+  }, sink((chunk, enc) => {
+    ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
+    delete chunk.time
+    same(chunk, {
+      pid,
+      hostname,
+      level: 30,
+      msg: 'my request',
+      req: {
+        method: originalReq.method,
+        url: originalReq.url,
+        headers: originalReq.headers,
+        remoteAddress: originalReq.socket.remoteAddress,
+        remotePort: originalReq.socket.remotePort
+      }
+    })
+  }))
+
+  const server = http.createServer(function (req, res) {
+    originalReq = req
+    instance.info({ req }, 'my request')
+    res.end('hello')
+  })
+  server.unref()
+  server.listen()
+  const err = await once(server, 'listening')
+  error(err)
+
+  const res = await once(http.get('http://localhost:' + server.address().port), 'response')
+  res.resume()
+  server.close()
+})
+
+test('http request support via serializer (avoids stdSerializers)', async ({ error, equal, match }) => {
   let originalReq
   const instance = pino({
     requestKey: 'myRequest',
     serializers: {
-      req: (req) => req.arbitraryProperty,
+      req: (req) => {
+        equal(req, originalReq)
+        return req.arbitraryProperty
+      }
     }
   }, sink((chunk, _enc) => {
     match(chunk, {
@@ -57,20 +99,21 @@ test('http request support via serializer', async ({ error, match }) => {
       hostname,
       level: 30,
       msg: 'my request',
-      myRequest: originalReq.arbitraryProperty,
+      myRequest: originalReq.arbitraryProperty
     })
   }))
 
   const server = http.createServer(function (req, res) {
+    originalReq = req
     req.arbitraryProperty = Math.random()
 
-    originalReq = req
     instance.info(req, 'my request')
     res.end('hello')
   })
   server.unref()
   server.listen()
   const err = await once(server, 'listening')
+  error(err)
 
   const res = await once(http.get('http://localhost:' + server.address().port), 'response')
   res.resume()
@@ -154,12 +197,55 @@ test('http response support', async ({ ok, same, error, teardown }) => {
   server.close()
 })
 
-test('http response support via a serializer', async ({ match, error }) => {
+test('http response support via a serializer', async ({ ok, same, error, teardown }) => {
+  const instance = pino({
+    serializers: {
+      res: pino.stdSerializers.res
+    }
+  }, sink((chunk, enc) => {
+    ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
+    delete chunk.time
+    same(chunk, {
+      pid,
+      hostname,
+      level: 30,
+      msg: 'my response',
+      res: {
+        statusCode: 200,
+        headers: {
+          'x-single': 'y',
+          'x-multi': [1, 2]
+        }
+      }
+    })
+  }))
+
+  const server = http.createServer(function (req, res) {
+    res.setHeader('x-single', 'y')
+    res.setHeader('x-multi', [1, 2])
+    res.end('hello')
+    instance.info({ res }, 'my response')
+  })
+
+  server.unref()
+  server.listen()
+  const err = await once(server, 'listening')
+  error(err)
+
+  const res = await once(http.get('http://localhost:' + server.address().port), 'response')
+  res.resume()
+  server.close()
+})
+
+test('http response support via serializer (avoids stdSerializers)', async ({ match, equal, error }) => {
   let originalRes
   const instance = pino({
     responseKey: 'myResponse',
     serializers: {
-      res: (res) => res.arbitraryProperty,
+      res: (res) => {
+        equal(res, originalRes)
+        return res.arbitraryProperty
+      }
     }
   }, sink((chunk, _enc) => {
     match(chunk, {
@@ -167,18 +253,16 @@ test('http response support via a serializer', async ({ match, error }) => {
       hostname,
       level: 30,
       msg: 'my response',
-      myResponse: originalRes.arbitraryProperty,
+      myResponse: originalRes.arbitraryProperty
     })
   }))
 
   const server = http.createServer(function (_req, res) {
+    originalRes = res
     res.arbitraryProperty = Math.random()
 
-    originalRes = res
-    res.setHeader('x-single', 'y')
-    res.setHeader('x-multi', [1, 2])
-    res.end('hello')
     instance.info(res, 'my response')
+    res.end('hello')
   })
 
   server.unref()
@@ -197,7 +281,7 @@ test('http request support via serializer in a child', async ({ ok, same, error,
     serializers: {
       req: pino.stdSerializers.req
     }
-  }, sink((chunk, _enc) => {
+  }, sink((chunk, enc) => {
     ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     same(chunk, {
@@ -225,6 +309,7 @@ test('http request support via serializer in a child', async ({ ok, same, error,
   server.unref()
   server.listen()
   const err = await once(server, 'listening')
+  error(err)
 
   const res = await once(http.get('http://localhost:' + server.address().port), 'response')
   res.resume()
