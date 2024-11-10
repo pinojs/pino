@@ -67,7 +67,7 @@ const defaultOptions = {
   serializers: Object.assign(Object.create(null), {
     err: defaultErrorSerializer,
     req: defaultRequestSerializer,
-    res: defaultResponseSerializer,
+    res: defaultResponseSerializer
   }),
   formatters: Object.assign(Object.create(null), {
     bindings (bindings) {
