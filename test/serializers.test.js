@@ -118,7 +118,9 @@ test('child does not overwrite parent serializers', async ({ equal }) => {
 test('Symbol.for(\'pino.serializers\')', async ({ equal, same, not }) => {
   const stream = sink()
   const expected = Object.assign({
-    err: stdSerializers.err
+    err: stdSerializers.err,
+    req: stdSerializers.req,
+    res: stdSerializers.res
   }, parentSerializers)
   const parent = pino({ serializers: parentSerializers }, stream)
   const child = parent.child({ a: 'property' })
@@ -158,7 +160,9 @@ test('children inherit parent Symbol serializers', async ({ equal, same, not }) 
     [Symbol.for('b')]: b
   }
   const expected = Object.assign({
-    err: stdSerializers.err
+    err: stdSerializers.err,
+    req: stdSerializers.req,
+    res: stdSerializers.res
   }, symbolSerializers)
   const parent = pino({ serializers: symbolSerializers }, stream)
 
