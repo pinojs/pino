@@ -552,7 +552,7 @@ const logger = pino({
 });
 ```
 
-For full documentation check the [README](https://github.com/openobserve/pino-openobserve)
+For full documentation check the [README](https://github.com/openobserve/pino-openobserve).
 
 <a id="pino-airbrake-transport"></a>
 ### pino-airbrake-transport
