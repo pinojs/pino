@@ -532,8 +532,8 @@ logger.info('Will NOT appear')
 [@openobserve/pino-openobserve](https://github.com/openobserve/pino-openobserve) is a Pino v7+ transport that can send the logs to [OpenObserve](https://openobserve.ai) Instance.
 
 ```
-import pino from 'pino';
-import OpenobserveTransport from '@openobserve/pino-openobserve';
+const pino = require('pino');
+const OpenobserveTransport = require('@openobserve/pino-openobserve');
 
 const logger = pino({
   level: 'info',
