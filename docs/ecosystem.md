@@ -81,3 +81,4 @@ prettifier inspired by the [logrus](https://github.com/sirupsen/logrus) logger.
 + [`pino-lambda`](https://github.com/FormidableLabs/pino-lambda): log transport for cloudwatch support inside aws-lambda 
 + [`cloud-pine`](https://github.com/metcoder95/cloud-pine): transport that provides abstraction and compatibility with [`@google-cloud/logging`](https://www.npmjs.com/package/@google-cloud/logging).
 + [`crawlee-pino`](https://github.com/imyelo/crawlee-pino): use Pino to log within Crawlee
++ [`@google-cloud/pino-logging-gcp-config`](https://www.npmjs.com/package/@google-cloud/pino-logging-gcp-config): Config helper and formatter to output [Google Cloud Platform Structured Logging](https://cloud.google.com/logging/docs/structured-logging)
