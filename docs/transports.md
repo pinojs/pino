@@ -222,7 +222,7 @@ In case you want to both use a custom transport, and output the log entries with
       }
     ]
 
-    const logger = pino(pino.transport({ targets: transports })
+    const logger = pino(pino.transport({ targets: transports }))
 ```
 
 ### Creating a transport pipeline
