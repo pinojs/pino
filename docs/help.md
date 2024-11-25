@@ -125,7 +125,7 @@ ExecStart=/bin/sh -c '/path/to/node app.js | pino-transport'
 
 Pino's default log destination is the singular destination of `stdout`. While
 not recommended for performance reasons, multiple destinations can be targeted
-by using [`pino.multistream`](/doc/api.md#pino-multistream).
+by using [`pino.multistream`](/docs/api.md#pino-multistream).
 
 In this example, we use `stderr` for `error` level logs and `stdout` as default
 for all other levels (e.g. `debug`, `info`, and `warn`).
