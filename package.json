@@ -63,8 +63,8 @@
     "@types/flush-write-stream": "^1.0.0",
     "@types/node": "^22.0.0",
     "@types/tap": "^15.0.6",
-    "@yao-pkg/pkg": "6.1.0",
-    "airtap": "4.0.4",
+    "@yao-pkg/pkg": "6.1.1",
+    "airtap": "5.0.0",
     "benchmark": "^2.1.4",
     "bole": "^5.0.5",
     "bunyan": "^1.8.14",
@@ -98,7 +98,7 @@
     "through2": "^4.0.0",
     "ts-node": "^10.9.1",
     "tsd": "^0.31.0",
-    "typescript": "~5.6.3",
+    "typescript": "~5.7.2",
     "winston": "^3.7.2"
   },
   "dependencies": {
