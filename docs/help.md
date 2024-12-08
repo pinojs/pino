@@ -260,6 +260,32 @@ module.exports = function createLogger(options) {
 }
 ```
 
+A library that configures Pino for
+[Google Cloud Structured Logging](https://cloud.google.com/logging/docs/structured-logging)
+is available at:
+[@google-cloud/pino-logging-gcp-config](https://www.npmjs.com/package/@google-cloud/pino-logging-gcp-config)
+
+This library has the following features:
+
++ Converts Pino log levels to Google Cloud Logging log levels, as above
++ Uses `message` instead of `msg` for the message key, as above
++ Adds a millisecond-granularity timestamp in the 
+  [structure](https://cloud.google.com/logging/docs/agent/logging/configuration#timestamp-processing)
+  recognised by Google Cloud Logging eg: \
+  `"timestamp":{"seconds":1445470140,"nanos":123000000}`
++ Adds a sequential
+  [`insertId`](https://cloud.google.com/logging/docs/reference/v2/rest/v2/LogEntry#FIELDS.insert_id)
+  to ensure log messages with identical timestamps are ordered correctly.
++ Logs including an `Error` object have the
+  [`stack_trace`](https://cloud.google.com/error-reporting/docs/formatting-error-messages#log-error)
+  property set so that the error is forwarded to Google Cloud Error Reporting.
++ Includes a
+  [`ServiceContext`](https://cloud.google.com/error-reporting/reference/rest/v1beta1/ServiceContext)
+  object in the logs for Google Cloud Error Reporting, auto detected from the
+  environment if not specified
++ Maps the OpenTelemetry properties `span_id`, `trace_id`, and `trace_flags`
+  to the equivalent Google Cloud Logging fields.
+
 <a id="grafana-loki"></a>
 ## Using Grafana Loki to evaluate pino logs in a kubernetes cluster
 
