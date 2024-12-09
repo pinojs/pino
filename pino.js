@@ -52,9 +52,7 @@ const {
 const { epochTime, nullTime } = time
 const { pid } = process
 const hostname = os.hostname()
-const defaultErrorSerializer = stdSerializers.err
-const defaultRequestSerializer = stdSerializers.req
-const defaultResponseSerializer = stdSerializers.res
+
 const defaultOptions = {
   level: 'info',
   levelComparison: SORTING_ORDER.ASC,
@@ -66,11 +64,6 @@ const defaultOptions = {
   nestedKey: null,
   enabled: true,
   base: { pid, hostname },
-  serializers: Object.assign(Object.create(null), {
-    err: defaultErrorSerializer,
-    req: defaultRequestSerializer,
-    res: defaultResponseSerializer
-  }),
   formatters: Object.assign(Object.create(null), {
     bindings (bindings) {
       return bindings
@@ -95,8 +88,6 @@ const defaultOptions = {
 
 const normalize = createArgsNormalizer(defaultOptions)
 
-const serializers = Object.assign(Object.create(null), stdSerializers)
-
 function pino (...args) {
   const instance = {}
   const { opts, stream } = normalize(instance, caller(), ...args)
@@ -110,8 +101,8 @@ function pino (...args) {
     timestamp,
     messageKey,
     errorKey,
-    requestKey,
     responseKey,
+    requestKey,
     nestedKey,
     base,
     name,
@@ -130,7 +121,13 @@ function pino (...args) {
     future
   } = opts
 
-  const futureSafe = Object.assign(Object.create(null), defaultFuture, future)
+  // future is made immutable, as it impacts other settings
+  const futureSafe = Object.freeze(Object.assign(Object.create(null), defaultFuture, future))
+
+  const defaultSerializers = futureSafe.skipUnconditionalStdSerializers
+    ? { err: stdSerializers.err, req: stdSerializers.req, res: stdSerializers.res }
+    : { err: stdSerializers.err }
+  const serializersSafe = Object.assign(Object.create(null), defaultSerializers, serializers)
 
   const stringifySafe = configure({
     maximumDepth: depthLimit,
@@ -153,7 +150,7 @@ function pino (...args) {
   const end = '}' + (crlf ? '\r\n' : '\n')
   const coreChindings = asChindings.bind(null, {
     [chindingsSym]: '',
-    [serializersSym]: serializers,
+    [serializersSym]: serializersSafe,
     [stringifiersSym]: stringifiers,
     [stringifySym]: stringify,
     [stringifySafeSym]: stringifySafe,
@@ -202,12 +199,12 @@ function pino (...args) {
     [formatOptsSym]: formatOpts,
     [messageKeySym]: messageKey,
     [errorKeySym]: errorKey,
-    [requestKeySym]: requestKey,
     [responseKeySym]: responseKey,
+    [requestKeySym]: requestKey,
     [nestedKeySym]: nestedKey,
     // protect against injection
     [nestedKeyStrSym]: nestedKey ? `,${JSON.stringify(nestedKey)}:{` : '',
-    [serializersSym]: serializers,
+    [serializersSym]: serializersSafe,
     [mixinSym]: mixin,
     [mixinMergeStrategySym]: mixinMergeStrategy,
     [chindingsSym]: chindings,
@@ -216,7 +213,7 @@ function pino (...args) {
     silent: noop,
     onChild,
     [msgPrefixSym]: msgPrefix,
-    [futureSym]: Object.freeze(futureSafe) // future is set immutable to each Pino top-instance, as it affects behavior of other settings
+    [futureSym]: futureSafe
   })
 
   Object.setPrototypeOf(instance, proto())
@@ -243,7 +240,7 @@ module.exports.transport = require('./lib/transport')
 module.exports.multistream = require('./lib/multistream')
 
 module.exports.levels = mappings()
-module.exports.stdSerializers = serializers
+module.exports.stdSerializers = Object.assign(Object.create(null), stdSerializers)
 module.exports.stdTimeFunctions = Object.assign({}, time)
 module.exports.symbols = symbols
 module.exports.version = version

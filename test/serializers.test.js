@@ -115,35 +115,63 @@ test('child does not overwrite parent serializers', async ({ equal }) => {
   equal((await o2).test, 'child')
 })
 
-test('Symbol.for(\'pino.serializers\')', async ({ equal, same, not }) => {
-  const stream = sink()
-  const expected = Object.assign({
-    err: stdSerializers.err,
-    req: stdSerializers.req,
-    res: stdSerializers.res
-  }, parentSerializers)
-  const parent = pino({ serializers: parentSerializers }, stream)
-  const child = parent.child({ a: 'property' })
+test('Symbol.for(\'pino.serializers\')', async ({ test }) => {
+  test('current behavior in major-version 9', async ({ equal, same, not }) => {
+    const stream = sink()
+    const expected = Object.assign({
+      err: stdSerializers.err
+    }, parentSerializers)
+    const parent = pino({ serializers: parentSerializers }, stream)
+    const child = parent.child({ a: 'property' })
 
-  same(parent[Symbol.for('pino.serializers')], expected)
-  same(child[Symbol.for('pino.serializers')], expected)
-  equal(parent[Symbol.for('pino.serializers')], child[Symbol.for('pino.serializers')])
+    same(parent[Symbol.for('pino.serializers')], expected)
+    same(child[Symbol.for('pino.serializers')], expected)
+    equal(parent[Symbol.for('pino.serializers')], child[Symbol.for('pino.serializers')])
 
-  const child2 = parent.child({}, {
-    serializers: {
-      a
+    const child2 = parent.child({}, {
+      serializers: {
+        a
+      }
+    })
+
+    function a () {
+      return 'hello'
     }
+
+    not(child2[Symbol.for('pino.serializers')], parentSerializers)
+    equal(child2[Symbol.for('pino.serializers')].a, a)
+    equal(child2[Symbol.for('pino.serializers')].test, parentSerializers.test)
   })
+  test('future behavior', async ({ equal, same, not }) => {
+    const stream = sink()
+    const expected = Object.assign({
+      err: stdSerializers.err,
+      req: stdSerializers.req,
+      res: stdSerializers.res
+    }, parentSerializers)
+    const future = { skipUnconditionalStdSerializers: true }
+    const parent = pino({ serializers: parentSerializers, future }, stream)
+    const child = parent.child({ a: 'property' })
 
-  function a () {
-    return 'hello'
-  }
+    same(parent[Symbol.for('pino.serializers')], expected)
+    same(child[Symbol.for('pino.serializers')], expected)
+    equal(parent[Symbol.for('pino.serializers')], child[Symbol.for('pino.serializers')])
 
-  not(child2[Symbol.for('pino.serializers')], parentSerializers)
-  equal(child2[Symbol.for('pino.serializers')].a, a)
-  equal(child2[Symbol.for('pino.serializers')].test, parentSerializers.test)
+    const child2 = parent.child({}, {
+      serializers: {
+        a
+      }
+    })
+
+    function a () {
+      return 'hello'
+    }
+
+    not(child2[Symbol.for('pino.serializers')], parentSerializers)
+    equal(child2[Symbol.for('pino.serializers')].a, a)
+    equal(child2[Symbol.for('pino.serializers')].test, parentSerializers.test)
+  })
 })
-
 test('children inherit parent serializers', async ({ equal }) => {
   const stream = sink()
   const parent = pino({ serializers: parentSerializers }, stream)
@@ -155,37 +183,71 @@ test('children inherit parent serializers', async ({ equal }) => {
 })
 
 test('children inherit parent Symbol serializers', async ({ equal, same, not }) => {
-  const stream = sink()
-  const symbolSerializers = {
-    [Symbol.for('b')]: b
-  }
-  const expected = Object.assign({
-    err: stdSerializers.err,
-    req: stdSerializers.req,
-    res: stdSerializers.res
-  }, symbolSerializers)
-  const parent = pino({ serializers: symbolSerializers }, stream)
-
-  same(parent[Symbol.for('pino.serializers')], expected)
-
-  const child = parent.child({}, {
-    serializers: {
-      [Symbol.for('a')]: a,
-      a
+  test('current behavior in major-version 9', async ({ equal, same, not }) => {
+    const stream = sink()
+    const symbolSerializers = {
+      [Symbol.for('b')]: b
     }
+    const expected = Object.assign({
+      err: stdSerializers.err
+    }, symbolSerializers)
+    const parent = pino({ serializers: symbolSerializers }, stream)
+
+    same(parent[Symbol.for('pino.serializers')], expected)
+
+    const child = parent.child({}, {
+      serializers: {
+        [Symbol.for('a')]: a,
+        a
+      }
+    })
+
+    function a () {
+      return 'hello'
+    }
+
+    function b () {
+      return 'world'
+    }
+
+    same(child[Symbol.for('pino.serializers')].a, a)
+    same(child[Symbol.for('pino.serializers')][Symbol.for('b')], b)
+    same(child[Symbol.for('pino.serializers')][Symbol.for('a')], a)
   })
+  test('future behavior', async ({ equal, same, not }) => {
+    const stream = sink()
+    const symbolSerializers = {
+      [Symbol.for('b')]: b
+    }
+    const expected = Object.assign({
+      err: stdSerializers.err,
+      req: stdSerializers.req,
+      res: stdSerializers.res
+    }, symbolSerializers)
+    const future = { skipUnconditionalStdSerializers: true }
+    const parent = pino({ serializers: symbolSerializers, future }, stream)
 
-  function a () {
-    return 'hello'
-  }
+    same(parent[Symbol.for('pino.serializers')], expected)
 
-  function b () {
-    return 'world'
-  }
+    const child = parent.child({}, {
+      serializers: {
+        [Symbol.for('a')]: a,
+        a
+      }
+    })
 
-  same(child[Symbol.for('pino.serializers')].a, a)
-  same(child[Symbol.for('pino.serializers')][Symbol.for('b')], b)
-  same(child[Symbol.for('pino.serializers')][Symbol.for('a')], a)
+    function a () {
+      return 'hello'
+    }
+
+    function b () {
+      return 'world'
+    }
+
+    same(child[Symbol.for('pino.serializers')].a, a)
+    same(child[Symbol.for('pino.serializers')][Symbol.for('b')], b)
+    same(child[Symbol.for('pino.serializers')][Symbol.for('a')], a)
+  })
 })
 
 test('children serializers get called', async ({ equal }) => {
