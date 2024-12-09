@@ -20,6 +20,7 @@ const {
   noop
 } = require('./lib/tools')
 const { version } = require('./lib/meta')
+const { future: defaultFuture } = require('./lib/deprecations')
 const {
   chindingsSym,
   redactFmtSym,
@@ -45,7 +46,8 @@ const {
   hooksSym,
   nestedKeyStrSym,
   mixinMergeStrategySym,
-  msgPrefixSym
+  msgPrefixSym,
+  futureSym
 } = symbols
 const { epochTime, nullTime } = time
 const { pid } = process
@@ -87,7 +89,8 @@ const defaultOptions = {
   customLevels: null,
   useOnlyCustomLevels: false,
   depthLimit: 5,
-  edgeLimit: 100
+  edgeLimit: 100,
+  future: Object.assign(Object.create(null), defaultFuture)
 }
 
 const normalize = createArgsNormalizer(defaultOptions)
@@ -123,8 +126,11 @@ function pino (...args) {
     depthLimit,
     edgeLimit,
     onChild,
-    msgPrefix
+    msgPrefix,
+    future
   } = opts
+
+  const futureSafe = Object.assign(Object.create(null), defaultFuture, future)
 
   const stringifySafe = configure({
     maximumDepth: depthLimit,
@@ -209,7 +215,8 @@ function pino (...args) {
     [hooksSym]: hooks,
     silent: noop,
     onChild,
-    [msgPrefixSym]: msgPrefix
+    [msgPrefixSym]: msgPrefix,
+    [futureSym]: Object.freeze(futureSafe) // future is set immutable to each Pino top-instance, as it affects behavior of other settings
   })
 
   Object.setPrototypeOf(instance, proto())

@@ -31,7 +31,7 @@ type TimeFn = () => string;
 type MixinFn<CustomLevels extends string = never> = (mergeObject: object, level: number, logger:pino.Logger<CustomLevels>) => object;
 type MixinMergeStrategyFn = (mergeObject: object, mixinObject: object) => object;
 
-type CustomLevelLogger<CustomLevels extends string, UseOnlyCustomLevels extends boolean = boolean> = { 
+type CustomLevelLogger<CustomLevels extends string, UseOnlyCustomLevels extends boolean = boolean> = {
     /**
      * Define additional logging levels.
      */
@@ -326,6 +326,9 @@ declare namespace pino {
         (obj: unknown, msg?: string, ...args: any[]): void;
         (msg: string, ...args: any[]): void;
     }
+
+    /** Future flags for Pino major-version 9. */
+    type FutureFlags = 'skipUnconditionalStdSerializers'
 
     interface LoggerOptions<CustomLevels extends string = never, UseOnlyCustomLevels extends boolean = boolean> {
         transport?: TransportSingleOptions | TransportMultiOptions | TransportPipelineOptions
@@ -676,6 +679,18 @@ declare namespace pino {
          * logs newline delimited JSON with `\r\n` instead of `\n`. Default: `false`.
          */
         crlf?: boolean;
+
+        /**
+         * The `future` object contains _opt-in_ flags specific to a Pino major version. These flags are used to change behavior,
+         * anticipating breaking-changes that will be introduced in the next major version.
+         * @example
+         * const parent = require('pino')({
+         *   future: {
+         *     skipUnconditionalStdSerializers: true
+         *   }
+         * })
+         */
+        future?: Partial<Record<FutureFlags, boolean>>
     }
 
     interface ChildLoggerOptions<CustomLevels extends string = never> {
@@ -771,6 +786,7 @@ declare namespace pino {
         readonly useOnlyCustomLevelsSym: unique symbol;
         readonly formattersSym: unique symbol;
         readonly hooksSym: unique symbol;
+        readonly futureSym: unique symbol;
     };
 
     /**

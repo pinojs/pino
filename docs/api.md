@@ -30,6 +30,7 @@
   * [pino.stdTimeFunctions](#pino-stdtimefunctions)
   * [pino.symbols](#pino-symbols)
   * [pino.version](#pino-version)
+  * [pino.futures](#pino-version)
 * [Interfaces](#interfaces)
   * [MultiStreamRes](#multistreamres)
   * [StreamEntry](#streamentry)
@@ -629,6 +630,19 @@ const parent = require('pino')({ onChild: (instance) => {
 }})
 // `onChild` will now be executed with the new child.
 parent.child(bindings)
+```
+
+<a id=opt-future></a>
+#### `future` (Object)
+
+The `future` object contains _opt-in_ flags specific to a Pino major version. These flags are used to change behavior,
+anticipating breaking-changes that will be introduced in the next major version.
+```js
+const parent = require('pino')({
+  future: {
+    skipUnconditionalStdSerializers: true
+  }
+})
 ```
 
 
