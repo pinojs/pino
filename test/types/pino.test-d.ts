@@ -209,6 +209,10 @@ const withHooks = pino({
             expectType<pino.Logger>(this);
             return method.apply(this, args);
         },
+        streamWrite(s) {
+            expectType<string>(s);
+            return s.replaceAll('secret-key', 'xxx');
+        },
     },
 });
 

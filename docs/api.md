@@ -375,6 +375,23 @@ const hooks = {
 }
 ```
 
+
+<a id="streamWrite"></a>
+##### `streamWrite`
+
+Allows for manipulating the _stringified_ JSON log data just before writing to various transports.
+
+The method receives the stringified JSON and must return valid stringified JSON.
+
+For example:
+```js
+const hooks = {
+  streamWrite (s) {
+    return s.replaceAll('sensitive-api-key', 'XXX')
+  }
+}
+```
+
 <a id=opt-formatters></a>
 #### `formatters` (Object)
 

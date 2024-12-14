@@ -641,6 +641,12 @@ declare namespace pino {
              * using apply, like so: method.apply(this, newArgumentsArray).
              */
             logMethod?: (this: Logger, args: Parameters<LogFn>, method: LogFn, level: number) => void;
+
+            /**
+             * Allows for manipulating the stringified JSON log output just before writing to various transports.
+             * This function must return a string and must be valid JSON.
+             */
+            streamWrite?: (s: string) => string;
         };
 
         /**

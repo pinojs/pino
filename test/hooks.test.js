@@ -95,3 +95,24 @@ tap.test('log method hook', t => {
 
   t.end()
 })
+
+tap.test('streamWrite hook', t => {
+  t.test('gets invoked', async t => {
+    t.plan(1)
+
+    const stream = sink()
+    const logger = pino({
+      hooks: {
+        streamWrite (s) {
+          return s.replaceAll('redact-me', 'XXX')
+        }
+      }
+    }, stream)
+
+    const o = once(stream, 'data')
+    logger.info('hide redact-me in this string')
+    t.match(await o, { msg: 'hide XXX in this string' })
+  })
+
+  t.end()
+})

@@ -70,7 +70,8 @@ const defaultOptions = {
     }
   }),
   hooks: {
-    logMethod: undefined
+    logMethod: undefined,
+    streamWrite: undefined
   },
   timestamp: epochTime,
   name: undefined,
