@@ -218,7 +218,7 @@ In case you want to both use a custom transport, and output the log entries with
       },
       {
         target: 'my-custom-transport',
-        options: { someParameter: true } 
+        options: { someParameter: true }
       }
     ]
 
@@ -423,6 +423,7 @@ PRs to this document are welcome for any new transports!
 
 ### Pino v7+ Compatible
 
++ [@appsignal/nodejs pino](#@appsignal/nodejs-pino)
 + [@axiomhq/pino](#@axiomhq/pino)
 + [@logtail/pino](#@logtail/pino)
 + [@macfja/pino-fingers-crossed](#macfja-pino-fingers-crossed)
@@ -468,6 +469,23 @@ PRs to this document are welcome for any new transports!
 + [pino-syslog](#pino-syslog)
 + [pino-websocket](#pino-websocket)
 
+<a id="@appsignal/nodejs-pino"></a>
+### @appsignal/nodejs
+
+[@appsignal/nodejs](https://www.npmjs.com/package/@appsignal/nodejs) [`AppsignalPinoTransport`](https://github.com/appsignal/appsignal-nodejs/blob/337eed9b72194f9500a685410fbfc9197c4db911/src/pino_transport.ts) is the official [AppSignal](https://appsignal.com/) transport for Pino.
+
+```javascript
+const pino = require('pino');
+
+pino({
+  transport: {
+    target: "@appsignal/nodejs/pino",
+    options: {
+      group: "optional-grou-name",
+    }
+  }
+});
+```
 
 <a id="@axiomhq/pino"></a>
 ### @axiomhq/pino
@@ -605,9 +623,9 @@ const pino = require('pino')
 const transport = pino.transport({
   target: 'pino-axiom',
   options: {
-    orgId: 'YOUR-ORG-ID', 
-    token: 'YOUR-TOKEN', 
-    dataset: 'YOUR-DATASET', 
+    orgId: 'YOUR-ORG-ID',
+    token: 'YOUR-TOKEN',
+    dataset: 'YOUR-DATASET',
   },
 })
 pino(transport)
@@ -727,7 +745,7 @@ https://github.com/deviantony/docker-elk to setup an ELK stack.
 <a id="pino-discord-webhook"></a>
 ### pino-discord-webhook
 
-[pino-discord-webhook](https://github.com/fabulousgk/pino-discord-webhook) is a  Pino v7+ compatible transport to forward log events to a [Discord](http://discord.com) webhook from a dedicated worker. 
+[pino-discord-webhook](https://github.com/fabulousgk/pino-discord-webhook) is a  Pino v7+ compatible transport to forward log events to a [Discord](http://discord.com) webhook from a dedicated worker.
 
 ```js
 import pino from 'pino'
@@ -1147,7 +1165,7 @@ Example output for the "hello world" log:
 <a id="pino-telegram-webhook"></a>
 ### pino-telegram-webhook
 
-[pino-telegram-webhook](https://github.com/Jhon-Mosk/pino-telegram-webhook) is a Pino v7+ transport for sending messages to [Telegram](https://telegram.org/). 
+[pino-telegram-webhook](https://github.com/Jhon-Mosk/pino-telegram-webhook) is a Pino v7+ transport for sending messages to [Telegram](https://telegram.org/).
 
 ```js
 const pino = require('pino');
