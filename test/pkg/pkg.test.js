@@ -8,6 +8,8 @@ const { join } = require('node:path')
 const { platform } = require('node:process')
 const execFile = promisify(require('node:child_process').execFile)
 
+const skip = process.env.PNPM_CI || process.env.CITGM
+
 /**
  * The following regex is for tesintg the deprecation warning that is thrown by the `punycode` module.
  * Exact text that it's matching is:
@@ -18,7 +20,7 @@ const execFile = promisify(require('node:child_process').execFile)
  */
 const deprecationWarningRegex = /^\(\w+:\d+\)\s\[[\w|\d]+\]\sDeprecationWarning: The `punycode` module is deprecated\.\s+Please use a userland alternative instead\.\s+\(Use `node --trace-deprecation \.\.\.` to show where the warning was created\)\s+$/
 
-test('worker test when packaged into executable using pkg', { skip: !!process.env.PNPM_CI }, async (t) => {
+test('worker test when packaged into executable using pkg', { skip }, async (t) => {
   const packageName = 'index'
 
   // package the app into several node versions, check config for more info
