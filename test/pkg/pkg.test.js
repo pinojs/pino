@@ -24,7 +24,8 @@ test('worker test when packaged into executable using pkg', { skip: !!process.en
   // package the app into several node versions, check config for more info
   const filePath = `${join(__dirname, packageName)}.js`
   const configPath = join(__dirname, 'pkg.config.json')
-  const { stderr } = await execFile('npx', ['pkg', filePath, '--config', configPath])
+  const npxExecutable = platform === 'win32' ? 'npx.cmd' : 'npx'
+  const { stderr } = await execFile(npxExecutable, ['pkg', filePath, '--config', configPath])
 
   // there should be no error when packaging
   const expectedvalue = stderr === '' || deprecationWarningRegex.test(stderr)
