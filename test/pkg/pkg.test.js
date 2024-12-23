@@ -6,7 +6,7 @@ const { promisify } = require('node:util')
 const { unlink } = require('node:fs/promises')
 const { join } = require('node:path')
 const { platform } = require('node:process')
-const exec = promisify(require('node:child_process').exec)
+const execFile = promisify(require('node:child_process').execFile)
 
 /**
  * The following regex is for tesintg the deprecation warning that is thrown by the `punycode` module.
@@ -24,7 +24,7 @@ test('worker test when packaged into executable using pkg', { skip: !!process.en
   // package the app into several node versions, check config for more info
   const filePath = `${join(__dirname, packageName)}.js`
   const configPath = join(__dirname, 'pkg.config.json')
-  const { stderr } = await exec(`npx pkg ${filePath} --config ${configPath}`)
+  const { stderr } = await execFile('npx', ['pkg', filePath, '--config', configPath], { shell: true })
 
   // there should be no error when packaging
   const expectedvalue = stderr === '' || deprecationWarningRegex.test(stderr)
@@ -42,7 +42,7 @@ test('worker test when packaged into executable using pkg', { skip: !!process.en
       executablePath = `./${executablePath}`
     }
 
-    const { stderr } = await exec(executablePath)
+    const { stderr } = await execFile(executablePath)
 
     // check if there were no errors
     const expectedvalue = stderr === '' || deprecationWarningRegex.test(stderr)
