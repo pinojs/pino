@@ -484,7 +484,7 @@ child.info('User authenticated!')
 <a id=opt-base></a>
 #### `base` (Object)
 
-Default: `{pid: process.pid, hostname: os.hostname}`
+Default: `{pid: process.pid, hostname: os.hostname()}`
 
 Key-value object added as child logger to each log line.
 
