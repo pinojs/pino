@@ -3,6 +3,7 @@
 const os = require('node:os')
 const { join } = require('node:path')
 const { once } = require('node:events')
+const { setImmediate: immediate } = require('node:timers/promises')
 const { readFile, writeFile } = require('node:fs').promises
 const { watchFileCreated, watchForWrite, file } = require('../helper')
 const { test } = require('tap')
@@ -12,10 +13,8 @@ const strip = require('strip-ansi')
 const execa = require('execa')
 const writer = require('flush-write-stream')
 const rimraf = require('rimraf')
-const { promisify } = require('node:util')
 const { tmpdir } = os
 
-const immediate = promisify(setImmediate)
 const pid = process.pid
 const hostname = os.hostname()
 
