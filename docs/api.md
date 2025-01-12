@@ -1307,7 +1307,7 @@ module.exports = function build () {
 }
 ```
 
-Note that _any `'error'`_ event emitted by the transport must be consider a fatal error and the process must be terminated.
+Note that _any `'error'`_ event emitted by the transport must be considered a fatal error and the process must be terminated.
 It's not-recoverable.
 
 For more on transports, how they work, and how to create them see the [`Transports documentation`](/docs/transports.md).
