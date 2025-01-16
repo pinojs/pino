@@ -62,7 +62,7 @@
   "devDependencies": {
     "@types/flush-write-stream": "^1.0.0",
     "@types/node": "^22.0.0",
-    "@types/tap": "^15.0.6",
+    "@types/tap": "^18.0.0",
     "@yao-pkg/pkg": "6.2.0",
     "airtap": "5.0.0",
     "benchmark": "^2.1.4",
