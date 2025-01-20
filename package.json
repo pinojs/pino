@@ -70,7 +70,7 @@
     "bunyan": "^1.8.14",
     "debug": "^4.3.4",
     "docsify-cli": "^4.4.4",
-    "eslint": "^8.17.0",
+    "eslint": "^9.18.0",
     "eslint-config-standard": "^17.0.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-n": "15.7.0",
