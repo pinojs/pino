@@ -352,6 +352,17 @@ function asObject (logger, level, args, ts, opts) {
   let lvl = (logger._childLevel | 0) + 1
   if (lvl < 1) lvl = 1
 
+  if (ts) {
+    logObject.time = ts
+  }
+
+  if (levelFormatter) {
+    const formattedLevel = levelFormatter(level, logger.levels.values[level])
+    Object.assign(logObject, formattedLevel)
+  } else {
+    logObject.level = logger.levels.values[level]
+  }
+
   if (opts.asObjectBindingsOnly) {
     if (msg !== null && typeof msg === 'object') {
       while (lvl-- && typeof argsCloned[0] === 'object') {
@@ -362,17 +373,6 @@ function asObject (logger, level, args, ts, opts) {
     const formattedLogObject = logObjectFormatter(logObject)
     return [formattedLogObject, ...argsCloned]
   } else {
-    if (ts) {
-      logObject.time = ts
-    }
-
-    if (levelFormatter) {
-      const formattedLevel = levelFormatter(level, logger.levels.values[level])
-      Object.assign(logObject, formattedLevel)
-    } else {
-      logObject.level = logger.levels.values[level]
-    }
-
     // deliberate, catching objects, arrays
     if (msg !== null && typeof msg === 'object') {
       while (lvl-- && typeof argsCloned[0] === 'object') {
