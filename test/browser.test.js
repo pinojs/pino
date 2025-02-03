@@ -165,6 +165,7 @@ test('opts.browser.asObject logs pino-like object to console', ({ end, ok, is })
   instance.info('test')
   end()
 })
+
 test('opts.browser.asObject uses opts.messageKey in logs', ({ end, ok, is }) => {
   const messageKey = 'message'
   const instance = require('../browser')({
@@ -180,6 +181,25 @@ test('opts.browser.asObject uses opts.messageKey in logs', ({ end, ok, is }) => 
   })
 
   instance.info('test')
+  end()
+})
+
+test('opts.browser.asObjectBindingsOnly passes the bindings but keep the message unformatted', ({ end, ok, is, deepEqual }) => {
+  const messageKey = 'message'
+  const instance = require('../browser')({
+    messageKey,
+    browser: {
+      asObjectBindingsOnly: true,
+      write: function (o, msg, ...args) {
+        is(o.level, 30)
+        ok(o.time)
+        is(msg, 'test %s')
+        deepEqual(args, ['foo'])
+      }
+    }
+  })
+
+  instance.info('test %s', 'foo')
   end()
 })
 

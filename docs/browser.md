@@ -27,6 +27,21 @@ pino.info('hi') // creates and logs {msg: 'hi', level: 30, time: <ts>}
 
 When `write` is set, `asObject` will always be `true`.
 
+### `asObjectBindingsOnly` (Boolean)
+
+```js
+const pino = require('pino')({browser: {asObjectBindingsOnly: true}})
+```
+
+The `asObjectBindingsOnly` is similar to `asObject` but will keep the message
+and arguments unformatted, this allows to defer formatting the message to the
+actual call to `console` methods, where browsers then have richer formatting in
+their devtools then when pino will format the message to a string first.
+
+```js
+pino.info('hello %s', 'world') // creates and logs {level: 30, time: <ts>}, 'hello %s', 'world'
+```
+
 ### `formatters` (Object)
 
 An object containing functions for formatting the shape of the log lines. When provided, it enables the logger to produce a pino-like log object with customized formatting. Currently, it supports formatting for the `level` object only.
