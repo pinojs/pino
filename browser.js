@@ -118,6 +118,13 @@ function pino (opts) {
   logger.levels = getLevels(opts)
   logger.level = level
 
+  logger.isLevelEnabled = function (level) {
+    if (!this.levels.values[level]) {
+      return false
+    }
+
+    return this.levels.values[level] >= this.levels.values[this.level]
+  }
   logger.setMaxListeners = logger.getMaxListeners =
   logger.emit = logger.addListener = logger.on =
   logger.prependListener = logger.once =
