@@ -18,6 +18,11 @@ test('Default levels suite', ({ test, end }) => {
     equal(true, log.isLevelEnabled('debug'))
   })
 
+  test('can check if current level enabled when as object', async ({ equal }) => {
+    const log = pino({ asObject: true, level: 'debug' })
+    equal(true, log.isLevelEnabled('debug'))
+  })
+
   test('can check if level enabled after level set', async ({ equal }) => {
     const log = pino()
     equal(false, log.isLevelEnabled('debug'))
