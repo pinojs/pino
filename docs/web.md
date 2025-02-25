@@ -12,6 +12,7 @@ web framework ecosystem.
   - [Pino with Node core `http`](#pino-with-node-core-http)
   - [Pino with Nest](#pino-with-nest)
   - [Pino with H3](#pino-with-h3)
+  - [Pino with Hono](#pino-with-hono)
 
 <a id="fastify"></a>
 ## Pino with Fastify
@@ -265,5 +266,51 @@ router.get(
 ```
 
 Execute `npx --yes listhen -w --open ./server.mjs`.
+
+See the [pino-http README](https://npm.im/pino-http) for more info.
+
+
+<a id="h3"></a>
+## Pino with Hono
+
+```sh
+npm install pino pino-http hono
+```
+
+```ts
+import { HttpBindings, serve } from '@hono/node-server';
+import { Hono } from 'hono';
+import { requestId } from 'hono/request-id';
+import { pino } from 'pino';
+import { pinoHttp } from 'pino-http';
+
+declare module 'hono' {
+  interface ContextVariableMap {
+    logger: pino.Logger;
+  }
+}
+
+const app = new Hono<{ Bindings: HttpBindings }>();
+app.use(requestId());
+app.use(async (c, next) => {
+  // pass hono's request-id to pino-http
+  c.env.incoming.id = c.var.requestId;
+
+  // map express style middleware to hono
+  await new Promise<void>((resolve) => pinoHttp()(c.env.incoming, c.env.outgoing, () => resolve()));
+
+  c.set('logger', c.env.incoming.log);
+
+  await next();
+});
+
+app.get('/', (c) => {
+  c.var.logger.info('something');
+
+  return c.text('Hello Node.js!');
+});
+
+serve(app);
+```
 
 See the [pino-http README](https://npm.im/pino-http) for more info.
