@@ -323,8 +323,8 @@ declare namespace pino {
         // TODO: why is this different from `obj: object` or `obj: any`?
         /* tslint:disable:no-unnecessary-generics */
         <T extends object>(obj: T, msg?: string, ...args: any[]): void;
-        (obj: unknown, msg?: string, ...args: any[]): void;
-        (msg: string, ...args: any[]): void;
+        (msg: string): void;
+        (msg: `${string}%${'s' | 'd' | 'O' | 'o' | 'j'}${string}`, ...args: any[]): void;
     }
 
     interface LoggerOptions<CustomLevels extends string = never, UseOnlyCustomLevels extends boolean = boolean> {
