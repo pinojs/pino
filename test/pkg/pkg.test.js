@@ -8,7 +8,7 @@ const { join } = require('node:path')
 const { platform } = require('node:process')
 const execFile = promisify(require('node:child_process').execFile)
 
-const skip = process.env.PNPM_CI || process.env.CITGM
+const skip = process.env.PNPM_CI || process.env.CITGM || process.arch === 'ppc64'
 
 /**
  * The following regex is for tesintg the deprecation warning that is thrown by the `punycode` module.
