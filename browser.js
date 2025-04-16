@@ -109,6 +109,7 @@ function pino (opts) {
     transmit,
     serialize,
     asObject: opts.browser.asObject,
+    asObjectBindingsOnly: opts.browser.asObjectBindingsOnly,
     formatters: opts.browser.formatters,
     levels,
     timestamp: getTimeFunction(opts),
@@ -324,7 +325,7 @@ function createWrap (self, opts, rootLogger, level) {
         argsIsSerialized = true
       }
       if (opts.asObject || opts.formatters) {
-        write.call(proto, asObject(this, level, args, ts, opts))
+        write.call(proto, ...asObject(this, level, args, ts, opts))
       } else write.apply(proto, args)
 
       if (opts.transmit) {
@@ -354,6 +355,10 @@ function asObject (logger, level, args, ts, opts) {
   const argsCloned = args.slice()
   let msg = argsCloned[0]
   const logObject = {}
+
+  let lvl = (logger._childLevel | 0) + 1
+  if (lvl < 1) lvl = 1
+
   if (ts) {
     logObject.time = ts
   }
@@ -365,19 +370,28 @@ function asObject (logger, level, args, ts, opts) {
     logObject.level = logger.levels.values[level]
   }
 
-  let lvl = (logger._childLevel | 0) + 1
-  if (lvl < 1) lvl = 1
-  // deliberate, catching objects, arrays
-  if (msg !== null && typeof msg === 'object') {
-    while (lvl-- && typeof argsCloned[0] === 'object') {
-      Object.assign(logObject, argsCloned.shift())
+  if (opts.asObjectBindingsOnly) {
+    if (msg !== null && typeof msg === 'object') {
+      while (lvl-- && typeof argsCloned[0] === 'object') {
+        Object.assign(logObject, argsCloned.shift())
+      }
     }
-    msg = argsCloned.length ? format(argsCloned.shift(), argsCloned) : undefined
-  } else if (typeof msg === 'string') msg = format(argsCloned.shift(), argsCloned)
-  if (msg !== undefined) logObject[opts.messageKey] = msg
 
-  const formattedLogObject = logObjectFormatter(logObject)
-  return formattedLogObject
+    const formattedLogObject = logObjectFormatter(logObject)
+    return [formattedLogObject, ...argsCloned]
+  } else {
+    // deliberate, catching objects, arrays
+    if (msg !== null && typeof msg === 'object') {
+      while (lvl-- && typeof argsCloned[0] === 'object') {
+        Object.assign(logObject, argsCloned.shift())
+      }
+      msg = argsCloned.length ? format(argsCloned.shift(), argsCloned) : undefined
+    } else if (typeof msg === 'string') msg = format(argsCloned.shift(), argsCloned)
+    if (msg !== undefined) logObject[opts.messageKey] = msg
+
+    const formattedLogObject = logObjectFormatter(logObject)
+    return [formattedLogObject]
+  }
 }
 
 function applySerializers (args, serialize, serializers, stdErrSerialize) {
