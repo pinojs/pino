@@ -1,0 +1,5 @@
+reporters:
+  - '@jsumners/line-reporter'
+
+files:
+  - 'test/**/*.test.js'
