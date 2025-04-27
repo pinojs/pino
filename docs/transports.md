@@ -442,6 +442,7 @@ PRs to this document are welcome for any new transports!
 + [pino-slack-webhook](#pino-slack-webhook)
 + [pino-telegram-webhook](#pino-telegram-webhook)
 + [pino-yc-transport](#pino-yc-transport)
++ [pino-roll](#pino-roll)
 
 ### Legacy
 
@@ -1181,6 +1182,30 @@ $ node app.js | pino-websocket -a my-websocket-server.example.com -p 3004
 ```
 
 For full documentation of command line switches read the [README](https://github.com/abeai/pino-websocket#readme).
+
+<a id="pino-roll"></a>
+### pino-roll
+
+`pino-roll` is a Pino transport that automatically rolls your log files based on size or time frequency.
+
+```js
+import { join } from 'path';
+import pino from 'pino';
+
+const transport = pino.transport({
+  target: 'pino-roll',
+  options: { file: join('logs', 'log'), frequency: 'daily', mkdir: true }
+});
+
+const logger = pino(transport);
+```
+
+then you can use the logger as usual:
+
+```js
+logger.info('Hello from pino-roll!');
+```
+For full documentation check the [README](https://github.com/mcollina/pino-roll?tab=readme-ov-file#pino-roll).
 
 <a id="pino-yc-transport"></a>
 ### pino-yc-transport
