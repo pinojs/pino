@@ -1,8 +1,8 @@
 'use strict'
-const test = require('tape')
+const test = require('node:test')
 const pino = require('../browser')
 
-test('child has parent level', ({ end, same, is }) => {
+test('child has parent level', (t, end) => {
   const instance = pino({
     level: 'error',
     browser: {}
@@ -10,11 +10,11 @@ test('child has parent level', ({ end, same, is }) => {
 
   const child = instance.child({})
 
-  same(child.level, instance.level)
+  t.assert.deepStrictEqual(child.level, instance.level)
   end()
 })
 
-test('child can set level at creation time', ({ end, same, is }) => {
+test('child can set level at creation time', (t, end) => {
   const instance = pino({
     level: 'error',
     browser: {}
@@ -22,11 +22,11 @@ test('child can set level at creation time', ({ end, same, is }) => {
 
   const child = instance.child({}, { level: 'info' }) // first bindings, then options
 
-  same(child.level, 'info')
+  t.assert.deepStrictEqual(child.level, 'info')
   end()
 })
 
-test('changing child level does not affect parent', ({ end, same, is }) => {
+test('changing child level does not affect parent', (t, end) => {
   const instance = pino({
     level: 'error',
     browser: {}
@@ -35,11 +35,11 @@ test('changing child level does not affect parent', ({ end, same, is }) => {
   const child = instance.child({})
   child.level = 'info'
 
-  same(instance.level, 'error')
+  t.assert.deepStrictEqual(instance.level, 'error')
   end()
 })
 
-test('child should log, if its own level allows it', ({ end, same, is }) => {
+test('child should log, if its own level allows it', (t, end) => {
   const expected = [
     {
       level: 30,
@@ -58,7 +58,7 @@ test('child should log, if its own level allows it', ({ end, same, is }) => {
     level: 'error',
     browser: {
       write (actual) {
-        checkLogObjects(is, same, actual, expected.shift())
+        checkLogObjects(t.assert.strictEqual, t.assert.deepStrictEqual, actual, expected.shift())
       }
     }
   })
@@ -71,11 +71,11 @@ test('child should log, if its own level allows it', ({ end, same, is }) => {
   child.warn('this is warn')
   child.error('this is an error')
 
-  same(expected.length, 0, 'not all messages were read')
+  t.assert.deepStrictEqual(expected.length, 0, 'not all messages were read')
   end()
 })
 
-test('changing child log level should not affect parent log behavior', ({ end, same, is }) => {
+test('changing child log level should not affect parent log behavior', (t, end) => {
   const expected = [
     {
       level: 50,
@@ -90,7 +90,7 @@ test('changing child log level should not affect parent log behavior', ({ end, s
     level: 'error',
     browser: {
       write (actual) {
-        checkLogObjects(is, same, actual, expected.shift())
+        checkLogObjects(t.assert.strictEqual, t.assert.deepStrictEqual, actual, expected.shift())
       }
     }
   })
@@ -102,17 +102,17 @@ test('changing child log level should not affect parent log behavior', ({ end, s
   instance.error('this is an error')
   instance.fatal('this is fatal')
 
-  same(expected.length, 0, 'not all messages were read')
+  t.assert.deepStrictEqual(expected.length, 0, 'not all messages were read')
   end()
 })
 
-test('onChild callback should be called when new child is created', ({ end, pass, plan }) => {
-  plan(1)
+test('onChild callback should be called when new child is created', (t, end) => {
+  t.plan(1)
   const instance = pino({
     level: 'error',
     browser: {},
     onChild: (_child) => {
-      pass('onChild callback was called')
+      t.assert.ok('onChild callback was called')
       end()
     }
   })
