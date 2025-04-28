@@ -1,13 +1,13 @@
 'use strict'
-const test = require('tape')
+const test = require('node:test')
 const pino = require('../browser')
 
-test('set browser opts disabled to true', ({ end, same }) => {
+test('set browser opts disabled to true', (t, end) => {
   const instance = pino({
     browser: {
       disabled: true,
       write (actual) {
-        checkLogObjects(same, actual, [])
+        checkLogObjects(t.assert.deepStrictEqual, actual, [])
       }
     }
   })
@@ -18,7 +18,7 @@ test('set browser opts disabled to true', ({ end, same }) => {
   end()
 })
 
-test('set browser opts disabled to false', ({ end, same }) => {
+test('set browser opts disabled to false', (t, end) => {
   const expected = [
     {
       level: 30,
@@ -37,7 +37,7 @@ test('set browser opts disabled to false', ({ end, same }) => {
     browser: {
       disabled: false,
       write (actual) {
-        checkLogObjects(same, actual, expected.shift())
+        checkLogObjects(t.assert.deepStrictEqual, actual, expected.shift())
       }
     }
   })
@@ -48,7 +48,7 @@ test('set browser opts disabled to false', ({ end, same }) => {
   end()
 })
 
-test('disabled is not set in browser opts', ({ end, same }) => {
+test('disabled is not set in browser opts', (t, end) => {
   const expected = [
     {
       level: 30,
@@ -66,7 +66,7 @@ test('disabled is not set in browser opts', ({ end, same }) => {
   const instance = pino({
     browser: {
       write (actual) {
-        checkLogObjects(same, actual, expected.shift())
+        checkLogObjects(t.assert.deepStrictEqual, actual, expected.shift())
       }
     }
   })
