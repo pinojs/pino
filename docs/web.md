@@ -277,27 +277,20 @@ See the [pino-http README](https://npm.im/pino-http) for more info.
 npm install pino pino-http hono
 ```
 
-```ts
-import { HttpBindings, serve } from '@hono/node-server';
+```js
+import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
 import { requestId } from 'hono/request-id';
-import { pino } from 'pino';
 import { pinoHttp } from 'pino-http';
 
-declare module 'hono' {
-  interface ContextVariableMap {
-    logger: pino.Logger;
-  }
-}
-
-const app = new Hono<{ Bindings: HttpBindings }>();
+const app = new Hono();
 app.use(requestId());
 app.use(async (c, next) => {
   // pass hono's request-id to pino-http
   c.env.incoming.id = c.var.requestId;
 
   // map express style middleware to hono
-  await new Promise<void>((resolve) => pinoHttp()(c.env.incoming, c.env.outgoing, () => resolve()));
+  await new Promise((resolve) => pinoHttp()(c.env.incoming, c.env.outgoing, () => resolve()));
 
   c.set('logger', c.env.incoming.log);
 
