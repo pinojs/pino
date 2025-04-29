@@ -978,6 +978,23 @@ node yourapp.js | pino-papertrail --host bar.papertrailapp.com --port 12345 --ap
 
 for full documentation of command line switches read [README](https://github.com/ovhemert/pino-papertrail#readme)
 
+<a id="pino-pg"></a>
+### pino-pg
+[pino-pg](https://www.npmjs.com/package/pino-pg) stores logs into PostgreSQL.
+Full documentation in the [README](https://github.com/Xstoudi/pino-pg).
+
+<a id="pino-redis"></a>
+### pino-redis
+
+[pino-redis][pino-redis] loads pino logs into [Redis][Redis].
+
+```sh
+$ node app.js | pino-redis -U redis://username:password@localhost:6379
+```
+
+[pino-redis]: https://github.com/buianhthang/pino-redis
+[Redis]: https://redis.io/
+
 <a id="pino-roll"></a>
 ### pino-roll
 
@@ -1001,23 +1018,6 @@ then you can use the logger as usual:
 logger.info('Hello from pino-roll!');
 ```
 For full documentation check the [README](https://github.com/mcollina/pino-roll?tab=readme-ov-file#pino-roll).
-
-<a id="pino-pg"></a>
-### pino-pg
-[pino-pg](https://www.npmjs.com/package/pino-pg) stores logs into PostgreSQL.
-Full documentation in the [README](https://github.com/Xstoudi/pino-pg).
-
-<a id="pino-redis"></a>
-### pino-redis
-
-[pino-redis][pino-redis] loads pino logs into [Redis][Redis].
-
-```sh
-$ node app.js | pino-redis -U redis://username:password@localhost:6379
-```
-
-[pino-redis]: https://github.com/buianhthang/pino-redis
-[Redis]: https://redis.io/
 
 <a id="pino-sentry"></a>
 ### pino-sentry
