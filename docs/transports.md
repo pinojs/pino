@@ -437,6 +437,7 @@ PRs to this document are welcome for any new transports!
 + [pino-loki](#pino-loki)
 + [pino-opentelemetry-transport](#pino-opentelemetry-transport)
 + [pino-pretty](#pino-pretty)
++ [pino-roll](#pino-roll)
 + [pino-seq-transport](#pino-seq-transport)
 + [pino-sentry-transport](#pino-sentry-transport)
 + [pino-slack-webhook](#pino-slack-webhook)
@@ -976,6 +977,30 @@ node yourapp.js | pino-papertrail --host bar.papertrailapp.com --port 12345 --ap
 
 
 for full documentation of command line switches read [README](https://github.com/ovhemert/pino-papertrail#readme)
+
+<a id="pino-roll"></a>
+### pino-roll
+
+`pino-roll` is a Pino transport that automatically rolls your log files based on size or time frequency.
+
+```js
+import { join } from 'path';
+import pino from 'pino';
+
+const transport = pino.transport({
+  target: 'pino-roll',
+  options: { file: join('logs', 'log'), frequency: 'daily', mkdir: true }
+});
+
+const logger = pino(transport);
+```
+
+then you can use the logger as usual:
+
+```js
+logger.info('Hello from pino-roll!');
+```
+For full documentation check the [README](https://github.com/mcollina/pino-roll?tab=readme-ov-file#pino-roll).
 
 <a id="pino-pg"></a>
 ### pino-pg
