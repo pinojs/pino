@@ -1,22 +1,22 @@
 'use strict'
-const test = require('tape')
+const test = require('node:test')
 const pino = require('../browser')
 
 function noop () {}
 
-test('throws if transmit object does not have send function', ({ end, throws }) => {
-  throws(() => {
+test('throws if transmit object does not have send function', (t, end) => {
+  t.assert.throws(() => {
     pino({ browser: { transmit: {} } })
   })
 
-  throws(() => {
+  t.assert.throws(() => {
     pino({ browser: { transmit: { send: 'not a func' } } })
   })
 
   end()
 })
 
-test('calls send function after write', ({ end, is }) => {
+test('calls send function after write', (t, end) => {
   let c = 0
   const logger = pino({
     browser: {
@@ -24,7 +24,7 @@ test('calls send function after write', ({ end, is }) => {
         c++
       },
       transmit: {
-        send () { is(c, 1) }
+        send () { t.assert.strictEqual(c, 1) }
       }
     }
   })
@@ -33,13 +33,13 @@ test('calls send function after write', ({ end, is }) => {
   end()
 })
 
-test('passes send function the logged level', ({ end, is }) => {
+test('passes send function the logged level', (t, end) => {
   const logger = pino({
     browser: {
       write () {},
       transmit: {
         send (level) {
-          is(level, 'fatal')
+          t.assert.strictEqual(level, 'fatal')
         }
       }
     }
@@ -49,14 +49,14 @@ test('passes send function the logged level', ({ end, is }) => {
   end()
 })
 
-test('passes send function message strings in logEvent object when asObject is not set', ({ end, same, is }) => {
+test('passes send function message strings in logEvent object when asObject is not set', (t, end) => {
   const logger = pino({
     browser: {
       write: noop,
       transmit: {
         send (level, { messages }) {
-          is(messages[0], 'test')
-          is(messages[1], 'another test')
+          t.assert.strictEqual(messages[0], 'test')
+          t.assert.strictEqual(messages[1], 'another test')
         }
       }
     }
@@ -67,14 +67,14 @@ test('passes send function message strings in logEvent object when asObject is n
   end()
 })
 
-test('passes send function message objects in logEvent object when asObject is not set', ({ end, same, is }) => {
+test('passes send function message objects in logEvent object when asObject is not set', (t, end) => {
   const logger = pino({
     browser: {
       write: noop,
       transmit: {
         send (level, { messages }) {
-          same(messages[0], { test: 'test' })
-          is(messages[1], 'another test')
+          t.assert.deepStrictEqual(messages[0], { test: 'test' })
+          t.assert.strictEqual(messages[1], 'another test')
         }
       }
     }
@@ -85,15 +85,15 @@ test('passes send function message objects in logEvent object when asObject is n
   end()
 })
 
-test('passes send function message strings in logEvent object when asObject is set', ({ end, same, is }) => {
+test('passes send function message strings in logEvent object when asObject is set', (t, end) => {
   const logger = pino({
     browser: {
       asObject: true,
       write: noop,
       transmit: {
         send (level, { messages }) {
-          is(messages[0], 'test')
-          is(messages[1], 'another test')
+          t.assert.strictEqual(messages[0], 'test')
+          t.assert.strictEqual(messages[1], 'another test')
         }
       }
     }
@@ -104,15 +104,15 @@ test('passes send function message strings in logEvent object when asObject is s
   end()
 })
 
-test('passes send function message objects in logEvent object when asObject is set', ({ end, same, is }) => {
+test('passes send function message objects in logEvent object when asObject is set', (t, end) => {
   const logger = pino({
     browser: {
       asObject: true,
       write: noop,
       transmit: {
         send (level, { messages }) {
-          same(messages[0], { test: 'test' })
-          is(messages[1], 'another test')
+          t.assert.deepStrictEqual(messages[0], { test: 'test' })
+          t.assert.strictEqual(messages[1], 'another test')
         }
       }
     }
@@ -123,7 +123,7 @@ test('passes send function message objects in logEvent object when asObject is s
   end()
 })
 
-test('supplies a timestamp (ts) in logEvent object which is exactly the same as the `time` property in asObject mode', ({ end, is }) => {
+test('supplies a timestamp (ts) in logEvent object which is exactly the same as the `time` property in asObject mode', (t, end) => {
   let expected
   const logger = pino({
     browser: {
@@ -133,7 +133,7 @@ test('supplies a timestamp (ts) in logEvent object which is exactly the same as 
       },
       transmit: {
         send (level, logEvent) {
-          is(logEvent.ts, expected)
+          t.assert.strictEqual(logEvent.ts, expected)
         }
       }
     }
@@ -143,7 +143,7 @@ test('supplies a timestamp (ts) in logEvent object which is exactly the same as 
   end()
 })
 
-test('passes send function child bindings via logEvent object', ({ end, same, is }) => {
+test('passes send function child bindings via logEvent object', (t, end) => {
   const logger = pino({
     browser: {
       write: noop,
@@ -151,10 +151,10 @@ test('passes send function child bindings via logEvent object', ({ end, same, is
         send (level, logEvent) {
           const messages = logEvent.messages
           const bindings = logEvent.bindings
-          same(bindings[0], { first: 'binding' })
-          same(bindings[1], { second: 'binding2' })
-          same(messages[0], { test: 'test' })
-          is(messages[1], 'another test')
+          t.assert.deepStrictEqual(bindings[0], { first: 'binding' })
+          t.assert.deepStrictEqual(bindings[1], { second: 'binding2' })
+          t.assert.deepStrictEqual(messages[0], { test: 'test' })
+          t.assert.strictEqual(messages[1], 'another test')
         }
       }
     }
@@ -167,7 +167,7 @@ test('passes send function child bindings via logEvent object', ({ end, same, is
   end()
 })
 
-test('passes send function level:{label, value} via logEvent object', ({ end, is }) => {
+test('passes send function level:{label, value} via logEvent object', (t, end) => {
   const logger = pino({
     browser: {
       write: noop,
@@ -176,8 +176,8 @@ test('passes send function level:{label, value} via logEvent object', ({ end, is
           const label = logEvent.level.label
           const value = logEvent.level.value
 
-          is(label, 'fatal')
-          is(value, 60)
+          t.assert.strictEqual(label, 'fatal')
+          t.assert.strictEqual(value, 60)
         }
       }
     }
@@ -187,7 +187,7 @@ test('passes send function level:{label, value} via logEvent object', ({ end, is
   end()
 })
 
-test('calls send function according to transmit.level', ({ end, is }) => {
+test('calls send function according to transmit.level', (t, end) => {
   let c = 0
   const logger = pino({
     browser: {
@@ -196,8 +196,8 @@ test('calls send function according to transmit.level', ({ end, is }) => {
         level: 'error',
         send (level) {
           c++
-          if (c === 1) is(level, 'error')
-          if (c === 2) is(level, 'fatal')
+          if (c === 1) t.assert.strictEqual(level, 'error')
+          if (c === 2) t.assert.strictEqual(level, 'fatal')
         }
       }
     }
@@ -208,7 +208,7 @@ test('calls send function according to transmit.level', ({ end, is }) => {
   end()
 })
 
-test('transmit.level defaults to logger level', ({ end, is }) => {
+test('transmit.level defaults to logger level', (t, end) => {
   let c = 0
   const logger = pino({
     level: 'error',
@@ -217,8 +217,8 @@ test('transmit.level defaults to logger level', ({ end, is }) => {
       transmit: {
         send (level) {
           c++
-          if (c === 1) is(level, 'error')
-          if (c === 2) is(level, 'fatal')
+          if (c === 1) t.assert.strictEqual(level, 'error')
+          if (c === 2) t.assert.strictEqual(level, 'fatal')
         }
       }
     }
@@ -229,7 +229,7 @@ test('transmit.level defaults to logger level', ({ end, is }) => {
   end()
 })
 
-test('transmit.level is effective even if lower than logger level', ({ end, is }) => {
+test('transmit.level is effective even if lower than logger level', (t, end) => {
   let c = 0
   const logger = pino({
     level: 'error',
@@ -239,9 +239,9 @@ test('transmit.level is effective even if lower than logger level', ({ end, is }
         level: 'info',
         send (level) {
           c++
-          if (c === 1) is(level, 'warn')
-          if (c === 2) is(level, 'error')
-          if (c === 3) is(level, 'fatal')
+          if (c === 1) t.assert.strictEqual(level, 'warn')
+          if (c === 2) t.assert.strictEqual(level, 'error')
+          if (c === 3) t.assert.strictEqual(level, 'fatal')
         }
       }
     }
@@ -252,7 +252,7 @@ test('transmit.level is effective even if lower than logger level', ({ end, is }
   end()
 })
 
-test('applies all serializers to messages and bindings (serialize:false - default)', ({ end, same, is }) => {
+test('applies all serializers to messages and bindings (serialize:false - default)', (t, end) => {
   const logger = pino({
     serializers: {
       first: () => 'first',
@@ -265,10 +265,10 @@ test('applies all serializers to messages and bindings (serialize:false - defaul
         send (level, logEvent) {
           const messages = logEvent.messages
           const bindings = logEvent.bindings
-          same(bindings[0], { first: 'first' })
-          same(bindings[1], { second: 'second' })
-          same(messages[0], { test: 'serialize it' })
-          is(messages[1].type, 'Error')
+          t.assert.deepStrictEqual(bindings[0], { first: 'first' })
+          t.assert.deepStrictEqual(bindings[1], { second: 'second' })
+          t.assert.deepStrictEqual(messages[0], { test: 'serialize it' })
+          t.assert.strictEqual(messages[1].type, 'Error')
         }
       }
     }
@@ -281,7 +281,7 @@ test('applies all serializers to messages and bindings (serialize:false - defaul
   end()
 })
 
-test('applies all serializers to messages and bindings (serialize:true)', ({ end, same, is }) => {
+test('applies all serializers to messages and bindings (serialize:true)', (t, end) => {
   const logger = pino({
     serializers: {
       first: () => 'first',
@@ -295,10 +295,10 @@ test('applies all serializers to messages and bindings (serialize:true)', ({ end
         send (level, logEvent) {
           const messages = logEvent.messages
           const bindings = logEvent.bindings
-          same(bindings[0], { first: 'first' })
-          same(bindings[1], { second: 'second' })
-          same(messages[0], { test: 'serialize it' })
-          is(messages[1].type, 'Error')
+          t.assert.deepStrictEqual(bindings[0], { first: 'first' })
+          t.assert.deepStrictEqual(bindings[1], { second: 'second' })
+          t.assert.deepStrictEqual(messages[0], { test: 'serialize it' })
+          t.assert.strictEqual(messages[1].type, 'Error')
         }
       }
     }
@@ -311,7 +311,7 @@ test('applies all serializers to messages and bindings (serialize:true)', ({ end
   end()
 })
 
-test('extracts correct bindings and raw messages over multiple transmits', ({ end, same, is }) => {
+test('extracts correct bindings and raw messages over multiple transmits', (t, end) => {
   let messages = null
   let bindings = null
 
@@ -332,23 +332,23 @@ test('extracts correct bindings and raw messages over multiple transmits', ({ en
 
   logger.fatal({ test: 'parent:test1' })
   logger.fatal({ test: 'parent:test2' })
-  same([], bindings)
-  same([{ test: 'parent:test2' }], messages)
+  t.assert.deepStrictEqual([], bindings)
+  t.assert.deepStrictEqual([{ test: 'parent:test2' }], messages)
 
   child.fatal({ test: 'child:test1' })
   child.fatal({ test: 'child:test2' })
-  same([{ child: true }], bindings)
-  same([{ test: 'child:test2' }], messages)
+  t.assert.deepStrictEqual([{ child: true }], bindings)
+  t.assert.deepStrictEqual([{ test: 'child:test2' }], messages)
 
   grandchild.fatal({ test: 'grandchild:test1' })
   grandchild.fatal({ test: 'grandchild:test2' })
-  same([{ child: true }, { grandchild: true }], bindings)
-  same([{ test: 'grandchild:test2' }], messages)
+  t.assert.deepStrictEqual([{ child: true }, { grandchild: true }], bindings)
+  t.assert.deepStrictEqual([{ test: 'grandchild:test2' }], messages)
 
   end()
 })
 
-test('does not log below configured level', ({ end, is }) => {
+test('does not log below configured level', (t, end) => {
   let message = null
   const logger = pino({
     level: 'info',
@@ -363,21 +363,21 @@ test('does not log below configured level', ({ end, is }) => {
   })
 
   logger.debug('this message is silent')
-  is(message, null)
+  t.assert.strictEqual(message, null)
 
   end()
 })
 
-test('silent level prevents logging even with transmit', ({ end, fail }) => {
+test('silent level prevents logging even with transmit', (t, end) => {
   const logger = pino({
     level: 'silent',
     browser: {
       write () {
-        fail('no data should be logged by the write method')
+        t.assert.fail('no data should be logged by the write method')
       },
       transmit: {
         send () {
-          fail('no data should be logged by the send method')
+          t.assert.fail('no data should be logged by the send method')
         }
       }
     }
@@ -390,7 +390,7 @@ test('silent level prevents logging even with transmit', ({ end, fail }) => {
   end()
 })
 
-test('does not call send when transmit.level is set to silent', ({ end, fail, is }) => {
+test('does not call send when transmit.level is set to silent', (t, end) => {
   let c = 0
   const logger = pino({
     level: 'trace',
@@ -401,7 +401,7 @@ test('does not call send when transmit.level is set to silent', ({ end, fail, is
       transmit: {
         level: 'silent',
         send () {
-          fail('no data should be logged by the transmit method')
+          t.assert.fail('no data should be logged by the transmit method')
         }
       }
     }
@@ -412,6 +412,6 @@ test('does not call send when transmit.level is set to silent', ({ end, fail, is
     logger[level]('message')
   })
 
-  is(c, levels.length, 'write must be called exactly once per level')
+  t.assert.strictEqual(c, levels.length, 'write must be called exactly once per level')
   end()
 })
