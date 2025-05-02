@@ -1,16 +1,16 @@
 'use strict'
-const test = require('tape')
+const test = require('node:test')
 const pino = require('../browser')
 
 Date.now = () => 1599400603614
 
-test('null timestamp', ({ end, is }) => {
+test('null timestamp', (t, end) => {
   const instance = pino({
     timestamp: pino.stdTimeFunctions.nullTime,
     browser: {
       asObject: true,
       write: function (o) {
-        is(o.time, undefined)
+        t.assert.strictEqual(o.time, undefined)
       }
     }
   })
@@ -18,13 +18,13 @@ test('null timestamp', ({ end, is }) => {
   end()
 })
 
-test('iso timestamp', ({ end, is }) => {
+test('iso timestamp', (t, end) => {
   const instance = pino({
     timestamp: pino.stdTimeFunctions.isoTime,
     browser: {
       asObject: true,
       write: function (o) {
-        is(o.time, '2020-09-06T13:56:43.614Z')
+        t.assert.strictEqual(o.time, '2020-09-06T13:56:43.614Z')
       }
     }
   })
@@ -32,13 +32,13 @@ test('iso timestamp', ({ end, is }) => {
   end()
 })
 
-test('epoch timestamp', ({ end, is }) => {
+test('epoch timestamp', (t, end) => {
   const instance = pino({
     timestamp: pino.stdTimeFunctions.epochTime,
     browser: {
       asObject: true,
       write: function (o) {
-        is(o.time, 1599400603614)
+        t.assert.strictEqual(o.time, 1599400603614)
       }
     }
   })
@@ -46,13 +46,13 @@ test('epoch timestamp', ({ end, is }) => {
   end()
 })
 
-test('unix timestamp', ({ end, is }) => {
+test('unix timestamp', (t, end) => {
   const instance = pino({
     timestamp: pino.stdTimeFunctions.unixTime,
     browser: {
       asObject: true,
       write: function (o) {
-        is(o.time, Math.round(1599400603614 / 1000.0))
+        t.assert.strictEqual(o.time, Math.round(1599400603614 / 1000.0))
       }
     }
   })
@@ -60,12 +60,12 @@ test('unix timestamp', ({ end, is }) => {
   end()
 })
 
-test('epoch timestamp by default', ({ end, is }) => {
+test('epoch timestamp by default', (t, end) => {
   const instance = pino({
     browser: {
       asObject: true,
       write: function (o) {
-        is(o.time, 1599400603614)
+        t.assert.strictEqual(o.time, 1599400603614)
       }
     }
   })
@@ -73,13 +73,13 @@ test('epoch timestamp by default', ({ end, is }) => {
   end()
 })
 
-test('not print timestamp if the option is false', ({ end, is }) => {
+test('not print timestamp if the option is false', (t, end) => {
   const instance = pino({
     timestamp: false,
     browser: {
       asObject: true,
       write: function (o) {
-        is(o.time, undefined)
+        t.assert.strictEqual(o.time, undefined)
       }
     }
   })
