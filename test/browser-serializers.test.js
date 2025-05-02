@@ -2,7 +2,7 @@
 // eslint-disable-next-line
 if (typeof $1 !== 'undefined') $1 = arguments.callee.caller.arguments[0]
 
-const test = require('tape')
+const test = require('node:test')
 const fresh = require('import-fresh')
 const pino = require('../browser')
 
@@ -14,13 +14,13 @@ const childSerializers = {
   test: () => 'child'
 }
 
-test('serializers override values', ({ end, is }) => {
+test('serializers override values', (t, end) => {
   const parent = pino({
     serializers: parentSerializers,
     browser: {
       serialize: true,
       write (o) {
-        is(o.test, 'parent')
+        t.assert.strictEqual(o.test, 'parent')
         end()
       }
     }
@@ -29,12 +29,12 @@ test('serializers override values', ({ end, is }) => {
   parent.fatal({ test: 'test' })
 })
 
-test('without the serialize option, serializers do not override values', ({ end, is }) => {
+test('without the serialize option, serializers do not override values', (t, end) => {
   const parent = pino({
     serializers: parentSerializers,
     browser: {
       write (o) {
-        is(o.test, 'test')
+        t.assert.strictEqual(o.test, 'test')
         end()
       }
     }
@@ -44,7 +44,7 @@ test('without the serialize option, serializers do not override values', ({ end,
 })
 
 if (process.title !== 'browser') {
-  test('if serialize option is true, standard error serializer is auto enabled', ({ end, same }) => {
+  test('if serialize option is true, standard error serializer is auto enabled', (t, end) => {
     const err = Error('test')
     err.code = 'test'
     err.type = 'Error' // get that cov
@@ -52,7 +52,7 @@ if (process.title !== 'browser') {
 
     const consoleError = console.error
     console.error = function (err) {
-      same(err, expect)
+      t.assert.deepStrictEqual(err, expect)
     }
 
     const logger = fresh('../browser')({
@@ -65,14 +65,14 @@ if (process.title !== 'browser') {
     end()
   })
 
-  test('if serialize option is array, standard error serializer is auto enabled', ({ end, same }) => {
+  test('if serialize option is array, standard error serializer is auto enabled', (t, end) => {
     const err = Error('test')
     err.code = 'test'
     const expect = pino.stdSerializers.err(err)
 
     const consoleError = console.error
     console.error = function (err) {
-      same(err, expect)
+      t.assert.deepStrictEqual(err, expect)
     }
 
     const logger = fresh('../browser', require)({
@@ -85,14 +85,14 @@ if (process.title !== 'browser') {
     end()
   })
 
-  test('if serialize option is array containing !stdSerializers.err, standard error serializer is disabled', ({ end, is }) => {
+  test('if serialize option is array containing !stdSerializers.err, standard error serializer is disabled', (t, end) => {
     const err = Error('test')
     err.code = 'test'
     const expect = err
 
     const consoleError = console.error
     console.error = function (err) {
-      is(err, expect)
+      t.assert.strictEqual(err, expect)
     }
 
     const logger = fresh('../browser', require)({
@@ -105,12 +105,12 @@ if (process.title !== 'browser') {
     end()
   })
 
-  test('in browser, serializers apply to all objects', ({ end, is }) => {
+  test('in browser, serializers apply to all objects', (t, end) => {
     const consoleError = console.error
     console.error = function (test, test2, test3, test4, test5) {
-      is(test.key, 'serialized')
-      is(test2.key2, 'serialized2')
-      is(test5.key3, 'serialized3')
+      t.assert.strictEqual(test.key, 'serialized')
+      t.assert.strictEqual(test2.key2, 'serialized2')
+      t.assert.strictEqual(test5.key3, 'serialized3')
     }
 
     const logger = fresh('../browser', require)({
@@ -128,12 +128,12 @@ if (process.title !== 'browser') {
     end()
   })
 
-  test('serialize can be an array of selected serializers', ({ end, is }) => {
+  test('serialize can be an array of selected serializers', (t, end) => {
     const consoleError = console.error
     console.error = function (test, test2, test3, test4, test5) {
-      is(test.key, 'test')
-      is(test2.key2, 'serialized2')
-      is(test5.key3, 'test')
+      t.assert.strictEqual(test.key, 'test')
+      t.assert.strictEqual(test2.key2, 'serialized2')
+      t.assert.strictEqual(test5.key3, 'test')
     }
 
     const logger = fresh('../browser', require)({
@@ -151,12 +151,12 @@ if (process.title !== 'browser') {
     end()
   })
 
-  test('serialize filter applies to child loggers', ({ end, is }) => {
+  test('serialize filter applies to child loggers', (t, end) => {
     const consoleError = console.error
     console.error = function (binding, test, test2, test3, test4, test5) {
-      is(test.key, 'test')
-      is(test2.key2, 'serialized2')
-      is(test5.key3, 'test')
+      t.assert.strictEqual(test.key, 'test')
+      t.assert.strictEqual(test2.key2, 'serialized2')
+      t.assert.strictEqual(test5.key3, 'test')
     }
 
     const logger = fresh('../browser', require)({
@@ -177,12 +177,12 @@ if (process.title !== 'browser') {
     end()
   })
 
-  test('serialize filter applies to child loggers through bindings', ({ end, is }) => {
+  test('serialize filter applies to child loggers through bindings', (t, end) => {
     const consoleError = console.error
     console.error = function (binding, test, test2, test3, test4, test5) {
-      is(test.key, 'test')
-      is(test2.key2, 'serialized2')
-      is(test5.key3, 'test')
+      t.assert.strictEqual(test.key, 'test')
+      t.assert.strictEqual(test2.key2, 'serialized2')
+      t.assert.strictEqual(test5.key3, 'test')
     }
 
     const logger = fresh('../browser', require)({
@@ -202,10 +202,10 @@ if (process.title !== 'browser') {
     end()
   })
 
-  test('parent serializers apply to child bindings', ({ end, is }) => {
+  test('parent serializers apply to child bindings', (t, end) => {
     const consoleError = console.error
     console.error = function (binding) {
-      is(binding.key, 'serialized')
+      t.assert.strictEqual(binding.key, 'serialized')
     }
 
     const logger = fresh('../browser', require)({
@@ -221,10 +221,10 @@ if (process.title !== 'browser') {
     end()
   })
 
-  test('child serializers apply to child bindings', ({ end, is }) => {
+  test('child serializers apply to child bindings', (t, end) => {
     const consoleError = console.error
     console.error = function (binding) {
-      is(binding.key, 'serialized')
+      t.assert.strictEqual(binding.key, 'serialized')
     }
 
     const logger = fresh('../browser', require)({
@@ -244,7 +244,7 @@ if (process.title !== 'browser') {
   })
 }
 
-test('child does not overwrite parent serializers', ({ end, is }) => {
+test('child does not overwrite parent serializers', (t, end) => {
   let c = 0
   const parent = pino({
     serializers: parentSerializers,
@@ -252,9 +252,9 @@ test('child does not overwrite parent serializers', ({ end, is }) => {
       serialize: true,
       write (o) {
         c++
-        if (c === 1) is(o.test, 'parent')
+        if (c === 1) t.assert.strictEqual(o.test, 'parent')
         if (c === 2) {
-          is(o.test, 'child')
+          t.assert.strictEqual(o.test, 'child')
           end()
         }
       }
@@ -266,13 +266,13 @@ test('child does not overwrite parent serializers', ({ end, is }) => {
   child.fatal({ test: 'test' })
 })
 
-test('children inherit parent serializers', ({ end, is }) => {
+test('children inherit parent serializers', (t, end) => {
   const parent = pino({
     serializers: parentSerializers,
     browser: {
       serialize: true,
       write (o) {
-        is(o.test, 'parent')
+        t.assert.strictEqual(o.test, 'parent')
       }
     }
   })
@@ -282,12 +282,12 @@ test('children inherit parent serializers', ({ end, is }) => {
   end()
 })
 
-test('children serializers get called', ({ end, is }) => {
+test('children serializers get called', (t, end) => {
   const parent = pino({
     browser: {
       serialize: true,
       write (o) {
-        is(o.test, 'child')
+        t.assert.strictEqual(o.test, 'child')
       }
     }
   })
@@ -298,13 +298,13 @@ test('children serializers get called', ({ end, is }) => {
   end()
 })
 
-test('children serializers get called when inherited from parent', ({ end, is }) => {
+test('children serializers get called when inherited from parent', (t, end) => {
   const parent = pino({
     serializers: parentSerializers,
     browser: {
       serialize: true,
       write: (o) => {
-        is(o.test, 'pass')
+        t.assert.strictEqual(o.test, 'pass')
       }
     }
   })
@@ -315,7 +315,7 @@ test('children serializers get called when inherited from parent', ({ end, is })
   end()
 })
 
-test('non overridden serializers are available in the children', ({ end, is }) => {
+test('non overridden serializers are available in the children', (t, end) => {
   const pSerializers = {
     onlyParent: () => 'parent',
     shared: () => 'parent'
@@ -334,10 +334,10 @@ test('non overridden serializers are available in the children', ({ end, is }) =
       serialize: true,
       write (o) {
         c++
-        if (c === 1) is(o.shared, 'child')
-        if (c === 2) is(o.onlyParent, 'parent')
-        if (c === 3) is(o.onlyChild, 'child')
-        if (c === 4) is(o.onlyChild, 'test')
+        if (c === 1) t.assert.strictEqual(o.shared, 'child')
+        if (c === 2) t.assert.strictEqual(o.onlyParent, 'parent')
+        if (c === 3) t.assert.strictEqual(o.onlyChild, 'child')
+        if (c === 4) t.assert.strictEqual(o.onlyChild, 'test')
       }
     }
   })
