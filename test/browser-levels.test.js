@@ -1,8 +1,8 @@
 'use strict'
-const test = require('tape')
+const test = require('node:test')
 const pino = require('../browser')
 
-test('set the level by string', ({ end, same, is }) => {
+test('set the level by string', (t, end) => {
   const expected = [
     {
       level: 50,
@@ -16,7 +16,7 @@ test('set the level by string', ({ end, same, is }) => {
   const instance = pino({
     browser: {
       write (actual) {
-        checkLogObjects(is, same, actual, expected.shift())
+        checkLogObjects(t.assert.strictEqual, t.assert.deepStrictEqual, actual, expected.shift())
       }
     }
   })
@@ -29,7 +29,7 @@ test('set the level by string', ({ end, same, is }) => {
   end()
 })
 
-test('set the level by string. init with silent', ({ end, same, is }) => {
+test('set the level by string. init with silent', (t, end) => {
   const expected = [
     {
       level: 50,
@@ -44,7 +44,7 @@ test('set the level by string. init with silent', ({ end, same, is }) => {
     level: 'silent',
     browser: {
       write (actual) {
-        checkLogObjects(is, same, actual, expected.shift())
+        checkLogObjects(t.assert.strictEqual, t.assert.deepStrictEqual, actual, expected.shift())
       }
     }
   })
@@ -57,7 +57,7 @@ test('set the level by string. init with silent', ({ end, same, is }) => {
   end()
 })
 
-test('set the level by string. init with silent and transmit', ({ end, same, is }) => {
+test('set the level by string. init with silent and transmit', (t, end) => {
   const expected = [
     {
       level: 50,
@@ -72,7 +72,7 @@ test('set the level by string. init with silent and transmit', ({ end, same, is 
     level: 'silent',
     browser: {
       write (actual) {
-        checkLogObjects(is, same, actual, expected.shift())
+        checkLogObjects(t.assert.strictEqual, t.assert.deepStrictEqual, actual, expected.shift())
       }
     },
     transmit: {
@@ -88,7 +88,7 @@ test('set the level by string. init with silent and transmit', ({ end, same, is 
   end()
 })
 
-test('set the level via constructor', ({ end, same, is }) => {
+test('set the level via constructor', (t, end) => {
   const expected = [
     {
       level: 50,
@@ -103,7 +103,7 @@ test('set the level via constructor', ({ end, same, is }) => {
     level: 'error',
     browser: {
       write (actual) {
-        checkLogObjects(is, same, actual, expected.shift())
+        checkLogObjects(t.assert.strictEqual, t.assert.deepStrictEqual, actual, expected.shift())
       }
     }
   })
@@ -115,7 +115,7 @@ test('set the level via constructor', ({ end, same, is }) => {
   end()
 })
 
-test('set custom level and use it', ({ end, same, is }) => {
+test('set custom level and use it', (t, end) => {
   const expected = [
     {
       level: 31,
@@ -128,7 +128,7 @@ test('set custom level and use it', ({ end, same, is }) => {
     },
     browser: {
       write (actual) {
-        checkLogObjects(is, same, actual, expected.shift())
+        checkLogObjects(t.assert.strictEqual, t.assert.deepStrictEqual, actual, expected.shift())
       }
     }
   })
@@ -138,44 +138,44 @@ test('set custom level and use it', ({ end, same, is }) => {
   end()
 })
 
-test('the wrong level throws', ({ end, throws }) => {
+test('the wrong level throws', (t, end) => {
   const instance = pino()
-  throws(() => {
+  t.assert.throws(() => {
     instance.level = 'kaboom'
   })
   end()
 })
 
-test('the wrong level by number throws', ({ end, throws }) => {
+test('the wrong level by number throws', (t, end) => {
   const instance = pino()
-  throws(() => {
+  t.assert.throws(() => {
     instance.levelVal = 55
   })
   end()
 })
 
-test('exposes level string mappings', ({ end, is }) => {
-  is(pino.levels.values.error, 50)
+test('exposes level string mappings', (t, end) => {
+  t.assert.strictEqual(pino.levels.values.error, 50)
   end()
 })
 
-test('exposes level number mappings', ({ end, is }) => {
-  is(pino.levels.labels[50], 'error')
+test('exposes level number mappings', (t, end) => {
+  t.assert.strictEqual(pino.levels.labels[50], 'error')
   end()
 })
 
-test('returns level integer', ({ end, is }) => {
+test('returns level integer', (t, end) => {
   const instance = pino({ level: 'error' })
-  is(instance.levelVal, 50)
+  t.assert.strictEqual(instance.levelVal, 50)
   end()
 })
 
-test('silent level via constructor', ({ end, fail }) => {
+test('silent level via constructor', (t, end) => {
   const instance = pino({
     level: 'silent',
     browser: {
       write () {
-        fail('no data should be logged')
+        t.assert.fail('no data should be logged')
       }
     }
   })
@@ -187,11 +187,11 @@ test('silent level via constructor', ({ end, fail }) => {
   end()
 })
 
-test('silent level by string', ({ end, fail }) => {
+test('silent level by string', (t, end) => {
   const instance = pino({
     browser: {
       write () {
-        fail('no data should be logged')
+        t.assert.fail('no data should be logged')
       }
     }
   })
@@ -205,8 +205,8 @@ test('silent level by string', ({ end, fail }) => {
   end()
 })
 
-test('exposed levels', ({ end, same }) => {
-  same(Object.keys(pino.levels.values), [
+test('exposed levels', (t, end) => {
+  t.assert.deepStrictEqual(Object.keys(pino.levels.values), [
     'fatal',
     'error',
     'warn',
@@ -217,8 +217,8 @@ test('exposed levels', ({ end, same }) => {
   end()
 })
 
-test('exposed labels', ({ end, same }) => {
-  same(Object.keys(pino.levels.labels), [
+test('exposed labels', (t, end) => {
+  t.assert.deepStrictEqual(Object.keys(pino.levels.labels), [
     '10',
     '20',
     '30',
