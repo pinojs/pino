@@ -3,7 +3,7 @@
 /* eslint no-prototype-builtins: 0 */
 
 const os = require('node:os')
-const { test } = require('tap')
+const { test } = require('node:test')
 const { sink, once } = require('./helper')
 const pino = require('../')
 
@@ -12,16 +12,16 @@ const hostname = os.hostname()
 const level = 50
 const name = 'error'
 
-test('err is serialized with additional properties set on the Error object', async ({ ok, same }) => {
+test('err is serialized with additional properties set on the Error object', async (t) => {
   const stream = sink()
   const err = Object.assign(new Error('myerror'), { foo: 'bar' })
   const instance = pino(stream)
   instance.level = name
   instance[name](err)
   const result = await once(stream, 'data')
-  ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
+  t.assert.ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
   delete result.time
-  same(result, {
+  t.assert.deepStrictEqual(result, {
     pid,
     hostname,
     level,
@@ -35,7 +35,7 @@ test('err is serialized with additional properties set on the Error object', asy
   })
 })
 
-test('type should be detected based on constructor', async ({ ok, same }) => {
+test('type should be detected based on constructor', async (t) => {
   class Bar extends Error {}
   const stream = sink()
   const err = new Bar('myerror')
@@ -43,9 +43,9 @@ test('type should be detected based on constructor', async ({ ok, same }) => {
   instance.level = name
   instance[name](err)
   const result = await once(stream, 'data')
-  ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
+  t.assert.ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
   delete result.time
-  same(result, {
+  t.assert.deepStrictEqual(result, {
     pid,
     hostname,
     level,
@@ -58,7 +58,7 @@ test('type should be detected based on constructor', async ({ ok, same }) => {
   })
 })
 
-test('type, message and stack should be first level properties', async ({ ok, same }) => {
+test('type, message and stack should be first level properties', async (t) => {
   const stream = sink()
   const err = Object.assign(new Error('foo'), { foo: 'bar' })
   const instance = pino(stream)
@@ -66,9 +66,9 @@ test('type, message and stack should be first level properties', async ({ ok, sa
   instance[name](err)
 
   const result = await once(stream, 'data')
-  ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
+  t.assert.ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
   delete result.time
-  same(result, {
+  t.assert.deepStrictEqual(result, {
     pid,
     hostname,
     level,
@@ -82,7 +82,7 @@ test('type, message and stack should be first level properties', async ({ ok, sa
   })
 })
 
-test('err serializer', async ({ ok, same }) => {
+test('err serializer', async (t) => {
   const stream = sink()
   const err = Object.assign(new Error('myerror'), { foo: 'bar' })
   const instance = pino({
@@ -94,9 +94,9 @@ test('err serializer', async ({ ok, same }) => {
   instance.level = name
   instance[name]({ err })
   const result = await once(stream, 'data')
-  ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
+  t.assert.ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
   delete result.time
-  same(result, {
+  t.assert.deepStrictEqual(result, {
     pid,
     hostname,
     level,
@@ -110,7 +110,7 @@ test('err serializer', async ({ ok, same }) => {
   })
 })
 
-test('an error with statusCode property is not confused for a http response', async ({ ok, same }) => {
+test('an error with statusCode property is not confused for a http response', async (t) => {
   const stream = sink()
   const err = Object.assign(new Error('StatusCodeErr'), { statusCode: 500 })
   const instance = pino(stream)
@@ -119,9 +119,9 @@ test('an error with statusCode property is not confused for a http response', as
   instance[name](err)
   const result = await once(stream, 'data')
 
-  ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
+  t.assert.ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
   delete result.time
-  same(result, {
+  t.assert.deepStrictEqual(result, {
     pid,
     hostname,
     level,
@@ -140,9 +140,9 @@ test('stack is omitted if it is not set on err', t => {
   const err = new Error('myerror')
   delete err.stack
   const instance = pino(sink(function (chunk, enc, cb) {
-    t.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
+    t.assert.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
-    t.equal(chunk.hasOwnProperty('stack'), false)
+    t.assert.strictEqual(chunk.hasOwnProperty('stack'), false)
     cb()
   }))
 
@@ -150,7 +150,7 @@ test('stack is omitted if it is not set on err', t => {
   instance[name](err)
 })
 
-test('correctly ignores toString on errors', async ({ same }) => {
+test('correctly ignores toString on errors', async (t) => {
   const err = new Error('myerror')
   err.toString = () => undefined
   const stream = sink()
@@ -160,7 +160,7 @@ test('correctly ignores toString on errors', async ({ same }) => {
   instance.fatal(err)
   const result = await once(stream, 'data')
   delete result.time
-  same(result, {
+  t.assert.deepStrictEqual(result, {
     pid,
     hostname,
     level: 60,
@@ -173,7 +173,7 @@ test('correctly ignores toString on errors', async ({ same }) => {
   })
 })
 
-test('assign mixin()', async ({ same }) => {
+test('assign mixin()', async (t) => {
   const err = new Error('myerror')
   const stream = sink()
   const instance = pino({
@@ -184,7 +184,7 @@ test('assign mixin()', async ({ same }) => {
   instance.fatal(err)
   const result = await once(stream, 'data')
   delete result.time
-  same(result, {
+  t.assert.deepStrictEqual(result, {
     pid,
     hostname,
     level: 60,
@@ -198,7 +198,7 @@ test('assign mixin()', async ({ same }) => {
   })
 })
 
-test('no err serializer', async ({ same }) => {
+test('no err serializer', async (t) => {
   const err = new Error('myerror')
   const stream = sink()
   const instance = pino({
@@ -207,7 +207,7 @@ test('no err serializer', async ({ same }) => {
   instance.fatal(err)
   const result = await once(stream, 'data')
   delete result.time
-  same(result, {
+  t.assert.deepStrictEqual(result, {
     pid,
     hostname,
     level: 60,
@@ -220,7 +220,7 @@ test('no err serializer', async ({ same }) => {
   })
 })
 
-test('empty serializer', async ({ same }) => {
+test('empty serializer', async (t) => {
   const err = new Error('myerror')
   const stream = sink()
   const instance = pino({
@@ -231,7 +231,7 @@ test('empty serializer', async ({ same }) => {
   instance.fatal(err)
   const result = await once(stream, 'data')
   delete result.time
-  same(result, {
+  t.assert.deepStrictEqual(result, {
     pid,
     hostname,
     level: 60,
@@ -239,7 +239,7 @@ test('empty serializer', async ({ same }) => {
   })
 })
 
-test('assign mixin()', async ({ same }) => {
+test('assign mixin()', async (t) => {
   const err = new Error('myerror')
   const stream = sink()
   const instance = pino({
@@ -250,7 +250,7 @@ test('assign mixin()', async ({ same }) => {
   instance.fatal(err)
   const result = await once(stream, 'data')
   delete result.time
-  same(result, {
+  t.assert.deepStrictEqual(result, {
     pid,
     hostname,
     level: 60,
@@ -264,7 +264,7 @@ test('assign mixin()', async ({ same }) => {
   })
 })
 
-test('no err serializer', async ({ same }) => {
+test('no err serializer', async (t) => {
   const err = new Error('myerror')
   const stream = sink()
   const instance = pino({
@@ -273,7 +273,7 @@ test('no err serializer', async ({ same }) => {
   instance.fatal(err)
   const result = await once(stream, 'data')
   delete result.time
-  same(result, {
+  t.assert.deepStrictEqual(result, {
     pid,
     hostname,
     level: 60,
@@ -286,7 +286,7 @@ test('no err serializer', async ({ same }) => {
   })
 })
 
-test('empty serializer', async ({ same }) => {
+test('empty serializer', async (t) => {
   const err = new Error('myerror')
   const stream = sink()
   const instance = pino({
@@ -297,7 +297,7 @@ test('empty serializer', async ({ same }) => {
   instance.fatal(err)
   const result = await once(stream, 'data')
   delete result.time
-  same(result, {
+  t.assert.deepStrictEqual(result, {
     pid,
     hostname,
     level: 60,
@@ -305,7 +305,7 @@ test('empty serializer', async ({ same }) => {
   })
 })
 
-test('correctly adds error information when nestedKey is used', async ({ same }) => {
+test('correctly adds error information when nestedKey is used', async (t) => {
   const err = new Error('myerror')
   err.toString = () => undefined
   const stream = sink()
@@ -316,7 +316,7 @@ test('correctly adds error information when nestedKey is used', async ({ same })
   instance.fatal(err)
   const result = await once(stream, 'data')
   delete result.time
-  same(result, {
+  t.assert.deepStrictEqual(result, {
     pid,
     hostname,
     level: 60,
@@ -331,7 +331,7 @@ test('correctly adds error information when nestedKey is used', async ({ same })
   })
 })
 
-test('correctly adds msg on error when nestedKey is used', async ({ same }) => {
+test('correctly adds msg on error when nestedKey is used', async (t) => {
   const err = new Error('myerror')
   err.toString = () => undefined
   const stream = sink()
@@ -342,7 +342,7 @@ test('correctly adds msg on error when nestedKey is used', async ({ same }) => {
   instance.fatal(err, 'msg message')
   const result = await once(stream, 'data')
   delete result.time
-  same(result, {
+  t.assert.deepStrictEqual(result, {
     pid,
     hostname,
     level: 60,
@@ -357,14 +357,14 @@ test('correctly adds msg on error when nestedKey is used', async ({ same }) => {
   })
 })
 
-test('msg should take precedence over error message on mergingObject', async ({ same }) => {
+test('msg should take precedence over error message on mergingObject', async (t) => {
   const err = new Error('myerror')
   const stream = sink()
   const instance = pino(stream)
   instance.error({ msg: 'my message', err })
   const result = await once(stream, 'data')
   delete result.time
-  same(result, {
+  t.assert.deepStrictEqual(result, {
     pid,
     hostname,
     level: 50,
@@ -377,14 +377,14 @@ test('msg should take precedence over error message on mergingObject', async ({ 
   })
 })
 
-test('considers messageKey when giving msg precedence over error', async ({ same }) => {
+test('considers messageKey when giving msg precedence over error', async (t) => {
   const err = new Error('myerror')
   const stream = sink()
   const instance = pino({ messageKey: 'message' }, stream)
   instance.error({ message: 'my message', err })
   const result = await once(stream, 'data')
   delete result.time
-  same(result, {
+  t.assert.deepStrictEqual(result, {
     pid,
     hostname,
     level: 50,
