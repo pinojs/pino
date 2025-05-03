@@ -1,26 +1,26 @@
 'use strict'
 
 const os = require('node:os')
-const { test } = require('tap')
+const { test } = require('node:test')
 const pino = require('../')
 
 const { pid } = process
 const hostname = os.hostname()
 
-test('metadata works', async ({ ok, same, equal }) => {
+test('metadata works', async t => {
   const now = Date.now()
   const instance = pino({}, {
     [Symbol.for('pino.metadata')]: true,
     write (chunk) {
-      equal(instance, this.lastLogger)
-      equal(30, this.lastLevel)
-      equal('a msg', this.lastMsg)
-      ok(Number(this.lastTime) >= now)
-      same(this.lastObj, { hello: 'world' })
+      t.assert.strictEqual(instance, this.lastLogger)
+      t.assert.strictEqual(30, this.lastLevel)
+      t.assert.strictEqual('a msg', this.lastMsg)
+      t.assert.ok(Number(this.lastTime) >= now)
+      t.assert.deepEqual(this.lastObj, { hello: 'world' })
       const result = JSON.parse(chunk)
-      ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
+      t.assert.ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
       delete result.time
-      same(result, {
+      t.assert.deepEqual(result, {
         pid,
         hostname,
         level: 30,
@@ -33,18 +33,18 @@ test('metadata works', async ({ ok, same, equal }) => {
   instance.info({ hello: 'world' }, 'a msg')
 })
 
-test('child loggers works', async ({ ok, same, equal }) => {
+test('child loggers works', async t => {
   const instance = pino({}, {
     [Symbol.for('pino.metadata')]: true,
     write (chunk) {
-      equal(child, this.lastLogger)
-      equal(30, this.lastLevel)
-      equal('a msg', this.lastMsg)
-      same(this.lastObj, { from: 'child' })
+      t.assert.strictEqual(child, this.lastLogger)
+      t.assert.strictEqual(30, this.lastLevel)
+      t.assert.strictEqual('a msg', this.lastMsg)
+      t.assert.deepEqual(this.lastObj, { from: 'child' })
       const result = JSON.parse(chunk)
-      ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
+      t.assert.ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
       delete result.time
-      same(result, {
+      t.assert.deepEqual(result, {
         pid,
         hostname,
         level: 30,
@@ -59,18 +59,18 @@ test('child loggers works', async ({ ok, same, equal }) => {
   child.info({ from: 'child' }, 'a msg')
 })
 
-test('without object', async ({ ok, same, equal }) => {
+test('without object', async t => {
   const instance = pino({}, {
     [Symbol.for('pino.metadata')]: true,
     write (chunk) {
-      equal(instance, this.lastLogger)
-      equal(30, this.lastLevel)
-      equal('a msg', this.lastMsg)
-      same({ }, this.lastObj)
+      t.assert.strictEqual(instance, this.lastLogger)
+      t.assert.strictEqual(30, this.lastLevel)
+      t.assert.strictEqual('a msg', this.lastMsg)
+      t.assert.deepEqual({ }, this.lastObj)
       const result = JSON.parse(chunk)
-      ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
+      t.assert.ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
       delete result.time
-      same(result, {
+      t.assert.deepEqual(result, {
         pid,
         hostname,
         level: 30,
@@ -82,18 +82,18 @@ test('without object', async ({ ok, same, equal }) => {
   instance.info('a msg')
 })
 
-test('without msg', async ({ ok, same, equal }) => {
+test('without msg', async t => {
   const instance = pino({}, {
     [Symbol.for('pino.metadata')]: true,
     write (chunk) {
-      equal(instance, this.lastLogger)
-      equal(30, this.lastLevel)
-      equal(undefined, this.lastMsg)
-      same({ hello: 'world' }, this.lastObj)
+      t.assert.strictEqual(instance, this.lastLogger)
+      t.assert.strictEqual(30, this.lastLevel)
+      t.assert.strictEqual(undefined, this.lastMsg)
+      t.assert.deepEqual({ hello: 'world' }, this.lastObj)
       const result = JSON.parse(chunk)
-      ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
+      t.assert.ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
       delete result.time
-      same(result, {
+      t.assert.deepEqual(result, {
         pid,
         hostname,
         level: 30,
