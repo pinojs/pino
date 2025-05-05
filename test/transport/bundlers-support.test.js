@@ -4,13 +4,13 @@ const os = require('node:os')
 const { join } = require('node:path')
 const { readFile } = require('node:fs').promises
 const { watchFileCreated, file } = require('../helper')
-const { test } = require('tap')
+const { test } = require('node:test')
 const pino = require('../../pino')
 
 const { pid } = process
 const hostname = os.hostname()
 
-test('pino.transport with destination overridden by bundler', async ({ same, teardown }) => {
+test('pino.transport with destination overridden by bundler', async (t) => {
   globalThis.__bundlerPathsOverrides = {
     foobar: join(__dirname, '..', 'fixtures', 'to-file-transport.js')
   }
@@ -20,13 +20,13 @@ test('pino.transport with destination overridden by bundler', async ({ same, tea
     target: 'foobar',
     options: { destination }
   })
-  teardown(transport.end.bind(transport))
+  t.after(transport.end.bind(transport))
   const instance = pino(transport)
   instance.info('hello')
   await watchFileCreated(destination)
   const result = JSON.parse(await readFile(destination))
   delete result.time
-  same(result, {
+  t.assert.deepStrictEqual(result, {
     pid,
     hostname,
     level: 30,
@@ -36,7 +36,7 @@ test('pino.transport with destination overridden by bundler', async ({ same, tea
   globalThis.__bundlerPathsOverrides = undefined
 })
 
-test('pino.transport with worker destination overridden by bundler', async ({ same, teardown }) => {
+test('pino.transport with worker destination overridden by bundler', async (t) => {
   globalThis.__bundlerPathsOverrides = {
     'pino-worker': join(__dirname, '..', '..', 'lib/worker.js')
   }
@@ -50,13 +50,13 @@ test('pino.transport with worker destination overridden by bundler', async ({ sa
       }
     ]
   })
-  teardown(transport.end.bind(transport))
+  t.after(transport.end.bind(transport))
   const instance = pino(transport)
   instance.info('hello')
   await watchFileCreated(destination)
   const result = JSON.parse(await readFile(destination))
   delete result.time
-  same(result, {
+  t.assert.deepStrictEqual(result, {
     pid,
     hostname,
     level: 30,
@@ -66,7 +66,7 @@ test('pino.transport with worker destination overridden by bundler', async ({ sa
   globalThis.__bundlerPathsOverrides = undefined
 })
 
-test('pino.transport with worker destination overridden by bundler and mjs transport', async ({ same, teardown }) => {
+test('pino.transport with worker destination overridden by bundler and mjs transport', async (t) => {
   globalThis.__bundlerPathsOverrides = {
     'pino-worker': join(__dirname, '..', '..', 'lib/worker.js')
   }
@@ -80,13 +80,13 @@ test('pino.transport with worker destination overridden by bundler and mjs trans
       }
     ]
   })
-  teardown(transport.end.bind(transport))
+  t.after(transport.end.bind(transport))
   const instance = pino(transport)
   instance.info('hello')
   await watchFileCreated(destination)
   const result = JSON.parse(await readFile(destination))
   delete result.time
-  same(result, {
+  t.assert.deepStrictEqual(result, {
     pid,
     hostname,
     level: 30,
