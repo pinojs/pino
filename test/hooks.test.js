@@ -1,6 +1,6 @@
 'use strict'
 
-const { describe, test } = require('node:test')
+const { test } = require('node:test')
 const { sink, once } = require('./helper')
 const pino = require('../')
 
@@ -13,8 +13,8 @@ function match (t, obj, expected) {
   t.assert.deepStrictEqual(checkObj, expected)
 }
 
-describe('log method hook', () => {
-  test('gets invoked', async t => {
+test('log method hook', async t => {
+  await t.test('gets invoked', async t => {
     t.plan(8)
 
     const stream = sink()
@@ -40,7 +40,7 @@ describe('log method hook', () => {
     match(t, await o, { msg: 'a-b-c' })
   })
 
-  test('fatal method invokes hook', async t => {
+  await t.test('fatal method invokes hook', async t => {
     t.plan(2)
 
     const stream = sink()
@@ -58,7 +58,7 @@ describe('log method hook', () => {
     match(t, await o, { msg: 'a' })
   })
 
-  test('children get the hook', async t => {
+  await t.test('children get the hook', async t => {
     t.plan(4)
 
     const stream = sink()
@@ -82,7 +82,7 @@ describe('log method hook', () => {
     match(t, await o, { msg: 'c-d' })
   })
 
-  test('get log level', async t => {
+  await t.test('get log level', async t => {
     t.plan(3)
 
     const stream = sink()
@@ -103,8 +103,8 @@ describe('log method hook', () => {
   })
 })
 
-describe('streamWrite hook', () => {
-  test('gets invoked', async t => {
+test('streamWrite hook', async t => {
+  await t.test('gets invoked', async t => {
     t.plan(1)
 
     const stream = sink()
