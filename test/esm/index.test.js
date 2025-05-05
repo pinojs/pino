@@ -1,6 +1,6 @@
 'use strict'
 
-const t = require('tap')
+const t = require('node:test')
 const semver = require('semver')
 
 const { isYarnPnp } = require('../helper')
