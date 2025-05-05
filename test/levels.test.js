@@ -1,6 +1,6 @@
 'use strict'
 
-const { test } = require('tap')
+const { test } = require('node:test')
 const { sink, once, check } = require('./helper')
 const pino = require('../')
 
@@ -10,7 +10,7 @@ const levelsLib = require('../lib/levels')
 process.removeAllListeners('warning')
 process.on('warning', () => {})
 
-test('set the level by string', async ({ equal }) => {
+test('set the level by string', async (t) => {
   const expected = [{
     level: 50,
     msg: 'this is an error'
@@ -26,17 +26,17 @@ test('set the level by string', async ({ equal }) => {
   instance.fatal('this is fatal')
   const result = await once(stream, 'data')
   const current = expected.shift()
-  check(equal, result, current.level, current.msg)
+  check(t.assert.strictEqual, result, current.level, current.msg)
 })
 
-test('the wrong level throws', async ({ throws }) => {
+test('the wrong level throws', async (t) => {
   const instance = pino()
-  throws(() => {
+  t.assert.throws(() => {
     instance.level = 'kaboom'
   })
 })
 
-test('set the level by number', async ({ equal }) => {
+test('set the level by number', async (t) => {
   const expected = [{
     level: 50,
     msg: 'this is an error'
@@ -53,29 +53,29 @@ test('set the level by number', async ({ equal }) => {
   instance.fatal('this is fatal')
   const result = await once(stream, 'data')
   const current = expected.shift()
-  check(equal, result, current.level, current.msg)
+  check(t.assert.strictEqual, result, current.level, current.msg)
 })
 
-test('exposes level string mappings', async ({ equal }) => {
-  equal(pino.levels.values.error, 50)
+test('exposes level string mappings', async (t) => {
+  t.assert.strictEqual(pino.levels.values.error, 50)
 })
 
-test('exposes level number mappings', async ({ equal }) => {
-  equal(pino.levels.labels[50], 'error')
+test('exposes level number mappings', async (t) => {
+  t.assert.strictEqual(pino.levels.labels[50], 'error')
 })
 
-test('returns level integer', async ({ equal }) => {
+test('returns level integer', async (t) => {
   const instance = pino({ level: 'error' })
-  equal(instance.levelVal, 50)
+  t.assert.strictEqual(instance.levelVal, 50)
 })
 
-test('child returns level integer', async ({ equal }) => {
+test('child returns level integer', async (t) => {
   const parent = pino({ level: 'error' })
   const child = parent.child({ foo: 'bar' })
-  equal(child.levelVal, 50)
+  t.assert.strictEqual(child.levelVal, 50)
 })
 
-test('set the level via exported pino function', async ({ equal }) => {
+test('set the level via exported pino function', async (t) => {
   const expected = [{
     level: 50,
     msg: 'this is an error'
@@ -91,17 +91,17 @@ test('set the level via exported pino function', async ({ equal }) => {
   instance.fatal('this is fatal')
   const result = await once(stream, 'data')
   const current = expected.shift()
-  check(equal, result, current.level, current.msg)
+  check(t.assert.strictEqual, result, current.level, current.msg)
 })
 
-test('level-change event', async ({ equal }) => {
+test('level-change event', async (t) => {
   const instance = pino()
   function handle (lvl, val, prevLvl, prevVal, logger) {
-    equal(lvl, 'trace')
-    equal(val, 10)
-    equal(prevLvl, 'info')
-    equal(prevVal, 30)
-    equal(logger, instance)
+    t.assert.strictEqual(lvl, 'trace')
+    t.assert.strictEqual(val, 10)
+    t.assert.strictEqual(prevLvl, 'info')
+    t.assert.strictEqual(prevVal, 30)
+    t.assert.strictEqual(logger, instance)
   }
   instance.on('level-change', handle)
   instance.level = 'trace'
@@ -125,21 +125,21 @@ test('level-change event', async ({ equal }) => {
   instance.removeListener('level-change', l2)
   instance.level = 'info'
 
-  equal(count, 6)
+  t.assert.strictEqual(count, 6)
 
-  instance.once('level-change', (lvl, val, prevLvl, prevVal, logger) => equal(logger, instance))
+  instance.once('level-change', (lvl, val, prevLvl, prevVal, logger) => t.assert.strictEqual(logger, instance))
   instance.level = 'info'
   const child = instance.child({})
-  instance.once('level-change', (lvl, val, prevLvl, prevVal, logger) => equal(logger, child))
+  instance.once('level-change', (lvl, val, prevLvl, prevVal, logger) => t.assert.strictEqual(logger, child))
   child.level = 'trace'
 })
 
-test('enable', async ({ fail }) => {
+test('enable', async (t) => {
   const instance = pino({
     level: 'trace',
     enabled: false
   }, sink((result, enc) => {
-    fail('no data should be logged')
+    t.assert.fail('no data should be logged')
   }))
 
   Object.keys(pino.levels.values).forEach((level) => {
@@ -147,11 +147,11 @@ test('enable', async ({ fail }) => {
   })
 })
 
-test('silent level', async ({ fail }) => {
+test('silent level', async (t) => {
   const instance = pino({
     level: 'silent'
   }, sink((result, enc) => {
-    fail('no data should be logged')
+    t.assert.fail('no data should be logged')
   }))
 
   Object.keys(pino.levels.values).forEach((level) => {
@@ -159,11 +159,11 @@ test('silent level', async ({ fail }) => {
   })
 })
 
-test('set silent via Infinity', async ({ fail }) => {
+test('set silent via Infinity', async (t) => {
   const instance = pino({
     level: Infinity
   }, sink((result, enc) => {
-    fail('no data should be logged')
+    t.assert.fail('no data should be logged')
   }))
 
   Object.keys(pino.levels.values).forEach((level) => {
@@ -171,8 +171,8 @@ test('set silent via Infinity', async ({ fail }) => {
   })
 })
 
-test('exposed levels', async ({ same }) => {
-  same(Object.keys(pino.levels.values), [
+test('exposed levels', async (t) => {
+  t.assert.deepStrictEqual(Object.keys(pino.levels.values), [
     'trace',
     'debug',
     'info',
@@ -182,8 +182,8 @@ test('exposed levels', async ({ same }) => {
   ])
 })
 
-test('exposed labels', async ({ same }) => {
-  same(Object.keys(pino.levels.labels), [
+test('exposed labels', async (t) => {
+  t.assert.deepStrictEqual(Object.keys(pino.levels.labels), [
     '10',
     '20',
     '30',
@@ -193,7 +193,7 @@ test('exposed labels', async ({ same }) => {
   ])
 })
 
-test('setting level in child', async ({ equal }) => {
+test('setting level in child', async (t) => {
   const expected = [{
     level: 50,
     msg: 'this is an error'
@@ -203,7 +203,7 @@ test('setting level in child', async ({ equal }) => {
   }]
   const instance = pino(sink((result, enc, cb) => {
     const current = expected.shift()
-    check(equal, result, current.level, current.msg)
+    check(t.assert.strictEqual, result, current.level, current.msg)
     cb()
   })).child({ level: 30 })
 
@@ -213,35 +213,35 @@ test('setting level in child', async ({ equal }) => {
   instance.fatal('this is fatal')
 })
 
-test('setting level by assigning a number to level', async ({ equal }) => {
+test('setting level by assigning a number to level', async (t) => {
   const instance = pino()
-  equal(instance.levelVal, 30)
-  equal(instance.level, 'info')
+  t.assert.strictEqual(instance.levelVal, 30)
+  t.assert.strictEqual(instance.level, 'info')
   instance.level = 50
-  equal(instance.levelVal, 50)
-  equal(instance.level, 'error')
+  t.assert.strictEqual(instance.levelVal, 50)
+  t.assert.strictEqual(instance.level, 'error')
 })
 
-test('setting level by number to unknown value results in a throw', async ({ throws }) => {
+test('setting level by number to unknown value results in a throw', async (t) => {
   const instance = pino()
-  throws(() => { instance.level = 973 })
+  t.assert.throws(() => { instance.level = 973 })
 })
 
-test('setting level by assigning a known label to level', async ({ equal }) => {
+test('setting level by assigning a known label to level', async (t) => {
   const instance = pino()
-  equal(instance.levelVal, 30)
-  equal(instance.level, 'info')
+  t.assert.strictEqual(instance.levelVal, 30)
+  t.assert.strictEqual(instance.level, 'info')
   instance.level = 'error'
-  equal(instance.levelVal, 50)
-  equal(instance.level, 'error')
+  t.assert.strictEqual(instance.levelVal, 50)
+  t.assert.strictEqual(instance.level, 'error')
 })
 
-test('levelVal is read only', async ({ throws }) => {
+test('levelVal is read only', async (t) => {
   const instance = pino()
-  throws(() => { instance.levelVal = 20 })
+  t.assert.throws(() => { instance.levelVal = 20 })
 })
 
-test('produces labels when told to', async ({ equal }) => {
+test('produces labels when told to', async (t) => {
   const expected = [{
     level: 'info',
     msg: 'hello world'
@@ -254,14 +254,14 @@ test('produces labels when told to', async ({ equal }) => {
     }
   }, sink((result, enc, cb) => {
     const current = expected.shift()
-    check(equal, result, current.level, current.msg)
+    check(t.assert.strictEqual, result, current.level, current.msg)
     cb()
   }))
 
   instance.info('hello world')
 })
 
-test('resets levels from labels to numbers', async ({ equal }) => {
+test('resets levels from labels to numbers', async (t) => {
   const expected = [{
     level: 30,
     msg: 'hello world'
@@ -269,14 +269,14 @@ test('resets levels from labels to numbers', async ({ equal }) => {
   pino({ useLevelLabels: true })
   const instance = pino({ useLevelLabels: false }, sink((result, enc, cb) => {
     const current = expected.shift()
-    check(equal, result, current.level, current.msg)
+    check(t.assert.strictEqual, result, current.level, current.msg)
     cb()
   }))
 
   instance.info('hello world')
 })
 
-test('changes label naming when told to', async ({ equal }) => {
+test('changes label naming when told to', async (t) => {
   const expected = [{
     priority: 30,
     msg: 'hello world'
@@ -289,15 +289,15 @@ test('changes label naming when told to', async ({ equal }) => {
     }
   }, sink((result, enc, cb) => {
     const current = expected.shift()
-    equal(result.priority, current.priority)
-    equal(result.msg, current.msg)
+    t.assert.strictEqual(result.priority, current.priority)
+    t.assert.strictEqual(result.msg, current.msg)
     cb()
   }))
 
   instance.info('hello world')
 })
 
-test('children produce labels when told to', async ({ equal }) => {
+test('children produce labels when told to', async (t) => {
   const expected = [
     {
       level: 'info',
@@ -316,7 +316,7 @@ test('children produce labels when told to', async ({ equal }) => {
     }
   }, sink((result, enc, cb) => {
     const current = expected.shift()
-    check(equal, result, current.level, current.msg)
+    check(t.assert.strictEqual, result, current.level, current.msg)
     cb()
   }))
 
@@ -327,7 +327,7 @@ test('children produce labels when told to', async ({ equal }) => {
   child2.info('child 2')
 })
 
-test('produces labels for custom levels', async ({ equal }) => {
+test('produces labels for custom levels', async (t) => {
   const expected = [
     {
       level: 'info',
@@ -350,7 +350,7 @@ test('produces labels for custom levels', async ({ equal }) => {
   }
   const instance = pino(opts, sink((result, enc, cb) => {
     const current = expected.shift()
-    check(equal, result, current.level, current.msg)
+    check(t.assert.strictEqual, result, current.level, current.msg)
     cb()
   }))
 
@@ -358,7 +358,7 @@ test('produces labels for custom levels', async ({ equal }) => {
   instance.foo('foobar')
 })
 
-test('setting levelKey does not affect labels when told to', async ({ equal }) => {
+test('setting levelKey does not affect labels when told to', async (t) => {
   const instance = pino(
     {
       formatters: {
@@ -368,7 +368,7 @@ test('setting levelKey does not affect labels when told to', async ({ equal }) =
       }
     },
     sink((result, enc, cb) => {
-      equal(result.priority, 'info')
+      t.assert.strictEqual(result.priority, 'info')
       cb()
     })
   )
@@ -376,48 +376,54 @@ test('setting levelKey does not affect labels when told to', async ({ equal }) =
   instance.info('hello world')
 })
 
-test('throws when creating a default label that does not exist in logger levels', async ({ throws }) => {
+test('throws when creating a default label that does not exist in logger levels', async (t) => {
   const defaultLevel = 'foo'
-  throws(() => {
+  t.assert.throws(() => {
     pino({
       customLevels: {
         bar: 5
       },
       level: defaultLevel
     })
-  }, `default level:${defaultLevel} must be included in custom levels`)
+  }, {
+    message: `default level:${defaultLevel} must be included in custom levels`
+  })
 })
 
-test('throws when creating a default value that does not exist in logger levels', async ({ throws }) => {
+test('throws when creating a default value that does not exist in logger levels', async (t) => {
   const defaultLevel = 15
-  throws(() => {
+  t.assert.throws(() => {
     pino({
       customLevels: {
         bar: 5
       },
       level: defaultLevel
     })
-  }, `default level:${defaultLevel} must be included in custom levels`)
+  }, {
+    message: `default level:${defaultLevel} must be included in custom levels`
+  })
 })
 
-test('throws when creating a default value that does not exist in logger levels', async ({ equal, throws }) => {
-  throws(() => {
+test('throws when creating a default value that does not exist in logger levels', async (t) => {
+  t.assert.throws(() => {
     pino({
       customLevels: {
         foo: 5
       },
       useOnlyCustomLevels: true
     })
-  }, 'default level:info must be included in custom levels')
+  }, {
+    message: 'default level:info must be included in custom levels'
+  })
 })
 
-test('passes when creating a default value that exists in logger levels', async ({ equal, throws }) => {
+test('passes when creating a default value that exists in logger levels', async (t) => {
   pino({
     level: 30
   })
 })
 
-test('log null value when message is null', async ({ equal }) => {
+test('log null value when message is null', async (t) => {
   const expected = {
     msg: null,
     level: 30
@@ -429,10 +435,10 @@ test('log null value when message is null', async ({ equal }) => {
   instance.info(null)
 
   const result = await once(stream, 'data')
-  check(equal, result, expected.level, expected.msg)
+  check(t.assert.strictEqual, result, expected.level, expected.msg)
 })
 
-test('formats when base param is null', async ({ equal }) => {
+test('formats when base param is null', async (t) => {
   const expected = {
     msg: 'a string',
     level: 30
@@ -444,52 +450,52 @@ test('formats when base param is null', async ({ equal }) => {
   instance.info(null, 'a %s', 'string')
 
   const result = await once(stream, 'data')
-  check(equal, result, expected.level, expected.msg)
+  check(t.assert.strictEqual, result, expected.level, expected.msg)
 })
 
-test('fatal method sync-flushes the destination if sync flushing is available', async ({ pass, doesNotThrow, plan }) => {
-  plan(2)
+test('fatal method sync-flushes the destination if sync flushing is available', async t => {
+  t.plan(2)
   const stream = sink()
   stream.flushSync = () => {
-    pass('destination flushed')
+    t.assert.ok('destination flushed')
   }
   const instance = pino(stream)
   instance.fatal('this is fatal')
   await once(stream, 'data')
-  doesNotThrow(() => {
+  t.assert.doesNotThrow(() => {
     stream.flushSync = undefined
     instance.fatal('this is fatal')
   })
 })
 
-test('fatal method should call async when sync-flushing fails', ({ equal, fail, doesNotThrow, plan }) => {
-  plan(2)
+test('fatal method should call async when sync-flushing fails', t => {
+  t.plan(2)
   const messages = [
     'this is fatal 1'
   ]
-  const stream = sink((result) => equal(result.msg, messages.shift()))
+  const stream = sink((result) => t.assert.strictEqual(result.msg, messages.shift()))
   stream.flushSync = () => { throw new Error('Error') }
-  stream.flush = () => fail('flush should be called')
+  stream.flush = () => t.assert.fail('flush should be called')
 
   const instance = pino(stream)
-  doesNotThrow(() => instance.fatal(messages[0]))
+  t.assert.doesNotThrow(() => instance.fatal(messages[0]))
 })
 
-test('calling silent method on logger instance', async ({ fail }) => {
+test('calling silent method on logger instance', async (t) => {
   const instance = pino({ level: 'silent' }, sink((result, enc) => {
-    fail('no data should be logged')
+    t.assert.fail('no data should be logged')
   }))
   instance.silent('hello world')
 })
 
-test('calling silent method on child logger', async ({ fail }) => {
+test('calling silent method on child logger', async (t) => {
   const child = pino({ level: 'silent' }, sink((result, enc) => {
-    fail('no data should be logged')
+    t.assert.fail('no data should be logged')
   })).child({})
   child.silent('hello world')
 })
 
-test('changing level from info to silent and back to info', async ({ equal }) => {
+test('changing level from info to silent and back to info', async (t) => {
   const expected = {
     level: 30,
     msg: 'hello world'
@@ -500,15 +506,15 @@ test('changing level from info to silent and back to info', async ({ equal }) =>
   instance.level = 'silent'
   instance.info('hello world')
   let result = stream.read()
-  equal(result, null)
+  t.assert.strictEqual(result, null)
 
   instance.level = 'info'
   instance.info('hello world')
   result = await once(stream, 'data')
-  check(equal, result, expected.level, expected.msg)
+  check(t.assert.strictEqual, result, expected.level, expected.msg)
 })
 
-test('changing level from info to silent and back to info in child logger', async ({ equal }) => {
+test('changing level from info to silent and back to info in child logger', async (t) => {
   const expected = {
     level: 30,
     msg: 'hello world'
@@ -519,15 +525,15 @@ test('changing level from info to silent and back to info in child logger', asyn
   child.level = 'silent'
   child.info('hello world')
   let result = stream.read()
-  equal(result, null)
+  t.assert.strictEqual(result, null)
 
   child.level = 'info'
   child.info('hello world')
   result = await once(stream, 'data')
-  check(equal, result, expected.level, expected.msg)
+  check(t.assert.strictEqual, result, expected.level, expected.msg)
 })
 
-test('changing level respects level comparison set to', async ({ test, end }) => {
+test('changing level respects level comparison set to', async (t) => {
   const ascLevels = {
     debug: 1,
     info: 2,
@@ -545,7 +551,7 @@ test('changing level respects level comparison set to', async ({ test, end }) =>
     msg: 'hello world'
   }
 
-  test('ASC in parent logger', async ({ equal }) => {
+  await t.test('ASC in parent logger', async (t) => {
     const customLevels = ascLevels
     const levelComparison = 'ASC'
 
@@ -555,15 +561,15 @@ test('changing level respects level comparison set to', async ({ test, end }) =>
     logger.level = 'warn'
     logger.info('hello world')
     let result = stream.read()
-    equal(result, null)
+    t.assert.strictEqual(result, null)
 
     logger.level = 'debug'
     logger.info('hello world')
     result = await once(stream, 'data')
-    check(equal, result, expected.level, expected.msg)
+    check(t.assert.strictEqual, result, expected.level, expected.msg)
   })
 
-  test('DESC in parent logger', async ({ equal }) => {
+  await t.test('DESC in parent logger', async (t) => {
     const customLevels = descLevels
     const levelComparison = 'DESC'
 
@@ -573,15 +579,15 @@ test('changing level respects level comparison set to', async ({ test, end }) =>
     logger.level = 'warn'
     logger.info('hello world')
     let result = stream.read()
-    equal(result, null)
+    t.assert.strictEqual(result, null)
 
     logger.level = 'debug'
     logger.info('hello world')
     result = await once(stream, 'data')
-    check(equal, result, expected.level, expected.msg)
+    check(t.assert.strictEqual, result, expected.level, expected.msg)
   })
 
-  test('custom function in parent logger', async ({ equal }) => {
+  await t.test('custom function in parent logger', async (t) => {
     const customLevels = {
       info: 2,
       debug: 345,
@@ -598,15 +604,15 @@ test('changing level respects level comparison set to', async ({ test, end }) =>
     logger.level = 'warn'
     logger.info('hello world')
     let result = stream.read()
-    equal(result, null)
+    t.assert.strictEqual(result, null)
 
     logger.level = 'debug'
     logger.info('hello world')
     result = await once(stream, 'data')
-    check(equal, result, expected.level, expected.msg)
+    check(t.assert.strictEqual, result, expected.level, expected.msg)
   })
 
-  test('ASC in child logger', async ({ equal }) => {
+  await t.test('ASC in child logger', async (t) => {
     const customLevels = ascLevels
     const levelComparison = 'ASC'
 
@@ -616,15 +622,15 @@ test('changing level respects level comparison set to', async ({ test, end }) =>
     logger.level = 'warn'
     logger.info('hello world')
     let result = stream.read()
-    equal(result, null)
+    t.assert.strictEqual(result, null)
 
     logger.level = 'debug'
     logger.info('hello world')
     result = await once(stream, 'data')
-    check(equal, result, expected.level, expected.msg)
+    check(t.assert.strictEqual, result, expected.level, expected.msg)
   })
 
-  test('DESC in parent logger', async ({ equal }) => {
+  await t.test('DESC in parent logger', async (t) => {
     const customLevels = descLevels
     const levelComparison = 'DESC'
 
@@ -634,15 +640,15 @@ test('changing level respects level comparison set to', async ({ test, end }) =>
     logger.level = 'warn'
     logger.info('hello world')
     let result = stream.read()
-    equal(result, null)
+    t.assert.strictEqual(result, null)
 
     logger.level = 'debug'
     logger.info('hello world')
     result = await once(stream, 'data')
-    check(equal, result, expected.level, expected.msg)
+    check(t.assert.strictEqual, result, expected.level, expected.msg)
   })
 
-  test('custom function in child logger', async ({ equal }) => {
+  await t.test('custom function in child logger', async (t) => {
     const customLevels = {
       info: 2,
       debug: 345,
@@ -659,18 +665,16 @@ test('changing level respects level comparison set to', async ({ test, end }) =>
     logger.level = 'warn'
     logger.info('hello world')
     let result = stream.read()
-    equal(result, null)
+    t.assert.strictEqual(result, null)
 
     logger.level = 'debug'
     logger.info('hello world')
     result = await once(stream, 'data')
-    check(equal, result, expected.level, expected.msg)
+    check(t.assert.strictEqual, result, expected.level, expected.msg)
   })
-
-  end()
 })
 
-test('changing level respects level comparison DESC', async ({ equal }) => {
+test('changing level respects level comparison DESC', async (t) => {
   const customLevels = {
     warn: 1,
     info: 2,
@@ -690,22 +694,22 @@ test('changing level respects level comparison DESC', async ({ equal }) => {
   logger.level = 'warn'
   logger.info('hello world')
   let result = stream.read()
-  equal(result, null)
+  t.assert.strictEqual(result, null)
 
   logger.level = 'debug'
   logger.info('hello world')
   result = await once(stream, 'data')
-  check(equal, result, expected.level, expected.msg)
+  check(t.assert.strictEqual, result, expected.level, expected.msg)
 })
 
 // testing for potential loss of Pino constructor scope from serializers - an edge case with circular refs see:  https://github.com/pinojs/pino/issues/833
-test('trying to get levels when `this` is no longer a Pino instance returns an empty string', async ({ equal }) => {
+test('trying to get levels when `this` is no longer a Pino instance returns an empty string', async (t) => {
   const notPinoInstance = { some: 'object', getLevel: levelsLib.getLevel }
   const blankedLevelValue = notPinoInstance.getLevel()
-  equal(blankedLevelValue, '')
+  t.assert.strictEqual(blankedLevelValue, '')
 })
 
-test('accepts capital letter for INFO level', async ({ equal }) => {
+test('accepts capital letter for INFO level', async (t) => {
   const stream = sink()
   const logger = pino({
     level: 'INFO'
@@ -713,10 +717,10 @@ test('accepts capital letter for INFO level', async ({ equal }) => {
 
   logger.info('test')
   const { level } = await once(stream, 'data')
-  equal(level, 30)
+  t.assert.strictEqual(level, 30)
 })
 
-test('accepts capital letter for FATAL level', async ({ equal }) => {
+test('accepts capital letter for FATAL level', async (t) => {
   const stream = sink()
   const logger = pino({
     level: 'FATAL'
@@ -724,10 +728,10 @@ test('accepts capital letter for FATAL level', async ({ equal }) => {
 
   logger.fatal('test')
   const { level } = await once(stream, 'data')
-  equal(level, 60)
+  t.assert.strictEqual(level, 60)
 })
 
-test('accepts capital letter for ERROR level', async ({ equal }) => {
+test('accepts capital letter for ERROR level', async (t) => {
   const stream = sink()
   const logger = pino({
     level: 'ERROR'
@@ -735,10 +739,10 @@ test('accepts capital letter for ERROR level', async ({ equal }) => {
 
   logger.error('test')
   const { level } = await once(stream, 'data')
-  equal(level, 50)
+  t.assert.strictEqual(level, 50)
 })
 
-test('accepts capital letter for WARN level', async ({ equal }) => {
+test('accepts capital letter for WARN level', async (t) => {
   const stream = sink()
   const logger = pino({
     level: 'WARN'
@@ -746,10 +750,10 @@ test('accepts capital letter for WARN level', async ({ equal }) => {
 
   logger.warn('test')
   const { level } = await once(stream, 'data')
-  equal(level, 40)
+  t.assert.strictEqual(level, 40)
 })
 
-test('accepts capital letter for DEBUG level', async ({ equal }) => {
+test('accepts capital letter for DEBUG level', async (t) => {
   const stream = sink()
   const logger = pino({
     level: 'DEBUG'
@@ -757,10 +761,10 @@ test('accepts capital letter for DEBUG level', async ({ equal }) => {
 
   logger.debug('test')
   const { level } = await once(stream, 'data')
-  equal(level, 20)
+  t.assert.strictEqual(level, 20)
 })
 
-test('accepts capital letter for TRACE level', async ({ equal }) => {
+test('accepts capital letter for TRACE level', async (t) => {
   const stream = sink()
   const logger = pino({
     level: 'TRACE'
@@ -768,5 +772,5 @@ test('accepts capital letter for TRACE level', async ({ equal }) => {
 
   logger.trace('test')
   const { level } = await once(stream, 'data')
-  equal(level, 10)
+  t.assert.strictEqual(level, 10)
 })
