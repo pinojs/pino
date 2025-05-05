@@ -1,7 +1,7 @@
 'use strict'
 
 const os = require('node:os')
-const { test } = require('tap')
+const { test } = require('node:test')
 const { sink, once } = require('./helper')
 const pino = require('../')
 
@@ -10,7 +10,7 @@ const hostname = os.hostname()
 const level = 50
 const name = 'error'
 
-test('mixin object is included', async ({ ok, same }) => {
+test('mixin object is included', async (t) => {
   let n = 0
   const stream = sink()
   const instance = pino({
@@ -21,9 +21,9 @@ test('mixin object is included', async ({ ok, same }) => {
   instance.level = name
   instance[name]('test')
   const result = await once(stream, 'data')
-  ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
+  t.assert.ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
   delete result.time
-  same(result, {
+  t.assert.deepStrictEqual(result, {
     pid,
     hostname,
     level,
@@ -32,8 +32,8 @@ test('mixin object is included', async ({ ok, same }) => {
   })
 })
 
-test('mixin object is new every time', async ({ plan, ok, same }) => {
-  plan(6)
+test('mixin object is new every time', async (t) => {
+  t.plan(6)
 
   let n = 0
   const stream = sink()
@@ -50,9 +50,9 @@ test('mixin object is new every time', async ({ plan, ok, same }) => {
     instance[name](msg)
     stream.resume()
     const result = await once(stream, 'data')
-    ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
+    t.assert.ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
     delete result.time
-    same(result, {
+    t.assert.deepStrictEqual(result, {
       pid,
       hostname,
       level,
@@ -62,18 +62,18 @@ test('mixin object is new every time', async ({ plan, ok, same }) => {
   }
 })
 
-test('mixin object is not called if below log level', async ({ ok }) => {
+test('mixin object is not called if below log level', async (t) => {
   const stream = sink()
   const instance = pino({
     mixin () {
-      ok(false, 'should not call mixin function')
+      t.assert.ok(false, 'should not call mixin function')
     }
   }, stream)
   instance.level = 'error'
   instance.info('test')
 })
 
-test('mixin object + logged object', async ({ ok, same }) => {
+test('mixin object + logged object', async (t) => {
   const stream = sink()
   const instance = pino({
     mixin () {
@@ -83,9 +83,9 @@ test('mixin object + logged object', async ({ ok, same }) => {
   instance.level = name
   instance[name]({ bar: 3, baz: 4 })
   const result = await once(stream, 'data')
-  ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
+  t.assert.ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
   delete result.time
-  same(result, {
+  t.assert.deepStrictEqual(result, {
     pid,
     hostname,
     level,
@@ -95,20 +95,20 @@ test('mixin object + logged object', async ({ ok, same }) => {
   })
 })
 
-test('mixin not a function', async ({ throws }) => {
+test('mixin not a function', async (t) => {
   const stream = sink()
-  throws(function () {
+  t.assert.throws(function () {
     pino({ mixin: 'not a function' }, stream)
   })
 })
 
-test('mixin can use context', async ({ ok, same }) => {
+test('mixin can use context', async (t) => {
   const stream = sink()
   const instance = pino({
     mixin (context) {
-      ok(context !== null, 'context should be defined')
-      ok(context !== undefined, 'context should be defined')
-      same(context, {
+      t.assert.ok(context !== null, 'context should be defined')
+      t.assert.ok(context !== undefined, 'context should be defined')
+      t.assert.deepStrictEqual(context, {
         message: '123',
         stack: 'stack'
       })
@@ -125,13 +125,13 @@ test('mixin can use context', async ({ ok, same }) => {
   }, 'test')
 })
 
-test('mixin works without context', async ({ ok, same }) => {
+test('mixin works without context', async (t) => {
   const stream = sink()
   const instance = pino({
     mixin (context) {
-      ok(context !== null, 'context is still defined w/o passing mergeObject')
-      ok(context !== undefined, 'context is still defined w/o passing mergeObject')
-      same(context, {})
+      t.assert.ok(context !== null, 'context is still defined w/o passing mergeObject')
+      t.assert.ok(context !== undefined, 'context is still defined w/o passing mergeObject')
+      t.assert.deepStrictEqual(context, {})
       return {
         something: true
       }
@@ -141,13 +141,13 @@ test('mixin works without context', async ({ ok, same }) => {
   instance[name]('test')
 })
 
-test('mixin can use level number', async ({ ok, same }) => {
+test('mixin can use level number', async (t) => {
   const stream = sink()
   const instance = pino({
     mixin (context, num) {
-      ok(num !== null, 'level should be defined')
-      ok(num !== undefined, 'level should be defined')
-      same(num, level)
+      t.assert.ok(num !== null, 'level should be defined')
+      t.assert.ok(num !== undefined, 'level should be defined')
+      t.assert.deepStrictEqual(num, level)
       return Object.assign({
         error: context.message,
         stack: context.stack
@@ -161,13 +161,13 @@ test('mixin can use level number', async ({ ok, same }) => {
   }, 'test')
 })
 
-test('mixin receives logger as third parameter', async ({ ok, same }) => {
+test('mixin receives logger as third parameter', async (t) => {
   const stream = sink()
   const instance = pino({
     mixin (context, num, logger) {
-      ok(logger !== null, 'logger should be defined')
-      ok(logger !== undefined, 'logger should be defined')
-      same(logger, instance)
+      t.assert.ok(logger !== null, 'logger should be defined')
+      t.assert.ok(logger !== undefined, 'logger should be defined')
+      t.assert.deepStrictEqual(logger, instance)
       return { ...context, num }
     }
   }, stream)
@@ -177,14 +177,14 @@ test('mixin receives logger as third parameter', async ({ ok, same }) => {
   }, 'test')
 })
 
-test('mixin receives child logger', async ({ ok, same }) => {
+test('mixin receives child logger', async (t) => {
   const stream = sink()
   let child = null
   const instance = pino({
     mixin (context, num, logger) {
-      ok(logger !== null, 'logger should be defined')
-      ok(logger !== undefined, 'logger should be defined')
-      same(logger.expected, child.expected)
+      t.assert.ok(logger !== null, 'logger should be defined')
+      t.assert.ok(logger !== undefined, 'logger should be defined')
+      t.assert.deepStrictEqual(logger.expected, child.expected)
       return { ...context, num }
     }
   }, stream)
@@ -197,14 +197,14 @@ test('mixin receives child logger', async ({ ok, same }) => {
   }, 'test')
 })
 
-test('mixin receives logger even if child exists', async ({ ok, same }) => {
+test('mixin receives logger even if child exists', async (t) => {
   const stream = sink()
   let child = null
   const instance = pino({
     mixin (context, num, logger) {
-      ok(logger !== null, 'logger should be defined')
-      ok(logger !== undefined, 'logger should be defined')
-      same(logger.expected, instance.expected)
+      t.assert.ok(logger !== null, 'logger should be defined')
+      t.assert.ok(logger !== undefined, 'logger should be defined')
+      t.assert.deepStrictEqual(logger.expected, instance.expected)
       return { ...context, num }
     }
   }, stream)
