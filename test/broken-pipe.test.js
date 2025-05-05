@@ -1,6 +1,6 @@
 'use strict'
 
-const t = require('tap')
+const t = require('node:test')
 const { join } = require('node:path')
 const { fork } = require('node:child_process')
 const { once } = require('./helper')
@@ -23,14 +23,14 @@ if (process.env.CITGM) {
 
 function test (file) {
   file = join('fixtures', 'broken-pipe', file)
-  t.test(file, { parallel: true }, async ({ equal }) => {
+  t.test(file, { parallel: true }, async (t) => {
     const child = fork(join(__dirname, file), { silent: true })
     child.stdout.destroy()
 
     child.stderr.pipe(process.stdout)
 
     const res = await once(child, 'close')
-    equal(res, 0) // process exits successfully
+    t.assert.strictEqual(res, 0) // process exits successfully
   })
 }
 
@@ -40,8 +40,8 @@ test('basic.js')
 test('destination.js')
 test('syncfalse.js')
 
-t.test('let error pass through', ({ equal, plan }) => {
-  plan(3)
+t.test('let error pass through', (t, end) => {
+  t.plan(3)
   const stream = pino.destination({ sync: true })
 
   // side effect of the pino constructor is that it will set an
@@ -52,6 +52,8 @@ t.test('let error pass through', ({ equal, plan }) => {
   process.nextTick(() => stream.emit('error', new Error('kaboom')))
 
   stream.on('error', (err) => {
-    equal(err.message, 'kaboom')
+    t.assert.strictEqual(err.message, 'kaboom')
   })
+
+  process.nextTick(end)
 })
