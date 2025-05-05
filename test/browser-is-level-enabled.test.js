@@ -1,6 +1,6 @@
 'use strict'
 
-const { test } = require('tap')
+const { test } = require('node:test')
 const pino = require('../browser')
 
 const customLevels = {
@@ -12,93 +12,89 @@ const customLevels = {
   fatal: 60
 }
 
-test('Default levels suite', ({ test, end }) => {
-  test('can check if current level enabled', async ({ equal }) => {
+test('Default levels suite', async t => {
+  await t.test('can check if current level enabled', async (t) => {
     const log = pino({ level: 'debug' })
-    equal(true, log.isLevelEnabled('debug'))
+    t.assert.strictEqual(true, log.isLevelEnabled('debug'))
   })
 
-  test('can check if current level enabled when as object', async ({ equal }) => {
+  await t.test('can check if current level enabled when as object', async (t) => {
     const log = pino({ asObject: true, level: 'debug' })
-    equal(true, log.isLevelEnabled('debug'))
+    t.assert.strictEqual(true, log.isLevelEnabled('debug'))
   })
 
-  test('can check if level enabled after level set', async ({ equal }) => {
+  await t.test('can check if level enabled after level set', async (t) => {
     const log = pino()
-    equal(false, log.isLevelEnabled('debug'))
+    t.assert.strictEqual(false, log.isLevelEnabled('debug'))
     log.level = 'debug'
-    equal(true, log.isLevelEnabled('debug'))
+    t.assert.strictEqual(true, log.isLevelEnabled('debug'))
   })
 
-  test('can check if higher level enabled', async ({ equal }) => {
+  await t.test('can check if higher level enabled', async (t) => {
     const log = pino({ level: 'debug' })
-    equal(true, log.isLevelEnabled('error'))
+    t.assert.strictEqual(true, log.isLevelEnabled('error'))
   })
 
-  test('can check if lower level is disabled', async ({ equal }) => {
+  await t.test('can check if lower level is disabled', async (t) => {
     const log = pino({ level: 'error' })
-    equal(false, log.isLevelEnabled('trace'))
+    t.assert.strictEqual(false, log.isLevelEnabled('trace'))
   })
 
-  test('ASC: can check if child has current level enabled', async ({ equal }) => {
+  await t.test('ASC: can check if child has current level enabled', async (t) => {
     const log = pino().child({}, { level: 'debug' })
-    equal(true, log.isLevelEnabled('debug'))
-    equal(true, log.isLevelEnabled('error'))
-    equal(false, log.isLevelEnabled('trace'))
+    t.assert.strictEqual(true, log.isLevelEnabled('debug'))
+    t.assert.strictEqual(true, log.isLevelEnabled('error'))
+    t.assert.strictEqual(false, log.isLevelEnabled('trace'))
   })
 
-  test('can check if custom level is enabled', async ({ equal }) => {
+  await t.test('can check if custom level is enabled', async (t) => {
     const log = pino({
       customLevels: { foo: 35 },
       level: 'debug'
     })
-    equal(true, log.isLevelEnabled('foo'))
-    equal(true, log.isLevelEnabled('error'))
-    equal(false, log.isLevelEnabled('trace'))
+    t.assert.strictEqual(true, log.isLevelEnabled('foo'))
+    t.assert.strictEqual(true, log.isLevelEnabled('error'))
+    t.assert.strictEqual(false, log.isLevelEnabled('trace'))
   })
-
-  end()
 })
 
-test('Custom levels suite', ({ test, end }) => {
-  test('can check if current level enabled', async ({ equal }) => {
+test('Custom levels suite', async t => {
+  await t.test('can check if current level enabled', async (t) => {
     const log = pino({ level: 'debug', customLevels })
-    equal(true, log.isLevelEnabled('debug'))
+    t.assert.strictEqual(true, log.isLevelEnabled('debug'))
   })
 
-  test('can check if level enabled after level set', async ({ equal }) => {
+  await t.test('can check if level enabled after level set', async (t) => {
     const log = pino({ customLevels })
-    equal(false, log.isLevelEnabled('debug'))
+    t.assert.strictEqual(false, log.isLevelEnabled('debug'))
     log.level = 'debug'
-    equal(true, log.isLevelEnabled('debug'))
+    t.assert.strictEqual(true, log.isLevelEnabled('debug'))
   })
 
-  test('can check if higher level enabled', async ({ equal }) => {
+  await t.test('can check if higher level enabled', async (t) => {
     const log = pino({ level: 'debug', customLevels })
-    equal(true, log.isLevelEnabled('error'))
+    t.assert.strictEqual(true, log.isLevelEnabled('error'))
   })
 
-  test('can check if lower level is disabled', async ({ equal }) => {
+  await t.test('can check if lower level is disabled', async (t) => {
     const log = pino({ level: 'error', customLevels })
-    equal(false, log.isLevelEnabled('trace'))
+    t.assert.strictEqual(false, log.isLevelEnabled('trace'))
   })
 
-  test('can check if child has current level enabled', async ({ equal }) => {
+  await t.test('can check if child has current level enabled', async (t) => {
     const log = pino().child({ customLevels }, { level: 'debug' })
-    equal(true, log.isLevelEnabled('debug'))
-    equal(true, log.isLevelEnabled('error'))
-    equal(false, log.isLevelEnabled('trace'))
+    t.assert.strictEqual(true, log.isLevelEnabled('debug'))
+    t.assert.strictEqual(true, log.isLevelEnabled('error'))
+    t.assert.strictEqual(false, log.isLevelEnabled('trace'))
   })
 
-  test('can check if custom level is enabled', async ({ equal }) => {
+  await t.test('can check if custom level is enabled', async (t) => {
     const log = pino({
       customLevels: { foo: 35, ...customLevels },
       level: 'debug'
     })
-    equal(true, log.isLevelEnabled('foo'))
-    equal(true, log.isLevelEnabled('error'))
-    equal(false, log.isLevelEnabled('trace'))
+    t.assert.strictEqual(true, log.isLevelEnabled('foo'))
+    t.assert.strictEqual(true, log.isLevelEnabled('error'))
+    t.assert.strictEqual(false, log.isLevelEnabled('trace'))
   })
-
-  end()
 })
