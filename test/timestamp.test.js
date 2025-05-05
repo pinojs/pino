@@ -2,19 +2,19 @@
 
 /* eslint no-prototype-builtins: 0 */
 
-const { test } = require('tap')
+const { test } = require('node:test')
 const { sink, once } = require('./helper')
 const pino = require('../')
 
-test('pino exposes standard time functions', async ({ ok }) => {
-  ok(pino.stdTimeFunctions)
-  ok(pino.stdTimeFunctions.epochTime)
-  ok(pino.stdTimeFunctions.unixTime)
-  ok(pino.stdTimeFunctions.nullTime)
-  ok(pino.stdTimeFunctions.isoTime)
+test('pino exposes standard time functions', async (t) => {
+  t.assert.ok(pino.stdTimeFunctions)
+  t.assert.ok(pino.stdTimeFunctions.epochTime)
+  t.assert.ok(pino.stdTimeFunctions.unixTime)
+  t.assert.ok(pino.stdTimeFunctions.nullTime)
+  t.assert.ok(pino.stdTimeFunctions.isoTime)
 })
 
-test('pino accepts external time functions', async ({ equal }) => {
+test('pino accepts external time functions', async (t) => {
   const opts = {
     timestamp: () => ',"time":"none"'
   }
@@ -22,11 +22,11 @@ test('pino accepts external time functions', async ({ equal }) => {
   const instance = pino(opts, stream)
   instance.info('foobar')
   const result = await once(stream, 'data')
-  equal(result.hasOwnProperty('time'), true)
-  equal(result.time, 'none')
+  t.assert.strictEqual(result.hasOwnProperty('time'), true)
+  t.assert.strictEqual(result.time, 'none')
 })
 
-test('pino accepts external time functions with custom label', async ({ equal }) => {
+test('pino accepts external time functions with custom label', async (t) => {
   const opts = {
     timestamp: () => ',"custom-time-label":"none"'
   }
@@ -34,61 +34,61 @@ test('pino accepts external time functions with custom label', async ({ equal })
   const instance = pino(opts, stream)
   instance.info('foobar')
   const result = await once(stream, 'data')
-  equal(result.hasOwnProperty('custom-time-label'), true)
-  equal(result['custom-time-label'], 'none')
+  t.assert.strictEqual(result.hasOwnProperty('custom-time-label'), true)
+  t.assert.strictEqual(result['custom-time-label'], 'none')
 })
 
-test('inserts timestamp by default', async ({ ok, equal }) => {
+test('inserts timestamp by default', async (t) => {
   const stream = sink()
   const instance = pino(stream)
   instance.info('foobar')
   const result = await once(stream, 'data')
-  equal(result.hasOwnProperty('time'), true)
-  ok(new Date(result.time) <= new Date(), 'time is greater than timestamp')
-  equal(result.msg, 'foobar')
+  t.assert.strictEqual(result.hasOwnProperty('time'), true)
+  t.assert.ok(new Date(result.time) <= new Date(), 'time is greater than timestamp')
+  t.assert.strictEqual(result.msg, 'foobar')
 })
 
-test('omits timestamp when timestamp option is false', async ({ equal }) => {
+test('omits timestamp when timestamp option is false', async (t) => {
   const stream = sink()
   const instance = pino({ timestamp: false }, stream)
   instance.info('foobar')
   const result = await once(stream, 'data')
-  equal(result.hasOwnProperty('time'), false)
-  equal(result.msg, 'foobar')
+  t.assert.strictEqual(result.hasOwnProperty('time'), false)
+  t.assert.strictEqual(result.msg, 'foobar')
 })
 
-test('inserts timestamp when timestamp option is true', async ({ ok, equal }) => {
+test('inserts timestamp when timestamp option is true', async (t) => {
   const stream = sink()
   const instance = pino({ timestamp: true }, stream)
   instance.info('foobar')
   const result = await once(stream, 'data')
-  equal(result.hasOwnProperty('time'), true)
-  ok(new Date(result.time) <= new Date(), 'time is greater than timestamp')
-  equal(result.msg, 'foobar')
+  t.assert.strictEqual(result.hasOwnProperty('time'), true)
+  t.assert.ok(new Date(result.time) <= new Date(), 'time is greater than timestamp')
+  t.assert.strictEqual(result.msg, 'foobar')
 })
 
-test('child inserts timestamp by default', async ({ ok, equal }) => {
+test('child inserts timestamp by default', async (t) => {
   const stream = sink()
   const logger = pino(stream)
   const instance = logger.child({ component: 'child' })
   instance.info('foobar')
   const result = await once(stream, 'data')
-  equal(result.hasOwnProperty('time'), true)
-  ok(new Date(result.time) <= new Date(), 'time is greater than timestamp')
-  equal(result.msg, 'foobar')
+  t.assert.strictEqual(result.hasOwnProperty('time'), true)
+  t.assert.ok(new Date(result.time) <= new Date(), 'time is greater than timestamp')
+  t.assert.strictEqual(result.msg, 'foobar')
 })
 
-test('child omits timestamp with option', async ({ equal }) => {
+test('child omits timestamp with option', async (t) => {
   const stream = sink()
   const logger = pino({ timestamp: false }, stream)
   const instance = logger.child({ component: 'child' })
   instance.info('foobar')
   const result = await once(stream, 'data')
-  equal(result.hasOwnProperty('time'), false)
-  equal(result.msg, 'foobar')
+  t.assert.strictEqual(result.hasOwnProperty('time'), false)
+  t.assert.strictEqual(result.msg, 'foobar')
 })
 
-test('pino.stdTimeFunctions.unixTime returns seconds based timestamps', async ({ equal }) => {
+test('pino.stdTimeFunctions.unixTime returns seconds based timestamps', async (t) => {
   const opts = {
     timestamp: pino.stdTimeFunctions.unixTime
   }
@@ -98,12 +98,12 @@ test('pino.stdTimeFunctions.unixTime returns seconds based timestamps', async ({
   Date.now = () => 1531069919686
   instance.info('foobar')
   const result = await once(stream, 'data')
-  equal(result.hasOwnProperty('time'), true)
-  equal(result.time, 1531069920)
+  t.assert.strictEqual(result.hasOwnProperty('time'), true)
+  t.assert.strictEqual(result.time, 1531069920)
   Date.now = now
 })
 
-test('pino.stdTimeFunctions.isoTime returns ISO 8601 timestamps', async ({ equal }) => {
+test('pino.stdTimeFunctions.isoTime returns ISO 8601 timestamps', async (t) => {
   const opts = {
     timestamp: pino.stdTimeFunctions.isoTime
   }
@@ -115,7 +115,7 @@ test('pino.stdTimeFunctions.isoTime returns ISO 8601 timestamps', async ({ equal
   const iso = new Date(ms).toISOString()
   instance.info('foobar')
   const result = await once(stream, 'data')
-  equal(result.hasOwnProperty('time'), true)
-  equal(result.time, iso)
+  t.assert.strictEqual(result.hasOwnProperty('time'), true)
+  t.assert.strictEqual(result.time, iso)
   Date.now = now
 })
