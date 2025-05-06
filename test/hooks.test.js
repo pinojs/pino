@@ -1,17 +1,9 @@
 'use strict'
 
 const { test } = require('node:test')
+const match = require('./custom-assertions/match')
 const { sink, once } = require('./helper')
 const pino = require('../')
-
-function match (t, obj, expected) {
-  const checkObj = Object.keys(expected).reduce((acc, key) => {
-    acc[key] = obj[key]
-    return acc
-  }, {})
-
-  t.assert.deepStrictEqual(checkObj, expected)
-}
 
 test('log method hook', async t => {
   await t.test('gets invoked', async t => {
@@ -37,7 +29,7 @@ test('log method hook', async t => {
 
     const o = once(stream, 'data')
     logger.info('a', 'b', 'c')
-    match(t, await o, { msg: 'a-b-c' })
+    match(await o, { msg: 'a-b-c' }, t)
   })
 
   await t.test('fatal method invokes hook', async t => {
@@ -55,7 +47,7 @@ test('log method hook', async t => {
 
     const o = once(stream, 'data')
     logger.fatal('a')
-    match(t, await o, { msg: 'a' })
+    match(await o, { msg: 'a' }, t)
   })
 
   await t.test('children get the hook', async t => {
@@ -75,11 +67,11 @@ test('log method hook', async t => {
 
     let o = once(stream, 'data')
     child.info('a', 'b')
-    match(t, await o, { msg: 'a-b' })
+    match(await o, { msg: 'a-b' }, t)
 
     o = once(stream, 'data')
     grandchild.info('c', 'd')
-    match(t, await o, { msg: 'c-d' })
+    match(await o, { msg: 'c-d' }, t)
   })
 
   await t.test('get log level', async t => {
@@ -99,7 +91,7 @@ test('log method hook', async t => {
 
     const o = once(stream, 'data')
     logger.error('a')
-    match(t, await o, { msg: 'a' })
+    match(await o, { msg: 'a' }, t)
   })
 })
 
@@ -118,6 +110,6 @@ test('streamWrite hook', async t => {
 
     const o = once(stream, 'data')
     logger.info('hide redact-me in this string')
-    match(t, await o, { msg: 'hide XXX in this string' })
+    match(await o, { msg: 'hide XXX in this string' }, t)
   })
 })
