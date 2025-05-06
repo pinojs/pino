@@ -10,7 +10,7 @@ const proxyquire = require('proxyquire')
 const strip = require('strip-ansi')
 const { file, sink } = require('./helper')
 
-test('sends to multiple streams using string levels', (t, end) => {
+test('sends to multiple streams using string levels', (t) => {
   let messageCount = 0
   const stream = writeStream(function (data, enc, cb) {
     messageCount += 1
@@ -30,7 +30,6 @@ test('sends to multiple streams using string levels', (t, end) => {
   log.debug('debug stream')
   log.fatal('fatal stream')
   t.assert.strictEqual(messageCount, 9)
-  end()
 })
 
 test('sends to multiple streams using custom levels', (t, end) => {
