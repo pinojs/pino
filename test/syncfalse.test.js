@@ -3,7 +3,7 @@
 const os = require('node:os')
 const { promises: { readFile }, createWriteStream } = require('node:fs')
 const { join } = require('node:path')
-const { test } = require('tap')
+const { test } = require('node:test')
 const { fork } = require('node:child_process')
 const writer = require('flush-write-stream')
 const {
@@ -16,10 +16,7 @@ const { promisify } = require('node:util')
 
 const sleep = promisify(setTimeout)
 
-test('asynchronous logging', async ({
-  equal,
-  teardown
-}) => {
+test('asynchronous logging', async (t) => {
   const now = Date.now
   const hostname = os.hostname
   const proc = process
@@ -61,20 +58,17 @@ test('asynchronous logging', async ({
   await once(child, 'close')
   // Wait for the last write to be flushed
   await sleep(100)
-  equal(actual, expected)
-  equal(actual2.trim(), expected2)
+  t.assert.strictEqual(actual, expected)
+  t.assert.strictEqual(actual2.trim(), expected2)
 
-  teardown(() => {
+  t.after(() => {
     os.hostname = hostname
     Date.now = now
     global.process = proc
   })
 })
 
-test('sync false with child', async ({
-  equal,
-  teardown
-}) => {
+test('sync false with child', async (t) => {
   const now = Date.now
   const hostname = os.hostname
   const proc = process
@@ -120,31 +114,32 @@ test('sync false with child', async ({
     cb()
   }))
   await once(child, 'close')
-  equal(actual, expected)
-  equal(actual2.trim(), expected2)
+  t.assert.strictEqual(actual, expected)
+  t.assert.strictEqual(actual2.trim(), expected2)
 
-  teardown(() => {
+  t.after(() => {
     os.hostname = hostname
     Date.now = now
     global.process = proc
   })
 })
 
-test('flush does nothing with sync true (default)', async ({ equal }) => {
+test('flush does nothing with sync true (default)', async (t) => {
   const instance = require('..')()
-  equal(instance.flush(), undefined)
+  t.assert.strictEqual(instance.flush(), undefined)
 })
 
-test('should still call flush callback even when does nothing with sync true (default)', (t) => {
+test('should still call flush callback even when does nothing with sync true (default)', (t, end) => {
   t.plan(3)
   const instance = require('..')()
   instance.flush((...args) => {
-    t.ok('flush called')
-    t.same(args, [])
+    t.assert.ok('flush called')
+    t.assert.deepStrictEqual(args, [])
 
     // next tick to make flush not called more than once
     process.nextTick(() => {
-      t.ok('flush next tick called')
+      t.assert.ok('flush next tick called')
+      end()
     })
   })
 })
@@ -171,18 +166,18 @@ test('should call the flush callback when flushed the data for async logger', as
 
   const [firstFlushData] = await getOutputLogLines()
 
-  t.equal(firstFlushData.msg, 'hello')
+  t.assert.strictEqual(firstFlushData.msg, 'hello')
 
   // should not flush this as no data accumulated that's bigger than min length
   instance.info('world')
 
   // Making sure data is not flushed yet
   const afterLogData = await getOutputLogLines()
-  t.equal(afterLogData.length, 1)
+  t.assert.strictEqual(afterLogData.length, 1)
 
   await flushPromise()
 
   // Making sure data is not flushed yet
   const afterSecondFlush = (await getOutputLogLines())[1]
-  t.equal(afterSecondFlush.msg, 'world')
+  t.assert.strictEqual(afterSecondFlush.msg, 'world')
 })
