@@ -1,6 +1,6 @@
 'use strict'
 
-const { test } = require('tap')
+const { test } = require('node:test')
 const { join } = require('node:path')
 const { createReadStream } = require('node:fs')
 const { promisify } = require('node:util')
@@ -15,7 +15,7 @@ const sleep = promisify(setTimeout)
 
 const skip = process.env.CI || process.env.CITGM
 
-test('eight million lines', { skip }, async ({ equal, comment }) => {
+test('eight million lines', { skip }, async (t) => {
   const destination = file()
   await execa(process.argv[0], [join(__dirname, '..', 'fixtures', 'transport-many-lines.js'), destination])
 
@@ -32,12 +32,9 @@ test('eight million lines', { skip }, async ({ equal, comment }) => {
   let count = 0
   await pipeline(createReadStream(destination), split(), new Writable({
     write (chunk, enc, cb) {
-      if (count % (toWrite / 10) === 0) {
-        comment(`read ${count}`)
-      }
       count++
       cb()
     }
   }))
-  equal(count, toWrite)
+  t.assert.strictEqual(count, toWrite)
 })
