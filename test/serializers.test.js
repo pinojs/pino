@@ -1,5 +1,5 @@
 'use strict'
-const { test } = require('tap')
+const { test } = require('node:test')
 const { sink, once } = require('./helper')
 const stdSerializers = require('pino-std-serializers')
 const pino = require('../')
@@ -12,19 +12,19 @@ const childSerializers = {
   test: () => 'child'
 }
 
-test('default err namespace error serializer', async ({ equal }) => {
+test('default err namespace error serializer', async (t) => {
   const stream = sink()
   const parent = pino(stream)
 
   parent.info({ err: ReferenceError('test') })
   const o = await once(stream, 'data')
-  equal(typeof o.err, 'object')
-  equal(o.err.type, 'ReferenceError')
-  equal(o.err.message, 'test')
-  equal(typeof o.err.stack, 'string')
+  t.assert.strictEqual(typeof o.err, 'object')
+  t.assert.strictEqual(o.err.type, 'ReferenceError')
+  t.assert.strictEqual(o.err.message, 'test')
+  t.assert.strictEqual(typeof o.err.stack, 'string')
 })
 
-test('custom serializer overrides default err namespace error serializer', async ({ equal }) => {
+test('custom serializer overrides default err namespace error serializer', async (t) => {
   const stream = sink()
   const parent = pino({
     serializers: {
@@ -38,13 +38,13 @@ test('custom serializer overrides default err namespace error serializer', async
 
   parent.info({ err: ReferenceError('test') })
   const o = await once(stream, 'data')
-  equal(typeof o.err, 'object')
-  equal(o.err.t, 'ReferenceError')
-  equal(o.err.m, 'test')
-  equal(typeof o.err.s, 'string')
+  t.assert.strictEqual(typeof o.err, 'object')
+  t.assert.strictEqual(o.err.t, 'ReferenceError')
+  t.assert.strictEqual(o.err.m, 'test')
+  t.assert.strictEqual(typeof o.err.s, 'string')
 })
 
-test('custom serializer overrides default err namespace error serializer when nestedKey is on', async ({ equal }) => {
+test('custom serializer overrides default err namespace error serializer when nestedKey is on', async (t) => {
   const stream = sink()
   const parent = pino({
     nestedKey: 'obj',
@@ -61,47 +61,47 @@ test('custom serializer overrides default err namespace error serializer when ne
 
   parent.info({ err: ReferenceError('test') })
   const o = await once(stream, 'data')
-  equal(typeof o.obj.err, 'object')
-  equal(o.obj.err.t, 'ReferenceError')
-  equal(o.obj.err.m, 'test')
-  equal(typeof o.obj.err.s, 'string')
+  t.assert.strictEqual(typeof o.obj.err, 'object')
+  t.assert.strictEqual(o.obj.err.t, 'ReferenceError')
+  t.assert.strictEqual(o.obj.err.m, 'test')
+  t.assert.strictEqual(typeof o.obj.err.s, 'string')
 })
 
-test('null overrides default err namespace error serializer', async ({ equal }) => {
+test('null overrides default err namespace error serializer', async (t) => {
   const stream = sink()
   const parent = pino({ serializers: { err: null } }, stream)
 
   parent.info({ err: ReferenceError('test') })
   const o = await once(stream, 'data')
-  equal(typeof o.err, 'object')
-  equal(typeof o.err.type, 'undefined')
-  equal(typeof o.err.message, 'undefined')
-  equal(typeof o.err.stack, 'undefined')
+  t.assert.strictEqual(typeof o.err, 'object')
+  t.assert.strictEqual(typeof o.err.type, 'undefined')
+  t.assert.strictEqual(typeof o.err.message, 'undefined')
+  t.assert.strictEqual(typeof o.err.stack, 'undefined')
 })
 
-test('undefined overrides default err namespace error serializer', async ({ equal }) => {
+test('undefined overrides default err namespace error serializer', async (t) => {
   const stream = sink()
   const parent = pino({ serializers: { err: undefined } }, stream)
 
   parent.info({ err: ReferenceError('test') })
   const o = await once(stream, 'data')
-  equal(typeof o.err, 'object')
-  equal(typeof o.err.type, 'undefined')
-  equal(typeof o.err.message, 'undefined')
-  equal(typeof o.err.stack, 'undefined')
+  t.assert.strictEqual(typeof o.err, 'object')
+  t.assert.strictEqual(typeof o.err.type, 'undefined')
+  t.assert.strictEqual(typeof o.err.message, 'undefined')
+  t.assert.strictEqual(typeof o.err.stack, 'undefined')
 })
 
-test('serializers override values', async ({ equal }) => {
+test('serializers override values', async (t) => {
   const stream = sink()
   const parent = pino({ serializers: parentSerializers }, stream)
   parent.child({}, { serializers: childSerializers })
 
   parent.fatal({ test: 'test' })
   const o = await once(stream, 'data')
-  equal(o.test, 'parent')
+  t.assert.strictEqual(o.test, 'parent')
 })
 
-test('child does not overwrite parent serializers', async ({ equal }) => {
+test('child does not overwrite parent serializers', async (t) => {
   const stream = sink()
   const parent = pino({ serializers: parentSerializers }, stream)
   const child = parent.child({}, { serializers: childSerializers })
@@ -109,13 +109,13 @@ test('child does not overwrite parent serializers', async ({ equal }) => {
   parent.fatal({ test: 'test' })
 
   const o = once(stream, 'data')
-  equal((await o).test, 'parent')
+  t.assert.strictEqual((await o).test, 'parent')
   const o2 = once(stream, 'data')
   child.fatal({ test: 'test' })
-  equal((await o2).test, 'child')
+  t.assert.strictEqual((await o2).test, 'child')
 })
 
-test('Symbol.for(\'pino.serializers\')', async ({ equal, same, not }) => {
+test('Symbol.for(\'pino.serializers\')', async (t) => {
   const stream = sink()
   const expected = Object.assign({
     err: stdSerializers.err
@@ -123,9 +123,9 @@ test('Symbol.for(\'pino.serializers\')', async ({ equal, same, not }) => {
   const parent = pino({ serializers: parentSerializers }, stream)
   const child = parent.child({ a: 'property' })
 
-  same(parent[Symbol.for('pino.serializers')], expected)
-  same(child[Symbol.for('pino.serializers')], expected)
-  equal(parent[Symbol.for('pino.serializers')], child[Symbol.for('pino.serializers')])
+  t.assert.deepStrictEqual(parent[Symbol.for('pino.serializers')], expected)
+  t.assert.deepStrictEqual(child[Symbol.for('pino.serializers')], expected)
+  t.assert.strictEqual(parent[Symbol.for('pino.serializers')], child[Symbol.for('pino.serializers')])
 
   const child2 = parent.child({}, {
     serializers: {
@@ -137,22 +137,22 @@ test('Symbol.for(\'pino.serializers\')', async ({ equal, same, not }) => {
     return 'hello'
   }
 
-  not(child2[Symbol.for('pino.serializers')], parentSerializers)
-  equal(child2[Symbol.for('pino.serializers')].a, a)
-  equal(child2[Symbol.for('pino.serializers')].test, parentSerializers.test)
+  t.assert.notStrictEqual(child2[Symbol.for('pino.serializers')], parentSerializers)
+  t.assert.strictEqual(child2[Symbol.for('pino.serializers')].a, a)
+  t.assert.strictEqual(child2[Symbol.for('pino.serializers')].test, parentSerializers.test)
 })
 
-test('children inherit parent serializers', async ({ equal }) => {
+test('children inherit parent serializers', async (t) => {
   const stream = sink()
   const parent = pino({ serializers: parentSerializers }, stream)
 
   const child = parent.child({ a: 'property' })
   child.fatal({ test: 'test' })
   const o = await once(stream, 'data')
-  equal(o.test, 'parent')
+  t.assert.strictEqual(o.test, 'parent')
 })
 
-test('children inherit parent Symbol serializers', async ({ equal, same, not }) => {
+test('children inherit parent Symbol serializers', async (t) => {
   const stream = sink()
   const symbolSerializers = {
     [Symbol.for('b')]: b
@@ -162,7 +162,7 @@ test('children inherit parent Symbol serializers', async ({ equal, same, not }) 
   }, symbolSerializers)
   const parent = pino({ serializers: symbolSerializers }, stream)
 
-  same(parent[Symbol.for('pino.serializers')], expected)
+  t.assert.deepStrictEqual(parent[Symbol.for('pino.serializers')], expected)
 
   const child = parent.child({}, {
     serializers: {
@@ -179,12 +179,12 @@ test('children inherit parent Symbol serializers', async ({ equal, same, not }) 
     return 'world'
   }
 
-  same(child[Symbol.for('pino.serializers')].a, a)
-  same(child[Symbol.for('pino.serializers')][Symbol.for('b')], b)
-  same(child[Symbol.for('pino.serializers')][Symbol.for('a')], a)
+  t.assert.strictEqual(child[Symbol.for('pino.serializers')].a, a)
+  t.assert.strictEqual(child[Symbol.for('pino.serializers')][Symbol.for('b')], b)
+  t.assert.strictEqual(child[Symbol.for('pino.serializers')][Symbol.for('a')], a)
 })
 
-test('children serializers get called', async ({ equal }) => {
+test('children serializers get called', async (t) => {
   const stream = sink()
   const parent = pino({
     test: 'this'
@@ -194,10 +194,10 @@ test('children serializers get called', async ({ equal }) => {
 
   child.fatal({ test: 'test' })
   const o = await once(stream, 'data')
-  equal(o.test, 'child')
+  t.assert.strictEqual(o.test, 'child')
 })
 
-test('children serializers get called when inherited from parent', async ({ equal }) => {
+test('children serializers get called when inherited from parent', async (t) => {
   const stream = sink()
   const parent = pino({
     test: 'this',
@@ -208,10 +208,10 @@ test('children serializers get called when inherited from parent', async ({ equa
 
   child.fatal({ test: 'fail' })
   const o = await once(stream, 'data')
-  equal(o.test, 'pass')
+  t.assert.strictEqual(o.test, 'pass')
 })
 
-test('non-overridden serializers are available in the children', async ({ equal }) => {
+test('non-overridden serializers are available in the children', async (t) => {
   const stream = sink()
   const pSerializers = {
     onlyParent: function () { return 'parent' },
@@ -229,16 +229,16 @@ test('non-overridden serializers are available in the children', async ({ equal 
 
   const o = once(stream, 'data')
   child.fatal({ shared: 'test' })
-  equal((await o).shared, 'child')
+  t.assert.strictEqual((await o).shared, 'child')
   const o2 = once(stream, 'data')
   child.fatal({ onlyParent: 'test' })
-  equal((await o2).onlyParent, 'parent')
+  t.assert.strictEqual((await o2).onlyParent, 'parent')
   const o3 = once(stream, 'data')
   child.fatal({ onlyChild: 'test' })
-  equal((await o3).onlyChild, 'child')
+  t.assert.strictEqual((await o3).onlyChild, 'child')
   const o4 = once(stream, 'data')
   parent.fatal({ onlyChild: 'test' })
-  equal((await o4).onlyChild, 'test')
+  t.assert.strictEqual((await o4).onlyChild, 'test')
 })
 
 test('custom serializer for messageKey', async (t) => {
@@ -249,5 +249,5 @@ test('custom serializer for messageKey', async (t) => {
   instance.info(o, 42)
 
   const { msg } = await once(stream, 'data')
-  t.equal(msg, '422')
+  t.assert.strictEqual(msg, '422')
 })
