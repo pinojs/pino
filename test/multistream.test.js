@@ -569,24 +569,20 @@ test('add a stream', (t, end) => {
   end()
 })
 
-test('multistream.add throws if not a stream', (t, end) => {
-  try {
+test('multistream.add throws if not a stream', (t) => {
+  t.assert.throws(() => {
     pino({
       level: 'trace'
     }, multistream().add({}))
-  } catch (_) {
-    end()
-  }
+  })
 })
 
-test('multistream throws if not a stream', (t, end) => {
-  try {
+test('multistream throws if not a stream', (t) => {
+  t.assert.throws(() => {
     pino({
       level: 'trace'
     }, multistream({}))
-  } catch (_) {
-    end()
-  }
+  })
 })
 
 test('multistream.write should not throw if one stream fails', (t, end) => {
