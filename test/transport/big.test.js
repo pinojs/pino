@@ -32,9 +32,6 @@ test('eight million lines', { skip }, async (t) => {
   let count = 0
   await pipeline(createReadStream(destination), split(), new Writable({
     write (chunk, enc, cb) {
-      if (count % (toWrite / 10) === 0) {
-        t.diagnostic(`read ${count}`)
-      }
       count++
       cb()
     }
