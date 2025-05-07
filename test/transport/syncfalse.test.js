@@ -3,7 +3,7 @@
 const os = require('node:os')
 const pino = require('../..')
 const { join } = require('node:path')
-const { test } = require('tap')
+const { test } = require('node:test')
 const { readFile } = require('node:fs').promises
 const { watchFileCreated, file } = require('../helper')
 const { promisify } = require('node:util')
@@ -11,7 +11,7 @@ const { promisify } = require('node:util')
 const { pid } = process
 const hostname = os.hostname()
 
-test('thread-stream async flush', async ({ equal, same }) => {
+test('thread-stream async flush', async (t) => {
   const destination = file()
   const transport = pino.transport({
     target: join(__dirname, '..', 'fixtures', 'to-file-transport.js'),
@@ -20,12 +20,12 @@ test('thread-stream async flush', async ({ equal, same }) => {
   const instance = pino(transport)
   instance.info('hello')
 
-  equal(instance.flush(), undefined)
+  t.assert.strictEqual(instance.flush(), undefined)
 
   await watchFileCreated(destination)
   const result = JSON.parse(await readFile(destination))
   delete result.time
-  same(result, {
+  t.assert.deepStrictEqual(result, {
     pid,
     hostname,
     level: 30,
@@ -51,18 +51,18 @@ test('thread-stream async flush should call the passed callback', async (t) => {
 
   const [firstFlushData] = await getOutputLogLines()
 
-  t.equal(firstFlushData.msg, 'hello')
+  t.assert.strictEqual(firstFlushData.msg, 'hello')
 
   // should not flush this as no data accumulated that's bigger than min length
   instance.info('world')
 
   // Making sure data is not flushed yet
   const afterLogData = await getOutputLogLines()
-  t.equal(afterLogData.length, 1)
+  t.assert.strictEqual(afterLogData.length, 1)
 
   await flushPromise()
 
   // Making sure data is not flushed yet
   const afterSecondFlush = (await getOutputLogLines())[1]
-  t.equal(afterSecondFlush.msg, 'world')
+  t.assert.strictEqual(afterSecondFlush.msg, 'world')
 })
