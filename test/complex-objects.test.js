@@ -1,11 +1,11 @@
 'use strict'
 
-const { test } = require('tap')
+const { test } = require('node:test')
 const { sink, once } = require('./helper')
 const { PassThrough } = require('node:stream')
 const pino = require('../')
 
-test('Proxy and stream objects', async ({ equal }) => {
+test('Proxy and stream objects', async (t) => {
   const s = new PassThrough()
   s.resume()
   s.write('', () => {})
@@ -16,10 +16,10 @@ test('Proxy and stream objects', async ({ equal }) => {
 
   const result = await once(stream, 'data')
 
-  equal(result.obj, '[unable to serialize, circular reference is too complex to analyze]')
+  t.assert.strictEqual(result.obj, '[unable to serialize, circular reference is too complex to analyze]')
 })
 
-test('Proxy and stream objects', async ({ equal }) => {
+test('Proxy and stream objects', async (t) => {
   const s = new PassThrough()
   s.resume()
   s.write('', () => {})
@@ -30,5 +30,5 @@ test('Proxy and stream objects', async ({ equal }) => {
 
   const result = await once(stream, 'data')
 
-  equal(result.p, '[unable to serialize, circular reference is too complex to analyze]')
+  t.assert.strictEqual(result.p, '[unable to serialize, circular reference is too complex to analyze]')
 })
