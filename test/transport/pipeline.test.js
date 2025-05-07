@@ -4,14 +4,14 @@ const os = require('node:os')
 const { join } = require('node:path')
 const { readFile } = require('node:fs').promises
 const { watchFileCreated, file } = require('../helper')
-const { test } = require('tap')
+const { test } = require('node:test')
 const pino = require('../../')
 const { DEFAULT_LEVELS } = require('../../lib/constants')
 
 const { pid } = process
 const hostname = os.hostname()
 
-test('pino.transport with a pipeline', async ({ same, teardown }) => {
+test('pino.transport with a pipeline', async (t) => {
   const destination = file()
   const transport = pino.transport({
     pipeline: [{
@@ -21,13 +21,13 @@ test('pino.transport with a pipeline', async ({ same, teardown }) => {
       options: { destination }
     }]
   })
-  teardown(transport.end.bind(transport))
+  t.after(transport.end.bind(transport))
   const instance = pino(transport)
   instance.info('hello')
   await watchFileCreated(destination)
   const result = JSON.parse(await readFile(destination))
   delete result.time
-  same(result, {
+  t.assert.deepStrictEqual(result, {
     pid,
     hostname,
     level: DEFAULT_LEVELS.info,
@@ -36,7 +36,7 @@ test('pino.transport with a pipeline', async ({ same, teardown }) => {
   })
 })
 
-test('pino.transport with targets containing pipelines', async ({ same, teardown }) => {
+test('pino.transport with targets containing pipelines', async (t) => {
   const destinationA = file()
   const destinationB = file()
   const transport = pino.transport({
@@ -59,7 +59,7 @@ test('pino.transport with targets containing pipelines', async ({ same, teardown
     ]
   })
 
-  teardown(transport.end.bind(transport))
+  t.after(transport.end.bind(transport))
   const instance = pino(transport)
   instance.info('hello')
   await watchFileCreated(destinationA)
@@ -68,13 +68,13 @@ test('pino.transport with targets containing pipelines', async ({ same, teardown
   const resultB = JSON.parse(await readFile(destinationB))
   delete resultA.time
   delete resultB.time
-  same(resultA, {
+  t.assert.deepStrictEqual(resultA, {
     pid,
     hostname,
     level: DEFAULT_LEVELS.info,
     msg: 'hello'
   })
-  same(resultB, {
+  t.assert.deepStrictEqual(resultB, {
     pid,
     hostname,
     level: DEFAULT_LEVELS.info,
@@ -83,7 +83,7 @@ test('pino.transport with targets containing pipelines', async ({ same, teardown
   })
 })
 
-test('pino.transport with targets containing pipelines with levels defined and dedupe', async ({ same, teardown }) => {
+test('pino.transport with targets containing pipelines with levels defined and dedupe', async (t) => {
   const destinationA = file()
   const destinationB = file()
   const transport = pino.transport({
@@ -109,7 +109,7 @@ test('pino.transport with targets containing pipelines with levels defined and d
     dedupe: true
   })
 
-  teardown(transport.end.bind(transport))
+  t.after(transport.end.bind(transport))
   const instance = pino(transport)
   instance.info('hello info')
   instance.error('hello error')
@@ -119,13 +119,13 @@ test('pino.transport with targets containing pipelines with levels defined and d
   const resultB = JSON.parse(await readFile(destinationB))
   delete resultA.time
   delete resultB.time
-  same(resultA, {
+  t.assert.deepStrictEqual(resultA, {
     pid,
     hostname,
     level: DEFAULT_LEVELS.info,
     msg: 'hello info'
   })
-  same(resultB, {
+  t.assert.deepStrictEqual(resultB, {
     pid,
     hostname,
     level: DEFAULT_LEVELS.error,
