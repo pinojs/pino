@@ -3,19 +3,19 @@
 const http = require('http')
 const os = require('node:os')
 const semver = require('semver')
-const { test, skip } = require('tap')
+const { test, skip } = require('node:test')
 const { sink, once } = require('./helper')
 const pino = require('../')
 
 const { pid } = process
 const hostname = os.hostname()
 
-test('http request support', async ({ ok, same, error, teardown }) => {
+test('http request support', async t => {
   let originalReq
   const instance = pino(sink((chunk, enc) => {
-    ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
+    t.assert.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
-    same(chunk, {
+    t.assert.deepStrictEqual(chunk, {
       pid,
       hostname,
       level: 30,
@@ -38,22 +38,22 @@ test('http request support', async ({ ok, same, error, teardown }) => {
   server.unref()
   server.listen()
   const err = await once(server, 'listening')
-  error(err)
+  t.assert.ifError(err)
   const res = await once(http.get('http://localhost:' + server.address().port), 'response')
   res.resume()
   server.close()
 })
 
-test('http request support via serializer', async ({ ok, same, error, teardown }) => {
+test('http request support via serializer', async t => {
   let originalReq
   const instance = pino({
     serializers: {
       req: pino.stdSerializers.req
     }
   }, sink((chunk, enc) => {
-    ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
+    t.assert.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
-    same(chunk, {
+    t.assert.deepStrictEqual(chunk, {
       pid,
       hostname,
       level: 30,
@@ -76,7 +76,7 @@ test('http request support via serializer', async ({ ok, same, error, teardown }
   server.unref()
   server.listen()
   const err = await once(server, 'listening')
-  error(err)
+  t.assert.ifError(err)
 
   const res = await once(http.get('http://localhost:' + server.address().port), 'response')
   res.resume()
@@ -84,14 +84,14 @@ test('http request support via serializer', async ({ ok, same, error, teardown }
 })
 
 // skipped because request connection is deprecated since v13, and request socket is always available
-skip('http request support via serializer without request connection', async ({ ok, same, error, teardown }) => {
+skip('http request support via serializer without request connection', async t => {
   let originalReq
   const instance = pino({
     serializers: {
       req: pino.stdSerializers.req
     }
   }, sink((chunk, enc) => {
-    ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
+    t.assert.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
     const expected = {
       pid,
@@ -108,7 +108,7 @@ skip('http request support via serializer without request connection', async ({ 
       expected.req.remoteAddress = originalReq.socket.remoteAddress
       expected.req.remotePort = originalReq.socket.remotePort
     }
-    same(chunk, expected)
+    t.assert.deepStrictEqual(chunk, expected)
   }))
 
   const server = http.createServer(function (req, res) {
@@ -120,19 +120,19 @@ skip('http request support via serializer without request connection', async ({ 
   server.unref()
   server.listen()
   const err = await once(server, 'listening')
-  error(err)
+  t.assert.ifError(err)
 
   const res = await once(http.get('http://localhost:' + server.address().port), 'response')
   res.resume()
   server.close()
 })
 
-test('http response support', async ({ ok, same, error, teardown }) => {
+test('http response support', async t => {
   let originalRes
   const instance = pino(sink((chunk, enc) => {
-    ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
+    t.assert.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
-    same(chunk, {
+    t.assert.deepEqual(chunk, {
       pid,
       hostname,
       level: 30,
@@ -153,22 +153,22 @@ test('http response support', async ({ ok, same, error, teardown }) => {
   server.listen()
   const err = await once(server, 'listening')
 
-  error(err)
+  t.assert.ifError(err)
 
   const res = await once(http.get('http://localhost:' + server.address().port), 'response')
   res.resume()
   server.close()
 })
 
-test('http response support via a serializer', async ({ ok, same, error, teardown }) => {
+test('http response support via a serializer', async t => {
   const instance = pino({
     serializers: {
       res: pino.stdSerializers.res
     }
   }, sink((chunk, enc) => {
-    ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
+    t.assert.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
-    same(chunk, {
+    t.assert.deepStrictEqual(chunk, {
       pid,
       hostname,
       level: 30,
@@ -193,23 +193,23 @@ test('http response support via a serializer', async ({ ok, same, error, teardow
   server.unref()
   server.listen()
   const err = await once(server, 'listening')
-  error(err)
+  t.assert.ifError(err)
 
   const res = await once(http.get('http://localhost:' + server.address().port), 'response')
   res.resume()
   server.close()
 })
 
-test('http request support via serializer in a child', async ({ ok, same, error, teardown }) => {
+test('http request support via serializer in a child', async t => {
   let originalReq
   const instance = pino({
     serializers: {
       req: pino.stdSerializers.req
     }
   }, sink((chunk, enc) => {
-    ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
+    t.assert.ok(new Date(chunk.time) <= new Date(), 'time is greater than Date.now()')
     delete chunk.time
-    same(chunk, {
+    t.assert.deepStrictEqual(chunk, {
       pid,
       hostname,
       level: 30,
@@ -234,7 +234,7 @@ test('http request support via serializer in a child', async ({ ok, same, error,
   server.unref()
   server.listen()
   const err = await once(server, 'listening')
-  error(err)
+  t.assert.ifError(err)
 
   const res = await once(http.get('http://localhost:' + server.address().port), 'response')
   res.resume()
