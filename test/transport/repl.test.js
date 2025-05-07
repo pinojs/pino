@@ -1,14 +1,14 @@
 'use strict'
 
-const { doesNotThrow, test } = require('tap')
+const { test } = require('node:test')
 const proxyquire = require('proxyquire')
 
-test('pino.transport resolves targets in REPL', async ({ same }) => {
+test('pino.transport resolves targets in REPL', async (t) => {
   // Arrange
   const transport = proxyquire('../../lib/transport', {
     './caller': () => ['node:repl']
   })
 
   // Act / Assert
-  doesNotThrow(() => transport({ target: 'pino-pretty' }))
+  t.assert.doesNotThrow(() => transport({ target: 'pino-pretty' }))
 })
