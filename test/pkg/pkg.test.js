@@ -1,6 +1,6 @@
 'use strict'
 
-const { test } = require('tap')
+const { test } = require('node:test')
 const config = require('./pkg.config.json')
 const { promisify } = require('node:util')
 const { unlink } = require('node:fs/promises')
@@ -30,7 +30,7 @@ test('worker test when packaged into executable using pkg', { skip }, async (t) 
 
   // there should be no error when packaging
   const expectedvalue = stderr === '' || deprecationWarningRegex.test(stderr)
-  t.ok(expectedvalue)
+  t.assert.ok(expectedvalue)
 
   // pkg outputs files in the following format by default: {filename}-{node version}
   for (const target of config.pkg.targets) {
@@ -48,11 +48,9 @@ test('worker test when packaged into executable using pkg', { skip }, async (t) 
 
     // check if there were no errors
     const expectedvalue = stderr === '' || deprecationWarningRegex.test(stderr)
-    t.ok(expectedvalue)
+    t.assert.ok(expectedvalue)
 
     // clean up afterwards
     await unlink(executablePath)
   }
-
-  t.end()
 })
