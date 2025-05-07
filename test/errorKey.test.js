@@ -1,10 +1,10 @@
 'use strict'
-const { test } = require('tap')
+const { test } = require('node:test')
 const { sink, once } = require('./helper')
 const stdSerializers = require('pino-std-serializers')
 const pino = require('../')
 
-test('set the errorKey with error serializer', async ({ equal, same }) => {
+test('set the errorKey with error serializer', async (t) => {
   const stream = sink()
   const errorKey = 'error'
   const instance = pino({
@@ -13,13 +13,13 @@ test('set the errorKey with error serializer', async ({ equal, same }) => {
   }, stream)
   instance.error(new ReferenceError('test'))
   const o = await once(stream, 'data')
-  equal(typeof o[errorKey], 'object')
-  equal(o[errorKey].type, 'ReferenceError')
-  equal(o[errorKey].message, 'test')
-  equal(typeof o[errorKey].stack, 'string')
+  t.assert.strictEqual(typeof o[errorKey], 'object')
+  t.assert.strictEqual(o[errorKey].type, 'ReferenceError')
+  t.assert.strictEqual(o[errorKey].message, 'test')
+  t.assert.strictEqual(typeof o[errorKey].stack, 'string')
 })
 
-test('set the errorKey without error serializer', async ({ equal, same }) => {
+test('set the errorKey without error serializer', async (t) => {
   const stream = sink()
   const errorKey = 'error'
   const instance = pino({
@@ -27,8 +27,8 @@ test('set the errorKey without error serializer', async ({ equal, same }) => {
   }, stream)
   instance.error(new ReferenceError('test'))
   const o = await once(stream, 'data')
-  equal(typeof o[errorKey], 'object')
-  equal(o[errorKey].type, 'ReferenceError')
-  equal(o[errorKey].message, 'test')
-  equal(typeof o[errorKey].stack, 'string')
+  t.assert.strictEqual(typeof o[errorKey], 'object')
+  t.assert.strictEqual(o[errorKey].type, 'ReferenceError')
+  t.assert.strictEqual(o[errorKey].message, 'test')
+  t.assert.strictEqual(typeof o[errorKey].stack, 'string')
 })
