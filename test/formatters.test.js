@@ -5,17 +5,9 @@ const { hostname } = require('node:os')
 const { join } = require('node:path')
 const { readFile } = require('node:fs').promises
 const { test } = require('node:test')
+const match = require('@jsumners/assert-match')
 const { sink, once, watchFileCreated, file } = require('./helper')
 const pino = require('../')
-
-function match (t, obj, expected) {
-  const checkObj = Object.keys(expected).reduce((acc, key) => {
-    acc[key] = obj[key]
-    return acc
-  }, {})
-
-  t.assert.deepStrictEqual(checkObj, expected)
-}
 
 test('level formatter', async (t) => {
   const stream = sink()
@@ -33,11 +25,11 @@ test('level formatter', async (t) => {
 
   const o = once(stream, 'data')
   logger.info('hello world')
-  match(t, await o, {
+  match(await o, {
     log: {
       level: 'info'
     }
-  })
+  }, t)
 })
 
 test('bindings formatter', async (t) => {
@@ -59,14 +51,14 @@ test('bindings formatter', async (t) => {
 
   const o = once(stream, 'data')
   logger.info('hello world')
-  match(t, await o, {
+  match(await o, {
     process: {
       pid: process.pid
     },
     host: {
       name: hostname()
     }
-  })
+  }, t)
 })
 
 test('no bindings formatter', async (t) => {
@@ -84,7 +76,7 @@ test('no bindings formatter', async (t) => {
   const log = await o
   t.assert.ok(!log.hasOwnProperty('pid'))
   t.assert.ok(!log.hasOwnProperty('hostname'))
-  match(t, log, { msg: 'hello world' })
+  match(log, { msg: 'hello world' }, t)
 })
 
 test('log formatter', async (t) => {
@@ -100,11 +92,11 @@ test('log formatter', async (t) => {
 
   const o = once(stream, 'data')
   logger.info({ foo: 'bar', nested: { object: true } }, 'hello world')
-  match(t, await o, {
+  match(await o, {
     hello: 'world',
     foo: 'bar',
     nested: { object: true }
-  })
+  }, t)
 })
 
 test('Formatters combined', async (t) => {
@@ -136,7 +128,7 @@ test('Formatters combined', async (t) => {
 
   const o = once(stream, 'data')
   logger.info({ foo: 'bar', nested: { object: true } }, 'hello world')
-  match(t, await o, {
+  match(await o, {
     log: {
       level: 'info'
     },
@@ -149,7 +141,7 @@ test('Formatters combined', async (t) => {
     hello: 'world',
     foo: 'bar',
     nested: { object: true }
-  })
+  }, t)
 })
 
 test('Formatters in child logger', async (t) => {
@@ -192,7 +184,7 @@ test('Formatters in child logger', async (t) => {
 
   const o = once(stream, 'data')
   child.info('hello world')
-  match(t, await o, {
+  match(await o, {
     log: {
       level: 'info'
     },
@@ -206,7 +198,7 @@ test('Formatters in child logger', async (t) => {
     foo: 'bar',
     nested: { object: true },
     faz: 'baz'
-  })
+  }, t)
 })
 
 test('Formatters without bindings in child logger', async (t) => {
@@ -249,7 +241,7 @@ test('Formatters without bindings in child logger', async (t) => {
 
   const o = once(stream, 'data')
   child.info('hello world')
-  match(t, await o, {
+  match(await o, {
     log: {
       level: 'info'
     },
@@ -262,7 +254,7 @@ test('Formatters without bindings in child logger', async (t) => {
     foo: 'bar',
     other: 'stuff',
     nested: { object: true }
-  })
+  }, t)
 })
 
 test('elastic common schema format', async (t) => {
@@ -301,14 +293,14 @@ test('elastic common schema format', async (t) => {
   logger.info({ foo: 'bar' }, 'hello world')
   const log = await o
   t.assert.ok(typeof log['@timestamp'] === 'string', '@timestamp is not of type string')
-  match(t, log, {
+  match(log, {
     log: { level: 'info', logger: 'pino' },
     process: { pid: process.pid },
     host: { name: hostname() },
     ecs: { version: '1.4.0' },
     foo: 'bar',
     message: 'hello world'
-  })
+  }, t)
 })
 
 test('formatter with transport', async (t) => {
@@ -334,11 +326,11 @@ test('formatter with transport', async (t) => {
   await watchFileCreated(destination)
   const result = JSON.parse(await readFile(destination))
   delete result.time
-  match(t, result, {
+  match(result, {
     hello: 'world',
     foo: 'bar',
     nested: { object: true }
-  })
+  }, t)
 })
 
 test('throws when custom level formatter is used with transport.targets', async (t) => {

@@ -60,6 +60,7 @@
   },
   "homepage": "https://getpino.io",
   "devDependencies": {
+    "@jsumners/assert-match": "^1.0.0",
     "@jsumners/line-reporter": "^1.0.1",
     "@types/flush-write-stream": "^1.0.0",
     "@types/node": "^22.0.0",
