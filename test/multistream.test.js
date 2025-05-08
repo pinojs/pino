@@ -32,7 +32,7 @@ test('sends to multiple streams using string levels', (t) => {
   t.assert.strictEqual(messageCount, 9)
 })
 
-test('sends to multiple streams using custom levels', (t, end) => {
+test('sends to multiple streams using custom levels', (t) => {
   let messageCount = 0
   const stream = writeStream(function (data, enc, cb) {
     messageCount += 1
@@ -52,10 +52,9 @@ test('sends to multiple streams using custom levels', (t, end) => {
   log.debug('debug stream')
   log.fatal('fatal stream')
   t.assert.strictEqual(messageCount, 9)
-  end()
 })
 
-test('sends to multiple streams using optionally predefined levels', (t, end) => {
+test('sends to multiple streams using optionally predefined levels', (t) => {
   let messageCount = 0
   const stream = writeStream(function (data, enc, cb) {
     messageCount += 1
@@ -94,10 +93,9 @@ test('sends to multiple streams using optionally predefined levels', (t, end) =>
   log.fatal('fatal stream')
   log.silent('silent stream')
   t.assert.strictEqual(messageCount, 24)
-  end()
 })
 
-test('sends to multiple streams using number levels', (t, end) => {
+test('sends to multiple streams using number levels', (t) => {
   let messageCount = 0
   const stream = writeStream(function (data, enc, cb) {
     messageCount += 1
@@ -115,10 +113,9 @@ test('sends to multiple streams using number levels', (t, end) => {
   log.debug('debug stream')
   log.fatal('fatal stream')
   t.assert.strictEqual(messageCount, 6)
-  end()
 })
 
-test('level include higher levels', (t, end) => {
+test('level include higher levels', (t) => {
   let messageCount = 0
   const stream = writeStream(function (data, enc, cb) {
     messageCount += 1
@@ -127,7 +124,6 @@ test('level include higher levels', (t, end) => {
   const log = pino({}, multistream([{ level: 'info', stream }]))
   log.fatal('message')
   t.assert.strictEqual(messageCount, 1)
-  end()
 })
 
 test('supports multiple arguments', (t, end) => {
@@ -272,7 +268,7 @@ test('children support custom levels', (t, end) => {
   child.foo('bar')
 })
 
-test('levelVal overrides level', (t, end) => {
+test('levelVal overrides level', (t) => {
   let messageCount = 0
   const stream = writeStream(function (data, enc, cb) {
     messageCount += 1
@@ -290,10 +286,9 @@ test('levelVal overrides level', (t, end) => {
   log.debug('debug stream')
   log.fatal('fatal stream')
   t.assert.strictEqual(messageCount, 6)
-  end()
 })
 
-test('forwards metadata', (t, end) => {
+test('forwards metadata', (t) => {
   t.plan(4)
   const streams = [
     {
@@ -314,10 +309,9 @@ test('forwards metadata', (t, end) => {
   }, multistream(streams))
 
   log.info({ hello: 'world' }, 'a msg')
-  end()
 })
 
-test('forward name', (t, end) => {
+test('forward name', (t) => {
   t.plan(2)
   const streams = [
     {
@@ -338,10 +332,9 @@ test('forward name', (t, end) => {
   }, multistream(streams))
 
   log.info({ hello: 'world' }, 'a msg')
-  end()
 })
 
-test('forward name with child', (t, end) => {
+test('forward name with child', (t) => {
   t.plan(3)
   const streams = [
     {
@@ -362,10 +355,9 @@ test('forward name with child', (t, end) => {
   }, multistream(streams)).child({ component: 'aComponent' })
 
   log.info({ hello: 'world' }, 'a msg')
-  end()
 })
 
-test('clone generates a new multistream with all stream at the same level', (t, end) => {
+test('clone generates a new multistream with all stream at the same level', (t) => {
   let messageCount = 0
   const stream = writeStream(function (data, enc, cb) {
     messageCount += 1
@@ -396,11 +388,9 @@ test('clone generates a new multistream with all stream at the same level', (t, 
   log.debug('debug message not counted')
   log.fatal('fatal stream')
   t.assert.strictEqual(messageCount, 8)
-
-  end()
 })
 
-test('one stream', (t, end) => {
+test('one stream', (t) => {
   let messageCount = 0
   const stream = writeStream(function (data, enc, cb) {
     messageCount += 1
@@ -413,10 +403,9 @@ test('one stream', (t, end) => {
   log.debug('debug stream')
   log.fatal('fatal stream')
   t.assert.strictEqual(messageCount, 1)
-  end()
 })
 
-test('dedupe', (t, end) => {
+test('dedupe', (t) => {
   let messageCount = 0
   const stream1 = writeStream(function (data, enc, cb) {
     messageCount -= 1
@@ -446,10 +435,9 @@ test('dedupe', (t, end) => {
   log.fatal('fatal stream')
   log.fatal('fatal stream')
   t.assert.strictEqual(messageCount, 1)
-  end()
 })
 
-test('dedupe when logs have different levels', (t, end) => {
+test('dedupe when logs have different levels', (t) => {
   let messageCount = 0
   const stream1 = writeStream(function (data, enc, cb) {
     messageCount += 1
@@ -481,10 +469,9 @@ test('dedupe when logs have different levels', (t, end) => {
   log.error('error streams')
   log.fatal('fatal streams')
   t.assert.strictEqual(messageCount, 6)
-  end()
 })
 
-test('dedupe when some streams has the same level', (t, end) => {
+test('dedupe when some streams has the same level', (t) => {
   let messageCount = 0
   const stream1 = writeStream(function (data, enc, cb) {
     messageCount -= 1
@@ -523,20 +510,18 @@ test('dedupe when some streams has the same level', (t, end) => {
   log.fatal('fatal streams')
   log.fatal('fatal streams')
   t.assert.strictEqual(messageCount, 3)
-  end()
 })
 
-test('no stream', (t, end) => {
+test('no stream', () => {
   const log = pino({
     level: 'trace'
   }, multistream())
   log.info('info stream')
   log.debug('debug stream')
   log.fatal('fatal stream')
-  end()
 })
 
-test('one stream', (t, end) => {
+test('one stream', (t) => {
   let messageCount = 0
   const stream = writeStream(function (data, enc, cb) {
     messageCount += 1
@@ -549,10 +534,9 @@ test('one stream', (t, end) => {
   log.debug('debug stream')
   log.fatal('fatal stream')
   t.assert.strictEqual(messageCount, 2)
-  end()
 })
 
-test('add a stream', (t, end) => {
+test('add a stream', (t) => {
   let messageCount = 0
   const stream = writeStream(function (data, enc, cb) {
     messageCount += 1
@@ -566,7 +550,6 @@ test('add a stream', (t, end) => {
   log.debug('debug stream')
   log.fatal('fatal stream')
   t.assert.strictEqual(messageCount, 2)
-  end()
 })
 
 test('multistream.add throws if not a stream', (t) => {
@@ -585,7 +568,7 @@ test('multistream throws if not a stream', (t) => {
   })
 })
 
-test('multistream.write should not throw if one stream fails', (t, end) => {
+test('multistream.write should not throw if one stream fails', (t) => {
   let messageCount = 0
   const stream = writeStream(function (data, enc, cb) {
     messageCount += 1
@@ -618,7 +601,6 @@ test('multistream.write should not throw if one stream fails', (t, end) => {
   log.debug('1')
   log.debug('2')
   t.assert.strictEqual(messageCount, 3)
-  end()
 })
 
 test('flushSync', (t, end) => {
