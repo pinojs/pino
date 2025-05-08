@@ -1,6 +1,7 @@
 'use strict'
 
-const { test } = require('tap')
+const { test } = require('node:test')
+const { mock } = require('cjs-mock')
 
 test('should import', async (t) => {
   t.plan(2)
@@ -8,7 +9,7 @@ test('should import', async (t) => {
     return {
       default: {
         default: () => {
-          t.equal(target, 'pino-pretty')
+          t.assert.strictEqual(target, 'pino-pretty')
           return Promise.resolve()
         }
       }
@@ -17,10 +18,9 @@ test('should import', async (t) => {
   const mockRealImport = async () => { await Promise.resolve(); throw Object.assign(new Error(), { code: 'ERR_MODULE_NOT_FOUND' }) }
 
   /** @type {typeof import('../lib/transport-stream.js')} */
-  const loadTransportStreamBuilder = t.mock('../lib/transport-stream.js', { 'real-require': { realRequire: mockRealRequire, realImport: mockRealImport } })
+  const loadTransportStreamBuilder = mock('../lib/transport-stream.js', { 'real-require': { realRequire: mockRealRequire, realImport: mockRealImport } })
 
   const fn = await loadTransportStreamBuilder('pino-pretty')
 
-  t.resolves(fn())
-  t.end()
+  t.assert.doesNotThrow(() => fn())
 })
