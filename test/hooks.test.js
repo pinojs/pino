@@ -1,25 +1,26 @@
 'use strict'
 
-const tap = require('tap')
+const { test } = require('node:test')
+const match = require('@jsumners/assert-match')
 const { sink, once } = require('./helper')
 const pino = require('../')
 
-tap.test('log method hook', t => {
-  t.test('gets invoked', async t => {
+test('log method hook', async t => {
+  await t.test('gets invoked', async t => {
     t.plan(8)
 
     const stream = sink()
     const logger = pino({
       hooks: {
         logMethod (args, method, level) {
-          t.type(args, Array)
-          t.type(level, 'number')
-          t.equal(args.length, 3)
-          t.equal(level, this.levels.values.info)
-          t.same(args, ['a', 'b', 'c'])
+          t.assert.ok(Array.isArray(args), 'args is not an array type')
+          t.assert.ok(typeof level === 'number', 'lever is not of type number')
+          t.assert.strictEqual(args.length, 3)
+          t.assert.strictEqual(level, this.levels.values.info)
+          t.assert.deepStrictEqual(args, ['a', 'b', 'c'])
 
-          t.type(method, Function)
-          t.equal(method.name, 'LOG')
+          t.assert.ok(typeof method === 'function', 'method is not of type function')
+          t.assert.strictEqual(method.name, 'LOG')
 
           method.apply(this, [args.join('-')])
         }
@@ -28,17 +29,17 @@ tap.test('log method hook', t => {
 
     const o = once(stream, 'data')
     logger.info('a', 'b', 'c')
-    t.match(await o, { msg: 'a-b-c' })
+    match(await o, { msg: 'a-b-c' }, t)
   })
 
-  t.test('fatal method invokes hook', async t => {
+  await t.test('fatal method invokes hook', async t => {
     t.plan(2)
 
     const stream = sink()
     const logger = pino({
       hooks: {
         logMethod (args, method) {
-          t.pass()
+          t.assert.ok(true)
           method.apply(this, [args.join('-')])
         }
       }
@@ -46,17 +47,17 @@ tap.test('log method hook', t => {
 
     const o = once(stream, 'data')
     logger.fatal('a')
-    t.match(await o, { msg: 'a' })
+    match(await o, { msg: 'a' }, t)
   })
 
-  t.test('children get the hook', async t => {
+  await t.test('children get the hook', async t => {
     t.plan(4)
 
     const stream = sink()
     const root = pino({
       hooks: {
         logMethod (args, method) {
-          t.pass()
+          t.assert.ok(true)
           method.apply(this, [args.join('-')])
         }
       }
@@ -66,22 +67,22 @@ tap.test('log method hook', t => {
 
     let o = once(stream, 'data')
     child.info('a', 'b')
-    t.match(await o, { msg: 'a-b' })
+    match(await o, { msg: 'a-b' }, t)
 
     o = once(stream, 'data')
     grandchild.info('c', 'd')
-    t.match(await o, { msg: 'c-d' })
+    match(await o, { msg: 'c-d' }, t)
   })
 
-  t.test('get log level', async t => {
+  await t.test('get log level', async t => {
     t.plan(3)
 
     const stream = sink()
     const logger = pino({
       hooks: {
         logMethod (args, method, level) {
-          t.type(level, 'number')
-          t.equal(level, this.levels.values.error)
+          t.assert.ok(typeof level === 'number', 'level is not of type number')
+          t.assert.strictEqual(level, this.levels.values.error)
 
           method.apply(this, [args.join('-')])
         }
@@ -90,14 +91,12 @@ tap.test('log method hook', t => {
 
     const o = once(stream, 'data')
     logger.error('a')
-    t.match(await o, { msg: 'a' })
+    match(await o, { msg: 'a' }, t)
   })
-
-  t.end()
 })
 
-tap.test('streamWrite hook', t => {
-  t.test('gets invoked', async t => {
+test('streamWrite hook', async t => {
+  await t.test('gets invoked', async t => {
     t.plan(1)
 
     const stream = sink()
@@ -111,8 +110,6 @@ tap.test('streamWrite hook', t => {
 
     const o = once(stream, 'data')
     logger.info('hide redact-me in this string')
-    t.match(await o, { msg: 'hide XXX in this string' })
+    match(await o, { msg: 'hide XXX in this string' }, t)
   })
-
-  t.end()
 })
