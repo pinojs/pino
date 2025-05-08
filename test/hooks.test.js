@@ -1,7 +1,7 @@
 'use strict'
 
 const { test } = require('node:test')
-const match = require('./custom-assertions/match')
+const match = require('@jsumners/assert-match')
 const { sink, once } = require('./helper')
 const pino = require('../')
 
