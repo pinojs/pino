@@ -7,6 +7,7 @@ const split = require('split2')
 const { existsSync, readFileSync, statSync, unlinkSync } = require('node:fs')
 const pid = process.pid
 const hostname = os.hostname()
+const t = require('tap')
 const { join } = require('node:path')
 const { tmpdir } = os
 
@@ -111,14 +112,17 @@ function file () {
 
 process.on('beforeExit', () => {
   if (files.length === 0) return
+  t.comment('unlink files')
   for (const file of files) {
     try {
+      t.comment(`unliking ${file}`)
       unlinkSync(file)
     } catch (e) {
       console.log(e)
     }
   }
   files = []
+  t.comment('unlink completed')
 })
 
 module.exports = { getPathToNull, sink, check, once, sleep, watchFileCreated, watchForWrite, isWin, isYarnPnp, file }

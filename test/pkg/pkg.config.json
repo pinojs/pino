@@ -7,8 +7,10 @@
             "../../node_modules/pino-abstract-transport/index.js"
         ],
         "targets": [
-            "node20",
-            "node22"
+            "node14",
+            "node16",
+            "node18",
+            "node20"
         ],
         "outputPath": "test/pkg"
     }
