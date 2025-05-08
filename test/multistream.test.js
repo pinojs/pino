@@ -3,14 +3,14 @@
 const writeStream = require('flush-write-stream')
 const { readFileSync } = require('node:fs')
 const { join } = require('node:path')
-const test = require('tap').test
+const test = require('node:test').test
 const pino = require('../')
 const multistream = pino.multistream
 const proxyquire = require('proxyquire')
 const strip = require('strip-ansi')
 const { file, sink } = require('./helper')
 
-test('sends to multiple streams using string levels', function (t) {
+test('sends to multiple streams using string levels', (t) => {
   let messageCount = 0
   const stream = writeStream(function (data, enc, cb) {
     messageCount += 1
@@ -29,11 +29,10 @@ test('sends to multiple streams using string levels', function (t) {
   log.info('info stream')
   log.debug('debug stream')
   log.fatal('fatal stream')
-  t.equal(messageCount, 9)
-  t.end()
+  t.assert.strictEqual(messageCount, 9)
 })
 
-test('sends to multiple streams using custom levels', function (t) {
+test('sends to multiple streams using custom levels', (t) => {
   let messageCount = 0
   const stream = writeStream(function (data, enc, cb) {
     messageCount += 1
@@ -52,11 +51,10 @@ test('sends to multiple streams using custom levels', function (t) {
   log.info('info stream')
   log.debug('debug stream')
   log.fatal('fatal stream')
-  t.equal(messageCount, 9)
-  t.end()
+  t.assert.strictEqual(messageCount, 9)
 })
 
-test('sends to multiple streams using optionally predefined levels', function (t) {
+test('sends to multiple streams using optionally predefined levels', (t) => {
   let messageCount = 0
   const stream = writeStream(function (data, enc, cb) {
     messageCount += 1
@@ -94,11 +92,10 @@ test('sends to multiple streams using optionally predefined levels', function (t
   log.error('error stream')
   log.fatal('fatal stream')
   log.silent('silent stream')
-  t.equal(messageCount, 24)
-  t.end()
+  t.assert.strictEqual(messageCount, 24)
 })
 
-test('sends to multiple streams using number levels', function (t) {
+test('sends to multiple streams using number levels', (t) => {
   let messageCount = 0
   const stream = writeStream(function (data, enc, cb) {
     messageCount += 1
@@ -115,11 +112,10 @@ test('sends to multiple streams using number levels', function (t) {
   log.info('info stream')
   log.debug('debug stream')
   log.fatal('fatal stream')
-  t.equal(messageCount, 6)
-  t.end()
+  t.assert.strictEqual(messageCount, 6)
 })
 
-test('level include higher levels', function (t) {
+test('level include higher levels', (t) => {
   let messageCount = 0
   const stream = writeStream(function (data, enc, cb) {
     messageCount += 1
@@ -127,22 +123,21 @@ test('level include higher levels', function (t) {
   })
   const log = pino({}, multistream([{ level: 'info', stream }]))
   log.fatal('message')
-  t.equal(messageCount, 1)
-  t.end()
+  t.assert.strictEqual(messageCount, 1)
 })
 
-test('supports multiple arguments', function (t) {
+test('supports multiple arguments', (t, end) => {
   const messages = []
   const stream = writeStream(function (data, enc, cb) {
     messages.push(JSON.parse(data))
     if (messages.length === 2) {
       const msg1 = messages[0]
-      t.equal(msg1.msg, 'foo bar baz foobar')
+      t.assert.strictEqual(msg1.msg, 'foo bar baz foobar')
 
       const msg2 = messages[1]
-      t.equal(msg2.msg, 'foo bar baz foobar barfoo foofoo')
+      t.assert.strictEqual(msg2.msg, 'foo bar baz foobar barfoo foofoo')
 
-      t.end()
+      end()
     }
     cb()
   })
@@ -151,12 +146,12 @@ test('supports multiple arguments', function (t) {
   log.info('%s %s %s %s %s %s', 'foo', 'bar', 'baz', 'foobar', 'barfoo', 'foofoo') // apply invoked
 })
 
-test('supports children', function (t) {
+test('supports children', (t, end) => {
   const stream = writeStream(function (data, enc, cb) {
     const input = JSON.parse(data)
-    t.equal(input.msg, 'child stream')
-    t.equal(input.child, 'one')
-    t.end()
+    t.assert.strictEqual(input.msg, 'child stream')
+    t.assert.strictEqual(input.child, 'one')
+    end()
     cb()
   })
   const streams = [
@@ -166,27 +161,27 @@ test('supports children', function (t) {
   log.info('child stream')
 })
 
-test('supports grandchildren', function (t) {
+test('supports grandchildren', (t, end) => {
   const messages = []
   const stream = writeStream(function (data, enc, cb) {
     messages.push(JSON.parse(data))
     if (messages.length === 3) {
       const msg1 = messages[0]
-      t.equal(msg1.msg, 'grandchild stream')
-      t.equal(msg1.child, 'one')
-      t.equal(msg1.grandchild, 'two')
+      t.assert.strictEqual(msg1.msg, 'grandchild stream')
+      t.assert.strictEqual(msg1.child, 'one')
+      t.assert.strictEqual(msg1.grandchild, 'two')
 
       const msg2 = messages[1]
-      t.equal(msg2.msg, 'grandchild stream')
-      t.equal(msg2.child, 'one')
-      t.equal(msg2.grandchild, 'two')
+      t.assert.strictEqual(msg2.msg, 'grandchild stream')
+      t.assert.strictEqual(msg2.child, 'one')
+      t.assert.strictEqual(msg2.grandchild, 'two')
 
       const msg3 = messages[2]
-      t.equal(msg3.msg, 'debug grandchild')
-      t.equal(msg3.child, 'one')
-      t.equal(msg3.grandchild, 'two')
+      t.assert.strictEqual(msg3.msg, 'debug grandchild')
+      t.assert.strictEqual(msg3.child, 'one')
+      t.assert.strictEqual(msg3.grandchild, 'two')
 
-      t.end()
+      end()
     }
     cb()
   })
@@ -201,10 +196,10 @@ test('supports grandchildren', function (t) {
   log.debug('debug grandchild')
 })
 
-test('supports custom levels', function (t) {
+test('supports custom levels', (t, end) => {
   const stream = writeStream(function (data, enc, cb) {
-    t.equal(JSON.parse(data).msg, 'bar')
-    t.end()
+    t.assert.strictEqual(JSON.parse(data).msg, 'bar')
+    end()
   })
   const log = pino({
     customLevels: {
@@ -214,16 +209,16 @@ test('supports custom levels', function (t) {
   log.foo('bar')
 })
 
-test('supports pretty print', function (t) {
+test('supports pretty print', (t) => {
   t.plan(2)
   const stream = writeStream(function (data, enc, cb) {
-    t.not(strip(data.toString()).match(/INFO.*: pretty print/), null)
+    t.assert.notEqual(strip(data.toString()).match(/INFO.*: pretty print/), null)
     cb()
   })
 
   const safeBoom = proxyquire('pino-pretty/lib/utils/build-safe-sonic-boom.js', {
     'sonic-boom': function () {
-      t.pass('sonic created')
+      t.assert.ok('sonic created')
       stream.flushSync = () => {}
       stream.flush = () => {}
       return stream
@@ -246,10 +241,10 @@ test('supports pretty print', function (t) {
   log.info('pretty print')
 })
 
-test('emit propagates events to each stream', function (t) {
+test('emit propagates events to each stream', (t) => {
   t.plan(3)
   const handler = function (data) {
-    t.equal(data.msg, 'world')
+    t.assert.strictEqual(data.msg, 'world')
   }
   const streams = [sink(), sink(), sink()]
   streams.forEach(function (s) {
@@ -259,10 +254,10 @@ test('emit propagates events to each stream', function (t) {
   stream.emit('hello', { msg: 'world' })
 })
 
-test('children support custom levels', function (t) {
+test('children support custom levels', (t, end) => {
   const stream = writeStream(function (data, enc, cb) {
-    t.equal(JSON.parse(data).msg, 'bar')
-    t.end()
+    t.assert.strictEqual(JSON.parse(data).msg, 'bar')
+    end()
   })
   const parent = pino({
     customLevels: {
@@ -273,7 +268,7 @@ test('children support custom levels', function (t) {
   child.foo('bar')
 })
 
-test('levelVal overrides level', function (t) {
+test('levelVal overrides level', (t) => {
   let messageCount = 0
   const stream = writeStream(function (data, enc, cb) {
     messageCount += 1
@@ -290,21 +285,20 @@ test('levelVal overrides level', function (t) {
   log.info('info stream')
   log.debug('debug stream')
   log.fatal('fatal stream')
-  t.equal(messageCount, 6)
-  t.end()
+  t.assert.strictEqual(messageCount, 6)
 })
 
-test('forwards metadata', function (t) {
+test('forwards metadata', (t) => {
   t.plan(4)
   const streams = [
     {
       stream: {
         [Symbol.for('pino.metadata')]: true,
         write (chunk) {
-          t.equal(log, this.lastLogger)
-          t.equal(30, this.lastLevel)
-          t.same({ hello: 'world' }, this.lastObj)
-          t.same('a msg', this.lastMsg)
+          t.assert.strictEqual(log, this.lastLogger)
+          t.assert.strictEqual(30, this.lastLevel)
+          t.assert.deepStrictEqual({ hello: 'world' }, this.lastObj)
+          t.assert.deepStrictEqual('a msg', this.lastMsg)
         }
       }
     }
@@ -315,10 +309,9 @@ test('forwards metadata', function (t) {
   }, multistream(streams))
 
   log.info({ hello: 'world' }, 'a msg')
-  t.end()
 })
 
-test('forward name', function (t) {
+test('forward name', (t) => {
   t.plan(2)
   const streams = [
     {
@@ -326,8 +319,8 @@ test('forward name', function (t) {
         [Symbol.for('pino.metadata')]: true,
         write (chunk) {
           const line = JSON.parse(chunk)
-          t.equal(line.name, 'helloName')
-          t.equal(line.hello, 'world')
+          t.assert.strictEqual(line.name, 'helloName')
+          t.assert.strictEqual(line.hello, 'world')
         }
       }
     }
@@ -339,19 +332,18 @@ test('forward name', function (t) {
   }, multistream(streams))
 
   log.info({ hello: 'world' }, 'a msg')
-  t.end()
 })
 
-test('forward name with child', function (t) {
+test('forward name with child', (t) => {
   t.plan(3)
   const streams = [
     {
       stream: {
         write (chunk) {
           const line = JSON.parse(chunk)
-          t.equal(line.name, 'helloName')
-          t.equal(line.hello, 'world')
-          t.equal(line.component, 'aComponent')
+          t.assert.strictEqual(line.name, 'helloName')
+          t.assert.strictEqual(line.hello, 'world')
+          t.assert.strictEqual(line.component, 'aComponent')
         }
       }
     }
@@ -363,10 +355,9 @@ test('forward name with child', function (t) {
   }, multistream(streams)).child({ component: 'aComponent' })
 
   log.info({ hello: 'world' }, 'a msg')
-  t.end()
 })
 
-test('clone generates a new multistream with all stream at the same level', function (t) {
+test('clone generates a new multistream with all stream at the same level', (t) => {
   let messageCount = 0
   const stream = writeStream(function (data, enc, cb) {
     messageCount += 1
@@ -381,12 +372,12 @@ test('clone generates a new multistream with all stream at the same level', func
   const ms = multistream(streams)
   const clone = ms.clone(30)
 
-  t.not(clone, ms)
+  t.assert.notEqual(clone, ms)
 
   clone.streams.forEach((s, i) => {
-    t.not(s, streams[i])
-    t.equal(s.stream, streams[i].stream)
-    t.equal(s.level, 30)
+    t.assert.notEqual(s, streams[i])
+    t.assert.strictEqual(s.stream, streams[i].stream)
+    t.assert.strictEqual(s.level, 30)
   })
 
   const log = pino({
@@ -396,12 +387,10 @@ test('clone generates a new multistream with all stream at the same level', func
   log.info('info stream')
   log.debug('debug message not counted')
   log.fatal('fatal stream')
-  t.equal(messageCount, 8)
-
-  t.end()
+  t.assert.strictEqual(messageCount, 8)
 })
 
-test('one stream', function (t) {
+test('one stream', (t) => {
   let messageCount = 0
   const stream = writeStream(function (data, enc, cb) {
     messageCount += 1
@@ -413,11 +402,10 @@ test('one stream', function (t) {
   log.info('info stream')
   log.debug('debug stream')
   log.fatal('fatal stream')
-  t.equal(messageCount, 1)
-  t.end()
+  t.assert.strictEqual(messageCount, 1)
 })
 
-test('dedupe', function (t) {
+test('dedupe', (t) => {
   let messageCount = 0
   const stream1 = writeStream(function (data, enc, cb) {
     messageCount -= 1
@@ -446,11 +434,10 @@ test('dedupe', function (t) {
   log.info('info stream')
   log.fatal('fatal stream')
   log.fatal('fatal stream')
-  t.equal(messageCount, 1)
-  t.end()
+  t.assert.strictEqual(messageCount, 1)
 })
 
-test('dedupe when logs have different levels', function (t) {
+test('dedupe when logs have different levels', (t) => {
   let messageCount = 0
   const stream1 = writeStream(function (data, enc, cb) {
     messageCount += 1
@@ -481,11 +468,10 @@ test('dedupe when logs have different levels', function (t) {
   log.warn('warn stream')
   log.error('error streams')
   log.fatal('fatal streams')
-  t.equal(messageCount, 6)
-  t.end()
+  t.assert.strictEqual(messageCount, 6)
 })
 
-test('dedupe when some streams has the same level', function (t) {
+test('dedupe when some streams has the same level', (t) => {
   let messageCount = 0
   const stream1 = writeStream(function (data, enc, cb) {
     messageCount -= 1
@@ -523,21 +509,19 @@ test('dedupe when some streams has the same level', function (t) {
   log.info('info stream')
   log.fatal('fatal streams')
   log.fatal('fatal streams')
-  t.equal(messageCount, 3)
-  t.end()
+  t.assert.strictEqual(messageCount, 3)
 })
 
-test('no stream', function (t) {
+test('no stream', () => {
   const log = pino({
     level: 'trace'
   }, multistream())
   log.info('info stream')
   log.debug('debug stream')
   log.fatal('fatal stream')
-  t.end()
 })
 
-test('one stream', function (t) {
+test('one stream', (t) => {
   let messageCount = 0
   const stream = writeStream(function (data, enc, cb) {
     messageCount += 1
@@ -549,11 +533,10 @@ test('one stream', function (t) {
   log.info('info stream')
   log.debug('debug stream')
   log.fatal('fatal stream')
-  t.equal(messageCount, 2)
-  t.end()
+  t.assert.strictEqual(messageCount, 2)
 })
 
-test('add a stream', function (t) {
+test('add a stream', (t) => {
   let messageCount = 0
   const stream = writeStream(function (data, enc, cb) {
     messageCount += 1
@@ -566,31 +549,26 @@ test('add a stream', function (t) {
   log.info('info stream')
   log.debug('debug stream')
   log.fatal('fatal stream')
-  t.equal(messageCount, 2)
-  t.end()
+  t.assert.strictEqual(messageCount, 2)
 })
 
-test('multistream.add throws if not a stream', function (t) {
-  try {
+test('multistream.add throws if not a stream', (t) => {
+  t.assert.throws(() => {
     pino({
       level: 'trace'
     }, multistream().add({}))
-  } catch (_) {
-    t.end()
-  }
+  })
 })
 
-test('multistream throws if not a stream', function (t) {
-  try {
+test('multistream throws if not a stream', (t) => {
+  t.assert.throws(() => {
     pino({
       level: 'trace'
     }, multistream({}))
-  } catch (_) {
-    t.end()
-  }
+  })
 })
 
-test('multistream.write should not throw if one stream fails', function (t) {
+test('multistream.write should not throw if one stream fails', (t) => {
   let messageCount = 0
   const stream = writeStream(function (data, enc, cb) {
     messageCount += 1
@@ -622,11 +600,10 @@ test('multistream.write should not throw if one stream fails', function (t) {
   // noop stream is ending, should emit an error but not throw
   log.debug('1')
   log.debug('2')
-  t.equal(messageCount, 3)
-  t.end()
+  t.assert.strictEqual(messageCount, 3)
 })
 
-test('flushSync', function (t) {
+test('flushSync', (t, end) => {
   const tmp = file()
   const destination = pino.destination({ dest: tmp, sync: false, minLength: 4096 })
   const stream = multistream([{ level: 'info', stream: destination }])
@@ -635,26 +612,26 @@ test('flushSync', function (t) {
     log.info('foo')
     log.info('bar')
     stream.flushSync()
-    t.equal(readFileSync(tmp, { encoding: 'utf-8' }).split('\n').length - 1, 2)
+    t.assert.strictEqual(readFileSync(tmp, { encoding: 'utf-8' }).split('\n').length - 1, 2)
     log.info('biz')
     stream.flushSync()
-    t.equal(readFileSync(tmp, { encoding: 'utf-8' }).split('\n').length - 1, 3)
-    t.end()
+    t.assert.strictEqual(readFileSync(tmp, { encoding: 'utf-8' }).split('\n').length - 1, 3)
+    end()
   })
 })
 
-test('ends all streams', function (t) {
+test('ends all streams', (t) => {
   t.plan(7)
   const stream = writeStream(function (data, enc, cb) {
-    t.pass('message')
+    t.assert.ok('message')
     cb()
   })
   stream.flushSync = function () {
-    t.pass('flushSync')
+    t.assert.ok('flushSync')
   }
   // stream2 has no flushSync
   const stream2 = writeStream(function (data, enc, cb) {
-    t.pass('message2')
+    t.assert.ok('message2')
     cb()
   })
   const streams = [
