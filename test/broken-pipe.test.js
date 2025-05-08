@@ -40,7 +40,7 @@ test('basic.js')
 test('destination.js')
 test('syncfalse.js')
 
-t.test('let error pass through', (t, end) => {
+t.test('let error pass through', async (t) => {
   t.plan(3)
   const stream = pino.destination({ sync: true })
 
@@ -55,5 +55,12 @@ t.test('let error pass through', (t, end) => {
     t.assert.strictEqual(err.message, 'kaboom')
   })
 
-  process.nextTick(end)
+  const endPromise = new Promise(resolve => {
+    stream.on('close', resolve)
+  })
+
+  process.nextTick(() => stream.end())
+
+  // Wait for the stream to end
+  await endPromise
 })
