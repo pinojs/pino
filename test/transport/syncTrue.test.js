@@ -3,7 +3,7 @@
 const pino = require('../..')
 const { join } = require('node:path')
 const { readFileSync } = require('node:fs')
-const { test } = require('tap')
+const { test } = require('node:test')
 const { file } = require('../helper')
 
 test('thread-stream sync true should log synchronously', async (t) => {
@@ -51,5 +51,5 @@ test('thread-stream sync true should log synchronously', async (t) => {
     throw new Error('Sync loop did not get interrupt')
   }
 
-  t.equal(flushData.length, 6)
+  t.assert.strictEqual(flushData.length, 6)
 })
