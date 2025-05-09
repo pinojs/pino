@@ -294,7 +294,7 @@ test('pino.transport with an array including a pino-pretty destination', async (
     msg: 'hello'
   })
   const actual = (await readFile(dest2)).toString()
-  match(strip(actual), /\[.*\] INFO.*hello/, t)
+  t.assert.match(strip(actual), /\[.*\] INFO.*hello/)
 })
 
 test('no transport.end()', async (t) => {
@@ -450,7 +450,7 @@ test('pino.transport with target pino-pretty', async (t) => {
   instance.info('hello')
   await watchFileCreated(destination)
   const actual = await readFile(destination, 'utf8')
-  match(strip(actual), /\[.*\] INFO.*hello/, t)
+  t.assert.match(strip(actual), /\[.*\] INFO.*hello/)
 })
 
 test('sets worker data informing the transport that pino will send its config', async (t) => {
