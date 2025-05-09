@@ -4,7 +4,7 @@ const os = require('node:os')
 const { join } = require('node:path')
 const { readFile } = require('node:fs').promises
 const { watchFileCreated, file } = require('../helper')
-const { test } = require('tap')
+const assert = require('node:assert/strict')
 const pino = require('../../pino')
 
 const { pid } = process
@@ -14,7 +14,7 @@ const hostname = os.hostname()
  * This file is packaged using pkg in order to test if transport-stream.js works in that context
  */
 
-test('pino.transport with worker destination overridden by bundler and mjs transport', async ({ same, teardown }) => {
+async function runTest () {
   globalThis.__bundlerPathsOverrides = {
     'pino-worker': join(__dirname, '..', '..', 'lib/worker.js')
   }
@@ -28,19 +28,23 @@ test('pino.transport with worker destination overridden by bundler and mjs trans
       }
     ]
   })
+  try {
+    const instance = pino(transport)
+    instance.info('hello')
+    await watchFileCreated(destination)
+    const result = JSON.parse(await readFile(destination))
+    delete result.time
+    assert.deepStrictEqual(result, {
+      pid,
+      hostname,
+      level: 30,
+      msg: 'hello'
+    })
 
-  teardown(transport.end.bind(transport))
-  const instance = pino(transport)
-  instance.info('hello')
-  await watchFileCreated(destination)
-  const result = JSON.parse(await readFile(destination))
-  delete result.time
-  same(result, {
-    pid,
-    hostname,
-    level: 30,
-    msg: 'hello'
-  })
+    globalThis.__bundlerPathsOverrides = undefined
+  } finally {
+    transport.end()
+  }
+}
 
-  globalThis.__bundlerPathsOverrides = undefined
-})
+runTest()
