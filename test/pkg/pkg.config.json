@@ -7,8 +7,6 @@
             "../../node_modules/pino-abstract-transport/index.js"
         ],
         "targets": [
-            "node16",
-            "node18",
             "node20",
             "node22"
         ],
