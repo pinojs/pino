@@ -1,7 +1,6 @@
 'use strict'
 
 const { test } = require('node:test')
-const { mock } = require('cjs-mock')
 
 test('should import', async (t) => {
   t.plan(2)
@@ -16,11 +15,9 @@ test('should import', async (t) => {
     }
   }
   const mockRealImport = async () => { await Promise.resolve(); throw Object.assign(new Error(), { code: 'ERR_MODULE_NOT_FOUND' }) }
+  const loadTransportStreamBuilder = require('../lib/transport-stream.js')
 
-  /** @type {typeof import('../lib/transport-stream.js')} */
-  const loadTransportStreamBuilder = mock('../lib/transport-stream.js', { 'real-require': { realRequire: mockRealRequire, realImport: mockRealImport } })
-
-  const fn = await loadTransportStreamBuilder('pino-pretty')
+  const fn = await loadTransportStreamBuilder('pino-pretty', { realImport: mockRealImport, realRequire: mockRealRequire })
 
   t.assert.doesNotThrow(() => fn())
 })
