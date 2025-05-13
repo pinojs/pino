@@ -58,6 +58,7 @@ test('thread-stream async flush should call the passed callback', async (t) => {
 
   // Making sure data is not flushed yet
   const afterLogData = await getOutputLogLines()
+  console.log(afterLogData)
   t.equal(afterLogData.length, 1)
 
   await flushPromise()
