@@ -1,6 +1,6 @@
 'use strict'
 
-const { test } = require('node:test')
+const { describe, test } = require('node:test')
 const { sink, once, check } = require('./helper')
 const pino = require('../')
 
@@ -533,7 +533,7 @@ test('changing level from info to silent and back to info in child logger', asyn
   check(t.assert.strictEqual, result, expected.level, expected.msg)
 })
 
-test('changing level respects level comparison set to', async (t) => {
+describe('changing level respects level comparison set to', () => {
   const ascLevels = {
     debug: 1,
     info: 2,
@@ -551,7 +551,7 @@ test('changing level respects level comparison set to', async (t) => {
     msg: 'hello world'
   }
 
-  await t.test('ASC in parent logger', async (t) => {
+  test('ASC in parent logger', async (t) => {
     const customLevels = ascLevels
     const levelComparison = 'ASC'
 
@@ -569,7 +569,7 @@ test('changing level respects level comparison set to', async (t) => {
     check(t.assert.strictEqual, result, expected.level, expected.msg)
   })
 
-  await t.test('DESC in parent logger', async (t) => {
+  test('DESC in parent logger', async (t) => {
     const customLevels = descLevels
     const levelComparison = 'DESC'
 
@@ -587,7 +587,7 @@ test('changing level respects level comparison set to', async (t) => {
     check(t.assert.strictEqual, result, expected.level, expected.msg)
   })
 
-  await t.test('custom function in parent logger', async (t) => {
+  test('custom function in parent logger', async (t) => {
     const customLevels = {
       info: 2,
       debug: 345,
@@ -612,7 +612,7 @@ test('changing level respects level comparison set to', async (t) => {
     check(t.assert.strictEqual, result, expected.level, expected.msg)
   })
 
-  await t.test('ASC in child logger', async (t) => {
+  test('ASC in child logger', async (t) => {
     const customLevels = ascLevels
     const levelComparison = 'ASC'
 
@@ -630,7 +630,7 @@ test('changing level respects level comparison set to', async (t) => {
     check(t.assert.strictEqual, result, expected.level, expected.msg)
   })
 
-  await t.test('DESC in parent logger', async (t) => {
+  test('DESC in parent logger', async (t) => {
     const customLevels = descLevels
     const levelComparison = 'DESC'
 
@@ -648,7 +648,7 @@ test('changing level respects level comparison set to', async (t) => {
     check(t.assert.strictEqual, result, expected.level, expected.msg)
   })
 
-  await t.test('custom function in child logger', async (t) => {
+  test('custom function in child logger', async (t) => {
     const customLevels = {
       info: 2,
       debug: 345,

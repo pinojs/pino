@@ -1,12 +1,12 @@
 'use strict'
 
-const { test } = require('node:test')
+const { describe, test } = require('node:test')
 const match = require('@jsumners/assert-match')
 const { sink, once } = require('./helper')
 const pino = require('../')
 
-test('log method hook', async t => {
-  await t.test('gets invoked', async t => {
+describe('log method hook', () => {
+  test('gets invoked', async t => {
     t.plan(8)
 
     const stream = sink()
@@ -32,7 +32,7 @@ test('log method hook', async t => {
     match(await o, { msg: 'a-b-c' }, t)
   })
 
-  await t.test('fatal method invokes hook', async t => {
+  test('fatal method invokes hook', async t => {
     t.plan(2)
 
     const stream = sink()
@@ -50,7 +50,7 @@ test('log method hook', async t => {
     match(await o, { msg: 'a' }, t)
   })
 
-  await t.test('children get the hook', async t => {
+  test('children get the hook', async t => {
     t.plan(4)
 
     const stream = sink()
@@ -74,7 +74,7 @@ test('log method hook', async t => {
     match(await o, { msg: 'c-d' }, t)
   })
 
-  await t.test('get log level', async t => {
+  test('get log level', async t => {
     t.plan(3)
 
     const stream = sink()
@@ -95,8 +95,8 @@ test('log method hook', async t => {
   })
 })
 
-test('streamWrite hook', async t => {
-  await t.test('gets invoked', async t => {
+describe('streamWrite hook', () => {
+  test('gets invoked', async t => {
     t.plan(1)
 
     const stream = sink()
