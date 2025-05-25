@@ -429,7 +429,6 @@ PRs to this document are welcome for any new transports!
 + [@openobserve/pino-openobserve](#pino-openobserve)
 + [pino-airbrake-transport](#pino-airbrake-transport)
 + [pino-axiom](#pino-axiom)
-+ [pino-datadog-transport](#pino-datadog-transport)
 + [pino-discord-webhook](#pino-discord-webhook)
 + [pino-elasticsearch](#pino-elasticsearch)
 + [pino-hana](#pino-hana)
@@ -443,6 +442,7 @@ PRs to this document are welcome for any new transports!
 + [pino-slack-webhook](#pino-slack-webhook)
 + [pino-telegram-webhook](#pino-telegram-webhook)
 + [pino-yc-transport](#pino-yc-transport)
++ [datadog-logger-integrations](#datadog-logger-integrations)
 
 ### Legacy
 
@@ -451,6 +451,7 @@ PRs to this document are welcome for any new transports!
 + [pino-cloudwatch](#pino-cloudwatch)
 + [pino-couch](#pino-couch)
 + [pino-datadog](#pino-datadog)
++ [pino-datadog-transport](#pino-datadog-transport)
 + [pino-gelf](#pino-gelf)
 + [pino-http-send](#pino-http-send)
 + [pino-kafka](#pino-kafka)
@@ -662,8 +663,35 @@ $ node foo | pino-datadog --key blablabla
 
 For full documentation of command line switches read [README](https://github.com/ovhemert/pino-datadog#readme)
 
+<a id="datadog-logger-integrations"></a>
+### datadog-logger-integrations
+
+[datadog-logger-integrations][datadog-logger-integrations] is a Pino v7+ compatible transport to forward log events to [Datadog][Datadog]
+from a dedicated worker:
+
+```js
+const pino = require('pino')
+const transport = pino.transport({
+  target: 'datadog-logger-integrations',
+  options: {
+    ddClientConf: {
+      authMethods: {
+        apiKeyAuth: <your datadog API key>
+      }
+    },
+  },
+  level: "error", // minimum log level that should be sent to datadog
+})
+pino(transport)
+```
+
+[datadog-logger-integrations]: https://github.com/marklai1998/datadog-logger-integrations
+[Datadog]: https://www.datadoghq.com/
+
 <a id="pino-datadog-transport"></a>
 ### pino-datadog-transport
+
+> Note. This package is depercated
 
 [pino-datadog-transport][pino-datadog-transport] is a Pino v7+ compatible transport to forward log events to [Datadog][Datadog]
 from a dedicated worker:
