@@ -451,7 +451,6 @@ PRs to this document are welcome for any new transports!
 + [pino-cloudwatch](#pino-cloudwatch)
 + [pino-couch](#pino-couch)
 + [pino-datadog](#pino-datadog)
-+ [pino-datadog-transport](#pino-datadog-transport)
 + [pino-gelf](#pino-gelf)
 + [pino-http-send](#pino-http-send)
 + [pino-kafka](#pino-kafka)
