@@ -673,7 +673,7 @@ const pino = require('pino')
 const transport = pino.transport({
   target: 'datadog-logger-integrations',
   options: {
-    ddClientConf: {
+    ddClientConfig: {
       authMethods: {
         apiKeyAuth: <your datadog API key>
       }
