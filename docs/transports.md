@@ -427,6 +427,7 @@ PRs to this document are welcome for any new transports!
 + [@logtail/pino](#@logtail/pino)
 + [@macfja/pino-fingers-crossed](#macfja-pino-fingers-crossed)
 + [@openobserve/pino-openobserve](#pino-openobserve)
++ [datadog-logger-integrations](#datadog-logger-integrations)
 + [pino-airbrake-transport](#pino-airbrake-transport)
 + [pino-axiom](#pino-axiom)
 + [pino-discord-webhook](#pino-discord-webhook)
@@ -442,7 +443,6 @@ PRs to this document are welcome for any new transports!
 + [pino-slack-webhook](#pino-slack-webhook)
 + [pino-telegram-webhook](#pino-telegram-webhook)
 + [pino-yc-transport](#pino-yc-transport)
-+ [datadog-logger-integrations](#datadog-logger-integrations)
 
 ### Legacy
 
@@ -685,33 +685,6 @@ pino(transport)
 ```
 
 [datadog-logger-integrations]: https://github.com/marklai1998/datadog-logger-integrations
-[Datadog]: https://www.datadoghq.com/
-
-<a id="pino-datadog-transport"></a>
-### pino-datadog-transport
-
-> Note. This package is depercated
-
-[pino-datadog-transport][pino-datadog-transport] is a Pino v7+ compatible transport to forward log events to [Datadog][Datadog]
-from a dedicated worker:
-
-```js
-const pino = require('pino')
-const transport = pino.transport({
-  target: 'pino-datadog-transport',
-  options: {
-    ddClientConf: {
-      authMethods: {
-        apiKeyAuth: <your datadog API key>
-      }
-    },
-  },
-  level: "error", // minimum log level that should be sent to datadog
-})
-pino(transport)
-```
-
-[pino-datadog-transport]: https://github.com/theogravity/datadog-transports
 [Datadog]: https://www.datadoghq.com/
 
 #### Logstash
