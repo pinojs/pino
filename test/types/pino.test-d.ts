@@ -10,10 +10,53 @@ const error = log.error;
 
 info("hello world");
 error("this is at error level");
-info("the answer is %d", 42);
+
+// primative types
+info('simple string');
+info(true)
+info(42);
+info(3.14);
+info(null);
+info(undefined);
+
+// object types
+info({ a: 1, b: '2' });
+info(new Error());
+info(new Date());
+info([])
+info(new Map());
+info(new Set());
+
+// template messages
+info('Hello %s', 'world');
+info('The answer is %d', 42);
+info('The object is %o', { a: 1, b: '2' });
+info('The json is %j', { a: 1, b: '2' });
+info('The object is %O', { a: 1, b: '2' });
+info('The answer is %d and the question is %s with %o', 42, 'unknown', { correct: 'order' });
+
+// template messages type errors
+expectError(info('Hello %s', 123));
+expectError(info('Hello %s', false));
+expectError(info('The answer is %d', 'not a number'));
+expectError(info('The object is %o', 'not an object'));
+expectError(info('The object is %j', 'not a JSON'));
+expectError(info('The object is %O', 'not an object'));
+expectError(info('The answer is %d and the question is %s with %o', 42, { incorrect: 'order' }, 'unknown'));
+
+
+// object types with messages
 info({ obj: 42 }, "hello world");
 info({ obj: 42, b: 2 }, "hello world");
 info({ obj: { aa: "bbb" } }, "another");
+info({ a: 1, b: '2' }, 'hello world with %s', 'extra data');
+
+// metadata with messages type errors
+expectError(info({ a: 1, b: '2' }, 'hello world with %s', 123));
+
+// multiple strings without template
+expectError(info('string1', 'string2', 'string3'));
+
 setImmediate(info, "after setImmediate");
 error(new Error("an error"));
 

@@ -319,12 +319,28 @@ declare namespace pino {
         labels: { [level: number]: string };
     }
 
+    type FormatSpecifier = 'd' | 's' | 'j' | 'o' | 'O';
+    type TypeMapping<T extends FormatSpecifier> = T extends 'd'
+        ? number
+        : T extends 's'
+            ? string
+            : T extends 'j' | 'o' | 'O'
+            ? object
+            : never;
+
+    type ParseArgs<
+        T,
+        Acc extends any[] = [],
+    > = T extends `${infer _}%${infer Format}${infer Rest}`
+        ? Format extends FormatSpecifier
+            ? ParseArgs<Rest, [...Acc, TypeMapping<Format>]>
+            : ParseArgs<Rest, Acc>
+        : Acc;
+
     interface LogFn {
-        // TODO: why is this different from `obj: object` or `obj: any`?
         /* tslint:disable:no-unnecessary-generics */
-        <T extends object>(obj: T, msg?: string, ...args: any[]): void;
-        (obj: unknown, msg?: string, ...args: any[]): void;
-        (msg: string, ...args: any[]): void;
+        <T extends unknown, TMsg extends string = string>(obj: Exclude<T, string>, msg?: TMsg, ...args: ParseArgs<TMsg>): void;
+        <T extends unknown, TMsg extends string = string>(msg: TMsg, ...args: ParseArgs<TMsg>): void;
     }
 
     interface LoggerOptions<CustomLevels extends string = never, UseOnlyCustomLevels extends boolean = boolean> {
@@ -886,4 +902,3 @@ export { pino as default, pino };
 // `import {P} from "pino"; const log: P.Logger;`.
 // (Legacy support for early 7.x releases, remove in 8.x.)
     export type { pino as P };
-
