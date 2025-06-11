@@ -44,7 +44,6 @@ expectError(info('The object is %j', 'not a JSON'));
 expectError(info('The object is %O', 'not an object'));
 expectError(info('The answer is %d and the question is %s with %o', 42, { incorrect: 'order' }, 'unknown'));
 
-
 // object types with messages
 info({ obj: 42 }, "hello world");
 info({ obj: 42, b: 2 }, "hello world");
@@ -53,6 +52,9 @@ info({ a: 1, b: '2' }, 'hello world with %s', 'extra data');
 
 // metadata with messages type errors
 expectError(info({ a: 1, b: '2' }, 'hello world with %s', 123));
+
+// metadata after message
+expectError(info('message', { a: 1, b: '2' }));
 
 // multiple strings without template
 expectError(info('string1', 'string2', 'string3'));
