@@ -34,6 +34,7 @@ info('The object is %o', { a: 1, b: '2' });
 info('The json is %j', { a: 1, b: '2' });
 info('The object is %O', { a: 1, b: '2' });
 info('The answer is %d and the question is %s with %o', 42, 'unknown', { correct: 'order' });
+info('Missing template is fine %s');
 
 // template messages type errors
 expectError(info('Hello %s', 123));
@@ -43,12 +44,16 @@ expectError(info('The object is %o', 'not an object'));
 expectError(info('The object is %j', 'not a JSON'));
 expectError(info('The object is %O', 'not an object'));
 expectError(info('The answer is %d and the question is %s with %o', 42, { incorrect: 'order' }, 'unknown'));
+expectError(info('Extra message %s', 'after template', 'not allowed'));
 
 // object types with messages
 info({ obj: 42 }, "hello world");
 info({ obj: 42, b: 2 }, "hello world");
 info({ obj: { aa: "bbb" } }, "another");
 info({ a: 1, b: '2' }, 'hello world with %s', 'extra data');
+
+// Extra message after template
+expectError(info({ a: 1, b: '2' }, 'hello world with %d', 2, 'extra' ));
 
 // metadata with messages type errors
 expectError(info({ a: 1, b: '2' }, 'hello world with %s', 123));
@@ -57,6 +62,7 @@ expectError(info({ a: 1, b: '2' }, 'hello world with %s', 123));
 expectError(info('message', { a: 1, b: '2' }));
 
 // multiple strings without template
+expectError(info('string1', 'string2'));
 expectError(info('string1', 'string2', 'string3'));
 
 setImmediate(info, "after setImmediate");
