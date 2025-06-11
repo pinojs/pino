@@ -319,8 +319,8 @@ declare namespace pino {
         labels: { [level: number]: string };
     }
 
-    type FormatSpecifier = 'd' | 's' | 'j' | 'o' | 'O';
-    type TypeMapping<T extends FormatSpecifier> = T extends 'd'
+    type PlaceholderSpecifier = 'd' | 's' | 'j' | 'o' | 'O';
+    type PlaceholderTypeMapping<T extends PlaceholderSpecifier> = T extends 'd'
         ? number
         : T extends 's'
             ? string
@@ -328,19 +328,18 @@ declare namespace pino {
             ? object
             : never;
 
-    type ParseArgs<
+    type ParseLogFnArgs<
         T,
         Acc extends any[] = [],
-    > = T extends `${infer _}%${infer Format}${infer Rest}`
-        ? Format extends FormatSpecifier
-            ? ParseArgs<Rest, [...Acc, TypeMapping<Format>]>
-            : ParseArgs<Rest, Acc>
+    > = T extends `${infer _}%${infer Placeholder}${infer Rest}`
+        ? Placeholder extends PlaceholderSpecifier
+            ? ParseLogFnArgs<Rest, [...Acc, PlaceholderTypeMapping<Placeholder>]>
+            : ParseLogFnArgs<Rest, Acc>
         : Acc;
 
     interface LogFn {
-        /* tslint:disable:no-unnecessary-generics */
-        <T extends unknown, TMsg extends string = string>(obj: Exclude<T, string>, msg?: TMsg, ...args: ParseArgs<TMsg>): void;
-        <T extends unknown, TMsg extends string = string>(msg: TMsg, ...args: ParseArgs<TMsg>): void;
+        <T extends unknown, TMsg extends string = string>(obj: Exclude<T, string>, msg?: TMsg, ...args: ParseLogFnArgs<TMsg>): void;
+        <_ extends unknown, TMsg extends string = string>(msg: TMsg, ...args: ParseLogFnArgs<TMsg>): void;
     }
 
     interface LoggerOptions<CustomLevels extends string = never, UseOnlyCustomLevels extends boolean = boolean> {
