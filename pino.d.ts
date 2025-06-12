@@ -338,7 +338,7 @@ declare namespace pino {
         : Acc;
 
     interface LogFn {
-        <T, TMsg extends string = string>(obj: Exclude<T, string>, msg?: TMsg, ...args: ParseLogFnArgs<TMsg> | []): void;
+        <T, TMsg extends string = string>(obj: T, msg?: T extends string ? never: TMsg, ...args: ParseLogFnArgs<TMsg> | []): void;
         <_, TMsg extends string = string>(msg: TMsg, ...args: ParseLogFnArgs<TMsg> | []): void;
     }
 

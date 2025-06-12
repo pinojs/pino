@@ -35,6 +35,8 @@ info('The json is %j', { a: 1, b: '2' });
 info('The object is %O', { a: 1, b: '2' });
 info('The answer is %d and the question is %s with %o', 42, 'unknown', { correct: 'order' });
 info('Missing placeholder is fine %s');
+declare const errorOrString: string | Error;
+info(errorOrString)
 
 // placeholder messages type errors
 expectError(info('Hello %s', 123));
