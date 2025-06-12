@@ -319,12 +319,27 @@ declare namespace pino {
         labels: { [level: number]: string };
     }
 
+    type PlaceholderSpecifier = 'd' | 's' | 'j' | 'o' | 'O';
+    type PlaceholderTypeMapping<T extends PlaceholderSpecifier> = T extends 'd'
+        ? number
+        : T extends 's'
+            ? string
+            : T extends 'j' | 'o' | 'O'
+            ? object
+            : never;
+
+    type ParseLogFnArgs<
+        T,
+        Acc extends unknown[] = [],
+    > = T extends `${infer _}%${infer Placeholder}${infer Rest}`
+        ? Placeholder extends PlaceholderSpecifier
+            ? ParseLogFnArgs<Rest, [...Acc, PlaceholderTypeMapping<Placeholder>]>
+            : ParseLogFnArgs<Rest, Acc>
+        : Acc;
+
     interface LogFn {
-        // TODO: why is this different from `obj: object` or `obj: any`?
-        /* tslint:disable:no-unnecessary-generics */
-        <T extends object>(obj: T, msg?: string, ...args: any[]): void;
-        (obj: unknown, msg?: string, ...args: any[]): void;
-        (msg: string, ...args: any[]): void;
+        <T, TMsg extends string = string>(obj: T, msg?: T extends string ? never: TMsg, ...args: ParseLogFnArgs<TMsg> | []): void;
+        <_, TMsg extends string = string>(msg: TMsg, ...args: ParseLogFnArgs<TMsg> | []): void;
     }
 
     interface LoggerOptions<CustomLevels extends string = never, UseOnlyCustomLevels extends boolean = boolean> {
@@ -886,4 +901,3 @@ export { pino as default, pino };
 // `import {P} from "pino"; const log: P.Logger;`.
 // (Legacy support for early 7.x releases, remove in 8.x.)
     export type { pino as P };
-
