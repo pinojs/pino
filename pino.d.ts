@@ -330,7 +330,7 @@ declare namespace pino {
 
     type ParseLogFnArgs<
         T,
-        Acc extends any[] = [],
+        Acc extends unknown[] = [],
     > = T extends `${infer _}%${infer Placeholder}${infer Rest}`
         ? Placeholder extends PlaceholderSpecifier
             ? ParseLogFnArgs<Rest, [...Acc, PlaceholderTypeMapping<Placeholder>]>
