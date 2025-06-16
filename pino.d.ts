@@ -219,6 +219,13 @@ declare namespace pino {
          * Noop function.
          */
         silent: pino.LogFn;
+
+        /**
+         * Get `msgPrefix` of the logger instance.
+         *
+         * See {@link https://github.com/pinojs/pino/blob/main/docs/api.md#msgprefix-string}.
+         */
+        get msgPrefix(): string | undefined;
     }
 
     type Bindings = Record<string, any>;
