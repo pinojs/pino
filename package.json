@@ -61,7 +61,7 @@
   "homepage": "https://getpino.io",
   "devDependencies": {
     "@types/flush-write-stream": "^1.0.0",
-    "@types/node": "^22.0.0",
+    "@types/node": "^24.0.8",
     "@types/tap": "^15.0.6",
     "@yao-pkg/pkg": "6.3.0",
     "airtap": "5.0.0",
