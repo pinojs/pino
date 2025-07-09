@@ -451,6 +451,16 @@ declare namespace pino {
              * pino.info('hi') // creates and logs {msg: 'hi', level: 30, time: <ts>}
              */
             asObject?: boolean;
+            /**
+             * The `asObjectBindingsOnly` option is similar to `asObject` but will keep the message and arguments
+             * unformatted. This allows to defer formatting the message to the actual call to console methods,
+             * where browsers then have richer formatting in their devtools than when pino will format the message to
+             * a string first.
+             *
+             * @example
+             * pino.info('hello %s', 'world') // creates and logs {level: 30, time: <ts>}, 'hello %s', 'world'
+             */
+            asObjectBindingsOnly?: boolean;
             formatters?: {
                 /**
                  * Changes the shape of the log level.
