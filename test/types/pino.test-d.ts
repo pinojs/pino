@@ -160,6 +160,12 @@ pino({
     },
 });
 
+pino({
+  browser: {
+    asObjectBindingsOnly: true,
+  }
+});
+
 pino({}, undefined);
 
 pino({ base: null });
