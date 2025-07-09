@@ -453,7 +453,7 @@ declare namespace pino {
             asObject?: boolean;
             /**
              * The `asObjectBindingsOnly` option is similar to `asObject` but will keep the message and arguments
-             * unformatted. This allows to defer formatting the message to the actual call to console methods,
+             * unformatted. This allows to defer formatting the message to the actual call to `console` methods,
              * where browsers then have richer formatting in their devtools than when pino will format the message to
              * a string first.
              *
