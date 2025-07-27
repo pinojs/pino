@@ -739,26 +739,16 @@ declare namespace pino {
     //// Top level variable (const) exports
 
 
-}
+    /**
+     * Provides functions for serializing objects common to many projects.
+     */
+    export const stdSerializers: typeof pinoStdSerializers;
 
-//// Callable default export
-
-declare function pino<CustomLevels extends string = never, UseOnlyCustomLevels extends boolean = boolean>(optionsOrStream?: pino.LoggerOptions<CustomLevels, UseOnlyCustomLevels> | pino.DestinationStream): pino.Logger<CustomLevels, UseOnlyCustomLevels>;
-declare function pino<CustomLevels extends string = never, UseOnlyCustomLevels extends boolean = boolean>(options: pino.LoggerOptions<CustomLevels, UseOnlyCustomLevels>, stream?: pino.DestinationStream | undefined): pino.Logger<CustomLevels, UseOnlyCustomLevels>;
-
-// Merge static properties and functions into the pino function via namespace merging
-declare namespace pino {
-    // Constants and functions - make them available as static properties
-    const version: string;
-    const levels: LevelMapping;
-    const stdSerializers: typeof pinoStdSerializers;
-    const stdTimeFunctions: {
-        epochTime: TimeFn;
-        unixTime: TimeFn;
-        nullTime: TimeFn;
-        isoTime: TimeFn;
-    };
-    const symbols: {
+    /**
+     * Holds the current log format version (as output in the v property of each log record).
+     */
+    export const levels: LevelMapping;
+    export const symbols: {
         readonly setLevelSym: unique symbol;
         readonly getLevelSym: unique symbol;
         readonly levelValSym: unique symbol;
@@ -789,18 +779,75 @@ declare namespace pino {
         readonly hooksSym: unique symbol;
     };
 
-    function destination(
+    /**
+     * Exposes the Pino package version. Also available on the logger instance.
+     */
+    export const version: string;
+
+    /**
+     * Provides functions for generating the timestamp property in the log output. You can set the `timestamp` option during
+     * initialization to one of these functions to adjust the output format. Alternatively, you can specify your own time function.
+     * A time function must synchronously return a string that would be a valid component of a JSON string. For example,
+     * the default function returns a string like `,"time":1493426328206`.
+     */
+    export const stdTimeFunctions: {
+        /**
+         * The default time function for Pino. Returns a string like `,"time":1493426328206`.
+         */
+        epochTime: TimeFn;
+        /*
+            * Returns the seconds since Unix epoch
+            */
+        unixTime: TimeFn;
+        /**
+         * Returns an empty string. This function is used when the `timestamp` option is set to `false`.
+         */
+        nullTime: TimeFn;
+        /*
+            * Returns ISO 8601-formatted time in UTC
+            */
+        isoTime: TimeFn;
+    };
+
+    //// Exported functions
+
+    /**
+     * Create a Pino Destination instance: a stream-like object with significantly more throughput (over 30%) than a standard Node.js stream.
+     * @param [dest]: The `destination` parameter, can be a file descriptor, a file path, or an object with `dest` property pointing to a fd or path.
+     *                An ordinary Node.js `stream` file descriptor can be passed as the destination (such as the result of `fs.createWriteStream`)
+     *                but for peak log writing performance, it is strongly recommended to use `pino.destination` to create the destination stream.
+     * @returns A Sonic-Boom  stream to be used as destination for the pino function
+     */
+    export function destination(
         dest?: number | object | string | DestinationStream | NodeJS.WritableStream | SonicBoomOpts,
     ): SonicBoom;
 
-    function transport<TransportOptions = Record<string, any>>(
+    export function transport<TransportOptions = Record<string, any>>(
         options: TransportSingleOptions<TransportOptions> | TransportMultiOptions<TransportOptions> | TransportPipelineOptions<TransportOptions>
-    ): ThreadStream;
+    ): ThreadStream
 
-    function multistream<TLevel = Level>(
+    export function multistream<TLevel = Level>(
         streamsArray: (DestinationStream | StreamEntry<TLevel>)[] | DestinationStream | StreamEntry<TLevel>,
         opts?: MultiStreamOptions
-    ): MultiStreamRes<TLevel>;
+    ): MultiStreamRes<TLevel>
 }
+
+//// Callable default export
+
+/**
+ * @param [optionsOrStream]: an options object or a writable stream where the logs will be written. It can also receive some log-line metadata, if the
+ * relative protocol is enabled. Default: process.stdout
+ * @returns a new logger instance.
+ */
+declare function pino<CustomLevels extends string = never, UseOnlyCustomLevels extends boolean = boolean>(optionsOrStream?: pino.LoggerOptions<CustomLevels, UseOnlyCustomLevels> | pino.DestinationStream): pino.Logger<CustomLevels, UseOnlyCustomLevels>;
+
+/**
+ * @param [options]: an options object
+ * @param [stream]: a writable stream where the logs will be written. It can also receive some log-line metadata, if the
+ * relative protocol is enabled. Default: process.stdout
+ * @returns a new logger instance.
+ */
+declare function pino<CustomLevels extends string = never, UseOnlyCustomLevels extends boolean = boolean>(options: pino.LoggerOptions<CustomLevels, UseOnlyCustomLevels>, stream?: pino.DestinationStream | undefined): pino.Logger<CustomLevels, UseOnlyCustomLevels>;
+
 
 export = pino;
