@@ -743,21 +743,8 @@ declare namespace pino {
 
 //// Callable default export
 
-/**
- * @param [optionsOrStream]: an options object or a writable stream where the logs will be written. It can also receive some log-line metadata, if the
- * relative protocol is enabled. Default: process.stdout
- * @returns a new logger instance.
- */
 declare function pino<CustomLevels extends string = never, UseOnlyCustomLevels extends boolean = boolean>(optionsOrStream?: pino.LoggerOptions<CustomLevels, UseOnlyCustomLevels> | pino.DestinationStream): pino.Logger<CustomLevels, UseOnlyCustomLevels>;
-
-/**
- * @param [options]: an options object
- * @param [stream]: a writable stream where the logs will be written. It can also receive some log-line metadata, if the
- * relative protocol is enabled. Default: process.stdout
- * @returns a new logger instance.
- */
 declare function pino<CustomLevels extends string = never, UseOnlyCustomLevels extends boolean = boolean>(options: pino.LoggerOptions<CustomLevels, UseOnlyCustomLevels>, stream?: pino.DestinationStream | undefined): pino.Logger<CustomLevels, UseOnlyCustomLevels>;
-
 
 // Merge static properties and functions into the pino function via namespace merging
 declare namespace pino {
