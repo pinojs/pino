@@ -452,7 +452,7 @@ const bLogger = pino({
   },
 });
 
-expectType<Logger<'log'>>(pino({
+expectType<pino.Logger<'log'>>(pino({
   customLevels: {
     log: 5,
   },

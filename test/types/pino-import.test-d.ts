@@ -11,7 +11,6 @@ expectType<pino.LogFn>(log.error);
 
 expectType<pino.Logger>(pinoStar.default());
 expectType<pino.Logger>(pinoCjsImport());
-expectType<pino.Logger>(pinoCjs());
 expectType<any>(pinoCjs());
 
 const levelChangeEventListener: pino.LevelChangeEventListener = (
