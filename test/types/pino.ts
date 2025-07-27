@@ -1,7 +1,7 @@
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import pinoPretty from 'pino-pretty'
-import { LoggerOptions, StreamEntry, pino } from '../../pino'
+import pino from '../../pino'
 
 const destination = join(
     tmpdir(),
@@ -57,14 +57,14 @@ const pinoOpts = {
     useOnlyCustomLevels: true,
     customLevels: customLevels,
     level: 'customDebug',
-} satisfies LoggerOptions;
+} satisfies pino.LoggerOptions;
 
 const multistreamOpts = {
     dedupe: true,
     levels: customLevels
 };
 
-const streams: StreamEntry<CustomLevels>[] = [
+const streams: pino.StreamEntry<CustomLevels>[] = [
     { level : 'customDebug',   stream : pinoPretty() },
     { level : 'info',    stream : pinoPretty() },
     { level : 'customNetwork', stream : pinoPretty() },

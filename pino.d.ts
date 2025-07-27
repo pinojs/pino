@@ -53,13 +53,13 @@ type CustomLevelLogger<CustomLevels extends string, UseOnlyCustomLevels extends 
 */
 type OnChildCallback<CustomLevels extends string = never> = (child: pino.Logger<CustomLevels>) => void
 
-export interface redactOptions {
+interface redactOptions {
     paths: string[];
     censor?: string | ((value: any, path: string[]) => any);
     remove?: boolean;
 }
 
-export interface LoggerExtras<CustomLevels extends string = never, UseOnlyCustomLevels extends boolean = boolean> extends EventEmitter {
+interface LoggerExtras<CustomLevels extends string = never, UseOnlyCustomLevels extends boolean = boolean> extends EventEmitter {
     /**
      * Exposes the Pino package version. Also available on the exported pino function.
      */
@@ -86,7 +86,7 @@ export interface LoggerExtras<CustomLevels extends string = never, UseOnlyCustom
      * @param options: an options object that will override child logger inherited options.
      * @returns a child logger instance.
      */
-    child<ChildCustomLevels extends string = never>(bindings: pino.Bindings, options?: ChildLoggerOptions<ChildCustomLevels>): pino.Logger<CustomLevels | ChildCustomLevels>;
+    child<ChildCustomLevels extends string = never>(bindings: pino.Bindings, options?: pino.ChildLoggerOptions<ChildCustomLevels>): pino.Logger<CustomLevels | ChildCustomLevels>;
 
     /**
      * This can be used to modify the callback function on creation of a new child.
@@ -319,12 +319,27 @@ declare namespace pino {
         labels: { [level: number]: string };
     }
 
+    type PlaceholderSpecifier = 'd' | 's' | 'j' | 'o' | 'O';
+    type PlaceholderTypeMapping<T extends PlaceholderSpecifier> = T extends 'd'
+        ? number
+        : T extends 's'
+            ? string
+            : T extends 'j' | 'o' | 'O'
+            ? object
+            : never;
+
+    type ParseLogFnArgs<
+        T,
+        Acc extends unknown[] = [],
+    > = T extends `${infer _}%${infer Placeholder}${infer Rest}`
+        ? Placeholder extends PlaceholderSpecifier
+            ? ParseLogFnArgs<Rest, [...Acc, PlaceholderTypeMapping<Placeholder>]>
+            : ParseLogFnArgs<Rest, Acc>
+        : Acc;
+
     interface LogFn {
-        // TODO: why is this different from `obj: object` or `obj: any`?
-        /* tslint:disable:no-unnecessary-generics */
-        <T extends object>(obj: T, msg?: string, ...args: any[]): void;
-        (obj: unknown, msg?: string, ...args: any[]): void;
-        (msg: string, ...args: any[]): void;
+        <T, TMsg extends string = string>(obj: T, msg?: T extends string ? never: TMsg, ...args: ParseLogFnArgs<TMsg> | []): void;
+        <_, TMsg extends string = string>(msg: TMsg, ...args: ParseLogFnArgs<TMsg> | []): void;
     }
 
     interface LoggerOptions<CustomLevels extends string = never, UseOnlyCustomLevels extends boolean = boolean> {
@@ -723,16 +738,40 @@ declare namespace pino {
 
     //// Top level variable (const) exports
 
-    /**
-     * Provides functions for serializing objects common to many projects.
-     */
-    export const stdSerializers: typeof pinoStdSerializers;
 
-    /**
-     * Holds the current log format version (as output in the v property of each log record).
-     */
-    export const levels: LevelMapping;
-    export const symbols: {
+}
+
+//// Callable default export
+
+/**
+ * @param [optionsOrStream]: an options object or a writable stream where the logs will be written. It can also receive some log-line metadata, if the
+ * relative protocol is enabled. Default: process.stdout
+ * @returns a new logger instance.
+ */
+declare function pino<CustomLevels extends string = never, UseOnlyCustomLevels extends boolean = boolean>(optionsOrStream?: pino.LoggerOptions<CustomLevels, UseOnlyCustomLevels> | pino.DestinationStream): pino.Logger<CustomLevels, UseOnlyCustomLevels>;
+
+/**
+ * @param [options]: an options object
+ * @param [stream]: a writable stream where the logs will be written. It can also receive some log-line metadata, if the
+ * relative protocol is enabled. Default: process.stdout
+ * @returns a new logger instance.
+ */
+declare function pino<CustomLevels extends string = never, UseOnlyCustomLevels extends boolean = boolean>(options: pino.LoggerOptions<CustomLevels, UseOnlyCustomLevels>, stream?: pino.DestinationStream | undefined): pino.Logger<CustomLevels, UseOnlyCustomLevels>;
+
+
+// Merge static properties and functions into the pino function via namespace merging
+declare namespace pino {
+    // Constants and functions - make them available as static properties
+    const version: string;
+    const levels: LevelMapping;
+    const stdSerializers: typeof pinoStdSerializers;
+    const stdTimeFunctions: {
+        epochTime: TimeFn;
+        unixTime: TimeFn;
+        nullTime: TimeFn;
+        isoTime: TimeFn;
+    };
+    const symbols: {
         readonly setLevelSym: unique symbol;
         readonly getLevelSym: unique symbol;
         readonly levelValSym: unique symbol;
@@ -763,128 +802,18 @@ declare namespace pino {
         readonly hooksSym: unique symbol;
     };
 
-    /**
-     * Exposes the Pino package version. Also available on the logger instance.
-     */
-    export const version: string;
-
-    /**
-     * Provides functions for generating the timestamp property in the log output. You can set the `timestamp` option during
-     * initialization to one of these functions to adjust the output format. Alternatively, you can specify your own time function.
-     * A time function must synchronously return a string that would be a valid component of a JSON string. For example,
-     * the default function returns a string like `,"time":1493426328206`.
-     */
-    export const stdTimeFunctions: {
-        /**
-         * The default time function for Pino. Returns a string like `,"time":1493426328206`.
-         */
-        epochTime: TimeFn;
-        /*
-            * Returns the seconds since Unix epoch
-            */
-        unixTime: TimeFn;
-        /**
-         * Returns an empty string. This function is used when the `timestamp` option is set to `false`.
-         */
-        nullTime: TimeFn;
-        /*
-            * Returns ISO 8601-formatted time in UTC
-            */
-        isoTime: TimeFn;
-    };
-
-    //// Exported functions
-
-    /**
-     * Create a Pino Destination instance: a stream-like object with significantly more throughput (over 30%) than a standard Node.js stream.
-     * @param [dest]: The `destination` parameter, can be a file descriptor, a file path, or an object with `dest` property pointing to a fd or path.
-     *                An ordinary Node.js `stream` file descriptor can be passed as the destination (such as the result of `fs.createWriteStream`)
-     *                but for peak log writing performance, it is strongly recommended to use `pino.destination` to create the destination stream.
-     * @returns A Sonic-Boom  stream to be used as destination for the pino function
-     */
-    export function destination(
+    function destination(
         dest?: number | object | string | DestinationStream | NodeJS.WritableStream | SonicBoomOpts,
     ): SonicBoom;
 
-    export function transport<TransportOptions = Record<string, any>>(
+    function transport<TransportOptions = Record<string, any>>(
         options: TransportSingleOptions<TransportOptions> | TransportMultiOptions<TransportOptions> | TransportPipelineOptions<TransportOptions>
-    ): ThreadStream
+    ): ThreadStream;
 
-    export function multistream<TLevel = Level>(
+    function multistream<TLevel = Level>(
         streamsArray: (DestinationStream | StreamEntry<TLevel>)[] | DestinationStream | StreamEntry<TLevel>,
         opts?: MultiStreamOptions
-    ): MultiStreamRes<TLevel>
+    ): MultiStreamRes<TLevel>;
 }
-
-//// Callable default export
-
-/**
- * @param [optionsOrStream]: an options object or a writable stream where the logs will be written. It can also receive some log-line metadata, if the
- * relative protocol is enabled. Default: process.stdout
- * @returns a new logger instance.
- */
-declare function pino<CustomLevels extends string = never, UseOnlyCustomLevels extends boolean = boolean>(optionsOrStream?: LoggerOptions<CustomLevels, UseOnlyCustomLevels> | DestinationStream): Logger<CustomLevels, UseOnlyCustomLevels>;
-
-/**
- * @param [options]: an options object
- * @param [stream]: a writable stream where the logs will be written. It can also receive some log-line metadata, if the
- * relative protocol is enabled. Default: process.stdout
- * @returns a new logger instance.
- */
-declare function pino<CustomLevels extends string = never, UseOnlyCustomLevels extends boolean = boolean>(options: LoggerOptions<CustomLevels, UseOnlyCustomLevels>, stream?: DestinationStream | undefined): Logger<CustomLevels, UseOnlyCustomLevels>;
-
-
-// Pass through all the top-level exports, allows `import {version} from "pino"`
-// Constants and functions
-export const destination: typeof pino.destination;
-export const transport: typeof pino.transport;
-export const multistream: typeof pino.multistream;
-export const levels: typeof pino.levels;
-export const stdSerializers: typeof pino.stdSerializers;
-export const stdTimeFunctions: typeof pino.stdTimeFunctions;
-export const symbols: typeof pino.symbols;
-export const version: typeof pino.version;
-
-// Types
-export type Bindings = pino.Bindings;
-export type DestinationStreamWithMetadata = pino.DestinationStreamWithMetadata;
-export type Level = pino.Level;
-export type LevelOrString = pino.LevelOrString;
-export type LevelWithSilent = pino.LevelWithSilent;
-export type LevelWithSilentOrString = pino.LevelWithSilentOrString;
-export type LevelChangeEventListener<CustomLevels extends string> = pino.LevelChangeEventListener<CustomLevels>;
-export type LogDescriptor = pino.LogDescriptor;
-export type Logger<CustomLevels extends string = never, UseOnlyCustomLevels extends boolean = boolean> = pino.Logger<CustomLevels, UseOnlyCustomLevels>;
-export type SerializedError = pino.SerializedError;
-export type SerializerFn = pino.SerializerFn;
-export type SerializedRequest = pino.SerializedRequest;
-export type SerializedResponse = pino.SerializedResponse;
-export type WriteFn = pino.WriteFn;
-
-// Interfaces
-export interface BaseLogger extends pino.BaseLogger {}
-export interface ChildLoggerOptions<CustomLevels extends string = never> extends pino.ChildLoggerOptions<CustomLevels> {}
-export interface DestinationStream extends pino.DestinationStream {}
-export interface LevelMapping extends pino.LevelMapping {}
-export interface LogEvent extends pino.LogEvent {}
-export interface LogFn extends pino.LogFn {}
-export interface LoggerOptions<CustomLevels extends string = never, UseOnlyCustomLevels extends boolean = boolean> extends pino.LoggerOptions<CustomLevels, UseOnlyCustomLevels> {}
-export interface MultiStreamOptions extends pino.MultiStreamOptions {}
-export interface MultiStreamRes<TLevel = Level> extends pino.MultiStreamRes<TLevel> {}
-export interface StreamEntry<TLevel = Level> extends pino.StreamEntry<TLevel> {}
-export interface TransportBaseOptions extends pino.TransportBaseOptions {}
-export interface TransportMultiOptions extends pino.TransportMultiOptions {}
-export interface TransportPipelineOptions extends pino.TransportPipelineOptions {}
-export interface TransportSingleOptions extends pino.TransportSingleOptions {}
-export interface TransportTargetOptions extends pino.TransportTargetOptions {}
-
-// Bundle all top level exports into a namespace, then export namespace both
-// as default (`import pino from "pino"`) and named variable
-// (`import {pino} from "pino"`).
-export { pino as default, pino };
-// Export just the type side of the namespace as "P", allows
-// `import {P} from "pino"; const log: P.Logger;`.
-// (Legacy support for early 7.x releases, remove in 8.x.)
-export type { pino as P };
 
 export = pino;
