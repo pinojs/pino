@@ -33,10 +33,10 @@ When `write` is set, `asObject` will always be `true`.
 const pino = require('pino')({browser: {asObjectBindingsOnly: true}})
 ```
 
-The `asObjectBindingsOnly` is similar to `asObject` but will keep the message
-and arguments unformatted, this allows to defer formatting the message to the
+The `asObjectBindingsOnly` option is similar to `asObject` but will keep the message
+and arguments unformatted. This allows to defer formatting the message to the
 actual call to `console` methods, where browsers then have richer formatting in
-their devtools then when pino will format the message to a string first.
+their devtools than when pino will format the message to a string first.
 
 ```js
 pino.info('hello %s', 'world') // creates and logs {level: 30, time: <ts>}, 'hello %s', 'world'
