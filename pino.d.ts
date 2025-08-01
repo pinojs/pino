@@ -816,6 +816,10 @@ declare namespace pino {
             * Returns ISO 8601-formatted time in UTC
             */
         isoTime: TimeFn;
+        /*
+            * Returns RFC 3339-formatted time in UTC
+            */
+        isoTimeNanos: TimeFn;
     };
 
     //// Exported functions
