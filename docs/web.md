@@ -270,7 +270,7 @@ Execute `npx --yes listhen -w --open ./server.mjs`.
 See the [pino-http README](https://npm.im/pino-http) for more info.
 
 
-<a id="h3"></a>
+<a id="hono"></a>
 ## Pino with Hono
 
 ```sh

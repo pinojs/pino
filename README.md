@@ -63,7 +63,7 @@ For using Pino with a web framework see:
 * [Pino with Koa](docs/web.md#koa)
 * [Pino with Node core `http`](docs/web.md#http)
 * [Pino with Nest](docs/web.md#nest)
-
+* [Pino with Hono](docs/web.md#hono)
 
 <a name="essentials"></a>
 ## Essentials
