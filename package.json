@@ -98,7 +98,7 @@
     "through2": "^4.0.0",
     "ts-node": "^10.9.1",
     "tsd": "^0.32.0",
-    "typescript": "~5.8.2",
+    "typescript": "~5.9.2",
     "winston": "^3.7.2"
   },
   "dependencies": {
