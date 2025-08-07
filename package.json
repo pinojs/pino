@@ -15,7 +15,7 @@
     "test-ci": "npm run lint && npm run transpile && tap --ts --no-check-coverage --coverage-report=lcovonly && npm run test-types",
     "test-ci-pnpm": "pnpm run lint && npm run transpile && tap --ts --no-coverage --no-check-coverage && pnpm run test-types",
     "test-ci-yarn-pnp": "yarn run lint && npm run transpile && tap --ts --no-check-coverage --coverage-report=lcovonly",
-    "test-types": "tsc && tsd && ts-node test/types/pino.ts",
+    "test-types": "tsc && tsd && ts-node test/types/pino.ts && attw --pack .",
     "test:smoke": "smoker smoke:pino && smoker smoke:browser && smoker smoke:file",
     "smoke:pino": "node ./pino.js",
     "smoke:browser": "node ./browser.js",
@@ -60,6 +60,7 @@
   },
   "homepage": "https://getpino.io",
   "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.1",
     "@types/flush-write-stream": "^1.0.0",
     "@types/node": "^24.0.8",
     "@types/tap": "^15.0.6",

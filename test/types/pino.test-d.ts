@@ -1,8 +1,9 @@
 import { IncomingMessage, ServerResponse } from "http";
 import { Socket } from "net";
 import { expectError, expectType } from 'tsd';
-import P, { LoggerOptions, pino } from "../../";
-import Logger = P.Logger;
+import pino from "../../";
+type LoggerOptions = pino.LoggerOptions;
+type Logger = pino.Logger;
 
 const log = pino();
 const info = log.info;
@@ -76,7 +77,7 @@ const testUniqSymbol = {
     [pino.symbols.needsMetadataGsym]: true,
 }[pino.symbols.needsMetadataGsym];
 
-const log2: P.Logger = pino({
+const log2: pino.Logger = pino({
     name: "myapp",
     safe: true,
     serializers: {
@@ -458,7 +459,7 @@ const bLogger = pino({
   },
 });
 
-expectType<Logger<'log'>>(pino({
+expectType<pino.Logger<'log'>>(pino({
   customLevels: {
     log: 5,
   },

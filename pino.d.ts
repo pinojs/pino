@@ -53,13 +53,13 @@ type CustomLevelLogger<CustomLevels extends string, UseOnlyCustomLevels extends 
 */
 type OnChildCallback<CustomLevels extends string = never> = (child: pino.Logger<CustomLevels>) => void
 
-export interface redactOptions {
+interface redactOptions {
     paths: string[];
     censor?: string | ((value: any, path: string[]) => any);
     remove?: boolean;
 }
 
-export interface LoggerExtras<CustomLevels extends string = never, UseOnlyCustomLevels extends boolean = boolean> extends EventEmitter {
+interface LoggerExtras<CustomLevels extends string = never, UseOnlyCustomLevels extends boolean = boolean> extends EventEmitter {
     /**
      * Exposes the Pino package version. Also available on the exported pino function.
      */
@@ -86,7 +86,7 @@ export interface LoggerExtras<CustomLevels extends string = never, UseOnlyCustom
      * @param options: an options object that will override child logger inherited options.
      * @returns a child logger instance.
      */
-    child<ChildCustomLevels extends string = never>(bindings: pino.Bindings, options?: ChildLoggerOptions<ChildCustomLevels>): pino.Logger<CustomLevels | ChildCustomLevels>;
+    child<ChildCustomLevels extends string = never>(bindings: pino.Bindings, options?: pino.ChildLoggerOptions<ChildCustomLevels>): pino.Logger<CustomLevels | ChildCustomLevels>;
 
     /**
      * This can be used to modify the callback function on creation of a new child.
@@ -755,6 +755,7 @@ declare namespace pino {
 
     //// Top level variable (const) exports
 
+
     /**
      * Provides functions for serializing objects common to many projects.
      */
@@ -855,7 +856,7 @@ declare namespace pino {
  * relative protocol is enabled. Default: process.stdout
  * @returns a new logger instance.
  */
-declare function pino<CustomLevels extends string = never, UseOnlyCustomLevels extends boolean = boolean>(optionsOrStream?: LoggerOptions<CustomLevels, UseOnlyCustomLevels> | DestinationStream): Logger<CustomLevels, UseOnlyCustomLevels>;
+declare function pino<CustomLevels extends string = never, UseOnlyCustomLevels extends boolean = boolean>(optionsOrStream?: pino.LoggerOptions<CustomLevels, UseOnlyCustomLevels> | pino.DestinationStream): pino.Logger<CustomLevels, UseOnlyCustomLevels>;
 
 /**
  * @param [options]: an options object
@@ -863,58 +864,7 @@ declare function pino<CustomLevels extends string = never, UseOnlyCustomLevels e
  * relative protocol is enabled. Default: process.stdout
  * @returns a new logger instance.
  */
-declare function pino<CustomLevels extends string = never, UseOnlyCustomLevels extends boolean = boolean>(options: LoggerOptions<CustomLevels, UseOnlyCustomLevels>, stream?: DestinationStream | undefined): Logger<CustomLevels, UseOnlyCustomLevels>;
+declare function pino<CustomLevels extends string = never, UseOnlyCustomLevels extends boolean = boolean>(options: pino.LoggerOptions<CustomLevels, UseOnlyCustomLevels>, stream?: pino.DestinationStream | undefined): pino.Logger<CustomLevels, UseOnlyCustomLevels>;
 
 
-// Pass through all the top-level exports, allows `import {version} from "pino"`
-// Constants and functions
-export const destination: typeof pino.destination;
-export const transport: typeof pino.transport;
-export const multistream: typeof pino.multistream;
-export const levels: typeof pino.levels;
-export const stdSerializers: typeof pino.stdSerializers;
-export const stdTimeFunctions: typeof pino.stdTimeFunctions;
-export const symbols: typeof pino.symbols;
-export const version: typeof pino.version;
-
-// Types
-export type Bindings = pino.Bindings;
-export type DestinationStreamWithMetadata = pino.DestinationStreamWithMetadata;
-export type Level = pino.Level;
-export type LevelOrString = pino.LevelOrString;
-export type LevelWithSilent = pino.LevelWithSilent;
-export type LevelWithSilentOrString = pino.LevelWithSilentOrString;
-export type LevelChangeEventListener<CustomLevels extends string> = pino.LevelChangeEventListener<CustomLevels>;
-export type LogDescriptor = pino.LogDescriptor;
-export type Logger<CustomLevels extends string = never, UseOnlyCustomLevels extends boolean = boolean> = pino.Logger<CustomLevels, UseOnlyCustomLevels>;
-export type SerializedError = pino.SerializedError;
-export type SerializerFn = pino.SerializerFn;
-export type SerializedRequest = pino.SerializedRequest;
-export type SerializedResponse = pino.SerializedResponse;
-export type WriteFn = pino.WriteFn;
-
-// Interfaces
-export interface BaseLogger extends pino.BaseLogger {}
-export interface ChildLoggerOptions<CustomLevels extends string = never> extends pino.ChildLoggerOptions<CustomLevels> {}
-export interface DestinationStream extends pino.DestinationStream {}
-export interface LevelMapping extends pino.LevelMapping {}
-export interface LogEvent extends pino.LogEvent {}
-export interface LogFn extends pino.LogFn {}
-export interface LoggerOptions<CustomLevels extends string = never, UseOnlyCustomLevels extends boolean = boolean> extends pino.LoggerOptions<CustomLevels, UseOnlyCustomLevels> {}
-export interface MultiStreamOptions extends pino.MultiStreamOptions {}
-export interface MultiStreamRes<TLevel = Level> extends pino.MultiStreamRes<TLevel> {}
-export interface StreamEntry<TLevel = Level> extends pino.StreamEntry<TLevel> {}
-export interface TransportBaseOptions extends pino.TransportBaseOptions {}
-export interface TransportMultiOptions extends pino.TransportMultiOptions {}
-export interface TransportPipelineOptions extends pino.TransportPipelineOptions {}
-export interface TransportSingleOptions extends pino.TransportSingleOptions {}
-export interface TransportTargetOptions extends pino.TransportTargetOptions {}
-
-// Bundle all top level exports into a namespace, then export namespace both
-// as default (`import pino from "pino"`) and named variable
-// (`import {pino} from "pino"`).
-export { pino as default, pino };
-// Export just the type side of the namespace as "P", allows
-// `import {P} from "pino"; const log: P.Logger;`.
-// (Legacy support for early 7.x releases, remove in 8.x.)
-    export type { pino as P };
+export = pino;
