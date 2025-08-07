@@ -807,6 +807,7 @@ test('logger message should have the prefix message that defined in the logger c
   const logger = pino({
     msgPrefix: 'My name is Bond '
   }, stream)
+  equal(logger.msgPrefix, 'My name is Bond ')
   logger.info('James Bond')
   const { msg } = await once(stream, 'data')
   equal(msg, 'My name is Bond James Bond')
@@ -848,6 +849,7 @@ test('child message should append parent prefix to current prefix that defined i
   }, stream)
   const child = instance.child({}, { msgPrefix: 'James ' })
   child.info('Bond')
+  equal(child.msgPrefix, 'My name is Bond James ')
   const { msg } = await once(stream, 'data')
   equal(msg, 'My name is Bond James Bond')
 })

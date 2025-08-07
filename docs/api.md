@@ -22,6 +22,7 @@
   * [logger\[Symbol.for('pino.serializers')\]](#serializers)
   * [Event: 'level-change'](#level-change)
   * [logger.version](#version)
+  * [logger.msgPrefix](#msgPrefix)
 * [Statics](#statics)
   * [pino.destination()](#pino-destination)
   * [pino.transport()](#pino-transport)
@@ -943,6 +944,7 @@ const child = logger.child({foo: 'bar'}, {level: 'debug'})
 child.debug('debug!') // will log as the `level` property set the level to debug
 ```
 
+<a id="options-msgPrefix"></a>
 ##### `options.msgPrefix` (String)
 
 Default: `undefined`
@@ -1173,6 +1175,13 @@ logger.level = 'trace' // trigger event using actual value change, notice consol
 Exposes the Pino package version. Also available on the exported `pino` function.
 
 * See [`pino.version`](#pino-version)
+
+<a id="msgPrefix"></a>
+### `logger.msgPrefix` (String|Undefined)
+
+Exposes the cumulative `msgPrefix` of the logger.
+
+* See [`options.msgPrefix`](#options-msgPrefix)
 
 ## Statics
 

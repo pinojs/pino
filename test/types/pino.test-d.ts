@@ -359,7 +359,8 @@ const customBaseLogger: CustomBaseLogger = {
   debug() {},
   trace() {},
   silent() {},
-  child() { return this }
+  child() { return this },
+  msgPrefix: 'prefix',
 }
 
 // custom levels
