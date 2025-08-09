@@ -1423,6 +1423,7 @@ The `pino.stdTimeFunctions` object provides a very small set of common functions
 * `pino.stdTimeFunctions.unixTime`: Seconds since Unix epoch
 * `pino.stdTimeFunctions.nullTime`: Clears timestamp property (Used when `timestamp: false`)
 * `pino.stdTimeFunctions.isoTime`: ISO 8601-formatted time in UTC
+* `pino.stdTimeFunctions.isoTimeNano`: RFC 3339-formatted time in UTC with nanosecond precision
 
 * See [`timestamp` option](#opt-timestamp)
 
