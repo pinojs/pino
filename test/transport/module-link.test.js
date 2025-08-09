@@ -121,7 +121,7 @@ test('pino({ transport })', { skip: isWin || isYarnPnp }, async ({ same, teardow
   const toRun = join(folder, 'index.js')
 
   const toRunContent = `
-    const pino = require('pino')
+    const pino = require('pino').default
     const logger = pino({
       transport: {
         target: 'transport',
@@ -198,7 +198,7 @@ test('pino({ transport }) from a wrapped dependency', { skip: isWin || isYarnPnp
   const wrapped = join(wrappedFolder, 'index.js')
 
   const wrappedContent = `
-    const pino = require('pino')
+    const pino = require('pino').default
     const getCaller = require('get-caller-file')
 
     module.exports = function build () {
