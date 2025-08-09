@@ -259,7 +259,7 @@ const withTimeFn = pino({
 });
 
 const withRFC3339TimeFn = pino({
-    timestamp: pino.stdTimeFunctions.isoTimeNanos,
+    timestamp: pino.stdTimeFunctions.isoTimeNano,
 });
 
 const withNestedKey = pino({

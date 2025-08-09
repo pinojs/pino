@@ -819,7 +819,7 @@ declare namespace pino {
         /*
             * Returns RFC 3339-formatted time in UTC
             */
-        isoTimeNanos: TimeFn;
+        isoTimeNano: TimeFn;
     };
 
     //// Exported functions

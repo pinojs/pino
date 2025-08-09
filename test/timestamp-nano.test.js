@@ -6,25 +6,30 @@ const { test } = require('tap')
 const { sink, once } = require('./helper')
 
 test('pino.stdTimeFunctions.isoTimeNanos returns RFC 3339 timestamps', async ({ equal }) => {
-  const ms = 1754060611115
+  // Mock Date.now at module initialization time
   const now = Date.now
-  Date.now = () => ms
+  Date.now = () => new Date('2025-08-01T15:03:45.000000000Z').getTime()
 
+  // Mock process.hrtime.bigint at module initialization time
   const hrTimeBigint = process.hrtime.bigint
-  process.hrtime.bigint = () => 101794177055958n
+  process.hrtime.bigint = () => 100000000000000n
 
   const pino = require('../')
 
   const opts = {
-    timestamp: pino.stdTimeFunctions.isoTimeNanos
+    timestamp: pino.stdTimeFunctions.isoTimeNano
   }
   const stream = sink()
-  process.hrtime.bigint = () => 101808350592625n
+
+  // Mock process.hrtime.bigint at invocation time
+  process.hrtime.bigint = () => 100000000000000n + 12345678n
+
   const instance = pino(opts, stream)
   instance.info('foobar')
   const result = await once(stream, 'data')
   equal(result.hasOwnProperty('time'), true)
-  equal(result.time, '2025-08-01T15:03:45.288536667Z')
+  equal(result.time, '2025-08-01T15:03:45.012345678Z')
+
   Date.now = now
   process.hrtime.bigint = hrTimeBigint
 })
