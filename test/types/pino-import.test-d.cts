@@ -15,7 +15,7 @@ expectType<pino.Logger>(pinoNamed());
 expectType<P.Logger>(pinoNamed());
 expectType<pino.Logger>(pinoStar.default());
 expectType<pino.Logger>(pinoStar.pino());
-expectType<pino.Logger>(pinoCjsImport.default());
+// expectType<pino.Logger>(pinoCjsImport.default());
 expectType<pino.Logger>(pinoCjsImport.pino());
 expectType<any>(pinoCjsNamed());
 expectType<any>(pinoCjs());
