@@ -1,18 +1,12 @@
 import { expectAssignable, expectType, expectNotAssignable } from "tsd";
 
 import pino from "../../";
-type LevelWithSilent = pino.LevelWithSilent;
-type Logger = pino.Logger;
-type LogFn = pino.LogFn;
-type DestinationStreamWithMetadata = pino.DestinationStreamWithMetadata;
-type Level = pino.Level;
-type LevelOrString = pino.LevelOrString;
-type LevelWithSilentOrString = pino.LevelWithSilentOrString;
-type LoggerOptions = pino.LoggerOptions;
+import type {LevelWithSilent, Logger, LogFn, DestinationStreamWithMetadata,  Level, LevelOrString, LevelWithSilentOrString, LoggerExtras, LoggerOptions } from "../../pino";
 
 // NB: can also use `import * as pino`, but that form is callable as `pino()`
 // under `esModuleInterop: false` or `pino.default()` under `esModuleInterop: true`.
 const log = pino();
+expectAssignable<LoggerExtras>(log);
 expectType<Logger>(log);
 expectType<LogFn>(log.info);
 
@@ -20,11 +14,9 @@ expectType<Parameters<typeof log.isLevelEnabled>>([log.level]);
 
 const level: Level = 'debug';
 expectAssignable<string>(level);
-expectAssignable<Level>(level);
 
 const levelWithSilent: LevelWithSilent = 'silent';
 expectAssignable<string>(levelWithSilent);
-expectAssignable<LevelWithSilent>(levelWithSilent);
 
 const levelOrString: LevelOrString = "myCustomLevel";
 expectAssignable<string>(levelOrString);

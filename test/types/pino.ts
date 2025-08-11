@@ -1,7 +1,8 @@
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import pinoPretty from 'pino-pretty'
-import pino from '../../pino'
+// Test both default ("Pino") and named ("pino") imports.
+import Pino, { LoggerOptions, StreamEntry, pino, multistream, transport } from '../../pino'
 
 const destination = join(
     tmpdir(),
@@ -9,25 +10,31 @@ const destination = join(
 )
 
 // Single
-const transport = pino.transport({
+const transport1 = transport({
     target: 'pino-pretty',
     options: { some: 'options for', the: 'transport' }
 })
-const logger = pino(transport)
+const logger = pino(transport1)
 logger.setBindings({ some: 'bindings' })
 logger.info('test2')
 logger.flush()
+const loggerDefault = Pino(transport1)
+loggerDefault.setBindings({ some: 'bindings' })
+loggerDefault.info('test2')
+loggerDefault.flush()
 
-const transport2 = pino.transport({
+const transport2 = transport({
     target: 'pino-pretty',
 })
 const logger2 = pino(transport2)
 logger2.info('test2')
+const logger2Default = Pino(transport2)
+logger2Default.info('test2')
 
 
 // Multiple
 
-const transports = pino.transport({targets: [
+const transports = transport({targets: [
     {
         level: 'info',
         target: 'pino-pretty',
@@ -57,22 +64,27 @@ const pinoOpts = {
     useOnlyCustomLevels: true,
     customLevels: customLevels,
     level: 'customDebug',
-} satisfies pino.LoggerOptions;
+} satisfies LoggerOptions;
 
 const multistreamOpts = {
     dedupe: true,
     levels: customLevels
 };
 
-const streams: pino.StreamEntry<CustomLevels>[] = [
+const streams: StreamEntry<CustomLevels>[] = [
     { level : 'customDebug',   stream : pinoPretty() },
     { level : 'info',    stream : pinoPretty() },
     { level : 'customNetwork', stream : pinoPretty() },
     { level : 'customError',   stream : pinoPretty() },
 ];
 
-const loggerCustomLevel = pino(pinoOpts, pino.multistream(streams, multistreamOpts));
+const loggerCustomLevel = pino(pinoOpts, multistream(streams, multistreamOpts));
 loggerCustomLevel.customDebug('test3')
 loggerCustomLevel.info('test4')
 loggerCustomLevel.customError('test5')
 loggerCustomLevel.customNetwork('test6')
+const loggerCustomLevelDefault = Pino(pinoOpts, multistream(streams, multistreamOpts));
+loggerCustomLevelDefault.customDebug('test3')
+loggerCustomLevelDefault.info('test4')
+loggerCustomLevelDefault.customError('test5')
+loggerCustomLevelDefault.customNetwork('test6')
