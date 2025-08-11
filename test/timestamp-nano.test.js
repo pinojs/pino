@@ -21,14 +21,14 @@ test('pino.stdTimeFunctions.isoTimeNanos returns RFC 3339 timestamps', async ({ 
   }
   const stream = sink()
 
-  // Mock process.hrtime.bigint at invocation time
-  process.hrtime.bigint = () => 100000000000000n + 12345678n
+  // Mock process.hrtime.bigint at invocation time, add 1 day to the timestamp
+  process.hrtime.bigint = () => 100000000000000n + 86400012345678n
 
   const instance = pino(opts, stream)
   instance.info('foobar')
   const result = await once(stream, 'data')
   equal(result.hasOwnProperty('time'), true)
-  equal(result.time, '2025-08-01T15:03:45.012345678Z')
+  equal(result.time, '2025-08-02T15:03:45.012345678Z')
 
   Date.now = now
   process.hrtime.bigint = hrTimeBigint
