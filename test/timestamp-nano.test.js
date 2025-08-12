@@ -5,7 +5,7 @@
 const { test } = require('tap')
 const { sink, once } = require('./helper')
 
-test('pino.stdTimeFunctions.isoTimeNanos returns RFC 3339 timestamps', async ({ equal }) => {
+test('pino.stdTimeFunctions.isoTimeNano returns RFC 3339 timestamps', async ({ equal }) => {
   // Mock Date.now at module initialization time
   const now = Date.now
   Date.now = () => new Date('2025-08-01T15:03:45.000000000Z').getTime()
