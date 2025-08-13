@@ -20,124 +20,120 @@ import * as pinoStdSerializers from "pino-std-serializers";
 import type { SonicBoom, SonicBoomOpts } from "sonic-boom";
 import type { WorkerOptions } from "worker_threads";
 
-
-
-//// Non-exported types and interfaces
-
-// ToDo https://github.com/pinojs/thread-stream/issues/24
-type ThreadStream = any
-
-type TimeFn = () => string;
-type MixinFn<CustomLevels extends string = never> = (mergeObject: object, level: number, logger:pino.Logger<CustomLevels>) => object;
-type MixinMergeStrategyFn = (mergeObject: object, mixinObject: object) => object;
-
-type CustomLevelLogger<CustomLevels extends string, UseOnlyCustomLevels extends boolean = boolean> = { 
-    /**
-     * Define additional logging levels.
-     */
-    customLevels: { [level in CustomLevels]: number };
-    /**
-     * Use only defined `customLevels` and omit Pino's levels.
-     */
-    useOnlyCustomLevels: UseOnlyCustomLevels;
- } & {
-    // This will override default log methods
-    [K in Exclude<pino.Level, CustomLevels>]: UseOnlyCustomLevels extends true ? never : pino.LogFn;
- } & {
-    [level in CustomLevels]: pino.LogFn;
- };
-
-/**
-* A synchronous callback that will run on each creation of a new child.
-* @param child: The newly created child logger instance.
-*/
-type OnChildCallback<CustomLevels extends string = never> = (child: pino.Logger<CustomLevels>) => void
-
-interface redactOptions {
-    paths: string[];
-    censor?: string | ((value: any, path: string[]) => any);
-    remove?: boolean;
-}
-
-interface LoggerExtras<CustomLevels extends string = never, UseOnlyCustomLevels extends boolean = boolean> extends EventEmitter {
-    /**
-     * Exposes the Pino package version. Also available on the exported pino function.
-     */
-    readonly version: string;
-
-    levels: pino.LevelMapping;
-
-    /**
-     * Outputs the level as a string instead of integer.
-     */
-    useLevelLabels: boolean;
-    /**
-     * Returns the integer value for the logger instance's logging level.
-     */
-    levelVal: number;
-
-    /**
-     * Creates a child logger, setting all key-value pairs in `bindings` as properties in the log lines. All serializers will be applied to the given pair.
-     * Child loggers use the same output stream as the parent and inherit the current log level of the parent at the time they are spawned.
-     * From v2.x.x the log level of a child is mutable (whereas in v1.x.x it was immutable), and can be set independently of the parent.
-     * If a `level` property is present in the object passed to `child` it will override the child logger level.
-     *
-     * @param bindings: an object of key-value pairs to include in log lines as properties.
-     * @param options: an options object that will override child logger inherited options.
-     * @returns a child logger instance.
-     */
-    child<ChildCustomLevels extends string = never>(bindings: pino.Bindings, options?: pino.ChildLoggerOptions<ChildCustomLevels>): pino.Logger<CustomLevels | ChildCustomLevels>;
-
-    /**
-     * This can be used to modify the callback function on creation of a new child.
-     */
-    onChild: OnChildCallback<CustomLevels>;
-
-    /**
-     * Registers a listener function that is triggered when the level is changed.
-     * Note: When browserified, this functionality will only be available if the `events` module has been required elsewhere
-     * (e.g. if you're using streams in the browser). This allows for a trade-off between bundle size and functionality.
-     *
-     * @param event: only ever fires the `'level-change'` event
-     * @param listener: The listener is passed four arguments: `levelLabel`, `levelValue`, `previousLevelLabel`, `previousLevelValue`.
-     */
-    on(event: "level-change", listener: pino.LevelChangeEventListener<CustomLevels, UseOnlyCustomLevels>): this;
-    addListener(event: "level-change", listener: pino.LevelChangeEventListener<CustomLevels, UseOnlyCustomLevels>): this;
-    once(event: "level-change", listener: pino.LevelChangeEventListener<CustomLevels, UseOnlyCustomLevels>): this;
-    prependListener(event: "level-change", listener: pino.LevelChangeEventListener<CustomLevels, UseOnlyCustomLevels>): this;
-    prependOnceListener(event: "level-change", listener: pino.LevelChangeEventListener<CustomLevels, UseOnlyCustomLevels>): this;
-    removeListener(event: "level-change", listener: pino.LevelChangeEventListener<CustomLevels, UseOnlyCustomLevels>): this;
-
-    /**
-     * A utility method for determining if a given log level will write to the destination.
-     */
-    isLevelEnabled(level: pino.LevelWithSilentOrString): boolean;
-
-    /**
-     * Returns an object containing all the current bindings, cloned from the ones passed in via logger.child().
-     */
-    bindings(): pino.Bindings;
-
-    /**
-     * Adds to the bindings of this logger instance.
-     * Note: Does not overwrite bindings. Can potentially result in duplicate keys in log lines.
-     *
-     * @param bindings: an object of key-value pairs to include in log lines as properties.
-     */
-    setBindings(bindings: pino.Bindings): void;
-
-    /**
-     * Flushes the content of the buffer when using pino.destination({ sync: false }).
-     * call the callback when finished
-     */
-    flush(cb?: (err?: Error) => void): void;
-}
-
-
 declare namespace pino {
-    //// Exported types and interfaces
+    //// Non-exported types and interfaces
 
-    interface BaseLogger {
+    // ToDo https://github.com/pinojs/thread-stream/issues/24
+    type ThreadStream = any
+
+    type TimeFn = () => string;
+    type MixinFn<CustomLevels extends string = never> = (mergeObject: object, level: number, logger:Logger<CustomLevels>) => object;
+    type MixinMergeStrategyFn = (mergeObject: object, mixinObject: object) => object;
+
+    type CustomLevelLogger<CustomLevels extends string, UseOnlyCustomLevels extends boolean = boolean> = { 
+        /**
+         * Define additional logging levels.
+         */
+        customLevels: { [level in CustomLevels]: number };
+        /**
+         * Use only defined `customLevels` and omit Pino's levels.
+         */
+        useOnlyCustomLevels: UseOnlyCustomLevels;
+    } & {
+        // This will override default log methods
+        [K in Exclude<Level, CustomLevels>]: UseOnlyCustomLevels extends true ? never : LogFn;
+    } & {
+        [level in CustomLevels]: LogFn;
+    };
+
+    /**
+    * A synchronous callback that will run on each creation of a new child.
+    * @param child: The newly created child logger instance.
+    */
+    type OnChildCallback<CustomLevels extends string = never> = (child: Logger<CustomLevels>) => void
+
+    export interface redactOptions {
+        paths: string[];
+        censor?: string | ((value: any, path: string[]) => any);
+        remove?: boolean;
+    }
+
+    export interface LoggerExtras<CustomLevels extends string = never, UseOnlyCustomLevels extends boolean = boolean> extends EventEmitter {
+        /**
+         * Exposes the Pino package version. Also available on the exported pino function.
+         */
+        readonly version: string;
+
+        levels: LevelMapping;
+
+        /**
+         * Outputs the level as a string instead of integer.
+         */
+        useLevelLabels: boolean;
+        /**
+         * Returns the integer value for the logger instance's logging level.
+         */
+        levelVal: number;
+
+        /**
+         * Creates a child logger, setting all key-value pairs in `bindings` as properties in the log lines. All serializers will be applied to the given pair.
+         * Child loggers use the same output stream as the parent and inherit the current log level of the parent at the time they are spawned.
+         * From v2.x.x the log level of a child is mutable (whereas in v1.x.x it was immutable), and can be set independently of the parent.
+         * If a `level` property is present in the object passed to `child` it will override the child logger level.
+         *
+         * @param bindings: an object of key-value pairs to include in log lines as properties.
+         * @param options: an options object that will override child logger inherited options.
+         * @returns a child logger instance.
+         */
+        child<ChildCustomLevels extends string = never>(bindings: Bindings, options?: ChildLoggerOptions<ChildCustomLevels>): Logger<CustomLevels | ChildCustomLevels>;
+
+        /**
+         * This can be used to modify the callback function on creation of a new child.
+         */
+        onChild: OnChildCallback<CustomLevels>;
+
+        /**
+         * Registers a listener function that is triggered when the level is changed.
+         * Note: When browserified, this functionality will only be available if the `events` module has been required elsewhere
+         * (e.g. if you're using streams in the browser). This allows for a trade-off between bundle size and functionality.
+         *
+         * @param event: only ever fires the `'level-change'` event
+         * @param listener: The listener is passed four arguments: `levelLabel`, `levelValue`, `previousLevelLabel`, `previousLevelValue`.
+         */
+        on(event: "level-change", listener: LevelChangeEventListener<CustomLevels, UseOnlyCustomLevels>): this;
+        addListener(event: "level-change", listener: LevelChangeEventListener<CustomLevels, UseOnlyCustomLevels>): this;
+        once(event: "level-change", listener: LevelChangeEventListener<CustomLevels, UseOnlyCustomLevels>): this;
+        prependListener(event: "level-change", listener: LevelChangeEventListener<CustomLevels, UseOnlyCustomLevels>): this;
+        prependOnceListener(event: "level-change", listener: LevelChangeEventListener<CustomLevels, UseOnlyCustomLevels>): this;
+        removeListener(event: "level-change", listener: LevelChangeEventListener<CustomLevels, UseOnlyCustomLevels>): this;
+
+        /**
+         * A utility method for determining if a given log level will write to the destination.
+         */
+        isLevelEnabled(level: LevelWithSilentOrString): boolean;
+
+        /**
+         * Returns an object containing all the current bindings, cloned from the ones passed in via logger.child().
+         */
+        bindings(): Bindings;
+
+        /**
+         * Adds to the bindings of this logger instance.
+         * Note: Does not overwrite bindings. Can potentially result in duplicate keys in log lines.
+         *
+         * @param bindings: an object of key-value pairs to include in log lines as properties.
+         */
+        setBindings(bindings: Bindings): void;
+
+        /**
+         * Flushes the content of the buffer when using pino.destination({ sync: false }).
+         * call the callback when finished
+         */
+        flush(cb?: (err?: Error) => void): void;
+    }
+
+    //// Exported types and interfaces
+    export interface BaseLogger {
         /**
          * Set this property to the desired logging level. In order of priority, available levels are:
          *
@@ -153,7 +149,7 @@ declare namespace pino {
          *
          * You can pass `'silent'` to disable logging.
          */
-        level: pino.LevelWithSilentOrString;
+        level: LevelWithSilentOrString;
 
         /**
          * Log at `'fatal'` level the given msg. If the first argument is an object, all its properties will be included in the JSON line.
@@ -164,7 +160,7 @@ declare namespace pino {
          * @param msg: the log message to write
          * @param ...args: format string values when `msg` is a format string
          */
-        fatal: pino.LogFn;
+        fatal: LogFn;
         /**
          * Log at `'error'` level the given msg. If the first argument is an object, all its properties will be included in the JSON line.
          * If more args follows `msg`, these will be used to format `msg` using `util.format`.
@@ -174,7 +170,7 @@ declare namespace pino {
          * @param msg: the log message to write
          * @param ...args: format string values when `msg` is a format string
          */
-        error: pino.LogFn;
+        error: LogFn;
         /**
          * Log at `'warn'` level the given msg. If the first argument is an object, all its properties will be included in the JSON line.
          * If more args follows `msg`, these will be used to format `msg` using `util.format`.
@@ -184,7 +180,7 @@ declare namespace pino {
          * @param msg: the log message to write
          * @param ...args: format string values when `msg` is a format string
          */
-        warn: pino.LogFn;
+        warn: LogFn;
         /**
          * Log at `'info'` level the given msg. If the first argument is an object, all its properties will be included in the JSON line.
          * If more args follows `msg`, these will be used to format `msg` using `util.format`.
@@ -194,7 +190,7 @@ declare namespace pino {
          * @param msg: the log message to write
          * @param ...args: format string values when `msg` is a format string
          */
-        info: pino.LogFn;
+        info: LogFn;
         /**
          * Log at `'debug'` level the given msg. If the first argument is an object, all its properties will be included in the JSON line.
          * If more args follows `msg`, these will be used to format `msg` using `util.format`.
@@ -204,7 +200,7 @@ declare namespace pino {
          * @param msg: the log message to write
          * @param ...args: format string values when `msg` is a format string
          */
-        debug: pino.LogFn;
+        debug: LogFn;
         /**
          * Log at `'trace'` level the given msg. If the first argument is an object, all its properties will be included in the JSON line.
          * If more args follows `msg`, these will be used to format `msg` using `util.format`.
@@ -214,11 +210,11 @@ declare namespace pino {
          * @param msg: the log message to write
          * @param ...args: format string values when `msg` is a format string
          */
-        trace: pino.LogFn;
+        trace: LogFn;
         /**
          * Noop function.
          */
-        silent: pino.LogFn;
+        silent: LogFn;
 
         /**
          * Get `msgPrefix` of the logger instance.
@@ -228,17 +224,17 @@ declare namespace pino {
         get msgPrefix(): string | undefined;
     }
 
-    type Bindings = Record<string, any>;
+    export type Bindings = Record<string, any>;
 
-    type Level = "fatal" | "error" | "warn" | "info" | "debug" | "trace";
-    type LevelOrString = Level | (string & {});
-    type LevelWithSilent = pino.Level | "silent";
-    type LevelWithSilentOrString = LevelWithSilent | (string & {});
+    export type Level = "fatal" | "error" | "warn" | "info" | "debug" | "trace";
+    export type LevelOrString = Level | (string & {});
+    export type LevelWithSilent = Level | "silent";
+    export type LevelWithSilentOrString = LevelWithSilent | (string & {});
 
-    type SerializerFn = (value: any) => any;
-    type WriteFn = (o: object) => void;
+    export type SerializerFn = (value: any) => any;
+    export type WriteFn = (o: object) => void;
 
-    type LevelChangeEventListener<CustomLevels extends string = never, UseOnlyCustomLevels extends boolean = boolean> = (
+    export type LevelChangeEventListener<CustomLevels extends string = never, UseOnlyCustomLevels extends boolean = boolean> = (
         lvl: LevelWithSilentOrString,
         val: number,
         prevLvl: LevelWithSilentOrString,
@@ -246,47 +242,47 @@ declare namespace pino {
         logger: Logger<CustomLevels, UseOnlyCustomLevels>
     ) => void;
 
-    type LogDescriptor = Record<string, any>;
+    export type LogDescriptor = Record<string, any>;
 
-    type Logger<CustomLevels extends string = never, UseOnlyCustomLevels extends boolean = boolean> = BaseLogger & LoggerExtras<CustomLevels> & CustomLevelLogger<CustomLevels, UseOnlyCustomLevels>;
+    export type Logger<CustomLevels extends string = never, UseOnlyCustomLevels extends boolean = boolean> = BaseLogger & LoggerExtras<CustomLevels> & CustomLevelLogger<CustomLevels, UseOnlyCustomLevels>;
 
-    type SerializedError = pinoStdSerializers.SerializedError;
-    type SerializedResponse = pinoStdSerializers.SerializedResponse;
-    type SerializedRequest = pinoStdSerializers.SerializedRequest;
+    export type SerializedError = pinoStdSerializers.SerializedError;
+    export type SerializedResponse = pinoStdSerializers.SerializedResponse;
+    export type SerializedRequest = pinoStdSerializers.SerializedRequest;
 
 
-    interface TransportTargetOptions<TransportOptions = Record<string, any>> {
+    export interface TransportTargetOptions<TransportOptions = Record<string, any>> {
         target: string
         options?: TransportOptions
         level?: LevelWithSilentOrString
     }
 
-    interface TransportBaseOptions<TransportOptions = Record<string, any>> {
+    export interface TransportBaseOptions<TransportOptions = Record<string, any>> {
         options?: TransportOptions
         worker?: WorkerOptions & { autoEnd?: boolean}
     }
 
-    interface TransportSingleOptions<TransportOptions = Record<string, any>> extends TransportBaseOptions<TransportOptions>{
+    export interface TransportSingleOptions<TransportOptions = Record<string, any>> extends TransportBaseOptions<TransportOptions>{
         target: string
     }
 
-    interface TransportPipelineOptions<TransportOptions = Record<string, any>> extends TransportBaseOptions<TransportOptions>{
+    export interface TransportPipelineOptions<TransportOptions = Record<string, any>> extends TransportBaseOptions<TransportOptions>{
         pipeline: TransportSingleOptions<TransportOptions>[]
         level?: LevelWithSilentOrString
     }
 
-    interface TransportMultiOptions<TransportOptions = Record<string, any>> extends TransportBaseOptions<TransportOptions>{
+    export interface TransportMultiOptions<TransportOptions = Record<string, any>> extends TransportBaseOptions<TransportOptions>{
         targets: readonly (TransportTargetOptions<TransportOptions>|TransportPipelineOptions<TransportOptions>)[],
         levels?: Record<string, number>
         dedupe?: boolean
     }
 
-    interface MultiStreamOptions {
+    export interface MultiStreamOptions {
         levels?: Record<string, number>
         dedupe?: boolean
     }
 
-    interface DestinationStream {
+    export interface DestinationStream {
         write(msg: string): void;
     }
 
@@ -296,17 +292,17 @@ declare namespace pino {
       lastTime: string;
       lastMsg: string;
       lastObj: object;
-      lastLogger: pino.Logger;
+      lastLogger: Logger;
     }
 
-    type DestinationStreamWithMetadata = DestinationStream & ({ [symbols.needsMetadataGsym]?: false } | DestinationStreamHasMetadata);
+    export type DestinationStreamWithMetadata = DestinationStream & ({ [symbols.needsMetadataGsym]?: false } | DestinationStreamHasMetadata);
 
-    interface StreamEntry<TLevel = Level> {
+    export interface StreamEntry<TLevel = Level> {
         stream: DestinationStream
         level?: TLevel
     }
 
-    interface MultiStreamRes<TOriginLevel = Level> {
+    export interface MultiStreamRes<TOriginLevel = Level> {
         write: (data: any) => void,
         add: <TLevel = Level>(dest: StreamEntry<TLevel> | DestinationStream) => MultiStreamRes<TOriginLevel & TLevel>,
         flushSync: () => void,
@@ -315,7 +311,7 @@ declare namespace pino {
         clone<TLevel = Level>(level: TLevel): MultiStreamRes<TLevel>,
     }
 
-    interface LevelMapping {
+    export interface LevelMapping {
         /**
          * Returns the mappings of level names to their respective internal number representation.
          */
@@ -344,12 +340,12 @@ declare namespace pino {
             : ParseLogFnArgs<Rest, Acc>
         : Acc;
 
-    interface LogFn {
+    export interface LogFn {
         <T, TMsg extends string = string>(obj: T, msg?: T extends string ? never: TMsg, ...args: ParseLogFnArgs<TMsg> | []): void;
         <_, TMsg extends string = string>(msg: TMsg, ...args: ParseLogFnArgs<TMsg> | []): void;
     }
 
-    interface LoggerOptions<CustomLevels extends string = never, UseOnlyCustomLevels extends boolean = boolean> {
+    export interface LoggerOptions<CustomLevels extends string = never, UseOnlyCustomLevels extends boolean = boolean> {
         transport?: TransportSingleOptions | TransportMultiOptions | TransportPipelineOptions
         /**
          * Avoid error causes by circular references in the object tree. Default: `true`.
@@ -702,7 +698,7 @@ declare namespace pino {
         crlf?: boolean;
     }
 
-    interface ChildLoggerOptions<CustomLevels extends string = never> {
+    export interface ChildLoggerOptions<CustomLevels extends string = never> {
         level?: LevelOrString;
         serializers?: { [key: string]: SerializerFn };
         customLevels?: { [level in CustomLevels]: number };
@@ -723,7 +719,7 @@ declare namespace pino {
      * to `messages` and `bindings` in the `logEvent` object. This allows  us to ensure a consistent format for all
      * values between server and client.
      */
-    interface LogEvent {
+    export interface LogEvent {
         /**
          * Unix epoch timestamp in milliseconds, the time is taken from the moment the logger method is called.
          */
@@ -754,7 +750,6 @@ declare namespace pino {
 
 
     //// Top level variable (const) exports
-
 
     /**
      * Provides functions for serializing objects common to many projects.
@@ -847,6 +842,23 @@ declare namespace pino {
         streamsArray: (DestinationStream | StreamEntry<TLevel>)[] | DestinationStream | StreamEntry<TLevel>,
         opts?: MultiStreamOptions
     ): MultiStreamRes<TLevel>
+
+    //// Nested version of default export for TypeScript/Babel compatibility
+
+    /**
+     * @param [optionsOrStream]: an options object or a writable stream where the logs will be written. It can also receive some log-line metadata, if the
+     * relative protocol is enabled. Default: process.stdout
+     * @returns a new logger instance.
+     */
+    function pino<CustomLevels extends string = never, UseOnlyCustomLevels extends boolean = boolean>(optionsOrStream?: LoggerOptions<CustomLevels, UseOnlyCustomLevels> | DestinationStream): Logger<CustomLevels, UseOnlyCustomLevels>;
+
+    /**
+     * @param [options]: an options object
+     * @param [stream]: a writable stream where the logs will be written. It can also receive some log-line metadata, if the
+     * relative protocol is enabled. Default: process.stdout
+     * @returns a new logger instance.
+     */
+    function pino<CustomLevels extends string = never, UseOnlyCustomLevels extends boolean = boolean>(options: LoggerOptions<CustomLevels, UseOnlyCustomLevels>, stream?: DestinationStream | undefined): Logger<CustomLevels, UseOnlyCustomLevels>;
 }
 
 //// Callable default export
@@ -865,6 +877,5 @@ declare function pino<CustomLevels extends string = never, UseOnlyCustomLevels e
  * @returns a new logger instance.
  */
 declare function pino<CustomLevels extends string = never, UseOnlyCustomLevels extends boolean = boolean>(options: pino.LoggerOptions<CustomLevels, UseOnlyCustomLevels>, stream?: pino.DestinationStream | undefined): pino.Logger<CustomLevels, UseOnlyCustomLevels>;
-
 
 export = pino;

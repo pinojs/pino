@@ -1,9 +1,8 @@
 import { IncomingMessage, ServerResponse } from "http";
 import { Socket } from "net";
 import { expectError, expectType } from 'tsd';
-import pino from "../../";
-type LoggerOptions = pino.LoggerOptions;
-type Logger = pino.Logger;
+import pino, { LoggerOptions } from "../../";
+import Logger = pino.Logger;
 
 const log = pino();
 const info = log.info;
@@ -12,7 +11,7 @@ const error = log.error;
 info("hello world");
 error("this is at error level");
 
-// primative types
+// primitive types
 info('simple string');
 info(true)
 info(42);
@@ -459,7 +458,7 @@ const bLogger = pino({
   },
 });
 
-expectType<pino.Logger<'log'>>(pino({
+expectType<Logger<'log'>>(pino({
   customLevels: {
     log: 5,
   },
