@@ -1461,14 +1461,24 @@ Exposes the Pino package version. Also available on the logger instance.
     - Returns: [MultiStreamRes](#multistreamres)
 
  Add `dest` stream to the array of streams of the current instance.
- * `flushSync()`
-   - Returns: `undefined`
+ *  `flushSync()`
+    - Returns: `undefined`
 
  Call `flushSync` on each stream held by the current instance.
+
+ * `lastId`
+   - number
+
+ The ID assigned to the last stream assigned to the current instance.
  * `minLevel`
    - number
 
  The minimum level amongst all the streams held by the current instance.
+
+ * `remove(id)`
+   - `id` [number]
+
+ Removes a stream from the array of streams of the current instance using its assigned ID.
  * `streams`
     - Returns: [StreamEntry[]](#streamentry)
 

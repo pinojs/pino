@@ -570,6 +570,56 @@ test('add a stream', function (t) {
   t.end()
 })
 
+test('remove a stream', function (t) {
+  let messageCount1 = 0
+  let messageCount2 = 0
+  let messageCount3 = 0
+
+  const stream1 = writeStream(function (data, enc, cb) {
+    messageCount1 += 1
+    cb()
+  })
+
+  const stream2 = writeStream(function (data, enc, cb) {
+    messageCount2 += 1
+    cb()
+  })
+
+  const stream3 = writeStream(function (data, enc, cb) {
+    messageCount3 += 1
+    cb()
+  })
+
+  const multi = multistream()
+  const log = pino({ level: 'trace', sync: true }, multi)
+
+  multi.add(stream1)
+  const id1 = multi.lastId
+
+  multi.add(stream2)
+  const id2 = multi.lastId
+
+  multi.add(stream3)
+  const id3 = multi.lastId
+
+  log.info('line')
+  multi.remove(id1)
+
+  log.info('line')
+  multi.remove(id2)
+
+  log.info('line')
+  multi.remove(id3)
+
+  log.info('line')
+  multi.remove(Math.floor(Math.random() * 1000)) // non-existing id
+
+  t.equal(messageCount1, 1)
+  t.equal(messageCount2, 2)
+  t.equal(messageCount3, 3)
+  t.end()
+})
+
 test('multistream.add throws if not a stream', function (t) {
   try {
     pino({
