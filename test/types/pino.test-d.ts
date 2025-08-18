@@ -35,12 +35,25 @@ info('The json is %j', { a: 1, b: '2' });
 info('The object is %O', { a: 1, b: '2' });
 info('The answer is %d and the question is %s with %o', 42, 'unknown', { correct: 'order' });
 info('Missing placeholder is fine %s');
+
+// %s placeholder supports all primitive types
+info('Boolean %s', true);
+info('Boolean %s', false);
+info('Number %s', 123);
+info('Number %s', 3.14);
+info('BigInt %s', BigInt(123));
+info('Null %s', null);
+info('Undefined %s', undefined);
+info('Symbol %s', Symbol('test'));
+info('String %s', 'hello');
+
+// %s placeholder with multiple primitives
+info('Multiple primitives %s %s %s', true, 42, 'world');
+info('All primitive types %s %s %s %s %s %s %s', 'string', 123, true, BigInt(123), null, undefined, Symbol('test'));
 declare const errorOrString: string | Error;
 info(errorOrString)
 
 // placeholder messages type errors
-expectError(info('Hello %s', 123));
-expectError(info('Hello %s', false));
 expectError(info('The answer is %d', 'not a number'));
 expectError(info('The object is %o', 'not an object'));
 expectError(info('The object is %j', 'not a JSON'));
@@ -58,7 +71,7 @@ info({ a: 1, b: '2' }, 'hello world with %s', 'extra data');
 expectError(info({ a: 1, b: '2' }, 'hello world with %d', 2, 'extra' ));
 
 // metadata with messages type errors
-expectError(info({ a: 1, b: '2' }, 'hello world with %s', 123));
+expectError(info({ a: 1, b: '2' }, 'hello world with %s', {}));
 
 // metadata after message
 expectError(info('message', { a: 1, b: '2' }));
