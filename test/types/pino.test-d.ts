@@ -38,9 +38,9 @@ info('Missing placeholder is fine %s');
 declare const errorOrString: string | Error;
 info(errorOrString)
 
-// placeholder messages type errors
-expectError(info('Hello %s', 123));
-expectError(info('Hello %s', false));
+// placeholder messages type errors (note: %s accepts any value)
+info('Hello %s', 123);
+info('Hello %s', false);
 expectError(info('The answer is %d', 'not a number'));
 expectError(info('The object is %o', 'not an object'));
 expectError(info('The object is %j', 'not a JSON'));
@@ -57,8 +57,8 @@ info({ a: 1, b: '2' }, 'hello world with %s', 'extra data');
 // Extra message after placeholder
 expectError(info({ a: 1, b: '2' }, 'hello world with %d', 2, 'extra' ));
 
-// metadata with messages type errors
-expectError(info({ a: 1, b: '2' }, 'hello world with %s', 123));
+// metadata with messages (note: %s accepts any value)
+info({ a: 1, b: '2' }, 'hello world with %s', 123);
 
 // metadata after message
 expectError(info('message', { a: 1, b: '2' }));
