@@ -8,7 +8,7 @@ let passedVersion = process.argv[2]
 
 if (passedVersion) {
   passedVersion = passedVersion.trim().replace(/^v/, '')
-  if (version != passedVersion) {
+  if (version !== passedVersion) {
     console.log(`Syncing version from ${version} to ${passedVersion}`)
     version = passedVersion
     const packageJson = require('../package.json')

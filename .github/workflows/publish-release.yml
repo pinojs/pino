@@ -26,14 +26,11 @@ jobs:
         with:
           node-version: '22'
           registry-url: 'https://registry.npmjs.org'
-          cache: 'npm'
       - run: npm install npm -g
       - run: npm install
       - name: Change version number and sync
         run: |
           node build/sync-version.mjs ${{ inputs.version }}
-      - name: update lockfile
-        run: npm install
       - name: GIT commit and push all changed files
         run: |
           git config --global user.name "mcollina"
