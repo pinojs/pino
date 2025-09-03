@@ -30,7 +30,7 @@ jobs:
       - run: npm install
       - name: Change version number and sync
         run: |
-          node build/sync-version.mjs ${{ inputs.version }}
+          node build/sync-version.js ${{ inputs.version }}
       - name: GIT commit and push all changed files
         run: |
           git config --global user.name "mcollina"
