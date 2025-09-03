@@ -757,7 +757,7 @@ from `msg` to another string as preferred.
 The `message` string may contain a printf style string with support for
 the following placeholders:
 
-* `%s` – string placeholder
+* `%s` – string placeholder, every non-string value passed in will have `.toString()` called.
 * `%d` – digit placeholder
 * `%O`, `%o`, and `%j` – object placeholder
 
