@@ -12,6 +12,7 @@ test('pino exposes standard time functions', async ({ ok }) => {
   ok(pino.stdTimeFunctions.unixTime)
   ok(pino.stdTimeFunctions.nullTime)
   ok(pino.stdTimeFunctions.isoTime)
+  ok(pino.stdTimeFunctions.isoTimeNano)
 })
 
 test('pino accepts external time functions', async ({ equal }) => {
