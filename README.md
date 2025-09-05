@@ -5,7 +5,7 @@
 [![Build Status](https://img.shields.io/github/actions/workflow/status/pinojs/pino/ci.yml)](https://github.com/pinojs/pino/actions)
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](https://standardjs.com/)
 
-[Very low overhead](#low-overhead) Node.js logger.
+[Very low overhead](#low-overhead) logger for [Node.js](https://nodejs.org/), [Bare](https://github.com/holepunchto/bare) & [Pear](https://docs.pears.com).
 
 ## Documentation
 
