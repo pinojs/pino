@@ -35,7 +35,7 @@ jobs:
         run: |
           git config --global user.name "mcollina"
           git config --global user.email "hello@matteocollina.com"
-          git commit -a -m "Bumped v${{ inputs.version }}"
+          git commit -n -a -m "Bumped v${{ inputs.version }}"
           git push origin HEAD:${{ github.ref }}
       - run: npm publish --access public --tag ${{ inputs.prerelease == true && 'next' || 'latest' }}
       - name: 'Create release notes'
