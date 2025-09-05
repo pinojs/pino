@@ -71,8 +71,9 @@ info({ a: 1, b: '2' }, 'hello world with %s', 'extra data');
 // Extra message after placeholder
 expectError(info({ a: 1, b: '2' }, 'hello world with %d', 2, 'extra' ));
 
-// metadata with messages type errors
-expectError(info({ a: 1, b: '2' }, 'hello world with %s', {}));
+// metadata with messages type passes, because of custom toString method
+// We can't detect if the object has a custom toString method that returns a string
+info({ a: 1, b: '2' }, 'hello world with %s', {});
 
 // metadata after message
 expectError(info('message', { a: 1, b: '2' }));
