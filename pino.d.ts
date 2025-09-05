@@ -341,17 +341,8 @@ declare namespace pino {
         : Acc;
 
     export interface LogFn {
-        <TMsg extends string = string>(
-            msg: TMsg, 
-            ...args: ParseLogFnArgs<TMsg>
-        ): void;
-        <T, TMsg extends string = string>(
-            obj: T, 
-            msg?: T extends string ? never : TMsg, 
-            ...args: ParseLogFnArgs<TMsg> extends [any, ...any[]]
-                ? ParseLogFnArgs<TMsg>
-                : any[]
-        ): void;
+        <TMsg extends string = string>(msg: TMsg, ...args: ParseLogFnArgs<TMsg>): void;
+        <T, TMsg extends string = string>(obj: T, msg?: T extends string ? never : TMsg, ...args: ParseLogFnArgs<TMsg> extends [any, ...any[]] ? ParseLogFnArgs<TMsg> : any[]): void;
     }
 
     export interface LoggerOptions<CustomLevels extends string = never, UseOnlyCustomLevels extends boolean = boolean> {

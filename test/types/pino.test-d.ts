@@ -474,7 +474,7 @@ const bLogger = pino({
 
 // Test that we can properly extract parameters from the log fn type
 type LogParam = Parameters<LogFn>
-const _: LogParam = [{ multiple: 'params' }, 'params', 'should', 'be', 'accepted']
+const _: LogParam = [{ multiple: 'params' }, 'should', 'be', 'accepted']
 
 const logger = mock.fn<LogFn>()
 logger.mock.calls[0].arguments[1]?.includes('I should be able to get params')
