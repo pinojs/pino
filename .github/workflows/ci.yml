@@ -42,11 +42,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        runtime: [node, bare]
         os: [macOS-latest, windows-latest, ubuntu-latest]
         node-version: [18, 20, 22]
         exclude:
           - os: windows-latest
             node-version: 22
+          - runtime: bare
+            node-version: 18
+          - runtime: bare
+            node-version: 20
 
     steps:
       - name: Check out repo
@@ -59,16 +64,26 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
+      - name: Setup Bare
+        run: npm install -g bare-runtime bare-make
+        if: ${{ matrix.runtime == 'bare' }}
+
       - name: Install dependencies
         run: npm i --ignore-scripts
 
       - name: Run tests
         run: npm run test-ci
+        if: ${{ matrix.runtime == 'node' }}
+
+      - name: Run tests
+        run: npm run test-ci-bare
+        if: ${{ matrix.runtime == 'bare' }}
 
       - name: Run smoke test
         if: >
           matrix.os != 'windows-latest' &&
-          matrix.node-version > 14
+          matrix.node-version > 14 &&
+          matrix.runtime != 'bare'
         run: npm run test:smoke
 
   automerge:
