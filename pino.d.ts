@@ -19,6 +19,7 @@ import type { EventEmitter } from "events";
 import * as pinoStdSerializers from "pino-std-serializers";
 import type { SonicBoom, SonicBoomOpts } from "sonic-boom";
 import type { WorkerOptions } from "worker_threads";
+import type { InspectOptions } from "node:util";
 
 declare namespace pino {
     //// Non-exported types and interfaces
@@ -842,6 +843,141 @@ declare namespace pino {
         streamsArray: (DestinationStream | StreamEntry<TLevel>)[] | DestinationStream | StreamEntry<TLevel>,
         opts?: MultiStreamOptions
     ): MultiStreamRes<TLevel>
+    
+    /**
+     * Console adapter that implements Node.js Console API using Pino logger.
+     * This class is fully compatible with Node.js Console and can be cast to it.
+     */
+    export class Console {
+        constructor(logger: Logger);
+        
+        /**
+         * Reference to the Console constructor for compatibility with Node.js Console interface.
+         */
+        Console: typeof Console;
+        
+        // Core logging methods - matching Node.js Console signatures exactly
+        /**
+         * Prints to stdout with newline. Equivalent to pino.info().
+         */
+        log(message?: any, ...optionalParams: any[]): void;
+        
+        /**
+         * Prints to stdout with newline. Equivalent to pino.info().
+         */
+        info(message?: any, ...optionalParams: any[]): void;
+        
+        /**
+         * Prints to stderr with newline. Equivalent to pino.warn().
+         */
+        warn(message?: any, ...optionalParams: any[]): void;
+        
+        /**
+         * Prints to stderr with newline. Equivalent to pino.error().
+         */
+        error(message?: any, ...optionalParams: any[]): void;
+        
+        /**
+         * Prints to stdout with newline. Equivalent to pino.debug().
+         */
+        debug(message?: any, ...optionalParams: any[]): void;
+        
+        /**
+         * Writes a message if value is falsy or omitted. It only writes a message and does not otherwise affect execution.
+         * The output always starts with "Assertion failed". If provided, message is formatted using util.format().
+         */
+        assert(value: any, message?: string, ...optionalParams: any[]): void;
+        
+        /**
+         * Prints to stderr the string 'Trace: ', followed by the util.format() formatted message and stack trace to the current position in the code.
+         */
+        trace(message?: any, ...optionalParams: any[]): void;
+        
+        /**
+         * Starts a timer that can be used to compute the duration of an operation. Timers are identified by a unique label.
+         */
+        time(label?: string): void;
+        
+        /**
+         * Stops a timer that was previously started by calling time() and prints the result to stdout.
+         */
+        timeEnd(label?: string): void;
+        
+        /**
+         * For a timer that was previously started by calling time(), prints the elapsed time and other data arguments to stdout.
+         */
+        timeLog(label?: string, ...data: any[]): void;
+        
+        /**
+         * Maintains an internal counter specific to label and outputs to stdout the number of times count() has been called with the given label.
+         */
+        count(label?: string): void;
+        
+        /**
+         * Resets the internal counter specific to label.
+         */
+        countReset(label?: string): void;
+        
+        /**
+         * Increases indentation of subsequent lines by spaces for groupIndentation length.
+         * If one or more labels are provided, those are printed first without the additional indentation.
+         */
+        group(...label: any[]): void;
+        
+        /**
+         * An alias for group().
+         */
+        groupCollapsed(...label: any[]): void;
+        
+        /**
+         * Decreases indentation of subsequent lines by spaces for groupIndentation length.
+         */
+        groupEnd(): void;
+        
+        /**
+         * Try to construct a table with the columns of the properties of tabularData and rows of tabularData and log it.
+         * Falls back to just logging the argument if it can't be parsed as tabular.
+         */
+        table(tabularData: any, properties?: readonly string[]): void;
+        
+        /**
+         * Uses util.inspect() on obj and prints the resulting string to stdout.
+         * This function bypasses any custom inspect() function defined on obj.
+         */
+        dir(obj: any, options?: InspectOptions): void;
+        
+        /**
+         * This method calls log() passing it the arguments received.
+         * This method does not produce any XML formatting.
+         */
+        dirxml(...data: any[]): void;
+        
+        /**
+         * When stdout is a TTY, calling clear() will attempt to clear the TTY.
+         * When stdout is not a TTY, this method does nothing.
+         */
+        clear(): void;
+        
+        // --- Inspector mode only methods for full Node.js Console compatibility ---
+        
+        /**
+         * This method does not display anything unless used in the inspector.
+         * The profile() method starts a JavaScript CPU profile with an optional label until profileEnd() is called.
+         */
+        profile(label?: string): void;
+        
+        /**
+         * This method does not display anything unless used in the inspector.
+         * Stops the current JavaScript CPU profiling session if one has been started and prints the report to the Profiles panel of the inspector.
+         */
+        profileEnd(label?: string): void;
+        
+        /**
+         * This method does not display anything unless used in the inspector.
+         * The timeStamp() method adds an event with the label 'label' to the Timeline panel of the inspector.
+         */
+        timeStamp(label?: string): void;
+    }
 
     //// Nested version of default export for TypeScript/Babel compatibility
 
