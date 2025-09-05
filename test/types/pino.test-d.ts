@@ -1,7 +1,7 @@
 import { IncomingMessage, ServerResponse } from "http";
 import { Socket } from "net";
 import { expectError, expectType } from 'tsd';
-import pino, { LoggerOptions } from "../../";
+import pino, { LogFn, LoggerOptions } from "../../";
 import Logger = pino.Logger;
 
 const log = pino();
@@ -74,11 +74,11 @@ expectError(info({ a: 1, b: '2' }, 'hello world with %d', 2, 'extra' ));
 expectError(info({ a: 1, b: '2' }, 'hello world with %s', {}));
 
 // metadata after message
-expectError(info('message', { a: 1, b: '2' }));
+// expectError(info('message', { a: 1, b: '2' }));
 
 // multiple strings without placeholder
-expectError(info('string1', 'string2'));
-expectError(info('string1', 'string2', 'string3'));
+// expectError(info('string1', 'string2'));
+// expectError(info('string1', 'string2', 'string3'));
 
 setImmediate(info, "after setImmediate");
 error(new Error("an error"));
@@ -470,6 +470,10 @@ const bLogger = pino({
     },
   },
 });
+
+// I should be able to properly extract parameters from the log fn type
+type LogParam = Parameters<LogFn>
+const _: LogParam = ['multiple', 'params', 'should', 'be', 'accepted']
 
 expectType<Logger<'log'>>(pino({
   customLevels: {
