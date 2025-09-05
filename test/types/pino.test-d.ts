@@ -1,4 +1,5 @@
 import { IncomingMessage, ServerResponse } from "http";
+import { mock } from 'node:test'
 import { Socket } from "net";
 import { expectError, expectType } from 'tsd';
 import pino, { LogFn, LoggerOptions } from "../../";
@@ -471,9 +472,26 @@ const bLogger = pino({
   },
 });
 
-// I should be able to properly extract parameters from the log fn type
+// Test that we can properly extract parameters from the log fn type
 type LogParam = Parameters<LogFn>
 const _: LogParam = [{ multiple: 'params' }, 'params', 'should', 'be', 'accepted']
+
+const logger = mock.fn<LogFn>()
+logger.mock.calls[0].arguments[1]?.includes('I should be able to get params')
+
+const hooks: LoggerOptions['hooks'] = {
+    logMethod(this, parameters, method) {
+        if (parameters.length >= 2) {
+        const [parameter1, parameter2, ...remainingParameters] = parameters;
+        if (typeof parameter1 === 'string') {
+            return method.apply(this, [parameter2, parameter1, ...remainingParameters]);
+        }
+        return method.apply(this, [parameter2]);
+        }
+
+        return method.apply(this, parameters);
+    }
+}
 
 expectType<Logger<'log'>>(pino({
   customLevels: {
