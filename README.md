@@ -11,6 +11,7 @@
 
 * [Benchmarks ⇗](/docs/benchmarks.md)
 * [API ⇗](/docs/api.md)
+* [Console Adapter ⇗](/docs/console-adapter.md)
 * [Browser API ⇗](/docs/browser.md)
 * [Redaction ⇗](/docs/redaction.md)
 * [Child Loggers ⇗](/docs/child-loggers.md)
@@ -45,6 +46,10 @@ logger.info('hello world')
 
 const child = logger.child({ a: 'property' })
 child.info('hello child!')
+
+// Or use the Console API for familiar interface
+const console = new pino.Console(logger)
+console.log('hello from console!')
 ```
 
 This produces:
@@ -52,6 +57,7 @@ This produces:
 ```
 {"level":30,"time":1531171074631,"msg":"hello world","pid":657,"hostname":"Davids-MBP-3.fritz.box"}
 {"level":30,"time":1531171082399,"msg":"hello child!","pid":657,"hostname":"Davids-MBP-3.fritz.box","a":"property"}
+{"level":30,"time":1531171082500,"msg":"hello from console!","pid":657,"hostname":"Davids-MBP-3.fritz.box"}
 ```
 
 For using Pino with a web framework see:
