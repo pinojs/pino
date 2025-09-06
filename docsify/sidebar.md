@@ -1,6 +1,7 @@
 * [Readme](/)
 * [API](/docs/api.md)
 * [Browser API](/docs/browser.md)
+* [Console Adapter](/docs/console-adapter.md)
 * [Redaction](/docs/redaction.md)
 * [Child Loggers](/docs/child-loggers.md)
 * [Transports](/docs/transports.md)

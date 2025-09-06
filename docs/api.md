@@ -27,6 +27,7 @@
   * [pino.destination()](#pino-destination)
   * [pino.transport()](#pino-transport)
   * [pino.multistream()](#pino-multistream)
+  * [pino.Console()](#pino-console)
   * [pino.stdSerializers](#pino-stdserializers)
   * [pino.stdTimeFunctions](#pino-stdtimefunctions)
   * [pino.symbols](#pino-symbols)
@@ -1437,6 +1438,54 @@ proxied for performant integration where necessary.
 
 The `pino.symbols` object is intended for library implementers and shouldn't be utilized
 for general use.
+
+<a id="pino-console"></a>
+### `pino.Console(logger) => Console`
+
+Creates a Console adapter instance that implements the Node.js Console API using a Pino logger.
+
+```js
+const pino = require('pino')
+const logger = pino()
+const console = new pino.Console(logger)
+
+// Use like Node.js console
+console.log('Hello, world!')
+console.error('An error occurred')
+console.time('operation')
+console.timeEnd('operation')
+```
+
+**Parameters:**
+- `logger` (Logger): A Pino logger instance
+
+**Returns:** A Console instance with full Node.js Console API compatibility
+
+**Features:**
+- All 21 Console methods implemented (log, info, warn, error, debug, assert, trace, time, timeEnd, timeLog, count, countReset, group, groupEnd, groupCollapsed, table, dir, dirxml, clear, profile, profileEnd, timeStamp)
+- Format specifier support (%s, %d, %i, %o, %O, %%)
+- TypeScript compatible - can be cast to Node.js Console interface
+- Performance optimized with level-enabled checks
+- Structured JSON output while maintaining Console API familiarity
+
+The Console adapter maps console methods to appropriate Pino log levels:
+- `console.log()`, `console.info()` → `pino.info()` (level 30)
+- `console.warn()` → `pino.warn()` (level 40) 
+- `console.error()` → `pino.error()` (level 50)
+- `console.debug()` → `pino.debug()` (level 20)
+
+**TypeScript Usage:**
+```typescript
+import pino from 'pino'
+
+const logger = pino()
+const console = new pino.Console(logger)
+
+// Type-safe casting to Node.js Console
+const nodeConsole: Console = console
+```
+
+For detailed documentation, examples, and migration guides, see [Console Adapter ⇗](/docs/console-adapter.md).
 
 <a id="pino-version"></a>
 ### `pino.version` (String)
