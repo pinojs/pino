@@ -24,7 +24,7 @@ test.afterEach(ctx => {
 })
 
 test('asJson emits events', async (t) => {
-  const plan = tspl(t, { plan: 3 })
+  const plan = tspl(t, { plan: 5 })
   const dest = new Writable({
     objectMode: true,
     write (data, enc, cb) {
@@ -39,10 +39,12 @@ test('asJson emits events', async (t) => {
   ]
 
   diagChan.subscribe('tracing:pino_asJson:start', (event) => {
+    plan.equal(Object.prototype.toString.call(event.instance), '[object Pino]')
     plan.deepStrictEqual(Array.from(event.arguments ?? []), expectedArguments)
   })
 
   diagChan.subscribe('tracing:pino_asJson:end', (event) => {
+    plan.equal(Object.prototype.toString.call(event.instance), '[object Pino]')
     plan.deepStrictEqual(Array.from(event.arguments ?? []), expectedArguments)
     plan.equal(
       event.line,
