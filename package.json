@@ -2,7 +2,7 @@
   "name": "pino",
   "version": "9.9.4",
   "description": "super fast, all natural json logger",
-  "main": "index.js",
+  "main": "pino.js",
   "type": "commonjs",
   "types": "pino.d.ts",
   "browser": "./browser.js",
@@ -15,7 +15,6 @@
     "test-ci": "npm run lint && npm run transpile && tap --ts --no-check-coverage --coverage-report=lcovonly && npm run test-types",
     "test-ci-pnpm": "pnpm run lint && npm run transpile && tap --ts --no-coverage --no-check-coverage && pnpm run test-types",
     "test-ci-yarn-pnp": "yarn run lint && npm run transpile && tap --ts --no-check-coverage --coverage-report=lcovonly",
-    "test-ci-bare": "npm run lint && bare test/bare.js",
     "test-types": "tsc && tsd && ts-node test/types/pino.ts && attw --pack .",
     "test:smoke": "smoker smoke:pino && smoker smoke:browser && smoker smoke:file",
     "smoke:pino": "node ./pino.js",
@@ -67,9 +66,7 @@
     "@types/tap": "^15.0.6",
     "@yao-pkg/pkg": "6.3.0",
     "airtap": "5.0.0",
-    "bare-stream": "^2.7.0",
     "bole": "^5.0.5",
-    "brittle": "^3.18.3",
     "bunyan": "^1.8.14",
     "debug": "^4.3.4",
     "docsify-cli": "^4.4.4",
@@ -115,47 +112,7 @@
     "real-require": "^0.2.0",
     "safe-stable-stringify": "^2.3.1",
     "sonic-boom": "^4.0.1",
-    "thread-stream": "^3.0.0",
-    "which-runtime": "^1.3.1"
-  },
-  "optionalDependencies": {
-    "bare-buffer": "^3.3.1",
-    "bare-fs": "^4.2.3",
-    "bare-module": "^5.0.3",
-    "bare-os": "^3.6.2",
-    "bare-path": "^3.0.0",
-    "bare-process": "^4.2.1",
-    "bare-worker": "^3.0.0"
-  },
-  "imports": {
-    "buffer": {
-      "bare": "bare-buffer",
-      "default": "buffer"
-    },
-    "fs": {
-      "bare": "bare-fs",
-      "default": "fs"
-    },
-    "module": {
-      "bare": "bare-module",
-      "default": "module"
-    },
-    "path": {
-      "bare": "bare-path",
-      "default": "path"
-    },
-    "worker_threads": {
-      "bare": "bare-worker",
-      "default": "worker_threads"
-    },
-    "node:os": {
-      "bare": "bare-os",
-      "default": "node:os"
-    },
-    "node:path": {
-      "bare": "bare-path",
-      "default": "node:path"
-    }
+    "thread-stream": "^3.0.0"
   },
   "tsd": {
     "directory": "test/types"
