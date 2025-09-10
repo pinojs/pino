@@ -326,7 +326,7 @@ declare namespace pino {
     type PlaceholderTypeMapping<T extends PlaceholderSpecifier> = T extends 'd'
         ? number
         : T extends 's'
-            ? string | number | boolean | bigint | null | undefined | symbol | object
+            ? unknown
             : T extends 'j' | 'o' | 'O'
             ? object
             : never;
