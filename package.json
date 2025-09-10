@@ -61,6 +61,7 @@
   "homepage": "https://getpino.io",
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.1",
+    "@matteo.collina/tspl": "^0.2.0",
     "@types/flush-write-stream": "^1.0.0",
     "@types/node": "^24.0.8",
     "@types/tap": "^15.0.6",
