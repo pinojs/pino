@@ -2,6 +2,7 @@
 
 const test = require('node:test')
 const os = require('node:os')
+const diagChan = require('node:diagnostics_channel')
 const { Writable } = require('node:stream')
 const tspl = require('@matteo.collina/tspl')
 const pino = require('../pino')
@@ -37,18 +38,16 @@ test('asJson emits events', async (t) => {
     `,"time":${t.pino.ts}`
   ]
 
-  pino.diagnosticsChannels.asJsonChan.subscribe({
-    start (event) {
-      plan.deepStrictEqual(Array.from(event.arguments ?? []), expectedArguments)
-    },
+  diagChan.subscribe('tracing:pino_asJson:start', (event) => {
+    plan.deepStrictEqual(Array.from(event.arguments ?? []), expectedArguments)
+  })
 
-    end (event) {
-      plan.deepStrictEqual(Array.from(event.arguments ?? []), expectedArguments)
-      plan.equal(
-        event.line,
+  diagChan.subscribe('tracing:pino_asJson:end', (event) => {
+    plan.deepStrictEqual(Array.from(event.arguments ?? []), expectedArguments)
+    plan.equal(
+      event.line,
         `{"level":30,"time":${t.pino.ts},"pid":${pid},"hostname":"${hostname}","msg":"testing"}\n`
-      )
-    }
+    )
   })
 
   const logger = pino({}, dest)
