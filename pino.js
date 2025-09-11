@@ -223,8 +223,6 @@ module.exports.destination = (dest = process.stdout.fd) => {
 module.exports.transport = require('./lib/transport')
 module.exports.multistream = require('./lib/multistream')
 
-module.exports.diagnosticsChannels = require('./lib/diagnostics')
-
 module.exports.levels = mappings()
 module.exports.stdSerializers = serializers
 module.exports.stdTimeFunctions = Object.assign({}, time)
