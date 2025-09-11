@@ -26,7 +26,7 @@
 
 ### Node.js
 
-Pino is built to run on [Node.js](http://nodejs.org)
+Pino is built to run on [Node.js](http://nodejs.org).
 
 ### Bare
 
