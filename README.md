@@ -5,7 +5,7 @@
 [![Build Status](https://img.shields.io/github/actions/workflow/status/pinojs/pino/ci.yml)](https://github.com/pinojs/pino/actions)
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](https://standardjs.com/)
 
-[Very low overhead](#low-overhead) logger for [Node.js](https://nodejs.org/), [Bare](https://github.com/holepunchto/bare) & [Pear](https://docs.pears.com).
+[Very low overhead](#low-overhead) JavaScript logger.
 
 ## Documentation
 
@@ -21,6 +21,21 @@
 * [Ecosystem ⇗](/docs/ecosystem.md)
 * [Help ⇗](/docs/help.md)
 * [Long Term Support Policy ⇗](/docs/lts.md)
+
+## Runtimes
+
+### Node.js
+
+Pino is built to run on [Node.js](http://nodejs.org)
+
+### Bare
+
+Pino works on [Bare](https://github.com/holepunchto/bare) with the [`pino-bare`](https://github.com/pinojs/pino-bare) compatability module.
+
+### Pear
+
+Pino works on [Pear](https://docs.pears.com), which is built on [Bare](https://github.com/holepunchto/bare), with the [`pino-bare`](https://github.com/pinojs/pino-bare) compatability module.
+
 
 ## Install
 
