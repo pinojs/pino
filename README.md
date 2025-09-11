@@ -34,7 +34,7 @@ Pino works on [Bare](https://github.com/holepunchto/bare) with the [`pino-bare`]
 
 ### Pear
 
-Pino works on [Pear](https://docs.pears.com), which is built on [Bare](https://github.com/holepunchto/bare), with the [`pino-bare`](https://github.com/pinojs/pino-bare) compatability module.
+Pino works on [Pear](https://docs.pears.com), which is built on [Bare](https://github.com/holepunchto/bare), with the [`pino-bare`](https://github.com/pinojs/pino-bare) compatibility module.
 
 
 ## Install
