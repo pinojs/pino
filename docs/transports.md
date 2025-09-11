@@ -443,6 +443,7 @@ PRs to this document are welcome for any new transports!
 + [pino-slack-webhook](#pino-slack-webhook)
 + [pino-telegram-webhook](#pino-telegram-webhook)
 + [pino-yc-transport](#pino-yc-transport)
++ [pino-email-transport](#pino-email-transport)
 
 ### Legacy
 
@@ -1233,6 +1234,13 @@ logger.error("error");
 logger.error(new Error("error"));
 logger.fatal("fatal");
 ```
+
+<a id="pino-email-transport"></a>
+### pino-email-transport
+
+The [pino-email-transport](https://www.npmjs.com/package/pino-email-transport) NPM package for sending log emails with nodemailer.
+
+[Quick start guide ⇗](https://www.npmjs.com/package/pino-email-transport)
 
 <a id="communication-between-pino-and-transport"></a>
 ## Communication between Pino and Transports
