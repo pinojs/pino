@@ -3,12 +3,15 @@
 const test = require('node:test')
 const os = require('node:os')
 const diagChan = require('node:diagnostics_channel')
+const { AsyncLocalStorage } = require('node:async_hooks')
 const { Writable } = require('node:stream')
 const tspl = require('@matteo.collina/tspl')
 const pino = require('../pino')
 
 const hostname = os.hostname()
 const { pid } = process
+const AS_JSON_START = 'tracing:pino_asJson:start'
+const AS_JSON_END = 'tracing:pino_asJson:end'
 
 test.beforeEach(ctx => {
   ctx.pino = {
@@ -17,6 +20,13 @@ test.beforeEach(ctx => {
   }
 
   Date.now = () => ctx.pino.ts
+
+  ctx.pino.dest = new Writable({
+    objectMode: true,
+    write (data, enc, cb) {
+      cb()
+    }
+  })
 })
 
 test.afterEach(ctx => {
@@ -24,13 +34,9 @@ test.afterEach(ctx => {
 })
 
 test('asJson emits events', async (t) => {
-  const plan = tspl(t, { plan: 5 })
-  const dest = new Writable({
-    objectMode: true,
-    write (data, enc, cb) {
-      cb()
-    }
-  })
+  const plan = tspl(t, { plan: 8 })
+  const { dest } = t.pino
+  const logger = pino({}, dest)
   const expectedArguments = [
     {},
     'testing',
@@ -38,21 +44,61 @@ test('asJson emits events', async (t) => {
     `,"time":${t.pino.ts}`
   ]
 
-  diagChan.subscribe('tracing:pino_asJson:start', (event) => {
-    plan.equal(Object.prototype.toString.call(event.instance), '[object Pino]')
-    plan.deepStrictEqual(Array.from(event.arguments ?? []), expectedArguments)
-  })
+  let startEvent
+  diagChan.subscribe(AS_JSON_START, startHandler)
+  diagChan.subscribe(AS_JSON_END, endHandler)
 
-  diagChan.subscribe('tracing:pino_asJson:end', (event) => {
+  logger.info('testing')
+  await plan
+
+  diagChan.unsubscribe(AS_JSON_START, startHandler)
+  diagChan.unsubscribe(AS_JSON_END, endHandler)
+
+  function startHandler (event) {
+    startEvent = event
     plan.equal(Object.prototype.toString.call(event.instance), '[object Pino]')
+    plan.equal(event.instance === logger, true)
+    plan.deepStrictEqual(Array.from(event.arguments ?? []), expectedArguments)
+  }
+
+  function endHandler (event) {
+    plan.equal(Object.prototype.toString.call(event.instance), '[object Pino]')
+    plan.equal(event.instance === logger, true)
     plan.deepStrictEqual(Array.from(event.arguments ?? []), expectedArguments)
     plan.equal(
       event.line,
-        `{"level":30,"time":${t.pino.ts},"pid":${pid},"hostname":"${hostname}","msg":"testing"}\n`
+      `{"level":30,"time":${t.pino.ts},"pid":${pid},"hostname":"${hostname}","msg":"testing"}\n`
     )
-  })
 
+    plan.equal(event.arguments === startEvent.arguments, true, 'same event object is supplied to both events')
+  }
+})
+
+test('asJson context is not lost', async (t) => {
+  const plan = tspl(t, { plan: 2 })
+  const { dest } = t.pino
   const logger = pino({}, dest)
-  logger.info('testing')
+  const asyncLocalStorage = new AsyncLocalStorage()
+  const localStore = { foo: 'bar' }
+
+  diagChan.subscribe(AS_JSON_START, startHandler)
+  diagChan.subscribe(AS_JSON_END, endHandler)
+
+  asyncLocalStorage.run(localStore, () => {
+    logger.info('testing')
+  })
   await plan
+
+  diagChan.unsubscribe(AS_JSON_START, startHandler)
+  diagChan.unsubscribe(AS_JSON_END, endHandler)
+
+  function startHandler () {
+    const store = asyncLocalStorage.getStore()
+    plan.equal(store === localStore, true)
+  }
+
+  function endHandler () {
+    const store = asyncLocalStorage.getStore()
+    plan.equal(store === localStore, true)
+  }
 })
