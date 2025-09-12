@@ -11,6 +11,6 @@ internal workings of the library. The currently supported events are:
   process. The emitted event payload has the following fields:
   - `instance`: the Pino instance associated with the function
   - `arguments`: the arguments passed to the function
-  - `line`: the finalized, newline delimited, log line as a string
+  - `result`: the finalized, newline delimited, log line as a string
 
 [tc]: https://nodejs.org/docs/latest/api/diagnostics_channel.html#tracingchannel-channels

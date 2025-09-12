@@ -66,7 +66,7 @@ test('asJson emits events', async (t) => {
     plan.equal(event.instance === logger, true)
     plan.deepStrictEqual(Array.from(event.arguments ?? []), expectedArguments)
     plan.equal(
-      event.line,
+      event.result,
       `{"level":30,"time":${t.pino.ts},"pid":${pid},"hostname":"${hostname}","msg":"testing"}\n`
     )
 
