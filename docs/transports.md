@@ -432,6 +432,7 @@ PRs to this document are welcome for any new transports!
 + [pino-datadog-transport](#pino-datadog-transport)
 + [pino-discord-webhook](#pino-discord-webhook)
 + [pino-elasticsearch](#pino-elasticsearch)
++ [pino-email-transport](#pino-email-transport)
 + [pino-hana](#pino-hana)
 + [pino-logfmt](#pino-logfmt)
 + [pino-loki](#pino-loki)
@@ -443,7 +444,6 @@ PRs to this document are welcome for any new transports!
 + [pino-slack-webhook](#pino-slack-webhook)
 + [pino-telegram-webhook](#pino-telegram-webhook)
 + [pino-yc-transport](#pino-yc-transport)
-+ [pino-email-transport](#pino-email-transport)
 
 ### Legacy
 
@@ -780,6 +780,13 @@ Then [create an index pattern](https://www.elastic.co/guide/en/kibana/current/se
 [pino-elasticsearch]: https://github.com/pinojs/pino-elasticsearch
 [elasticsearch]: https://www.elastic.co/products/elasticsearch
 [kibana]: https://www.elastic.co/products/kibana
+
+<a id="pino-email-transport"></a>
+### pino-email-transport
+
+The [pino-email-transport](https://www.npmjs.com/package/pino-email-transport) NPM package for sending log emails with nodemailer.
+
+[Quick start guide ⇗](https://www.npmjs.com/package/pino-email-transport)
 
 <a id="pino-gelf"></a>
 ### pino-gelf
@@ -1234,13 +1241,6 @@ logger.error("error");
 logger.error(new Error("error"));
 logger.fatal("fatal");
 ```
-
-<a id="pino-email-transport"></a>
-### pino-email-transport
-
-The [pino-email-transport](https://www.npmjs.com/package/pino-email-transport) NPM package for sending log emails with nodemailer.
-
-[Quick start guide ⇗](https://www.npmjs.com/package/pino-email-transport)
 
 <a id="communication-between-pino-and-transport"></a>
 ## Communication between Pino and Transports
