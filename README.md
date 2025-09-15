@@ -15,6 +15,7 @@
 * [Redaction ⇗](/docs/redaction.md)
 * [Child Loggers ⇗](/docs/child-loggers.md)
 * [Transports ⇗](/docs/transports.md)
+* [Diagnostics ⇗](/docs/diagnostics.md)
 * [Web Frameworks ⇗](/docs/web.md)
 * [Pretty Printing ⇗](/docs/pretty.md)
 * [Asynchronous Logging ⇗](/docs/asynchronous.md)
