@@ -27,6 +27,7 @@ log levels at runtime.
 + [`pino-caller`](https://github.com/pinojs/pino-caller): add callsite to the log line.
 + [`pino-clf`](https://github.com/pinojs/pino-clf): reformat Pino logs into
 Common Log Format.
++ [`pino-console`](https://github.com/pinojs/pino-console): adapter for the [WHATWG Console](https://console.spec.whatwg.org/) spec. 
 + [`pino-debug`](https://github.com/pinojs/pino-debug): use Pino to interpret
 [`debug`](https://npm.im/debug) logs.
 + [`pino-elasticsearch`](https://github.com/pinojs/pino-elasticsearch): send
