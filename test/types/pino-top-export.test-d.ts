@@ -22,6 +22,7 @@ expectType<LevelMapping>(levels);
 expectType<MultiStreamRes>(multistream(process.stdout));
 expectType<SerializedError>(stdSerializers.err({} as any));
 expectType<string>(stdTimeFunctions.isoTime());
+expectType<string>(stdTimeFunctions.isoTimeNano());
 expectType<string>(version);
 
 // Can't test against `unique symbol`, see https://github.com/SamVerschueren/tsd/issues/49

@@ -273,6 +273,10 @@ const withTimeFn = pino({
     timestamp: pino.stdTimeFunctions.isoTime,
 });
 
+const withRFC3339TimeFn = pino({
+    timestamp: pino.stdTimeFunctions.isoTimeNano,
+});
+
 const withNestedKey = pino({
     nestedKey: "payload",
 });
