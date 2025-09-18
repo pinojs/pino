@@ -37,6 +37,9 @@
   * [DestinationStream](#destinationstream)
 * [Types](#types)
   * [Level](#level-1)
+* [TypeScript](#typescript)
+  * [Module Augmentation](#module-augmentation)
+  * [LogFnFields Interface](#logfnfields-interface)
 
 <a id="export"></a>
 ## `pino([options], [destination]) => logger`
@@ -1508,3 +1511,78 @@ Exposes the Pino package version. Also available on the logger instance.
 ### `Level`
 
   * Values: `"fatal"` | `"error"` | `"warn"` | `"info"` | `"debug"` | `"trace"`
+
+## TypeScript
+
+### Module Augmentation
+
+Pino supports TypeScript module augmentation to extend its type definitions. This allows you to customize the logging behavior to fit your application's specific requirements.
+
+#### `LogFnFields` Interface
+
+The `LogFnFields` interface can be augmented to control what fields are allowed in logging method objects. This is particularly useful for:
+
+- Preventing certain fields from being logged (for security or compliance reasons)
+- Enforcing specific field types across your application
+- Enforcing consistent structured logging
+
+##### Banning Fields
+
+You can ban specific fields from being passed to logging methods by setting them to `never`. This helps prevent users from unintentionally overriding fields that are already set in the logger's `base` option, or clarifies that these fields are predefined.
+
+```typescript
+declare module "pino" {
+  interface LogFnFields {
+    service?: never;
+    version?: never;
+  }
+}
+
+
+// These will now cause TypeScript errors
+logger.info({ service: 'other-api', message: 'success' })   // ❌
+logger.info({ message: 'success' })     // ✅
+```
+
+##### Enforcing Field Types
+
+You can also enforce specific types for certain fields:
+
+```typescript
+declare module "pino" {
+  interface LogFnFields {
+    userId?: string;
+    requestId?: string;
+  }
+}
+
+// These will cause TypeScript errors
+logger.info({ userId: 123 })           // ❌ Error: userId must be string
+logger.info({ requestId: null })       // ❌ Error: requestId must be string
+
+// This works fine
+logger.info({ userId: '123' })     // ✅ Works fine
+```
+
+##### Enforcing Structured Logging
+
+Required fields (non-optional) enforce consistent structured logging by requiring specific fields in all log objects:
+
+```typescript
+declare module "pino" {
+  interface LogFnFields {
+    userId: string
+  }
+}
+
+logger.info({ userId: '123' }) // ✅ Works fine
+logger.info({}) // ❌ Property 'userId' is missing in type '{}'
+```
+
+**Note**: Required fields will cause TypeScript errors when logging certain types like `Error` objects that don't contain the required properties:
+
+```typescript
+logger.error(new Error('test')) // ❌ Property 'userId' is missing in type 'Error'
+```
+
+This ensures that all log entries include required context fields, promoting consistent logging practices.
