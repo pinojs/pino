@@ -13,6 +13,9 @@ const { pid } = process
 const AS_JSON_START = 'tracing:pino_asJson:start'
 const AS_JSON_END = 'tracing:pino_asJson:end'
 
+// Skip tests if diagnostics_channel.tracingChannel is not available (Node < 18.19)
+const skip = typeof diagChan.tracingChannel !== 'function'
+
 test.beforeEach(ctx => {
   ctx.pino = {
     ts: 1757512800000, // 2025-09-10T10:00:00.000-05:00
@@ -33,7 +36,7 @@ test.afterEach(ctx => {
   Date.now = ctx.pino.now
 })
 
-test('asJson emits events', async (t) => {
+test('asJson emits events', { skip }, async (t) => {
   const plan = tspl(t, { plan: 8 })
   const { dest } = t.pino
   const logger = pino({}, dest)
@@ -74,7 +77,7 @@ test('asJson emits events', async (t) => {
   }
 })
 
-test('asJson context is not lost', async (t) => {
+test('asJson context is not lost', { skip }, async (t) => {
   const plan = tspl(t, { plan: 2 })
   const { dest } = t.pino
   const logger = pino({}, dest)
