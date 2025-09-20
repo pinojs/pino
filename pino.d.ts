@@ -863,6 +863,19 @@ declare namespace pino {
      * @returns a new logger instance.
      */
     function pino<CustomLevels extends string = never, UseOnlyCustomLevels extends boolean = boolean>(options: LoggerOptions<CustomLevels, UseOnlyCustomLevels>, stream?: DestinationStream | undefined): Logger<CustomLevels, UseOnlyCustomLevels>;
+
+    /**
+     * Attach selected static members to the nested callable export, so that
+     * `const { pino } = require('pino')` exposes them (e.g. `pino.stdTimeFunctions`).
+     */
+    namespace pino {
+        const stdTimeFunctions: {
+            epochTime: TimeFn;
+            unixTime: TimeFn;
+            nullTime: TimeFn;
+            isoTime: TimeFn;
+        };
+    }
 }
 
 //// Callable default export
