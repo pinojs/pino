@@ -571,3 +571,15 @@ expectError(loggerWithCustomLevelOnly.error('test'));
 expectError(loggerWithCustomLevelOnly.warn('test'));
 expectError(loggerWithCustomLevelOnly.debug('test'));
 expectError(loggerWithCustomLevelOnly.trace('test'));
+
+// Module extension
+declare module "../../" {
+    interface LogFnFields {
+        bannedField?: never;
+        typeCheckedField?: string
+    }
+}
+
+info({typeCheckedField: 'bar'})
+expectError(info({bannedField: 'bar'}))
+expectError(info({typeCheckedField: 123}))
