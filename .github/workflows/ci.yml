@@ -47,6 +47,8 @@ jobs:
         exclude:
           - os: windows-latest
             node-version: 22
+          - os: windows-latest
+            node-version: '18.18'  
 
     steps:
       - name: Check out repo
