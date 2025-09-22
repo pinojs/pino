@@ -83,6 +83,8 @@ test('transport uses pino config without customizations', async ({ same, teardow
   instance.info('baz')
   instance.error(error)
   await watchFileCreated(destination)
+  // A short delay to ensure async transport writes are flushed (fixes CI timing issues)
+  await new Promise(resolve => setTimeout(resolve, 100))
   const result = parseLogs(await readFile(destination))
 
   same(result, [{
