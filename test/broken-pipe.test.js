@@ -42,7 +42,7 @@ test('let error pass through', async (t) => {
   process.nextTick(() => stream.emit('error', new Error('kaboom')))
 
   stream.on('error', (err) => {
-    assert.equal(err.message, 'kaboom')
+    plan.equal(err.message, 'kaboom')
   })
 
   await plan
