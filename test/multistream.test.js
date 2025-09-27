@@ -1,16 +1,19 @@
 'use strict'
 
-const writeStream = require('flush-write-stream')
+const test = require('node:test')
+const assert = require('node:assert')
 const { readFileSync } = require('node:fs')
 const { join } = require('node:path')
-const test = require('tap').test
-const pino = require('../')
-const multistream = pino.multistream
 const proxyquire = require('proxyquire')
 const strip = require('strip-ansi')
+const tspl = require('@matteo.collina/tspl')
+
+const writeStream = require('flush-write-stream')
+const pino = require('../')
+const multistream = pino.multistream
 const { file, sink } = require('./helper')
 
-test('sends to multiple streams using string levels', function (t) {
+test('sends to multiple streams using string levels', async () => {
   let messageCount = 0
   const stream = writeStream(function (data, enc, cb) {
     messageCount += 1
@@ -29,11 +32,10 @@ test('sends to multiple streams using string levels', function (t) {
   log.info('info stream')
   log.debug('debug stream')
   log.fatal('fatal stream')
-  t.equal(messageCount, 9)
-  t.end()
+  assert.equal(messageCount, 9)
 })
 
-test('sends to multiple streams using custom levels', function (t) {
+test('sends to multiple streams using custom levels', async () => {
   let messageCount = 0
   const stream = writeStream(function (data, enc, cb) {
     messageCount += 1
@@ -52,11 +54,10 @@ test('sends to multiple streams using custom levels', function (t) {
   log.info('info stream')
   log.debug('debug stream')
   log.fatal('fatal stream')
-  t.equal(messageCount, 9)
-  t.end()
+  assert.equal(messageCount, 9)
 })
 
-test('sends to multiple streams using optionally predefined levels', function (t) {
+test('sends to multiple streams using optionally predefined levels', async () => {
   let messageCount = 0
   const stream = writeStream(function (data, enc, cb) {
     messageCount += 1
@@ -94,11 +95,10 @@ test('sends to multiple streams using optionally predefined levels', function (t
   log.error('error stream')
   log.fatal('fatal stream')
   log.silent('silent stream')
-  t.equal(messageCount, 24)
-  t.end()
+  assert.equal(messageCount, 24)
 })
 
-test('sends to multiple streams using number levels', function (t) {
+test('sends to multiple streams using number levels', async () => {
   let messageCount = 0
   const stream = writeStream(function (data, enc, cb) {
     messageCount += 1
@@ -115,11 +115,10 @@ test('sends to multiple streams using number levels', function (t) {
   log.info('info stream')
   log.debug('debug stream')
   log.fatal('fatal stream')
-  t.equal(messageCount, 6)
-  t.end()
+  assert.equal(messageCount, 6)
 })
 
-test('level include higher levels', function (t) {
+test('level include higher levels', async () => {
   let messageCount = 0
   const stream = writeStream(function (data, enc, cb) {
     messageCount += 1
@@ -127,36 +126,36 @@ test('level include higher levels', function (t) {
   })
   const log = pino({}, multistream([{ level: 'info', stream }]))
   log.fatal('message')
-  t.equal(messageCount, 1)
-  t.end()
+  assert.equal(messageCount, 1)
 })
 
-test('supports multiple arguments', function (t) {
+test('supports multiple arguments', async (t) => {
+  const plan = tspl(t, { plan: 2 })
   const messages = []
   const stream = writeStream(function (data, enc, cb) {
     messages.push(JSON.parse(data))
     if (messages.length === 2) {
       const msg1 = messages[0]
-      t.equal(msg1.msg, 'foo bar baz foobar')
+      plan.equal(msg1.msg, 'foo bar baz foobar')
 
       const msg2 = messages[1]
-      t.equal(msg2.msg, 'foo bar baz foobar barfoo foofoo')
-
-      t.end()
+      plan.equal(msg2.msg, 'foo bar baz foobar barfoo foofoo')
     }
     cb()
   })
   const log = pino({}, multistream({ stream }))
   log.info('%s %s %s %s', 'foo', 'bar', 'baz', 'foobar') // apply not invoked
   log.info('%s %s %s %s %s %s', 'foo', 'bar', 'baz', 'foobar', 'barfoo', 'foofoo') // apply invoked
+
+  await plan
 })
 
-test('supports children', function (t) {
+test('supports children', async (t) => {
+  const plan = tspl(t, { plan: 2 })
   const stream = writeStream(function (data, enc, cb) {
     const input = JSON.parse(data)
-    t.equal(input.msg, 'child stream')
-    t.equal(input.child, 'one')
-    t.end()
+    plan.equal(input.msg, 'child stream')
+    plan.equal(input.child, 'one')
     cb()
   })
   const streams = [
@@ -164,29 +163,30 @@ test('supports children', function (t) {
   ]
   const log = pino({}, multistream(streams)).child({ child: 'one' })
   log.info('child stream')
+
+  await plan
 })
 
-test('supports grandchildren', function (t) {
+test('supports grandchildren', async (t) => {
+  const plan = tspl(t, { plan: 9 })
   const messages = []
   const stream = writeStream(function (data, enc, cb) {
     messages.push(JSON.parse(data))
     if (messages.length === 3) {
       const msg1 = messages[0]
-      t.equal(msg1.msg, 'grandchild stream')
-      t.equal(msg1.child, 'one')
-      t.equal(msg1.grandchild, 'two')
+      plan.equal(msg1.msg, 'grandchild stream')
+      plan.equal(msg1.child, 'one')
+      plan.equal(msg1.grandchild, 'two')
 
       const msg2 = messages[1]
-      t.equal(msg2.msg, 'grandchild stream')
-      t.equal(msg2.child, 'one')
-      t.equal(msg2.grandchild, 'two')
+      plan.equal(msg2.msg, 'grandchild stream')
+      plan.equal(msg2.child, 'one')
+      plan.equal(msg2.grandchild, 'two')
 
       const msg3 = messages[2]
-      t.equal(msg3.msg, 'debug grandchild')
-      t.equal(msg3.child, 'one')
-      t.equal(msg3.grandchild, 'two')
-
-      t.end()
+      plan.equal(msg3.msg, 'debug grandchild')
+      plan.equal(msg3.child, 'one')
+      plan.equal(msg3.grandchild, 'two')
     }
     cb()
   })
@@ -199,12 +199,14 @@ test('supports grandchildren', function (t) {
   }, multistream(streams)).child({ child: 'one' }).child({ grandchild: 'two' })
   log.info('grandchild stream')
   log.debug('debug grandchild')
+
+  await plan
 })
 
-test('supports custom levels', function (t) {
+test('supports custom levels', (t, end) => {
   const stream = writeStream(function (data, enc, cb) {
-    t.equal(JSON.parse(data).msg, 'bar')
-    t.end()
+    assert.equal(JSON.parse(data).msg, 'bar')
+    end()
   })
   const log = pino({
     customLevels: {
@@ -214,16 +216,16 @@ test('supports custom levels', function (t) {
   log.foo('bar')
 })
 
-test('supports pretty print', function (t) {
-  t.plan(2)
+test('supports pretty print', async (t) => {
+  const plan = tspl(t, { plan: 2 })
   const stream = writeStream(function (data, enc, cb) {
-    t.not(strip(data.toString()).match(/INFO.*: pretty print/), null)
+    plan.equal(strip(data.toString()).match(/INFO.*: pretty print/) != null, true)
     cb()
   })
 
   const safeBoom = proxyquire('pino-pretty/lib/utils/build-safe-sonic-boom.js', {
     'sonic-boom': function () {
-      t.pass('sonic created')
+      plan.ok('sonic created')
       stream.flushSync = () => {}
       stream.flush = () => {}
       return stream
@@ -244,12 +246,14 @@ test('supports pretty print', function (t) {
   ]))
 
   log.info('pretty print')
+
+  await plan
 })
 
-test('emit propagates events to each stream', function (t) {
-  t.plan(3)
+test('emit propagates events to each stream', async (t) => {
+  const plan = tspl(t, { plan: 3 })
   const handler = function (data) {
-    t.equal(data.msg, 'world')
+    plan.equal(data.msg, 'world')
   }
   const streams = [sink(), sink(), sink()]
   streams.forEach(function (s) {
@@ -257,12 +261,14 @@ test('emit propagates events to each stream', function (t) {
   })
   const stream = multistream(streams)
   stream.emit('hello', { msg: 'world' })
+
+  await plan
 })
 
-test('children support custom levels', function (t) {
+test('children support custom levels', async (t) => {
+  const plan = tspl(t, { plan: 1 })
   const stream = writeStream(function (data, enc, cb) {
-    t.equal(JSON.parse(data).msg, 'bar')
-    t.end()
+    plan.equal(JSON.parse(data).msg, 'bar')
   })
   const parent = pino({
     customLevels: {
@@ -271,9 +277,11 @@ test('children support custom levels', function (t) {
   }, multistream([{ level: 35, stream }]))
   const child = parent.child({ child: 'yes' })
   child.foo('bar')
+
+  await plan
 })
 
-test('levelVal overrides level', function (t) {
+test('levelVal overrides level', async () => {
   let messageCount = 0
   const stream = writeStream(function (data, enc, cb) {
     messageCount += 1
@@ -290,21 +298,20 @@ test('levelVal overrides level', function (t) {
   log.info('info stream')
   log.debug('debug stream')
   log.fatal('fatal stream')
-  t.equal(messageCount, 6)
-  t.end()
+  assert.equal(messageCount, 6)
 })
 
-test('forwards metadata', function (t) {
-  t.plan(4)
+test('forwards metadata', async (t) => {
+  const plan = tspl(t, { plan: 4 })
   const streams = [
     {
       stream: {
         [Symbol.for('pino.metadata')]: true,
         write (chunk) {
-          t.equal(log, this.lastLogger)
-          t.equal(30, this.lastLevel)
-          t.same({ hello: 'world' }, this.lastObj)
-          t.same('a msg', this.lastMsg)
+          plan.equal(log, this.lastLogger)
+          plan.equal(30, this.lastLevel)
+          plan.deepEqual({ hello: 'world' }, this.lastObj)
+          plan.deepEqual('a msg', this.lastMsg)
         }
       }
     }
@@ -315,19 +322,20 @@ test('forwards metadata', function (t) {
   }, multistream(streams))
 
   log.info({ hello: 'world' }, 'a msg')
-  t.end()
+
+  await plan
 })
 
-test('forward name', function (t) {
-  t.plan(2)
+test('forward name', async (t) => {
+  const plan = tspl(t, { plan: 2 })
   const streams = [
     {
       stream: {
         [Symbol.for('pino.metadata')]: true,
         write (chunk) {
           const line = JSON.parse(chunk)
-          t.equal(line.name, 'helloName')
-          t.equal(line.hello, 'world')
+          plan.equal(line.name, 'helloName')
+          plan.equal(line.hello, 'world')
         }
       }
     }
@@ -339,19 +347,20 @@ test('forward name', function (t) {
   }, multistream(streams))
 
   log.info({ hello: 'world' }, 'a msg')
-  t.end()
+
+  await plan
 })
 
-test('forward name with child', function (t) {
-  t.plan(3)
+test('forward name with child', async (t) => {
+  const plan = tspl(t, { plan: 3 })
   const streams = [
     {
       stream: {
         write (chunk) {
           const line = JSON.parse(chunk)
-          t.equal(line.name, 'helloName')
-          t.equal(line.hello, 'world')
-          t.equal(line.component, 'aComponent')
+          plan.equal(line.name, 'helloName')
+          plan.equal(line.hello, 'world')
+          plan.equal(line.component, 'aComponent')
         }
       }
     }
@@ -363,10 +372,12 @@ test('forward name with child', function (t) {
   }, multistream(streams)).child({ component: 'aComponent' })
 
   log.info({ hello: 'world' }, 'a msg')
-  t.end()
+
+  await plan
 })
 
-test('clone generates a new multistream with all stream at the same level', function (t) {
+test('clone generates a new multistream with all stream at the same level', async (t) => {
+  const plan = tspl(t, { plan: 14 })
   let messageCount = 0
   const stream = writeStream(function (data, enc, cb) {
     messageCount += 1
@@ -381,12 +392,14 @@ test('clone generates a new multistream with all stream at the same level', func
   const ms = multistream(streams)
   const clone = ms.clone(30)
 
-  t.not(clone, ms)
+  // eslint-disable-next-line eqeqeq
+  plan.equal(clone != ms, true)
 
   clone.streams.forEach((s, i) => {
-    t.not(s, streams[i])
-    t.equal(s.stream, streams[i].stream)
-    t.equal(s.level, 30)
+    // eslint-disable-next-line eqeqeq
+    plan.equal(s != streams[i], true)
+    plan.equal(s.stream, streams[i].stream)
+    plan.equal(s.level, 30)
   })
 
   const log = pino({
@@ -396,12 +409,12 @@ test('clone generates a new multistream with all stream at the same level', func
   log.info('info stream')
   log.debug('debug message not counted')
   log.fatal('fatal stream')
-  t.equal(messageCount, 8)
+  plan.equal(messageCount, 8)
 
-  t.end()
+  await plan
 })
 
-test('one stream', function (t) {
+test('one stream', async () => {
   let messageCount = 0
   const stream = writeStream(function (data, enc, cb) {
     messageCount += 1
@@ -413,11 +426,10 @@ test('one stream', function (t) {
   log.info('info stream')
   log.debug('debug stream')
   log.fatal('fatal stream')
-  t.equal(messageCount, 1)
-  t.end()
+  assert.equal(messageCount, 1)
 })
 
-test('dedupe', function (t) {
+test('dedupe', async () => {
   let messageCount = 0
   const stream1 = writeStream(function (data, enc, cb) {
     messageCount -= 1
@@ -446,11 +458,10 @@ test('dedupe', function (t) {
   log.info('info stream')
   log.fatal('fatal stream')
   log.fatal('fatal stream')
-  t.equal(messageCount, 1)
-  t.end()
+  assert.equal(messageCount, 1)
 })
 
-test('dedupe when logs have different levels', function (t) {
+test('dedupe when logs have different levels', async () => {
   let messageCount = 0
   const stream1 = writeStream(function (data, enc, cb) {
     messageCount += 1
@@ -481,11 +492,10 @@ test('dedupe when logs have different levels', function (t) {
   log.warn('warn stream')
   log.error('error streams')
   log.fatal('fatal streams')
-  t.equal(messageCount, 6)
-  t.end()
+  assert.equal(messageCount, 6)
 })
 
-test('dedupe when some streams has the same level', function (t) {
+test('dedupe when some streams has the same level', async () => {
   let messageCount = 0
   const stream1 = writeStream(function (data, enc, cb) {
     messageCount -= 1
@@ -523,21 +533,19 @@ test('dedupe when some streams has the same level', function (t) {
   log.info('info stream')
   log.fatal('fatal streams')
   log.fatal('fatal streams')
-  t.equal(messageCount, 3)
-  t.end()
+  assert.equal(messageCount, 3)
 })
 
-test('no stream', function (t) {
+test('no stream', async () => {
   const log = pino({
     level: 'trace'
   }, multistream())
   log.info('info stream')
   log.debug('debug stream')
   log.fatal('fatal stream')
-  t.end()
 })
 
-test('one stream', function (t) {
+test('one stream', async () => {
   let messageCount = 0
   const stream = writeStream(function (data, enc, cb) {
     messageCount += 1
@@ -549,11 +557,10 @@ test('one stream', function (t) {
   log.info('info stream')
   log.debug('debug stream')
   log.fatal('fatal stream')
-  t.equal(messageCount, 2)
-  t.end()
+  assert.equal(messageCount, 2)
 })
 
-test('add a stream', function (t) {
+test('add a stream', async () => {
   let messageCount = 0
   const stream = writeStream(function (data, enc, cb) {
     messageCount += 1
@@ -566,11 +573,10 @@ test('add a stream', function (t) {
   log.info('info stream')
   log.debug('debug stream')
   log.fatal('fatal stream')
-  t.equal(messageCount, 2)
-  t.end()
+  assert.equal(messageCount, 2)
 })
 
-test('remove a stream', function (t) {
+test('remove a stream', async () => {
   let messageCount1 = 0
   let messageCount2 = 0
   let messageCount3 = 0
@@ -614,33 +620,30 @@ test('remove a stream', function (t) {
   log.info('line')
   multi.remove(Math.floor(Math.random() * 1000)) // non-existing id
 
-  t.equal(messageCount1, 1)
-  t.equal(messageCount2, 2)
-  t.equal(messageCount3, 3)
-  t.end()
+  assert.equal(messageCount1, 1)
+  assert.equal(messageCount2, 2)
+  assert.equal(messageCount3, 3)
 })
 
-test('multistream.add throws if not a stream', function (t) {
+test('multistream.add throws if not a stream', async () => {
   try {
     pino({
       level: 'trace'
     }, multistream().add({}))
   } catch (_) {
-    t.end()
   }
 })
 
-test('multistream throws if not a stream', function (t) {
+test('multistream throws if not a stream', async () => {
   try {
     pino({
       level: 'trace'
     }, multistream({}))
   } catch (_) {
-    t.end()
   }
 })
 
-test('multistream.write should not throw if one stream fails', function (t) {
+test('multistream.write should not throw if one stream fails', async () => {
   let messageCount = 0
   const stream = writeStream(function (data, enc, cb) {
     messageCount += 1
@@ -672,11 +675,11 @@ test('multistream.write should not throw if one stream fails', function (t) {
   // noop stream is ending, should emit an error but not throw
   log.debug('1')
   log.debug('2')
-  t.equal(messageCount, 3)
-  t.end()
+  assert.equal(messageCount, 3)
 })
 
-test('flushSync', function (t) {
+test('flushSync', async (t) => {
+  const plan = tspl(t, { plan: 2 })
   const tmp = file()
   const destination = pino.destination({ dest: tmp, sync: false, minLength: 4096 })
   const stream = multistream([{ level: 'info', stream: destination }])
@@ -685,26 +688,27 @@ test('flushSync', function (t) {
     log.info('foo')
     log.info('bar')
     stream.flushSync()
-    t.equal(readFileSync(tmp, { encoding: 'utf-8' }).split('\n').length - 1, 2)
+    plan.equal(readFileSync(tmp, { encoding: 'utf-8' }).split('\n').length - 1, 2)
     log.info('biz')
     stream.flushSync()
-    t.equal(readFileSync(tmp, { encoding: 'utf-8' }).split('\n').length - 1, 3)
-    t.end()
+    plan.equal(readFileSync(tmp, { encoding: 'utf-8' }).split('\n').length - 1, 3)
   })
+
+  await plan
 })
 
-test('ends all streams', function (t) {
-  t.plan(7)
+test('ends all streams', async (t) => {
+  const plan = tspl(t, { plan: 7 })
   const stream = writeStream(function (data, enc, cb) {
-    t.pass('message')
+    plan.ok('message')
     cb()
   })
   stream.flushSync = function () {
-    t.pass('flushSync')
+    plan.ok('flushSync')
   }
   // stream2 has no flushSync
   const stream2 = writeStream(function (data, enc, cb) {
-    t.pass('message2')
+    plan.ok('message2')
     cb()
   })
   const streams = [
@@ -720,4 +724,6 @@ test('ends all streams', function (t) {
   }, multi)
   log.info('info stream')
   multi.end()
+
+  await plan
 })

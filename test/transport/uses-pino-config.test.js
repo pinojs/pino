@@ -1,11 +1,13 @@
 'use strict'
 
+const test = require('node:test')
+const assert = require('node:assert')
 const os = require('node:os')
 const { join } = require('node:path')
 const { readFile } = require('node:fs').promises
 const writeStream = require('flush-write-stream')
+
 const { watchFileCreated, file } = require('../helper')
-const { test } = require('tap')
 const pino = require('../../')
 
 const { pid } = process
@@ -23,8 +25,7 @@ function parseLogs (buffer) {
   return JSON.parse(`[${buffer.toString().replace(/}{/g, '},{')}]`)
 }
 
-test('transport uses pino config', async ({ same, teardown, plan }) => {
-  plan(1)
+test('transport uses pino config', async (t) => {
   const destination = file()
   const transport = pino.transport({
     pipeline: [{
@@ -34,7 +35,7 @@ test('transport uses pino config', async ({ same, teardown, plan }) => {
       options: { destination }
     }]
   })
-  teardown(transport.end.bind(transport))
+  t.after(transport.end.bind(transport))
   const instance = pino({
     messageKey: 'customMessageKey',
     errorKey: 'customErrorKey',
@@ -47,7 +48,7 @@ test('transport uses pino config', async ({ same, teardown, plan }) => {
   await watchFileCreated(destination)
   const result = parseLogs(await readFile(destination))
 
-  same(result, [{
+  assert.deepEqual(result, [{
     severityText: 'custom',
     body: 'foo',
     attributes: {
@@ -65,8 +66,7 @@ test('transport uses pino config', async ({ same, teardown, plan }) => {
   }])
 })
 
-test('transport uses pino config without customizations', async ({ same, teardown, plan }) => {
-  plan(1)
+test('transport uses pino config without customizations', async (t) => {
   const destination = file()
   const transport = pino.transport({
     pipeline: [{
@@ -76,7 +76,7 @@ test('transport uses pino config without customizations', async ({ same, teardow
       options: { destination }
     }]
   })
-  teardown(transport.end.bind(transport))
+  t.after(transport.end.bind(transport))
   const instance = pino(transport)
 
   const error = new Error('qux')
@@ -85,7 +85,7 @@ test('transport uses pino config without customizations', async ({ same, teardow
   await watchFileCreated(destination)
   const result = parseLogs(await readFile(destination))
 
-  same(result, [{
+  assert.deepEqual(result, [{
     severityText: 'info',
     body: 'baz',
     attributes: {
@@ -103,8 +103,7 @@ test('transport uses pino config without customizations', async ({ same, teardow
   }])
 })
 
-test('transport uses pino config with multistream', async ({ same, teardown, plan }) => {
-  plan(2)
+test('transport uses pino config with multistream', async (t) => {
   const destination = file()
   const messages = []
   const stream = writeStream(function (data, enc, cb) {
@@ -121,7 +120,7 @@ test('transport uses pino config with multistream', async ({ same, teardown, pla
       options: { destination }
     }]
   })
-  teardown(transport.end.bind(transport))
+  t.after(transport.end.bind(transport))
   const instance = pino({
     messageKey: 'customMessageKey',
     errorKey: 'customErrorKey',
@@ -135,7 +134,7 @@ test('transport uses pino config with multistream', async ({ same, teardown, pla
   await watchFileCreated(destination)
   const result = parseLogs(await readFile(destination))
 
-  same(result, [{
+  assert.deepEqual(result, [{
     severityText: 'custom',
     body: 'fizz',
     attributes: {
@@ -152,7 +151,7 @@ test('transport uses pino config with multistream', async ({ same, teardown, pla
     error: serializedError
   }])
 
-  same(messages, [{
+  assert.deepEqual(messages, [{
     level: 35,
     pid,
     hostname,

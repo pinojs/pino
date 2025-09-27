@@ -1,76 +1,78 @@
 'use strict'
 
-const { test } = require('tap')
+const test = require('node:test')
+const assert = require('node:assert')
+
 const { sink, once } = require('./helper')
 const pino = require('../')
 
-test('redact option – throws if not array', async ({ throws }) => {
-  throws(() => {
+test('redact option – throws if not array', async () => {
+  assert.throws(() => {
     pino({ redact: 'req.headers.cookie' })
   })
 })
 
-test('redact option – throws if array does not only contain strings', async ({ throws }) => {
-  throws(() => {
+test('redact option – throws if array does not only contain strings', async () => {
+  assert.throws(() => {
     pino({ redact: ['req.headers.cookie', {}] })
   })
 })
 
-test('redact option – throws if array contains an invalid path', async ({ throws }) => {
-  throws(() => {
+test('redact option – throws if array contains an invalid path', async () => {
+  assert.throws(() => {
     pino({ redact: ['req,headers.cookie'] })
   })
 })
 
-test('redact.paths option – throws if not array', async ({ throws }) => {
-  throws(() => {
+test('redact.paths option – throws if not array', async () => {
+  assert.throws(() => {
     pino({ redact: { paths: 'req.headers.cookie' } })
   })
 })
 
-test('redact.paths option – throws if array does not only contain strings', async ({ throws }) => {
-  throws(() => {
+test('redact.paths option – throws if array does not only contain strings', async () => {
+  assert.throws(() => {
     pino({ redact: { paths: ['req.headers.cookie', {}] } })
   })
 })
 
-test('redact.paths option – throws if array contains an invalid path', async ({ throws }) => {
-  throws(() => {
+test('redact.paths option – throws if array contains an invalid path', async () => {
+  assert.throws(() => {
     pino({ redact: { paths: ['req,headers.cookie'] } })
   })
 })
 
-test('redact option – top level key', async ({ equal }) => {
+test('redact option – top level key', async () => {
   const stream = sink()
   const instance = pino({ redact: ['key'] }, stream)
   instance.info({
     key: { redact: 'me' }
   })
   const { key } = await once(stream, 'data')
-  equal(key, '[Redacted]')
+  assert.equal(key, '[Redacted]')
 })
 
-test('redact option – top level key next level key', async ({ equal }) => {
+test('redact option – top level key next level key', async () => {
   const stream = sink()
   const instance = pino({ redact: ['key', 'key.foo'] }, stream)
   instance.info({
     key: { redact: 'me' }
   })
   const { key } = await once(stream, 'data')
-  equal(key, '[Redacted]')
+  assert.equal(key, '[Redacted]')
 })
 
-test('redact option – next level key then top level key', async ({ equal }) => {
+test('redact option – next level key then top level key', async () => {
   const stream = sink()
   const instance = pino({ redact: ['key.foo', 'key'] }, stream)
   instance.info({
     key: { redact: 'me' }
   })
   const { key } = await once(stream, 'data')
-  equal(key, '[Redacted]')
+  assert.equal(key, '[Redacted]')
 })
 
-test('redact option – object', async ({ equal }) => {
+test('redact option – object', async () => {
   const stream = sink()
   const instance = pino({ redact: ['req.headers.cookie'] }, stream)
   instance.info({
@@ -88,10 +90,10 @@ test('redact option – object', async ({ equal }) => {
     }
   })
   const { req } = await once(stream, 'data')
-  equal(req.headers.cookie, '[Redacted]')
+  assert.equal(req.headers.cookie, '[Redacted]')
 })
 
-test('redact option – child object', async ({ equal }) => {
+test('redact option – child object', async () => {
   const stream = sink()
   const instance = pino({ redact: ['req.headers.cookie'] }, stream)
   instance.child({
@@ -109,10 +111,10 @@ test('redact option – child object', async ({ equal }) => {
     }
   }).info('message completed')
   const { req } = await once(stream, 'data')
-  equal(req.headers.cookie, '[Redacted]')
+  assert.equal(req.headers.cookie, '[Redacted]')
 })
 
-test('redact option – interpolated object', async ({ equal }) => {
+test('redact option – interpolated object', async () => {
   const stream = sink()
   const instance = pino({ redact: ['req.headers.cookie'] }, stream)
 
@@ -131,10 +133,10 @@ test('redact option – interpolated object', async ({ equal }) => {
     }
   })
   const { msg } = await once(stream, 'data')
-  equal(JSON.parse(msg.replace(/test /, '')).req.headers.cookie, '[Redacted]')
+  assert.equal(JSON.parse(msg.replace(/test /, '')).req.headers.cookie, '[Redacted]')
 })
 
-test('redact.paths option – object', async ({ equal }) => {
+test('redact.paths option – object', async () => {
   const stream = sink()
   const instance = pino({ redact: { paths: ['req.headers.cookie'] } }, stream)
   instance.info({
@@ -152,10 +154,10 @@ test('redact.paths option – object', async ({ equal }) => {
     }
   })
   const { req } = await once(stream, 'data')
-  equal(req.headers.cookie, '[Redacted]')
+  assert.equal(req.headers.cookie, '[Redacted]')
 })
 
-test('redact.paths option – child object', async ({ equal }) => {
+test('redact.paths option – child object', async () => {
   const stream = sink()
   const instance = pino({ redact: { paths: ['req.headers.cookie'] } }, stream)
   instance.child({
@@ -173,10 +175,10 @@ test('redact.paths option – child object', async ({ equal }) => {
     }
   }).info('message completed')
   const { req } = await once(stream, 'data')
-  equal(req.headers.cookie, '[Redacted]')
+  assert.equal(req.headers.cookie, '[Redacted]')
 })
 
-test('redact.paths option – interpolated object', async ({ equal }) => {
+test('redact.paths option – interpolated object', async () => {
   const stream = sink()
   const instance = pino({ redact: { paths: ['req.headers.cookie'] } }, stream)
 
@@ -195,10 +197,10 @@ test('redact.paths option – interpolated object', async ({ equal }) => {
     }
   })
   const { msg } = await once(stream, 'data')
-  equal(JSON.parse(msg.replace(/test /, '')).req.headers.cookie, '[Redacted]')
+  assert.equal(JSON.parse(msg.replace(/test /, '')).req.headers.cookie, '[Redacted]')
 })
 
-test('redact.censor option – sets the redact value', async ({ equal }) => {
+test('redact.censor option – sets the redact value', async () => {
   const stream = sink()
   const instance = pino({ redact: { paths: ['req.headers.cookie'], censor: 'test' } }, stream)
   instance.info({
@@ -216,20 +218,20 @@ test('redact.censor option – sets the redact value', async ({ equal }) => {
     }
   })
   const { req } = await once(stream, 'data')
-  equal(req.headers.cookie, 'test')
+  assert.equal(req.headers.cookie, 'test')
 })
 
-test('redact.censor option – can be a function that accepts value and path arguments', async ({ equal }) => {
+test('redact.censor option – can be a function that accepts value and path arguments', async () => {
   const stream = sink()
   const instance = pino({ redact: { paths: ['topLevel'], censor: (value, path) => value + ' ' + path.join('.') } }, stream)
   instance.info({
     topLevel: 'test'
   })
   const { topLevel } = await once(stream, 'data')
-  equal(topLevel, 'test topLevel')
+  assert.equal(topLevel, 'test topLevel')
 })
 
-test('redact.censor option – can be a function that accepts value and path arguments (nested path)', async ({ equal }) => {
+test('redact.censor option – can be a function that accepts value and path arguments (nested path)', async () => {
   const stream = sink()
   const instance = pino({ redact: { paths: ['req.headers.cookie'], censor: (value, path) => value + ' ' + path.join('.') } }, stream)
   instance.info({
@@ -247,10 +249,10 @@ test('redact.censor option – can be a function that accepts value and path arg
     }
   })
   const { req } = await once(stream, 'data')
-  equal(req.headers.cookie, 'SESSID=298zf09hf012fh2; csrftoken=u32t4o3tb3gg43; _gat=1; req.headers.cookie')
+  assert.equal(req.headers.cookie, 'SESSID=298zf09hf012fh2; csrftoken=u32t4o3tb3gg43; _gat=1; req.headers.cookie')
 })
 
-test('redact.remove option – removes both key and value', async ({ equal }) => {
+test('redact.remove option – removes both key and value', async () => {
   const stream = sink()
   const instance = pino({ redact: { paths: ['req.headers.cookie'], remove: true } }, stream)
   instance.info({
@@ -268,49 +270,49 @@ test('redact.remove option – removes both key and value', async ({ equal }) =>
     }
   })
   const { req } = await once(stream, 'data')
-  equal('cookie' in req.headers, false)
+  assert.equal('cookie' in req.headers, false)
 })
 
-test('redact.remove – top level key - object value', async ({ equal }) => {
+test('redact.remove – top level key - object value', async () => {
   const stream = sink()
   const instance = pino({ redact: { paths: ['key'], remove: true } }, stream)
   instance.info({
     key: { redact: 'me' }
   })
   const o = await once(stream, 'data')
-  equal('key' in o, false)
+  assert.equal('key' in o, false)
 })
 
-test('redact.remove – top level key - number value', async ({ equal }) => {
+test('redact.remove – top level key - number value', async () => {
   const stream = sink()
   const instance = pino({ redact: { paths: ['key'], remove: true } }, stream)
   instance.info({
     key: 1
   })
   const o = await once(stream, 'data')
-  equal('key' in o, false)
+  assert.equal('key' in o, false)
 })
 
-test('redact.remove – top level key - boolean value', async ({ equal }) => {
+test('redact.remove – top level key - boolean value', async () => {
   const stream = sink()
   const instance = pino({ redact: { paths: ['key'], remove: true } }, stream)
   instance.info({
     key: false
   })
   const o = await once(stream, 'data')
-  equal('key' in o, false)
+  assert.equal('key' in o, false)
 })
 
-test('redact.remove – top level key in child logger', async ({ equal }) => {
+test('redact.remove – top level key in child logger', async () => {
   const stream = sink()
   const opts = { redact: { paths: ['key'], remove: true } }
   const instance = pino(opts, stream).child({ key: { redact: 'me' } })
   instance.info('test')
   const o = await once(stream, 'data')
-  equal('key' in o, false)
+  assert.equal('key' in o, false)
 })
 
-test('redact.paths preserves original object values after the log write', async ({ equal }) => {
+test('redact.paths preserves original object values after the log write', async () => {
   const stream = sink()
   const instance = pino({ redact: ['req.headers.cookie'] }, stream)
   const obj = {
@@ -329,11 +331,11 @@ test('redact.paths preserves original object values after the log write', async 
   }
   instance.info(obj)
   const o = await once(stream, 'data')
-  equal(o.req.headers.cookie, '[Redacted]')
-  equal(obj.req.headers.cookie, 'SESSID=298zf09hf012fh2; csrftoken=u32t4o3tb3gg43; _gat=1;')
+  assert.equal(o.req.headers.cookie, '[Redacted]')
+  assert.equal(obj.req.headers.cookie, 'SESSID=298zf09hf012fh2; csrftoken=u32t4o3tb3gg43; _gat=1;')
 })
 
-test('redact.paths preserves original object values after the log write', async ({ equal }) => {
+test('redact.paths preserves original object values after the log write', async () => {
   const stream = sink()
   const instance = pino({ redact: { paths: ['req.headers.cookie'] } }, stream)
   const obj = {
@@ -352,11 +354,11 @@ test('redact.paths preserves original object values after the log write', async 
   }
   instance.info(obj)
   const o = await once(stream, 'data')
-  equal(o.req.headers.cookie, '[Redacted]')
-  equal(obj.req.headers.cookie, 'SESSID=298zf09hf012fh2; csrftoken=u32t4o3tb3gg43; _gat=1;')
+  assert.equal(o.req.headers.cookie, '[Redacted]')
+  assert.equal(obj.req.headers.cookie, 'SESSID=298zf09hf012fh2; csrftoken=u32t4o3tb3gg43; _gat=1;')
 })
 
-test('redact.censor preserves original object values after the log write', async ({ equal }) => {
+test('redact.censor preserves original object values after the log write', async () => {
   const stream = sink()
   const instance = pino({ redact: { paths: ['req.headers.cookie'], censor: 'test' } }, stream)
   const obj = {
@@ -375,11 +377,11 @@ test('redact.censor preserves original object values after the log write', async
   }
   instance.info(obj)
   const o = await once(stream, 'data')
-  equal(o.req.headers.cookie, 'test')
-  equal(obj.req.headers.cookie, 'SESSID=298zf09hf012fh2; csrftoken=u32t4o3tb3gg43; _gat=1;')
+  assert.equal(o.req.headers.cookie, 'test')
+  assert.equal(obj.req.headers.cookie, 'SESSID=298zf09hf012fh2; csrftoken=u32t4o3tb3gg43; _gat=1;')
 })
 
-test('redact.remove preserves original object values after the log write', async ({ equal }) => {
+test('redact.remove preserves original object values after the log write', async () => {
   const stream = sink()
   const instance = pino({ redact: { paths: ['req.headers.cookie'], remove: true } }, stream)
   const obj = {
@@ -398,11 +400,11 @@ test('redact.remove preserves original object values after the log write', async
   }
   instance.info(obj)
   const o = await once(stream, 'data')
-  equal('cookie' in o.req.headers, false)
-  equal('cookie' in obj.req.headers, true)
+  assert.equal('cookie' in o.req.headers, false)
+  assert.equal('cookie' in obj.req.headers, true)
 })
 
-test('redact – supports last position wildcard paths', async ({ equal }) => {
+test('redact – supports last position wildcard paths', async () => {
   const stream = sink()
   const instance = pino({ redact: ['req.headers.*'] }, stream)
   instance.info({
@@ -420,12 +422,12 @@ test('redact – supports last position wildcard paths', async ({ equal }) => {
     }
   })
   const { req } = await once(stream, 'data')
-  equal(req.headers.cookie, '[Redacted]')
-  equal(req.headers.host, '[Redacted]')
-  equal(req.headers.connection, '[Redacted]')
+  assert.equal(req.headers.cookie, '[Redacted]')
+  assert.equal(req.headers.host, '[Redacted]')
+  assert.equal(req.headers.connection, '[Redacted]')
 })
 
-test('redact – supports first position wildcard paths', async ({ equal }) => {
+test('redact – supports first position wildcard paths', async () => {
   const stream = sink()
   const instance = pino({ redact: ['*.headers'] }, stream)
   instance.info({
@@ -443,10 +445,10 @@ test('redact – supports first position wildcard paths', async ({ equal }) => {
     }
   })
   const { req } = await once(stream, 'data')
-  equal(req.headers, '[Redacted]')
+  assert.equal(req.headers, '[Redacted]')
 })
 
-test('redact – supports first position wildcards before other paths', async ({ equal }) => {
+test('redact – supports first position wildcards before other paths', async () => {
   const stream = sink()
   const instance = pino({ redact: ['*.headers.cookie', 'req.id'] }, stream)
   instance.info({
@@ -464,11 +466,11 @@ test('redact – supports first position wildcards before other paths', async ({
     }
   })
   const { req } = await once(stream, 'data')
-  equal(req.headers.cookie, '[Redacted]')
-  equal(req.id, '[Redacted]')
+  assert.equal(req.headers.cookie, '[Redacted]')
+  assert.equal(req.id, '[Redacted]')
 })
 
-test('redact – supports first position wildcards after other paths', async ({ equal }) => {
+test('redact – supports first position wildcards after other paths', async () => {
   const stream = sink()
   const instance = pino({ redact: ['req.id', '*.headers.cookie'] }, stream)
   instance.info({
@@ -486,11 +488,11 @@ test('redact – supports first position wildcards after other paths', async ({ 
     }
   })
   const { req } = await once(stream, 'data')
-  equal(req.headers.cookie, '[Redacted]')
-  equal(req.id, '[Redacted]')
+  assert.equal(req.headers.cookie, '[Redacted]')
+  assert.equal(req.id, '[Redacted]')
 })
 
-test('redact – supports first position wildcards after top level keys', async ({ equal }) => {
+test('redact – supports first position wildcards after top level keys', async () => {
   const stream = sink()
   const instance = pino({ redact: ['key', '*.headers.cookie'] }, stream)
   instance.info({
@@ -508,10 +510,10 @@ test('redact – supports first position wildcards after top level keys', async 
     }
   })
   const { req } = await once(stream, 'data')
-  equal(req.headers.cookie, '[Redacted]')
+  assert.equal(req.headers.cookie, '[Redacted]')
 })
 
-test('redact – supports top level wildcard', async ({ equal }) => {
+test('redact – supports top level wildcard', async () => {
   const stream = sink()
   const instance = pino({ redact: ['*'] }, stream)
   instance.info({
@@ -529,10 +531,10 @@ test('redact – supports top level wildcard', async ({ equal }) => {
     }
   })
   const { req } = await once(stream, 'data')
-  equal(req, '[Redacted]')
+  assert.equal(req, '[Redacted]')
 })
 
-test('redact – supports top level wildcard with a censor function', async ({ equal }) => {
+test('redact – supports top level wildcard with a censor function', async () => {
   const stream = sink()
   const instance = pino({
     redact: {
@@ -555,10 +557,10 @@ test('redact – supports top level wildcard with a censor function', async ({ e
     }
   })
   const { req } = await once(stream, 'data')
-  equal(req, '[Redacted]')
+  assert.equal(req, '[Redacted]')
 })
 
-test('redact – supports top level wildcard and leading wildcard', async ({ equal }) => {
+test('redact – supports top level wildcard and leading wildcard', async () => {
   const stream = sink()
   const instance = pino({ redact: ['*', '*.req'] }, stream)
   instance.info({
@@ -576,10 +578,10 @@ test('redact – supports top level wildcard and leading wildcard', async ({ equ
     }
   })
   const { req } = await once(stream, 'data')
-  equal(req, '[Redacted]')
+  assert.equal(req, '[Redacted]')
 })
 
-test('redact – supports intermediate wildcard paths', async ({ equal }) => {
+test('redact – supports intermediate wildcard paths', async () => {
   const stream = sink()
   const instance = pino({ redact: ['req.*.cookie'] }, stream)
   instance.info({
@@ -597,10 +599,10 @@ test('redact – supports intermediate wildcard paths', async ({ equal }) => {
     }
   })
   const { req } = await once(stream, 'data')
-  equal(req.headers.cookie, '[Redacted]')
+  assert.equal(req.headers.cookie, '[Redacted]')
 })
 
-test('redacts numbers at the top level', async ({ equal }) => {
+test('redacts numbers at the top level', async () => {
   const stream = sink()
   const instance = pino({ redact: ['id'] }, stream)
   const obj = {
@@ -608,10 +610,10 @@ test('redacts numbers at the top level', async ({ equal }) => {
   }
   instance.info(obj)
   const o = await once(stream, 'data')
-  equal(o.id, '[Redacted]')
+  assert.equal(o.id, '[Redacted]')
 })
 
-test('redacts booleans at the top level', async ({ equal }) => {
+test('redacts booleans at the top level', async () => {
   const stream = sink()
   const instance = pino({ redact: ['maybe'] }, stream)
   const obj = {
@@ -619,10 +621,10 @@ test('redacts booleans at the top level', async ({ equal }) => {
   }
   instance.info(obj)
   const o = await once(stream, 'data')
-  equal(o.maybe, '[Redacted]')
+  assert.equal(o.maybe, '[Redacted]')
 })
 
-test('redacts strings at the top level', async ({ equal }) => {
+test('redacts strings at the top level', async () => {
   const stream = sink()
   const instance = pino({ redact: ['s'] }, stream)
   const obj = {
@@ -630,10 +632,10 @@ test('redacts strings at the top level', async ({ equal }) => {
   }
   instance.info(obj)
   const o = await once(stream, 'data')
-  equal(o.s, '[Redacted]')
+  assert.equal(o.s, '[Redacted]')
 })
 
-test('does not redact primitives if not objects', async ({ equal }) => {
+test('does not redact primitives if not objects', async () => {
   const stream = sink()
   const instance = pino({ redact: ['a.b'] }, stream)
   const obj = {
@@ -641,10 +643,10 @@ test('does not redact primitives if not objects', async ({ equal }) => {
   }
   instance.info(obj)
   const o = await once(stream, 'data')
-  equal(o.a, 42)
+  assert.equal(o.a, 42)
 })
 
-test('redacts null at the top level', async ({ equal }) => {
+test('redacts null at the top level', async () => {
   const stream = sink()
   const instance = pino({ redact: ['n'] }, stream)
   const obj = {
@@ -652,10 +654,10 @@ test('redacts null at the top level', async ({ equal }) => {
   }
   instance.info(obj)
   const o = await once(stream, 'data')
-  equal(o.n, '[Redacted]')
+  assert.equal(o.n, '[Redacted]')
 })
 
-test('supports bracket notation', async ({ equal }) => {
+test('supports bracket notation', async () => {
   const stream = sink()
   const instance = pino({ redact: ['a["b.b"]'] }, stream)
   const obj = {
@@ -663,10 +665,10 @@ test('supports bracket notation', async ({ equal }) => {
   }
   instance.info(obj)
   const o = await once(stream, 'data')
-  equal(o.a['b.b'], '[Redacted]')
+  assert.equal(o.a['b.b'], '[Redacted]')
 })
 
-test('supports bracket notation with further nesting', async ({ equal }) => {
+test('supports bracket notation with further nesting', async () => {
   const stream = sink()
   const instance = pino({ redact: ['a["b.b"].c'] }, stream)
   const obj = {
@@ -674,10 +676,10 @@ test('supports bracket notation with further nesting', async ({ equal }) => {
   }
   instance.info(obj)
   const o = await once(stream, 'data')
-  equal(o.a['b.b'].c, '[Redacted]')
+  assert.equal(o.a['b.b'].c, '[Redacted]')
 })
 
-test('supports bracket notation with empty string as path segment', async ({ equal }) => {
+test('supports bracket notation with empty string as path segment', async () => {
   const stream = sink()
   const instance = pino({ redact: ['a[""].c'] }, stream)
   const obj = {
@@ -685,10 +687,10 @@ test('supports bracket notation with empty string as path segment', async ({ equ
   }
   instance.info(obj)
   const o = await once(stream, 'data')
-  equal(o.a[''].c, '[Redacted]')
+  assert.equal(o.a[''].c, '[Redacted]')
 })
 
-test('supports leading bracket notation (single quote)', async ({ equal }) => {
+test('supports leading bracket notation (single quote)', async () => {
   const stream = sink()
   const instance = pino({ redact: ['[\'a.a\'].b'] }, stream)
   const obj = {
@@ -696,10 +698,10 @@ test('supports leading bracket notation (single quote)', async ({ equal }) => {
   }
   instance.info(obj)
   const o = await once(stream, 'data')
-  equal(o['a.a'].b, '[Redacted]')
+  assert.equal(o['a.a'].b, '[Redacted]')
 })
 
-test('supports leading bracket notation (double quote)', async ({ equal }) => {
+test('supports leading bracket notation (double quote)', async () => {
   const stream = sink()
   const instance = pino({ redact: ['["a.a"].b'] }, stream)
   const obj = {
@@ -707,10 +709,10 @@ test('supports leading bracket notation (double quote)', async ({ equal }) => {
   }
   instance.info(obj)
   const o = await once(stream, 'data')
-  equal(o['a.a'].b, '[Redacted]')
+  assert.equal(o['a.a'].b, '[Redacted]')
 })
 
-test('supports leading bracket notation (backtick quote)', async ({ equal }) => {
+test('supports leading bracket notation (backtick quote)', async () => {
   const stream = sink()
   const instance = pino({ redact: ['[`a.a`].b'] }, stream)
   const obj = {
@@ -718,10 +720,10 @@ test('supports leading bracket notation (backtick quote)', async ({ equal }) => 
   }
   instance.info(obj)
   const o = await once(stream, 'data')
-  equal(o['a.a'].b, '[Redacted]')
+  assert.equal(o['a.a'].b, '[Redacted]')
 })
 
-test('supports leading bracket notation (single-segment path)', async ({ equal }) => {
+test('supports leading bracket notation (single-segment path)', async () => {
   const stream = sink()
   const instance = pino({ redact: ['[`a.a`]'] }, stream)
   const obj = {
@@ -729,10 +731,10 @@ test('supports leading bracket notation (single-segment path)', async ({ equal }
   }
   instance.info(obj)
   const o = await once(stream, 'data')
-  equal(o['a.a'], '[Redacted]')
+  assert.equal(o['a.a'], '[Redacted]')
 })
 
-test('supports leading bracket notation (single-segment path, wildcard)', async ({ equal }) => {
+test('supports leading bracket notation (single-segment path, wildcard)', async () => {
   const stream = sink()
   const instance = pino({ redact: ['[*]'] }, stream)
   const obj = {
@@ -740,10 +742,10 @@ test('supports leading bracket notation (single-segment path, wildcard)', async 
   }
   instance.info(obj)
   const o = await once(stream, 'data')
-  equal(o['a.a'], '[Redacted]')
+  assert.equal(o['a.a'], '[Redacted]')
 })
 
-test('child bindings are redacted using wildcard path', async ({ equal }) => {
+test('child bindings are redacted using wildcard path', async () => {
   const stream = sink()
   const instance = pino({ redact: ['*.headers.cookie'] }, stream)
   instance.child({
@@ -756,10 +758,10 @@ test('child bindings are redacted using wildcard path', async ({ equal }) => {
     }
   }).info('message completed')
   const { req } = await once(stream, 'data')
-  equal(req.headers.cookie, '[Redacted]')
+  assert.equal(req.headers.cookie, '[Redacted]')
 })
 
-test('child bindings are redacted using wildcard and plain path keys', async ({ equal }) => {
+test('child bindings are redacted using wildcard and plain path keys', async () => {
   const stream = sink()
   const instance = pino({ redact: ['req.method', '*.headers.cookie'] }, stream)
   instance.child({
@@ -772,11 +774,11 @@ test('child bindings are redacted using wildcard and plain path keys', async ({ 
     }
   }).info('message completed')
   const { req } = await once(stream, 'data')
-  equal(req.headers.cookie, '[Redacted]')
-  equal(req.method, '[Redacted]')
+  assert.equal(req.headers.cookie, '[Redacted]')
+  assert.equal(req.method, '[Redacted]')
 })
 
-test('redacts boolean at the top level', async ({ equal }) => {
+test('redacts boolean at the top level', async () => {
   const stream = sink()
   const instance = pino({ redact: ['msg'] }, stream)
   const obj = {
@@ -784,11 +786,11 @@ test('redacts boolean at the top level', async ({ equal }) => {
   }
   instance.info(obj, true)
   const o = await once(stream, 'data')
-  equal(o.s, 's')
-  equal(o.msg, '[Redacted]')
+  assert.equal(o.s, 's')
+  assert.equal(o.msg, '[Redacted]')
 })
 
-test('child can customize redact', async ({ equal }) => {
+test('child can customize redact', async () => {
   const stream = sink()
   const instance = pino({ redact: ['req.method', '*.headers.cookie'] }, stream)
   instance.child({
@@ -803,12 +805,12 @@ test('child can customize redact', async ({ equal }) => {
     redact: ['req.url']
   }).info('message completed')
   const { req } = await once(stream, 'data')
-  equal(req.headers.cookie, 'SESSID=298zf09hf012fh2; csrftoken=u32t4o3tb3gg43; _gat=1;')
-  equal(req.method, 'GET')
-  equal(req.url, '[Redacted]')
+  assert.equal(req.headers.cookie, 'SESSID=298zf09hf012fh2; csrftoken=u32t4o3tb3gg43; _gat=1;')
+  assert.equal(req.method, 'GET')
+  assert.equal(req.url, '[Redacted]')
 })
 
-test('child can remove parent redact by array', async ({ equal }) => {
+test('child can remove parent redact by array', async () => {
   const stream = sink()
   const instance = pino({ redact: ['req.method', '*.headers.cookie'] }, stream)
   instance.child({
@@ -823,11 +825,11 @@ test('child can remove parent redact by array', async ({ equal }) => {
     redact: []
   }).info('message completed')
   const { req } = await once(stream, 'data')
-  equal(req.headers.cookie, 'SESSID=298zf09hf012fh2; csrftoken=u32t4o3tb3gg43; _gat=1;')
-  equal(req.method, 'GET')
+  assert.equal(req.headers.cookie, 'SESSID=298zf09hf012fh2; csrftoken=u32t4o3tb3gg43; _gat=1;')
+  assert.equal(req.method, 'GET')
 })
 
-test('redact safe stringify', async ({ equal }) => {
+test('redact safe stringify', async () => {
   const stream = sink()
   const instance = pino({ redact: { paths: ['that.secret'] } }, stream)
 
@@ -841,7 +843,7 @@ test('redact safe stringify', async ({ equal }) => {
     }
   })
   const { that, other } = await once(stream, 'data')
-  equal(that.secret, '[Redacted]')
-  equal(that.myBigInt, 123)
-  equal(other.mySecondBigInt, 222)
+  assert.equal(that.secret, '[Redacted]')
+  assert.equal(that.myBigInt, 123)
+  assert.equal(other.mySecondBigInt, 222)
 })

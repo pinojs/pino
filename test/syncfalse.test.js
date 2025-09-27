@@ -1,9 +1,10 @@
 'use strict'
 
+const test = require('node:test')
+const assert = require('node:assert')
 const os = require('node:os')
 const { promises: { readFile }, createWriteStream } = require('node:fs')
 const { join } = require('node:path')
-const { test } = require('tap')
 const { fork } = require('node:child_process')
 const writer = require('flush-write-stream')
 const {
@@ -13,13 +14,11 @@ const {
   watchFileCreated
 } = require('./helper')
 const { promisify } = require('node:util')
+const tspl = require('@matteo.collina/tspl')
 
 const sleep = promisify(setTimeout)
 
-test('asynchronous logging', async ({
-  equal,
-  teardown
-}) => {
+test('asynchronous logging', async (t) => {
   const now = Date.now
   const hostname = os.hostname
   const proc = process
@@ -61,20 +60,17 @@ test('asynchronous logging', async ({
   await once(child, 'close')
   // Wait for the last write to be flushed
   await sleep(100)
-  equal(actual, expected)
-  equal(actual2.trim(), expected2)
+  assert.equal(actual, expected)
+  assert.equal(actual2.trim(), expected2)
 
-  teardown(() => {
+  t.after(() => {
     os.hostname = hostname
     Date.now = now
     global.process = proc
   })
 })
 
-test('sync false with child', async ({
-  equal,
-  teardown
-}) => {
+test('sync false with child', async (t) => {
   const now = Date.now
   const hostname = os.hostname
   const proc = process
@@ -120,36 +116,38 @@ test('sync false with child', async ({
     cb()
   }))
   await once(child, 'close')
-  equal(actual, expected)
-  equal(actual2.trim(), expected2)
+  assert.equal(actual, expected)
+  assert.equal(actual2.trim(), expected2)
 
-  teardown(() => {
+  t.after(() => {
     os.hostname = hostname
     Date.now = now
     global.process = proc
   })
 })
 
-test('flush does nothing with sync true (default)', async ({ equal }) => {
+test('flush does nothing with sync true (default)', async () => {
   const instance = require('..')()
-  equal(instance.flush(), undefined)
+  assert.equal(instance.flush(), undefined)
 })
 
-test('should still call flush callback even when does nothing with sync true (default)', (t) => {
-  t.plan(3)
+test('should still call flush callback even when does nothing with sync true (default)', async (t) => {
+  const plan = tspl(t, { plan: 3 })
   const instance = require('..')()
   instance.flush((...args) => {
-    t.ok('flush called')
-    t.same(args, [])
+    plan.ok('flush called')
+    plan.deepEqual(args, [])
 
     // next tick to make flush not called more than once
     process.nextTick(() => {
-      t.ok('flush next tick called')
+      plan.ok('flush next tick called')
     })
   })
+
+  await plan
 })
 
-test('should call the flush callback when flushed the data for async logger', async (t) => {
+test('should call the flush callback when flushed the data for async logger', async () => {
   const outputPath = file()
   async function getOutputLogLines () {
     return (await readFile(outputPath)).toString().trim().split('\n').map(JSON.parse)
@@ -171,18 +169,18 @@ test('should call the flush callback when flushed the data for async logger', as
 
   const [firstFlushData] = await getOutputLogLines()
 
-  t.equal(firstFlushData.msg, 'hello')
+  assert.equal(firstFlushData.msg, 'hello')
 
   // should not flush this as no data accumulated that's bigger than min length
   instance.info('world')
 
   // Making sure data is not flushed yet
   const afterLogData = await getOutputLogLines()
-  t.equal(afterLogData.length, 1)
+  assert.equal(afterLogData.length, 1)
 
   await flushPromise()
 
   // Making sure data is not flushed yet
   const afterSecondFlush = (await getOutputLogLines())[1]
-  t.equal(afterSecondFlush.msg, 'world')
+  assert.equal(afterSecondFlush.msg, 'world')
 })

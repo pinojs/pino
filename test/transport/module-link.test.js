@@ -1,14 +1,16 @@
 'use strict'
 
+const test = require('node:test')
+const assert = require('node:assert')
 const os = require('node:os')
 const { join } = require('node:path')
 const { readFile, symlink, unlink, mkdir, writeFile } = require('node:fs').promises
-const { test } = require('tap')
-const { isWin, isYarnPnp, watchFileCreated, file } = require('../helper')
 const { once } = require('node:events')
 const execa = require('execa')
-const pino = require('../../')
 const rimraf = require('rimraf')
+
+const { isWin, isYarnPnp, watchFileCreated, file } = require('../helper')
+const pino = require('../../')
 
 const { pid } = process
 const hostname = os.hostname()
@@ -39,7 +41,7 @@ async function uninstallTransportModule () {
 }
 
 // TODO make this test pass on Windows
-test('pino.transport with package', { skip: isWin }, async ({ same, teardown }) => {
+test('pino.transport with package', { skip: isWin }, async (t) => {
   const destination = file()
 
   await installTransportModule()
@@ -49,7 +51,7 @@ test('pino.transport with package', { skip: isWin }, async ({ same, teardown }) 
     options: { destination }
   })
 
-  teardown(async () => {
+  t.after(async () => {
     await uninstallTransportModule()
     transport.end()
   })
@@ -58,7 +60,7 @@ test('pino.transport with package', { skip: isWin }, async ({ same, teardown }) 
   await watchFileCreated(destination)
   const result = JSON.parse(await readFile(destination))
   delete result.time
-  same(result, {
+  assert.deepEqual(result, {
     pid,
     hostname,
     level: 30,
@@ -67,7 +69,7 @@ test('pino.transport with package', { skip: isWin }, async ({ same, teardown }) 
 })
 
 // TODO make this test pass on Windows
-test('pino.transport with package as a target', { skip: isWin }, async ({ same, teardown }) => {
+test('pino.transport with package as a target', { skip: isWin }, async (t) => {
   const destination = file()
 
   await installTransportModule()
@@ -78,7 +80,7 @@ test('pino.transport with package as a target', { skip: isWin }, async ({ same, 
       options: { destination }
     }]
   })
-  teardown(async () => {
+  t.after(async () => {
     await uninstallTransportModule()
     transport.end()
   })
@@ -87,7 +89,7 @@ test('pino.transport with package as a target', { skip: isWin }, async ({ same, 
   await watchFileCreated(destination)
   const result = JSON.parse(await readFile(destination))
   delete result.time
-  same(result, {
+  assert.deepEqual(result, {
     pid,
     hostname,
     level: 30,
@@ -96,13 +98,13 @@ test('pino.transport with package as a target', { skip: isWin }, async ({ same, 
 })
 
 // TODO make this test pass on Windows
-test('pino({ transport })', { skip: isWin || isYarnPnp }, async ({ same, teardown }) => {
+test('pino({ transport })', { skip: isWin || isYarnPnp }, async (t) => {
   const folder = join(
     os.tmpdir(),
     '_' + Math.random().toString(36).substr(2, 9)
   )
 
-  teardown(() => {
+  t.after(() => {
     rimraf.sync(folder)
   })
 
@@ -139,7 +141,7 @@ test('pino({ transport })', { skip: isWin || isYarnPnp }, async ({ same, teardow
 
   const result = JSON.parse(await readFile(destination))
   delete result.time
-  same(result, {
+  assert.deepEqual(result, {
     pid: child.pid,
     hostname,
     level: 30,
@@ -148,7 +150,7 @@ test('pino({ transport })', { skip: isWin || isYarnPnp }, async ({ same, teardow
 })
 
 // TODO make this test pass on Windows
-test('pino({ transport }) from a wrapped dependency', { skip: isWin || isYarnPnp }, async ({ same, teardown }) => {
+test('pino({ transport }) from a wrapped dependency', { skip: isWin || isYarnPnp }, async (t) => {
   const folder = join(
     os.tmpdir(),
     '_' + Math.random().toString(36).substr(2, 9)
@@ -164,7 +166,7 @@ test('pino({ transport }) from a wrapped dependency', { skip: isWin || isYarnPnp
   await mkdir(join(folder, 'node_modules'), { recursive: true })
   await mkdir(join(wrappedFolder, 'node_modules'), { recursive: true })
 
-  teardown(() => {
+  t.after(() => {
     rimraf.sync(wrappedFolder)
     rimraf.sync(folder)
   })
@@ -230,7 +232,7 @@ test('pino({ transport }) from a wrapped dependency', { skip: isWin || isYarnPnp
 
   const result = JSON.parse(await readFile(destination))
   delete result.time
-  same(result, {
+  assert.deepEqual(result, {
     pid: child.pid,
     hostname,
     level: 30,

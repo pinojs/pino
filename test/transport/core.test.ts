@@ -1,14 +1,16 @@
+import test from 'node:test'
+import assert from 'node:assert'
 import * as os from 'node:os'
 import { join } from 'node:path'
 import { once } from 'node:events'
 import fs from 'node:fs'
-import { watchFileCreated } from '../helper'
-import { test } from 'tap'
-import pino from '../../'
 import * as url from 'node:url'
 import { default as strip } from 'strip-ansi'
 import execa from 'execa'
 import writer from 'flush-write-stream'
+
+import { watchFileCreated } from '../helper'
+import pino from '../../'
 
 if (process.platform === 'win32') {
   // TODO: Implement .ts files loading support for Windows
@@ -19,7 +21,7 @@ const readFile = fs.promises.readFile
 const { pid } = process
 const hostname = os.hostname()
 
-test('pino.transport with file', async ({ same, teardown }) => {
+test('pino.transport with file', async (t) => {
   const destination = join(
     os.tmpdir(),
     '_' + Math.random().toString(36).substr(2, 9)
@@ -28,13 +30,13 @@ test('pino.transport with file', async ({ same, teardown }) => {
     target: join(__dirname, '..', 'fixtures', 'ts', 'to-file-transport.ts'),
     options: { destination }
   })
-  teardown(transport.end.bind(transport))
+  t.after(transport.end.bind(transport))
   const instance = pino(transport)
   instance.info('hello')
   await watchFileCreated(destination)
   const result = JSON.parse(await readFile(destination, { encoding: 'utf8' }))
   delete result.time
-  same(result, {
+  assert.deepEqual(result, {
     pid,
     hostname,
     level: 30,
@@ -42,15 +44,15 @@ test('pino.transport with file', async ({ same, teardown }) => {
   })
 })
 
-test('pino.transport with file (no options + error handling)', async ({ equal }) => {
+test('pino.transport with file (no options + error handling)', async () => {
   const transport = pino.transport({
     target: join(__dirname, '..', 'fixtures', 'ts', 'to-file-transport.ts')
   })
   const [err] = await once(transport, 'error')
-  equal(err.message, 'kaboom')
+  assert.equal(err.message, 'kaboom')
 })
 
-test('pino.transport with file URL', async ({ same, teardown }) => {
+test('pino.transport with file URL', async (t) => {
   const destination = join(
     os.tmpdir(),
     '_' + Math.random().toString(36).substr(2, 9)
@@ -59,13 +61,13 @@ test('pino.transport with file URL', async ({ same, teardown }) => {
     target: url.pathToFileURL(join(__dirname, '..', 'fixtures', 'ts', 'to-file-transport.ts')).href,
     options: { destination }
   })
-  teardown(transport.end.bind(transport))
+  t.after(transport.end.bind(transport))
   const instance = pino(transport)
   instance.info('hello')
   await watchFileCreated(destination)
   const result = JSON.parse(await readFile(destination, { encoding: 'utf8' }))
   delete result.time
-  same(result, {
+  assert.deepEqual(result, {
     pid,
     hostname,
     level: 30,
@@ -73,7 +75,7 @@ test('pino.transport with file URL', async ({ same, teardown }) => {
   })
 })
 
-test('pino.transport with two files', async ({ same, teardown }) => {
+test('pino.transport with two files', async (t) => {
   const dest1 = join(
     os.tmpdir(),
     '_' + Math.random().toString(36).substr(2, 9)
@@ -94,7 +96,7 @@ test('pino.transport with two files', async ({ same, teardown }) => {
     }]
   })
 
-  teardown(transport.end.bind(transport))
+  t.after(transport.end.bind(transport))
 
   const instance = pino(transport)
   instance.info('hello')
@@ -103,7 +105,7 @@ test('pino.transport with two files', async ({ same, teardown }) => {
 
   const result1 = JSON.parse(await readFile(dest1, { encoding: 'utf8' }))
   delete result1.time
-  same(result1, {
+  assert.deepEqual(result1, {
     pid,
     hostname,
     level: 30,
@@ -111,7 +113,7 @@ test('pino.transport with two files', async ({ same, teardown }) => {
   })
   const result2 = JSON.parse(await readFile(dest2, { encoding: 'utf8' }))
   delete result2.time
-  same(result2, {
+  assert.deepEqual(result2, {
     pid,
     hostname,
     level: 30,
@@ -119,7 +121,7 @@ test('pino.transport with two files', async ({ same, teardown }) => {
   })
 })
 
-test('no transport.end()', async ({ same, teardown }) => {
+test('no transport.end()', async (t) => {
   const destination = join(
     os.tmpdir(),
     '_' + Math.random().toString(36).substr(2, 9)
@@ -133,7 +135,7 @@ test('no transport.end()', async ({ same, teardown }) => {
   await watchFileCreated(destination)
   const result = JSON.parse(await readFile(destination, { encoding: 'utf8' }))
   delete result.time
-  same(result, {
+  assert.deepEqual(result, {
     pid,
     hostname,
     level: 30,
@@ -141,7 +143,7 @@ test('no transport.end()', async ({ same, teardown }) => {
   })
 })
 
-test('autoEnd = false', async ({ equal, same, teardown }) => {
+test('autoEnd = false', async (t) => {
   const destination = join(
     os.tmpdir(),
     '_' + Math.random().toString(36).substr(2, 9)
@@ -152,7 +154,7 @@ test('autoEnd = false', async ({ equal, same, teardown }) => {
     options: { destination },
     worker: { autoEnd: false }
   })
-  teardown(transport.end.bind(transport))
+  t.after(transport.end.bind(transport))
   await once(transport, 'ready')
 
   const instance = pino(transport)
@@ -160,11 +162,11 @@ test('autoEnd = false', async ({ equal, same, teardown }) => {
 
   await watchFileCreated(destination)
 
-  equal(count, process.listenerCount('exit'))
+  assert.equal(count, process.listenerCount('exit'))
 
   const result = JSON.parse(await readFile(destination, { encoding: 'utf8' }))
   delete result.time
-  same(result, {
+  assert.deepEqual(result, {
     pid,
     hostname,
     level: 30,
@@ -172,7 +174,7 @@ test('autoEnd = false', async ({ equal, same, teardown }) => {
   })
 })
 
-test('stdout in worker', async ({ not }) => {
+test('stdout in worker', async () => {
   let actual = ''
   const child = execa(process.argv[0], ['-r', 'ts-node/register', join(__dirname, '..', 'fixtures', 'ts', 'transport-main.ts')])
 
@@ -181,10 +183,10 @@ test('stdout in worker', async ({ not }) => {
     cb()
   }))
   await once(child, 'close')
-  not(strip(actual).match(/Hello/), null)
+  assert.equal(strip(actual).match(/Hello/) != null, true)
 })
 
-test('log and exit on ready', async ({ not }) => {
+test('log and exit on ready', async () => {
   let actual = ''
   const child = execa(process.argv[0], ['-r', 'ts-node/register', join(__dirname, '..', 'fixtures', 'ts', 'transport-exit-on-ready.ts')])
 
@@ -193,10 +195,10 @@ test('log and exit on ready', async ({ not }) => {
     cb()
   }))
   await once(child, 'close')
-  not(strip(actual).match(/Hello/), null)
+  assert.equal(strip(actual).match(/Hello/) != null, true)
 })
 
-test('log and exit before ready', async ({ not }) => {
+test('log and exit before ready', async () => {
   let actual = ''
   const child = execa(process.argv[0], ['-r', 'ts-node/register', join(__dirname, '..', 'fixtures', 'ts', 'transport-exit-immediately.ts')])
 
@@ -205,10 +207,10 @@ test('log and exit before ready', async ({ not }) => {
     cb()
   }))
   await once(child, 'close')
-  not(strip(actual).match(/Hello/), null)
+  assert.equal(strip(actual).match(/Hello/) != null, true)
 })
 
-test('log and exit before ready with async dest', async ({ not }) => {
+test('log and exit before ready with async dest', async () => {
   const destination = join(
     os.tmpdir(),
     '_' + Math.random().toString(36).substr(2, 9)
@@ -219,11 +221,11 @@ test('log and exit before ready with async dest', async ({ not }) => {
 
   const actual = await readFile(destination, { encoding: 'utf8' })
 
-  not(strip(actual).match(/HELLO/), null)
-  not(strip(actual).match(/WORLD/), null)
+  assert.equal(strip(actual).match(/HELLO/) != null, true)
+  assert.equal(strip(actual).match(/WORLD/) != null, true)
 })
 
-test('string integer destination', async ({ not }) => {
+test('string integer destination', async () => {
   let actual = ''
   const child = execa(process.argv[0], ['-r', 'ts-node/register', join(__dirname, '..', 'fixtures', 'ts', 'transport-string-stdout.ts')])
 
@@ -232,5 +234,5 @@ test('string integer destination', async ({ not }) => {
     cb()
   }))
   await once(child, 'close')
-  not(strip(actual).match(/Hello/), null)
+  assert.equal(strip(actual).match(/Hello/) != null, true)
 })
