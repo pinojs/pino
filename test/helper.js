@@ -112,17 +112,13 @@ function file () {
 
 process.on('beforeExit', () => {
   if (files.length === 0) return
-  console.log('unlink files')
   for (const file of files) {
     try {
-      console.log(`unliking ${file}`)
       unlinkSync(file)
     } catch (e) {
-      console.log(e)
     }
   }
   files = []
-  console.log('unlink completed')
 })
 
 /**
