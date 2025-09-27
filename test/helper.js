@@ -1,14 +1,14 @@
 'use strict'
 
-const crypto = require('crypto')
+const crypto = require('node:crypto')
+const { join } = require('node:path')
 const os = require('node:os')
+const { existsSync, readFileSync, statSync, unlinkSync } = require('node:fs')
 const writer = require('flush-write-stream')
 const split = require('split2')
-const { existsSync, readFileSync, statSync, unlinkSync } = require('node:fs')
+
 const pid = process.pid
 const hostname = os.hostname()
-const t = require('tap')
-const { join } = require('node:path')
 const { tmpdir } = os
 
 const isWin = process.platform === 'win32'
@@ -112,17 +112,17 @@ function file () {
 
 process.on('beforeExit', () => {
   if (files.length === 0) return
-  t.comment('unlink files')
+  console.log('unlink files')
   for (const file of files) {
     try {
-      t.comment(`unliking ${file}`)
+      console.log(`unliking ${file}`)
       unlinkSync(file)
     } catch (e) {
       console.log(e)
     }
   }
   files = []
-  t.comment('unlink completed')
+  console.log('unlink completed')
 })
 
 /**
@@ -134,7 +134,6 @@ process.on('beforeExit', () => {
  */
 function match (found, expected) {
   for (const [key, value] of Object.entries(expected)) {
-    // TODO: support arrays
     if (Object.prototype.toString.call(value) === '[object Object]') {
       match(found[key], value)
       continue
