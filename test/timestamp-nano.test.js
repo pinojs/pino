@@ -2,10 +2,12 @@
 
 /* eslint no-prototype-builtins: 0 */
 
-const { test } = require('tap')
+const test = require('node:test')
+const assert = require('node:assert')
+
 const { sink, once } = require('./helper')
 
-test('pino.stdTimeFunctions.isoTimeNano returns RFC 3339 timestamps', async ({ equal }) => {
+test('pino.stdTimeFunctions.isoTimeNano returns RFC 3339 timestamps', async () => {
   // Mock Date.now at module initialization time
   const now = Date.now
   Date.now = () => new Date('2025-08-01T15:03:45.000000000Z').getTime()
@@ -27,8 +29,8 @@ test('pino.stdTimeFunctions.isoTimeNano returns RFC 3339 timestamps', async ({ e
   const instance = pino(opts, stream)
   instance.info('foobar')
   const result = await once(stream, 'data')
-  equal(result.hasOwnProperty('time'), true)
-  equal(result.time, '2025-08-02T15:03:45.012345678Z')
+  assert.equal(result.hasOwnProperty('time'), true)
+  assert.equal(result.time, '2025-08-02T15:03:45.012345678Z')
 
   Date.now = now
   process.hrtime.bigint = hrTimeBigint
