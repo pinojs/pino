@@ -1,26 +1,29 @@
 'use strict'
 
+const test = require('node:test')
 const os = require('node:os')
-const { test } = require('tap')
+const tspl = require('@matteo.collina/tspl')
+
 const pino = require('../')
 
 const { pid } = process
 const hostname = os.hostname()
 
-test('metadata works', async ({ ok, same, equal }) => {
+test('metadata works', async (t) => {
+  const plan = tspl(t, { plan: 7 })
   const now = Date.now()
   const instance = pino({}, {
     [Symbol.for('pino.metadata')]: true,
     write (chunk) {
-      equal(instance, this.lastLogger)
-      equal(30, this.lastLevel)
-      equal('a msg', this.lastMsg)
-      ok(Number(this.lastTime) >= now)
-      same(this.lastObj, { hello: 'world' })
+      plan.equal(instance, this.lastLogger)
+      plan.equal(30, this.lastLevel)
+      plan.equal('a msg', this.lastMsg)
+      plan.ok(Number(this.lastTime) >= now)
+      plan.deepEqual(this.lastObj, { hello: 'world' })
       const result = JSON.parse(chunk)
-      ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
+      plan.ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
       delete result.time
-      same(result, {
+      plan.deepEqual(result, {
         pid,
         hostname,
         level: 30,
@@ -31,20 +34,23 @@ test('metadata works', async ({ ok, same, equal }) => {
   })
 
   instance.info({ hello: 'world' }, 'a msg')
+
+  await plan
 })
 
-test('child loggers works', async ({ ok, same, equal }) => {
+test('child loggers works', async (t) => {
+  const plan = tspl(t, { plan: 6 })
   const instance = pino({}, {
     [Symbol.for('pino.metadata')]: true,
     write (chunk) {
-      equal(child, this.lastLogger)
-      equal(30, this.lastLevel)
-      equal('a msg', this.lastMsg)
-      same(this.lastObj, { from: 'child' })
+      plan.equal(child, this.lastLogger)
+      plan.equal(30, this.lastLevel)
+      plan.equal('a msg', this.lastMsg)
+      plan.deepEqual(this.lastObj, { from: 'child' })
       const result = JSON.parse(chunk)
-      ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
+      plan.ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
       delete result.time
-      same(result, {
+      plan.deepEqual(result, {
         pid,
         hostname,
         level: 30,
@@ -57,20 +63,23 @@ test('child loggers works', async ({ ok, same, equal }) => {
 
   const child = instance.child({ hello: 'world' })
   child.info({ from: 'child' }, 'a msg')
+
+  await plan
 })
 
-test('without object', async ({ ok, same, equal }) => {
+test('without object', async (t) => {
+  const plan = tspl(t, { plan: 6 })
   const instance = pino({}, {
     [Symbol.for('pino.metadata')]: true,
     write (chunk) {
-      equal(instance, this.lastLogger)
-      equal(30, this.lastLevel)
-      equal('a msg', this.lastMsg)
-      same({ }, this.lastObj)
+      plan.equal(instance, this.lastLogger)
+      plan.equal(30, this.lastLevel)
+      plan.equal('a msg', this.lastMsg)
+      plan.deepEqual({ }, this.lastObj)
       const result = JSON.parse(chunk)
-      ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
+      plan.ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
       delete result.time
-      same(result, {
+      plan.deepEqual(result, {
         pid,
         hostname,
         level: 30,
@@ -80,20 +89,23 @@ test('without object', async ({ ok, same, equal }) => {
   })
 
   instance.info('a msg')
+
+  await plan
 })
 
-test('without msg', async ({ ok, same, equal }) => {
+test('without msg', async (t) => {
+  const plan = tspl(t, { plan: 6 })
   const instance = pino({}, {
     [Symbol.for('pino.metadata')]: true,
     write (chunk) {
-      equal(instance, this.lastLogger)
-      equal(30, this.lastLevel)
-      equal(undefined, this.lastMsg)
-      same({ hello: 'world' }, this.lastObj)
+      plan.equal(instance, this.lastLogger)
+      plan.equal(30, this.lastLevel)
+      plan.equal(undefined, this.lastMsg)
+      plan.deepEqual({ hello: 'world' }, this.lastObj)
       const result = JSON.parse(chunk)
-      ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
+      plan.ok(new Date(result.time) <= new Date(), 'time is greater than Date.now()')
       delete result.time
-      same(result, {
+      plan.deepEqual(result, {
         pid,
         hostname,
         level: 30,
@@ -103,4 +115,6 @@ test('without msg', async ({ ok, same, equal }) => {
   })
 
   instance.info({ hello: 'world' })
+
+  await plan
 })
