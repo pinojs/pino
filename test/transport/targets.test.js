@@ -1,18 +1,19 @@
 'use strict'
 
-const { test } = require('tap')
+const test = require('node:test')
 const { join } = require('node:path')
-const proxyquire = require('proxyquire')
 const Writable = require('node:stream').Writable
+const proxyquire = require('proxyquire')
+const tspl = require('@matteo.collina/tspl')
 const pino = require('../../pino')
 
-test('file-target mocked', async function ({ equal, same, plan, pass }) {
-  plan(1)
+test('file-target mocked', async function (t) {
+  const plan = tspl(t, { plan: 1 })
   let ret
   const fileTarget = proxyquire('../../file', {
     './pino': {
       destination (opts) {
-        same(opts, { dest: 1, sync: false })
+        plan.deepEqual(opts, { dest: 1, sync: false })
 
         ret = new Writable()
         ret.fd = opts.dest
@@ -27,18 +28,21 @@ test('file-target mocked', async function ({ equal, same, plan, pass }) {
   })
 
   await fileTarget()
+  await plan
 })
 
-test('pino.transport with syntax error', ({ same, teardown, plan }) => {
-  plan(1)
+test('pino.transport with syntax error', async (t) => {
+  const plan = tspl(t, { plan: 1 })
   const transport = pino.transport({
     targets: [{
       target: join(__dirname, '..', 'fixtures', 'syntax-error-esm.mjs')
     }]
   })
-  teardown(transport.end.bind(transport))
+  t.after(transport.end.bind(transport))
 
   transport.on('error', (err) => {
-    same(err, new SyntaxError('Unexpected end of input'))
+    plan.deepEqual(err, new SyntaxError('Unexpected end of input'))
   })
+
+  await plan
 })
