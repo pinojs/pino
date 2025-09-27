@@ -43,12 +43,10 @@ jobs:
       fail-fast: false
       matrix:
         os: [macOS-latest, windows-latest, ubuntu-latest]
-        node-version: [18, '18.18', 20, 22]
+        node-version: [20, 22, 24]
         exclude:
           - os: windows-latest
             node-version: 22
-          - os: windows-latest
-            node-version: '18.18'  
 
     steps:
       - name: Check out repo

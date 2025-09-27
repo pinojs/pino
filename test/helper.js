@@ -125,4 +125,36 @@ process.on('beforeExit', () => {
   t.comment('unlink completed')
 })
 
-module.exports = { getPathToNull, sink, check, once, sleep, watchFileCreated, watchForWrite, isWin, isYarnPnp, file }
+/**
+ * match is a bare-bones object shape matcher. We should be able to replace
+ * this with `assert.partialDeepStrictEqual` when v22 is our minimum.
+ *
+ * @param {object} found
+ * @param {object} expected
+ */
+function match (found, expected) {
+  for (const [key, value] of Object.entries(expected)) {
+    // TODO: support arrays
+    if (Object.prototype.toString.call(value) === '[object Object]') {
+      match(found[key], value)
+      continue
+    }
+    if (value !== found[key]) {
+      throw Error(`expected "${value}" but found "${found[key]}"`)
+    }
+  }
+}
+
+module.exports = {
+  check,
+  file,
+  getPathToNull,
+  isWin,
+  isYarnPnp,
+  match,
+  once,
+  sink,
+  sleep,
+  watchFileCreated,
+  watchForWrite
+}
