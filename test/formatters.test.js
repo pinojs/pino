@@ -1,14 +1,17 @@
 'use strict'
 /* eslint no-prototype-builtins: 0 */
 
+const test = require('node:test')
+const assert = require('node:assert')
 const { hostname } = require('node:os')
 const { join } = require('node:path')
 const { readFile } = require('node:fs').promises
-const { test } = require('tap')
-const { sink, once, watchFileCreated, file } = require('./helper')
+const tspl = require('@matteo.collina/tspl')
+
+const { sink, match, once, watchFileCreated, file } = require('./helper')
 const pino = require('../')
 
-test('level formatter', async ({ match }) => {
+test('level formatter', async () => {
   const stream = sink()
   const logger = pino({
     formatters: {
@@ -31,7 +34,7 @@ test('level formatter', async ({ match }) => {
   })
 })
 
-test('bindings formatter', async ({ match }) => {
+test('bindings formatter', async () => {
   const stream = sink()
   const logger = pino({
     formatters: {
@@ -60,7 +63,7 @@ test('bindings formatter', async ({ match }) => {
   })
 })
 
-test('no bindings formatter', async ({ match, notOk }) => {
+test('no bindings formatter', async () => {
   const stream = sink()
   const logger = pino({
     formatters: {
@@ -73,17 +76,18 @@ test('no bindings formatter', async ({ match, notOk }) => {
   const o = once(stream, 'data')
   logger.info('hello world')
   const log = await o
-  notOk(log.hasOwnProperty('pid'))
-  notOk(log.hasOwnProperty('hostname'))
+  assert.equal(log.hasOwnProperty('pid'), false)
+  assert.equal(log.hasOwnProperty('hostname'), false)
   match(log, { msg: 'hello world' })
 })
 
-test('log formatter', async ({ match, equal }) => {
+test('log formatter', async (t) => {
+  const plan = tspl(t, { plan: 1 })
   const stream = sink()
   const logger = pino({
     formatters: {
       log (obj) {
-        equal(obj.hasOwnProperty('msg'), false)
+        plan.equal(obj.hasOwnProperty('msg'), false)
         return { hello: 'world', ...obj }
       }
     }
@@ -96,9 +100,11 @@ test('log formatter', async ({ match, equal }) => {
     foo: 'bar',
     nested: { object: true }
   })
+
+  await plan
 })
 
-test('Formatters combined', async ({ match }) => {
+test('Formatters combined', async () => {
   const stream = sink()
   const logger = pino({
     formatters: {
@@ -143,7 +149,7 @@ test('Formatters combined', async ({ match }) => {
   })
 })
 
-test('Formatters in child logger', async ({ match }) => {
+test('Formatters in child logger', async () => {
   const stream = sink()
   const logger = pino({
     formatters: {
@@ -200,7 +206,7 @@ test('Formatters in child logger', async ({ match }) => {
   })
 })
 
-test('Formatters without bindings in child logger', async ({ match }) => {
+test('Formatters without bindings in child logger', async () => {
   const stream = sink()
   const logger = pino({
     formatters: {
@@ -256,7 +262,7 @@ test('Formatters without bindings in child logger', async ({ match }) => {
   })
 })
 
-test('elastic common schema format', async ({ match, type }) => {
+test('elastic common schema format', async () => {
   const stream = sink()
   const ecs = {
     formatters: {
@@ -291,7 +297,7 @@ test('elastic common schema format', async ({ match, type }) => {
   const o = once(stream, 'data')
   logger.info({ foo: 'bar' }, 'hello world')
   const log = await o
-  type(log['@timestamp'], 'string')
+  assert.equal(typeof log['@timestamp'], 'string')
   match(log, {
     log: { level: 'info', logger: 'pino' },
     process: { pid: process.pid },
@@ -302,12 +308,13 @@ test('elastic common schema format', async ({ match, type }) => {
   })
 })
 
-test('formatter with transport', async ({ match, equal }) => {
+test('formatter with transport', async (t) => {
+  const plan = tspl(t, { plan: 1 })
   const destination = file()
   const logger = pino({
     formatters: {
       log (obj) {
-        equal(obj.hasOwnProperty('msg'), false)
+        plan.equal(obj.hasOwnProperty('msg'), false)
         return { hello: 'world', ...obj }
       }
     },
@@ -332,24 +339,26 @@ test('formatter with transport', async ({ match, equal }) => {
   })
 })
 
-test('throws when custom level formatter is used with transport.targets', async ({ throws }) => {
-  throws(() => {
-    pino({
-      formatters: {
-        level (label) {
-          return label
-        }
-      },
-      transport: {
-        targets: [
-          {
-            target: 'pino/file',
-            options: { destination: 'foo.log' }
+test('throws when custom level formatter is used with transport.targets', async () => {
+  assert.throws(
+    () => {
+      pino({
+        formatters: {
+          level (label) {
+            return label
           }
-        ]
+        },
+        transport: {
+          targets: [
+            {
+              target: 'pino/file',
+              options: { destination: 'foo.log' }
+            }
+          ]
+        }
       }
-    }
-    )
-  },
-  Error('option.transport.targets do not allow custom level formatters'))
+      )
+    },
+    Error('option.transport.targets do not allow custom level formatters')
+  )
 })
