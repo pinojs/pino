@@ -1,18 +1,20 @@
 'use strict'
 
+const test = require('node:test')
+const assert = require('node:assert')
 const { join } = require('node:path')
 const { once } = require('node:events')
 const { setImmediate: immediate } = require('node:timers/promises')
-const { test } = require('tap')
+
 const pino = require('../../')
 
-test('pino.transport emits error if the worker exits with 0 unexpectably', async ({ same, teardown, equal }) => {
+test('pino.transport emits error if the worker exits with 0 unexpectably', async (t) => {
   // This test will take 10s, because flushSync waits for 10s
   const transport = pino.transport({
     target: join(__dirname, '..', 'fixtures', 'crashing-transport.js'),
     sync: true
   })
-  teardown(transport.end.bind(transport))
+  t.after(transport.end.bind(transport))
 
   await once(transport, 'ready')
 
@@ -30,5 +32,5 @@ test('pino.transport emits error if the worker exits with 0 unexpectably', async
 
   await immediate()
 
-  same(maybeError.message, 'the worker has exited')
+  assert.equal(maybeError.message, 'the worker has exited')
 })
