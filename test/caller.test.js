@@ -3,7 +3,7 @@ const loop = require('./fixtures/caller-loop.js')
 
 test('caller', async ({ test, end }) => {
   test('returns a callstack of absolute paths', async ({ equal }) => {
-    const callers = loop(7, true).map(fileName => fileName.substring(__dirname.length))
+    const callers = loop(7).map(fileName => fileName.substring(__dirname.length))
 
     // default callstack size is 10, but the top 2 are dropped
     equal(callers.length, 8)
