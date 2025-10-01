@@ -21,7 +21,7 @@ jobs:
       contents: write
       id-token: write
     steps:
-      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4
+      - uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493 # v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'

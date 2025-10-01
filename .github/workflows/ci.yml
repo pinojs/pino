@@ -27,7 +27,7 @@ jobs:
       contents: read
     steps:
       - name: Check out repo
-        uses: actions/checkout@v5
+        uses: actions/checkout@v5.0.0
         with:
           persist-credentials: false
 
@@ -52,7 +52,7 @@ jobs:
 
     steps:
       - name: Check out repo
-        uses: actions/checkout@v5
+        uses: actions/checkout@v5.0.0
         with:
           persist-credentials: false
 
