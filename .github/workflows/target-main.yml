@@ -12,7 +12,7 @@ jobs:
     if: ${{ github.base_ref != "master" }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/github-script@v7
+      - uses: actions/github-script@v8
         with:
           script: |
             github.rest.issues.createComment({
