@@ -57,3 +57,10 @@ const loggerOptions:LoggerOptions = {
 }
 
 expectType<LoggerOptions>(loggerOptions)
+
+// Reference: https://github.com/pinojs/pino/issues/2285
+const someConst = "test" as const;
+pino().error({}, someConst);
+const someFunc = <T extends typeof someConst>(someConst: T) => {
+    pino().error({}, someConst);
+};

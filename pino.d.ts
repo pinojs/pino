@@ -341,7 +341,11 @@ declare namespace pino {
         : Acc;
 
     export interface LogFn {
+        // Simple case: When first argument is always a string message, use parsed arguments directly
         <TMsg extends string = string>(msg: TMsg, ...args: ParseLogFnArgs<TMsg>): void;
+        // Complex case: When first argument can be any type - if it's a string, no message needed; otherwise require a message
+        <T, TMsg extends string = string>(obj: T, msg?: T extends string ? never: TMsg, ...args: ParseLogFnArgs<TMsg> | []): void;
+        // Complex case with type safety: Same as above but ensures ParseLogFnArgs is a valid tuple before using it
         <T, TMsg extends string = string>(obj: T, msg?: T extends string ? never : TMsg, ...args: ParseLogFnArgs<TMsg> extends [unknown, ...unknown[]] ? ParseLogFnArgs<TMsg> : unknown[]): void;
     }
 
