@@ -1,7 +1,9 @@
 'use strict'
 
+const test = require('node:test')
+const assert = require('node:assert')
 const os = require('node:os')
-const { test } = require('tap')
+
 const { sink, once } = require('./helper')
 const pino = require('../')
 
@@ -9,7 +11,7 @@ const { pid } = process
 const hostname = os.hostname()
 
 function testEscape (ch, key) {
-  test('correctly escape ' + ch, async ({ same }) => {
+  test('correctly escape ' + ch, async () => {
     const stream = sink()
     const instance = pino({
       name: 'hello'
@@ -17,7 +19,7 @@ function testEscape (ch, key) {
     instance.fatal('this contains ' + key)
     const result = await once(stream, 'data')
     delete result.time
-    same(result, {
+    assert.deepEqual(result, {
       pid,
       hostname,
       level: 60,
@@ -73,7 +75,7 @@ toEscape.forEach((key) => {
   testEscape(JSON.stringify(key), key)
 })
 
-test('correctly escape `hello \\u001F world \\n \\u0022`', async ({ same }) => {
+test('correctly escape `hello \\u001F world \\n \\u0022`', async () => {
   const stream = sink()
   const instance = pino({
     name: 'hello'
@@ -81,7 +83,7 @@ test('correctly escape `hello \\u001F world \\n \\u0022`', async ({ same }) => {
   instance.fatal('hello \u001F world \n \u0022')
   const result = await once(stream, 'data')
   delete result.time
-  same(result, {
+  assert.deepEqual(result, {
     pid,
     hostname,
     level: 60,

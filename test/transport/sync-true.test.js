@@ -1,12 +1,14 @@
 'use strict'
 
-const pino = require('../..')
+const test = require('node:test')
+const assert = require('node:assert')
 const { join } = require('node:path')
 const { readFileSync } = require('node:fs')
-const { test } = require('tap')
-const { file } = require('../helper')
 
-test('thread-stream sync true should log synchronously', async (t) => {
+const { file } = require('../helper')
+const pino = require('../..')
+
+test('thread-stream sync true should log synchronously', async () => {
   const outputPath = file()
 
   function getOutputLogLines () {
@@ -51,5 +53,5 @@ test('thread-stream sync true should log synchronously', async (t) => {
     throw new Error('Sync loop did not get interrupt')
   }
 
-  t.equal(flushData.length, 6)
+  assert.equal(flushData.length, 6)
 })

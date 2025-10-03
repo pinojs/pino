@@ -1,10 +1,12 @@
+import test from 'node:test'
+import assert from 'node:assert'
 import * as os from 'node:os'
 import { join } from 'node:path'
 import fs from 'node:fs'
-import { watchFileCreated } from '../helper'
-import { test } from 'tap'
-import pino from '../../'
 import * as url from 'node:url'
+
+import { watchFileCreated } from '../helper'
+import pino from '../../'
 
 const readFile = fs.promises.readFile
 
@@ -13,7 +15,7 @@ const hostname = os.hostname()
 
 // A subset of the test from core.test.js, we don't need all of them to check for compatibility
 function runTests(esVersion: string): void {
-  test(`(ts -> ${esVersion}) pino.transport with file`, async ({ same, teardown }) => {
+  test(`(ts -> ${esVersion}) pino.transport with file`, async (t) => {
     const destination = join(
       os.tmpdir(),
       '_' + Math.random().toString(36).substr(2, 9)
@@ -22,13 +24,13 @@ function runTests(esVersion: string): void {
       target: join(__dirname, '..', 'fixtures', 'ts', `to-file-transport.${esVersion}.cjs`),
       options: { destination }
     })
-    teardown(transport.end.bind(transport))
+    t.after(transport.end.bind(transport))
     const instance = pino(transport)
     instance.info('hello')
     await watchFileCreated(destination)
     const result = JSON.parse(await readFile(destination, { encoding: 'utf8' }))
     delete result.time
-    same(result, {
+    assert.deepEqual(result, {
       pid,
       hostname,
       level: 30,
@@ -36,7 +38,7 @@ function runTests(esVersion: string): void {
     })
   })
 
-  test(`(ts -> ${esVersion}) pino.transport with file URL`, async ({ same, teardown }) => {
+  test(`(ts -> ${esVersion}) pino.transport with file URL`, async (t) => {
     const destination = join(
       os.tmpdir(),
       '_' + Math.random().toString(36).substr(2, 9)
@@ -45,13 +47,13 @@ function runTests(esVersion: string): void {
       target: url.pathToFileURL(join(__dirname, '..', 'fixtures', 'ts', `to-file-transport.${esVersion}.cjs`)).href,
       options: { destination }
     })
-    teardown(transport.end.bind(transport))
+    t.after(transport.end.bind(transport))
     const instance = pino(transport)
     instance.info('hello')
     await watchFileCreated(destination)
     const result = JSON.parse(await readFile(destination, { encoding: 'utf8' }))
     delete result.time
-    same(result, {
+    assert.deepEqual(result, {
       pid,
       hostname,
       level: 30,
@@ -59,7 +61,7 @@ function runTests(esVersion: string): void {
     })
   })
 
-  test(`(ts -> ${esVersion}) pino.transport with two files`, async ({ same, teardown }) => {
+  test(`(ts -> ${esVersion}) pino.transport with two files`, async (t) => {
     const dest1 = join(
       os.tmpdir(),
       '_' + Math.random().toString(36).substr(2, 9)
@@ -80,7 +82,7 @@ function runTests(esVersion: string): void {
       }]
     })
 
-    teardown(transport.end.bind(transport))
+    t.after(transport.end.bind(transport))
 
     const instance = pino(transport)
     instance.info('hello')
@@ -89,7 +91,7 @@ function runTests(esVersion: string): void {
 
     const result1 = JSON.parse(await readFile(dest1, { encoding: 'utf8' }))
     delete result1.time
-    same(result1, {
+    assert.deepEqual(result1, {
       pid,
       hostname,
       level: 30,
@@ -97,7 +99,7 @@ function runTests(esVersion: string): void {
     })
     const result2 = JSON.parse(await readFile(dest2, { encoding: 'utf8' }))
     delete result2.time
-    same(result2, {
+    assert.deepEqual(result2, {
       pid,
       hostname,
       level: 30,

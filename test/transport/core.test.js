@@ -1,36 +1,39 @@
 'use strict'
 
+const test = require('node:test')
+const assert = require('node:assert')
 const os = require('node:os')
 const { join } = require('node:path')
 const { once } = require('node:events')
 const { setImmediate: immediate } = require('node:timers/promises')
 const { readFile, writeFile } = require('node:fs').promises
-const { watchFileCreated, watchForWrite, file } = require('../helper')
-const { test } = require('tap')
-const pino = require('../../')
 const url = require('url')
 const strip = require('strip-ansi')
 const execa = require('execa')
 const writer = require('flush-write-stream')
 const rimraf = require('rimraf')
-const { tmpdir } = os
+const tspl = require('@matteo.collina/tspl')
 
+const { match, watchFileCreated, watchForWrite, file } = require('../helper')
+const pino = require('../../')
+
+const { tmpdir } = os
 const pid = process.pid
 const hostname = os.hostname()
 
-test('pino.transport with file', async ({ same, teardown }) => {
+test('pino.transport with file', async (t) => {
   const destination = file()
   const transport = pino.transport({
     target: join(__dirname, '..', 'fixtures', 'to-file-transport.js'),
     options: { destination }
   })
-  teardown(transport.end.bind(transport))
+  t.after(transport.end.bind(transport))
   const instance = pino(transport)
   instance.info('hello')
   await watchFileCreated(destination)
   const result = JSON.parse(await readFile(destination))
   delete result.time
-  same(result, {
+  assert.deepEqual(result, {
     pid,
     hostname,
     level: 30,
@@ -38,27 +41,27 @@ test('pino.transport with file', async ({ same, teardown }) => {
   })
 })
 
-test('pino.transport with file (no options + error handling)', async ({ equal }) => {
+test('pino.transport with file (no options + error handling)', async () => {
   const transport = pino.transport({
     target: join(__dirname, '..', 'fixtures', 'to-file-transport.js')
   })
   const [err] = await once(transport, 'error')
-  equal(err.message, 'kaboom')
+  assert.equal(err.message, 'kaboom')
 })
 
-test('pino.transport with file URL', async ({ same, teardown }) => {
+test('pino.transport with file URL', async (t) => {
   const destination = file()
   const transport = pino.transport({
     target: url.pathToFileURL(join(__dirname, '..', 'fixtures', 'to-file-transport.js')).href,
     options: { destination }
   })
-  teardown(transport.end.bind(transport))
+  t.after(transport.end.bind(transport))
   const instance = pino(transport)
   instance.info('hello')
   await watchFileCreated(destination)
   const result = JSON.parse(await readFile(destination))
   delete result.time
-  same(result, {
+  assert.deepEqual(result, {
     pid,
     hostname,
     level: 30,
@@ -66,8 +69,7 @@ test('pino.transport with file URL', async ({ same, teardown }) => {
   })
 })
 
-test('pino.transport errors if file does not exists', ({ plan, pass }) => {
-  plan(1)
+test('pino.transport errors if file does not exists', (t, end) => {
   const instance = pino.transport({
     target: join(__dirname, '..', 'fixtures', 'non-existent-file'),
     worker: {
@@ -77,13 +79,14 @@ test('pino.transport errors if file does not exists', ({ plan, pass }) => {
     }
   })
   instance.on('error', function () {
-    pass('error received')
+    assert.ok('error received')
+    end()
   })
 })
 
-test('pino.transport errors if transport worker module does not export a function', ({ plan, equal }) => {
+test('pino.transport errors if transport worker module does not export a function', async (t) => {
   // TODO: add case for non-pipelined single target (needs changes in thread-stream)
-  plan(2)
+  const plan = tspl(t, { plan: 2 })
   const manyTargetsInstance = pino.transport({
     targets: [{
       level: 'info',
@@ -94,7 +97,7 @@ test('pino.transport errors if transport worker module does not export a functio
     }]
   })
   manyTargetsInstance.on('error', function (e) {
-    equal(e.message, 'exported worker is not a function')
+    plan.equal(e.message, 'exported worker is not a function')
   })
 
   const pipelinedInstance = pino.transport({
@@ -103,23 +106,25 @@ test('pino.transport errors if transport worker module does not export a functio
     }]
   })
   pipelinedInstance.on('error', function (e) {
-    equal(e.message, 'exported worker is not a function')
+    plan.equal(e.message, 'exported worker is not a function')
   })
+
+  await plan
 })
 
-test('pino.transport with esm', async ({ same, teardown }) => {
+test('pino.transport with esm', async (t) => {
   const destination = file()
   const transport = pino.transport({
     target: join(__dirname, '..', 'fixtures', 'to-file-transport.mjs'),
     options: { destination }
   })
   const instance = pino(transport)
-  teardown(transport.end.bind(transport))
+  t.after(transport.end.bind(transport))
   instance.info('hello')
   await watchFileCreated(destination)
   const result = JSON.parse(await readFile(destination))
   delete result.time
-  same(result, {
+  assert.deepEqual(result, {
     pid,
     hostname,
     level: 30,
@@ -127,7 +132,7 @@ test('pino.transport with esm', async ({ same, teardown }) => {
   })
 })
 
-test('pino.transport with two files', async ({ same, teardown }) => {
+test('pino.transport with two files', async (t) => {
   const dest1 = file()
   const dest2 = file()
   const transport = pino.transport({
@@ -141,13 +146,13 @@ test('pino.transport with two files', async ({ same, teardown }) => {
       options: { destination: dest2 }
     }]
   })
-  teardown(transport.end.bind(transport))
+  t.after(transport.end.bind(transport))
   const instance = pino(transport)
   instance.info('hello')
   await Promise.all([watchFileCreated(dest1), watchFileCreated(dest2)])
   const result1 = JSON.parse(await readFile(dest1))
   delete result1.time
-  same(result1, {
+  assert.deepEqual(result1, {
     pid,
     hostname,
     level: 30,
@@ -155,7 +160,7 @@ test('pino.transport with two files', async ({ same, teardown }) => {
   })
   const result2 = JSON.parse(await readFile(dest2))
   delete result2.time
-  same(result2, {
+  assert.deepEqual(result2, {
     pid,
     hostname,
     level: 30,
@@ -163,7 +168,7 @@ test('pino.transport with two files', async ({ same, teardown }) => {
   })
 })
 
-test('pino.transport with two files and custom levels', async ({ same, teardown }) => {
+test('pino.transport with two files and custom levels', async (t) => {
   const dest1 = file()
   const dest2 = file()
   const transport = pino.transport({
@@ -178,13 +183,13 @@ test('pino.transport with two files and custom levels', async ({ same, teardown 
     }],
     levels: { trace: 10, debug: 20, info: 30, warn: 40, error: 50, fatal: 60, foo: 25 }
   })
-  teardown(transport.end.bind(transport))
+  t.after(transport.end.bind(transport))
   const instance = pino(transport)
   instance.info('hello')
   await Promise.all([watchFileCreated(dest1), watchFileCreated(dest2)])
   const result1 = JSON.parse(await readFile(dest1))
   delete result1.time
-  same(result1, {
+  assert.deepEqual(result1, {
     pid,
     hostname,
     level: 30,
@@ -192,7 +197,7 @@ test('pino.transport with two files and custom levels', async ({ same, teardown 
   })
   const result2 = JSON.parse(await readFile(dest2))
   delete result2.time
-  same(result2, {
+  assert.deepEqual(result2, {
     pid,
     hostname,
     level: 30,
@@ -200,7 +205,7 @@ test('pino.transport with two files and custom levels', async ({ same, teardown 
   })
 })
 
-test('pino.transport without specifying default levels', async ({ same, teardown }) => {
+test('pino.transport without specifying default levels', async (t) => {
   const dest = file()
   const transport = pino.transport({
     targets: [{
@@ -210,13 +215,13 @@ test('pino.transport without specifying default levels', async ({ same, teardown
     }],
     levels: { foo: 25 }
   })
-  teardown(transport.end.bind(transport))
+  t.after(transport.end.bind(transport))
   const instance = pino(transport)
   instance.info('hello')
   await Promise.all([watchFileCreated(dest)])
   const result1 = JSON.parse(await readFile(dest))
   delete result1.time
-  same(result1, {
+  assert.deepEqual(result1, {
     pid,
     hostname,
     level: 30,
@@ -224,7 +229,7 @@ test('pino.transport without specifying default levels', async ({ same, teardown
   })
 })
 
-test('pino.transport with two files and dedupe', async ({ same, teardown }) => {
+test('pino.transport with two files and dedupe', async (t) => {
   const dest1 = file()
   const dest2 = file()
   const transport = pino.transport({
@@ -239,14 +244,14 @@ test('pino.transport with two files and dedupe', async ({ same, teardown }) => {
       options: { destination: dest2 }
     }]
   })
-  teardown(transport.end.bind(transport))
+  t.after(transport.end.bind(transport))
   const instance = pino(transport)
   instance.info('hello')
   instance.error('world')
   await Promise.all([watchFileCreated(dest1), watchFileCreated(dest2)])
   const result1 = JSON.parse(await readFile(dest1))
   delete result1.time
-  same(result1, {
+  assert.deepEqual(result1, {
     pid,
     hostname,
     level: 30,
@@ -254,7 +259,7 @@ test('pino.transport with two files and dedupe', async ({ same, teardown }) => {
   })
   const result2 = JSON.parse(await readFile(dest2))
   delete result2.time
-  same(result2, {
+  assert.deepEqual(result2, {
     pid,
     hostname,
     level: 50,
@@ -262,7 +267,7 @@ test('pino.transport with two files and dedupe', async ({ same, teardown }) => {
   })
 })
 
-test('pino.transport with an array including a pino-pretty destination', async ({ same, match, teardown }) => {
+test('pino.transport with an array including a pino-pretty destination', async (t) => {
   const dest1 = file()
   const dest2 = file()
   const transport = pino.transport({
@@ -280,23 +285,23 @@ test('pino.transport with an array including a pino-pretty destination', async (
       }
     }]
   })
-  teardown(transport.end.bind(transport))
+  t.after(transport.end.bind(transport))
   const instance = pino(transport)
   instance.info('hello')
   await Promise.all([watchFileCreated(dest1), watchFileCreated(dest2)])
   const result1 = JSON.parse(await readFile(dest1))
   delete result1.time
-  same(result1, {
+  assert.deepEqual(result1, {
     pid,
     hostname,
     level: 30,
     msg: 'hello'
   })
   const actual = (await readFile(dest2)).toString()
-  match(strip(actual), /\[.*\] INFO.*hello/)
+  assert.match(strip(actual), /\[.*\] INFO.*hello/)
 })
 
-test('no transport.end()', async ({ same, teardown }) => {
+test('no transport.end()', async (t) => {
   const destination = file()
   const transport = pino.transport({
     target: join(__dirname, '..', 'fixtures', 'to-file-transport.js'),
@@ -307,7 +312,7 @@ test('no transport.end()', async ({ same, teardown }) => {
   await watchFileCreated(destination)
   const result = JSON.parse(await readFile(destination))
   delete result.time
-  same(result, {
+  assert.deepEqual(result, {
     pid,
     hostname,
     level: 30,
@@ -315,7 +320,7 @@ test('no transport.end()', async ({ same, teardown }) => {
   })
 })
 
-test('autoEnd = false', async ({ equal, same, teardown }) => {
+test('autoEnd = false', async (t) => {
   const destination = file()
   const count = process.listenerCount('exit')
   const transport = pino.transport({
@@ -323,7 +328,7 @@ test('autoEnd = false', async ({ equal, same, teardown }) => {
     options: { destination },
     worker: { autoEnd: false }
   })
-  teardown(transport.end.bind(transport))
+  t.after(transport.end.bind(transport))
   await once(transport, 'ready')
 
   const instance = pino(transport)
@@ -331,11 +336,11 @@ test('autoEnd = false', async ({ equal, same, teardown }) => {
 
   await watchFileCreated(destination)
 
-  equal(count, process.listenerCount('exit'))
+  assert.equal(count, process.listenerCount('exit'))
 
   const result = JSON.parse(await readFile(destination))
   delete result.time
-  same(result, {
+  assert.deepEqual(result, {
     pid,
     hostname,
     level: 30,
@@ -343,33 +348,33 @@ test('autoEnd = false', async ({ equal, same, teardown }) => {
   })
 })
 
-test('pino.transport with target and targets', async ({ fail, equal }) => {
-  try {
-    pino.transport({
-      target: '/a/file',
-      targets: [{
-        target: '/a/file'
-      }]
-    })
-    fail('must throw')
-  } catch (err) {
-    equal(err.message, 'only one of target or targets can be specified')
-  }
+test('pino.transport with target and targets', async () => {
+  assert.throws(
+    () => {
+      pino.transport({
+        target: '/a/file',
+        targets: [{
+          target: '/a/file'
+        }]
+      })
+    },
+    /only one of target or targets can be specified/
+  )
 })
 
-test('pino.transport with target pino/file', async ({ same, teardown }) => {
+test('pino.transport with target pino/file', async (t) => {
   const destination = file()
   const transport = pino.transport({
     target: 'pino/file',
     options: { destination }
   })
-  teardown(transport.end.bind(transport))
+  t.after(transport.end.bind(transport))
   const instance = pino(transport)
   instance.info('hello')
   await watchFileCreated(destination)
   const result = JSON.parse(await readFile(destination))
   delete result.time
-  same(result, {
+  assert.deepEqual(result, {
     pid,
     hostname,
     level: 30,
@@ -377,10 +382,10 @@ test('pino.transport with target pino/file', async ({ same, teardown }) => {
   })
 })
 
-test('pino.transport with target pino/file and mkdir option', async ({ same, teardown }) => {
+test('pino.transport with target pino/file and mkdir option', async (t) => {
   const folder = join(tmpdir(), `pino-${process.pid}-mkdir-transport-file`)
   const destination = join(folder, 'log.txt')
-  teardown(() => {
+  t.after(() => {
     try {
       rimraf.sync(folder)
     } catch (err) {
@@ -391,13 +396,13 @@ test('pino.transport with target pino/file and mkdir option', async ({ same, tea
     target: 'pino/file',
     options: { destination, mkdir: true }
   })
-  teardown(transport.end.bind(transport))
+  t.after(transport.end.bind(transport))
   const instance = pino(transport)
   instance.info('hello')
   await watchFileCreated(destination)
   const result = JSON.parse(await readFile(destination))
   delete result.time
-  same(result, {
+  assert.deepEqual(result, {
     pid,
     hostname,
     level: 30,
@@ -405,20 +410,20 @@ test('pino.transport with target pino/file and mkdir option', async ({ same, tea
   })
 })
 
-test('pino.transport with target pino/file and append option', async ({ same, teardown }) => {
+test('pino.transport with target pino/file and append option', async (t) => {
   const destination = file()
   await writeFile(destination, JSON.stringify({ pid, hostname, time: Date.now(), level: 30, msg: 'hello' }))
   const transport = pino.transport({
     target: 'pino/file',
     options: { destination, append: false }
   })
-  teardown(transport.end.bind(transport))
+  t.after(transport.end.bind(transport))
   const instance = pino(transport)
   instance.info('goodbye')
   await watchForWrite(destination, '"goodbye"')
   const result = JSON.parse(await readFile(destination))
   delete result.time
-  same(result, {
+  assert.deepEqual(result, {
     pid,
     hostname,
     level: 30,
@@ -426,47 +431,50 @@ test('pino.transport with target pino/file and append option', async ({ same, te
   })
 })
 
-test('pino.transport should error with unknown target', async ({ fail, equal }) => {
-  try {
-    pino.transport({
-      target: 'origin',
-      caller: 'unknown-file.js'
-    })
-    fail('must throw')
-  } catch (err) {
-    equal(err.message, 'unable to determine transport target for "origin"')
-  }
+test('pino.transport should error with unknown target', async () => {
+  assert.throws(
+    () => {
+      pino.transport({
+        target: 'origin',
+        caller: 'unknown-file.js'
+      })
+    },
+    /unable to determine transport target for "origin"/
+  )
 })
 
-test('pino.transport with target pino-pretty', async ({ match, teardown }) => {
+test('pino.transport with target pino-pretty', async (t) => {
   const destination = file()
   const transport = pino.transport({
     target: 'pino-pretty',
     options: { destination }
   })
-  teardown(transport.end.bind(transport))
+  t.after(transport.end.bind(transport))
   const instance = pino(transport)
   instance.info('hello')
   await watchFileCreated(destination)
   const actual = await readFile(destination, 'utf8')
-  match(strip(actual), /\[.*\] INFO.*hello/)
+  assert.match(strip(actual), /\[.*\] INFO.*hello/)
 })
 
-test('sets worker data informing the transport that pino will send its config', ({ match, plan, teardown }) => {
-  plan(1)
+test('sets worker data informing the transport that pino will send its config', async (t) => {
+  const plan = tspl(t, { plan: 1 })
   const transport = pino.transport({
     target: join(__dirname, '..', 'fixtures', 'transport-worker-data.js')
   })
-  teardown(transport.end.bind(transport))
+  t.after(transport.end.bind(transport))
   const instance = pino(transport)
   transport.once('workerData', (workerData) => {
     match(workerData.workerData, { pinoWillSendConfig: true })
+    plan.ok('passed')
   })
   instance.info('hello')
+
+  await plan
 })
 
-test('sets worker data informing the transport that pino will send its config (frozen file)', ({ match, plan, teardown }) => {
-  plan(1)
+test('sets worker data informing the transport that pino will send its config (frozen file)', async (t) => {
+  const plan = tspl(t, { plan: 1 })
   const config = {
     transport: {
       target: join(__dirname, '..', 'fixtures', 'transport-worker-data.js'),
@@ -478,24 +486,27 @@ test('sets worker data informing the transport that pino will send its config (f
   Object.freeze(config.transport.options)
   const instance = pino(config)
   const transport = instance[pino.symbols.streamSym]
-  teardown(transport.end.bind(transport))
+  t.after(transport.end.bind(transport))
   transport.once('workerData', (workerData) => {
     match(workerData.workerData, { pinoWillSendConfig: true })
+    plan.ok('passed')
   })
   instance.info('hello')
+
+  await plan
 })
 
-test('stdout in worker', async ({ not }) => {
+test('stdout in worker', async () => {
   let actual = ''
   const child = execa(process.argv[0], [join(__dirname, '..', 'fixtures', 'transport-main.js')])
 
   for await (const chunk of child.stdout) {
     actual += chunk
   }
-  not(strip(actual).match(/Hello/), null)
+  assert.equal(strip(actual).match(/Hello/) != null, true)
 })
 
-test('log and exit on ready', async ({ not }) => {
+test('log and exit on ready', async () => {
   let actual = ''
   const child = execa(process.argv[0], [join(__dirname, '..', 'fixtures', 'transport-exit-on-ready.js')])
 
@@ -505,10 +516,10 @@ test('log and exit on ready', async ({ not }) => {
   }))
   await once(child, 'close')
   await immediate()
-  not(strip(actual).match(/Hello/), null)
+  assert.equal(strip(actual).match(/Hello/) != null, true)
 })
 
-test('log and exit before ready', async ({ not }) => {
+test('log and exit before ready', async () => {
   let actual = ''
   const child = execa(process.argv[0], [join(__dirname, '..', 'fixtures', 'transport-exit-immediately.js')])
 
@@ -518,21 +529,21 @@ test('log and exit before ready', async ({ not }) => {
   }))
   await once(child, 'close')
   await immediate()
-  not(strip(actual).match(/Hello/), null)
+  assert.equal(strip(actual).match(/Hello/) != null, true)
 })
 
-test('log and exit before ready with async dest', async ({ not }) => {
+test('log and exit before ready with async dest', async () => {
   const destination = file()
   const child = execa(process.argv[0], [join(__dirname, '..', 'fixtures', 'transport-exit-immediately-with-async-dest.js'), destination])
 
   await once(child, 'exit')
 
   const actual = await readFile(destination, 'utf8')
-  not(strip(actual).match(/HELLO/), null)
-  not(strip(actual).match(/WORLD/), null)
+  assert.equal(strip(actual).match(/HELLO/) != null, true)
+  assert.equal(strip(actual).match(/WORLD/) != null, true)
 })
 
-test('string integer destination', async ({ not }) => {
+test('string integer destination', async () => {
   let actual = ''
   const child = execa(process.argv[0], [join(__dirname, '..', 'fixtures', 'transport-string-stdout.js')])
 
@@ -542,10 +553,10 @@ test('string integer destination', async ({ not }) => {
   }))
   await once(child, 'close')
   await immediate()
-  not(strip(actual).match(/Hello/), null)
+  assert.equal(strip(actual).match(/Hello/) != null, true)
 })
 
-test('pino transport options with target', async ({ teardown, same }) => {
+test('pino transport options with target', async (t) => {
   const destination = file()
   const instance = pino({
     transport: {
@@ -554,12 +565,12 @@ test('pino transport options with target', async ({ teardown, same }) => {
     }
   })
   const transportStream = instance[pino.symbols.streamSym]
-  teardown(transportStream.end.bind(transportStream))
+  t.after(transportStream.end.bind(transportStream))
   instance.info('transport option test')
   await watchFileCreated(destination)
   const result = JSON.parse(await readFile(destination))
   delete result.time
-  same(result, {
+  assert.deepEqual(result, {
     pid,
     hostname,
     level: 30,
@@ -567,7 +578,7 @@ test('pino transport options with target', async ({ teardown, same }) => {
   })
 })
 
-test('pino transport options with targets', async ({ teardown, same }) => {
+test('pino transport options with targets', async (t) => {
   const dest1 = file()
   const dest2 = file()
   const instance = pino({
@@ -579,13 +590,13 @@ test('pino transport options with targets', async ({ teardown, same }) => {
     }
   })
   const transportStream = instance[pino.symbols.streamSym]
-  teardown(transportStream.end.bind(transportStream))
+  t.after(transportStream.end.bind(transportStream))
   instance.info('transport option test')
 
   await Promise.all([watchFileCreated(dest1), watchFileCreated(dest2)])
   const result1 = JSON.parse(await readFile(dest1))
   delete result1.time
-  same(result1, {
+  assert.deepEqual(result1, {
     pid,
     hostname,
     level: 30,
@@ -593,7 +604,7 @@ test('pino transport options with targets', async ({ teardown, same }) => {
   })
   const result2 = JSON.parse(await readFile(dest2))
   delete result2.time
-  same(result2, {
+  assert.deepEqual(result2, {
     pid,
     hostname,
     level: 30,
@@ -601,43 +612,43 @@ test('pino transport options with targets', async ({ teardown, same }) => {
   })
 })
 
-test('transport options with target and targets', async ({ fail, equal }) => {
-  try {
-    pino({
-      transport: {
-        target: {},
-        targets: {}
-      }
-    })
-    fail('must throw')
-  } catch (err) {
-    equal(err.message, 'only one of target or targets can be specified')
-  }
+test('transport options with target and targets', async () => {
+  assert.throws(
+    () => {
+      pino({
+        transport: {
+          target: {},
+          targets: {}
+        }
+      })
+    },
+    /only one of target or targets can be specified/
+  )
 })
 
-test('transport options with target and stream', async ({ fail, equal }) => {
-  try {
-    pino({
-      transport: {
-        target: {}
-      }
-    }, '/log/null')
-    fail('must throw')
-  } catch (err) {
-    equal(err.message, 'only one of option.transport or stream can be specified')
-  }
+test('transport options with target and stream', async () => {
+  assert.throws(
+    () => {
+      pino({
+        transport: {
+          target: {}
+        }
+      }, '/log/null')
+    },
+    /only one of option.transport or stream can be specified/
+  )
 })
 
-test('transport options with stream', async ({ fail, equal, teardown }) => {
-  try {
-    const dest1 = file()
-    const transportStream = pino.transport({ target: 'pino/file', options: { destination: dest1 } })
-    teardown(transportStream.end.bind(transportStream))
-    pino({
-      transport: transportStream
-    })
-    fail('must throw')
-  } catch (err) {
-    equal(err.message, 'option.transport do not allow stream, please pass to option directly. e.g. pino(transport)')
-  }
+test('transport options with stream', async (t) => {
+  const dest1 = file()
+  const transportStream = pino.transport({ target: 'pino/file', options: { destination: dest1 } })
+  t.after(transportStream.end.bind(transportStream))
+  assert.throws(
+    () => {
+      pino({
+        transport: transportStream
+      })
+    },
+    Error('option.transport do not allow stream, please pass to option directly. e.g. pino(transport)')
+  )
 })
