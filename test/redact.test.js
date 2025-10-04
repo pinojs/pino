@@ -847,3 +847,47 @@ test('redact safe stringify', async () => {
   assert.equal(that.myBigInt, 123)
   assert.equal(other.mySecondBigInt, 222)
 })
+
+test('censor function should not be called for non-existent nested paths (issue #2313)', async () => {
+  const stream = sink()
+  const censorCalls = []
+
+  const instance = pino({
+    redact: {
+      paths: ['a.b.c', 'req.authorization', 'url'],
+      censor (value, path) {
+        censorCalls.push({ value, path: path.join('.') })
+        if (typeof value !== 'string') {
+          return '***'
+        }
+        return '***'
+      }
+    }
+  }, stream)
+
+  // Test case 1: parent exists but nested path doesn't
+  censorCalls.length = 0
+  instance.info({ req: { id: 'test' } }, 'test message')
+  await once(stream, 'data')
+  assert.equal(censorCalls.length, 0, 'censor should not be called when req.authorization does not exist')
+
+  // Test case 2: parent exists but deeply nested path doesn't
+  censorCalls.length = 0
+  instance.info({ a: { d: 'test' } }, 'test message')
+  await once(stream, 'data')
+  assert.equal(censorCalls.length, 0, 'censor should not be called when a.b.c does not exist')
+
+  // Test case 3: multiple parent keys exist but nested paths don't
+  censorCalls.length = 0
+  instance.info({ a: { c: 'should-not-show-me' }, req: { id: 'test' } }, 'test message')
+  await once(stream, 'data')
+  assert.equal(censorCalls.length, 0, 'censor should not be called when neither a.b.c nor req.authorization exist')
+
+  // Test case 4: verify censor IS called when path exists
+  censorCalls.length = 0
+  instance.info({ req: { authorization: 'bearer token' } }, 'test message')
+  await once(stream, 'data')
+  assert.equal(censorCalls.length, 1, 'censor should be called when req.authorization exists')
+  assert.equal(censorCalls[0].path, 'req.authorization')
+  assert.equal(censorCalls[0].value, 'bearer token')
+})
