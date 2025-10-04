@@ -54,7 +54,7 @@ declare namespace pino {
 
     export interface redactOptions {
         paths: string[];
-        censor?: string | ((value: any, path: string[]) => any);
+        censor?: string | ((value: unknown, path: string[]) => unknown);
         remove?: boolean;
     }
 
