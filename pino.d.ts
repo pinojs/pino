@@ -774,7 +774,6 @@ declare namespace pino {
         readonly mixinSym: unique symbol;
         readonly lsCacheSym: unique symbol;
         readonly chindingsSym: unique symbol;
-        readonly parsedChindingsSym: unique symbol;
         readonly asJsonSym: unique symbol;
         readonly writeSym: unique symbol;
         readonly serializersSym: unique symbol;
