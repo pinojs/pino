@@ -140,6 +140,17 @@ pino({
 });
 
 pino({
+		redact: {
+				paths: [],
+				censor: (value): string => 'SECRET',
+		},
+});
+
+expectError(pino({
+    redact: { paths: [], censor: (value: string) => value },
+}));
+
+pino({
     depthLimit: 1
 });
 
