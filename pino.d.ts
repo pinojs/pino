@@ -879,6 +879,7 @@ declare namespace pino {
             unixTime: TimeFn;
             nullTime: TimeFn;
             isoTime: TimeFn;
+            isoTimeNano: TimeFn;
         };
     }
 }

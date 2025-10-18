@@ -1,8 +1,7 @@
 import { expectType } from "tsd";
 
-import pino from '../../pino';
-import P, { pino as pinoNamed } from "../../pino";
 import * as pinoStar from "../../pino";
+import { default as P, default as pino, pino as pinoNamed } from '../../pino';
 import pinoCjsImport = require ("../../pino");
 const pinoCjs = require("../../pino");
 const { P: pinoCjsNamed } = require('pino')
@@ -19,6 +18,8 @@ expectType<pino.Logger>(pinoStar.pino());
 expectType<pino.Logger>(pinoCjsImport.pino());
 expectType<any>(pinoCjsNamed());
 expectType<any>(pinoCjs());
+expectType<P.TimeFn>(pinoNamed.stdTimeFunctions.isoTimeNano)
+expectType<string>(pinoNamed.stdTimeFunctions.isoTimeNano())
 
 const levelChangeEventListener: P.LevelChangeEventListener = (
     lvl: P.LevelWithSilent | string,
