@@ -594,3 +594,6 @@ declare module "../../" {
 info({typeCheckedField: 'bar'})
 expectError(info({bannedField: 'bar'}))
 expectError(info({typeCheckedField: 123}))
+const someGenericFunction = <T extends string | number | symbol = never>(arg: Record<T, unknown>) => {
+    info(arg)
+}
