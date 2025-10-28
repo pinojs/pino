@@ -450,7 +450,7 @@ function createLogEventShape (bindings) {
 
 function asErrValue (err) {
   const obj = {
-    type: err.constructor.name,
+    type: err.name || err.constructor.name,
     msg: err.message,
     stack: err.stack
   }
