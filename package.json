@@ -104,7 +104,7 @@
   "dependencies": {
     "atomic-sleep": "^1.0.0",
     "on-exit-leak-free": "^2.1.0",
-    "pino-abstract-transport": "^2.0.0",
+    "pino-abstract-transport": "^3.0.0",
     "pino-std-serializers": "^7.0.0",
     "process-warning": "^5.0.0",
     "quick-format-unescaped": "^4.0.3",
