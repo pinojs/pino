@@ -12,10 +12,10 @@ Notice that as long as you don't have commit-access to the project, you have to 
 
 There are a few basic ground-rules for contributors:
 
-1. **No `--force` pushes** on `master` or modifying the Git history in any way after a PR has been merged.
-1. **Non-master branches** ought to be used for ongoing work.
+1. **No `--force` pushes** on `main` or modifying the Git history in any way after a PR has been merged.
+1. **Non-main branches** ought to be used for ongoing work.
 1. **Non-trivial changes** ought to be subject to an **internal pull-request** to solicit feedback from other contributors.
-1. All pull-requests for new features **must** target the `master` branch. PRs to fix bugs in LTS releases are also allowed.
+1. All pull-requests for new features **must** target the `main` branch. PRs to fix bugs in LTS releases are also allowed.
 1. Contributors should attempt to adhere to the prevailing code-style.
 1. 100% code coverage
 
