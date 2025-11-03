@@ -111,6 +111,7 @@ function pino (opts) {
     asObject: opts.browser.asObject,
     asObjectBindingsOnly: opts.browser.asObjectBindingsOnly,
     formatters: opts.browser.formatters,
+    reportCaller: opts.browser.reportCaller,
     levels,
     timestamp: getTimeFunction(opts),
     messageKey: opts.messageKey || 'msg',
@@ -325,8 +326,23 @@ function createWrap (self, opts, rootLogger, level) {
         argsIsSerialized = true
       }
       if (opts.asObject || opts.formatters) {
-        write.call(proto, ...asObject(this, level, args, ts, opts))
-      } else write.apply(proto, args)
+        const out = asObject(this, level, args, ts, opts)
+        if (opts.reportCaller && out && out.length > 0 && out[0] && typeof out[0] === 'object') {
+          try {
+            const caller = getCallerLocation()
+            if (caller) out[0].caller = caller
+          } catch (e) {}
+        }
+        write.call(proto, ...out)
+      } else {
+        if (opts.reportCaller) {
+          try {
+            const caller = getCallerLocation()
+            if (caller) args.push(caller)
+          } catch (e) {}
+        }
+        write.apply(proto, args)
+      }
 
       if (opts.transmit) {
         const transmitLevel = opts.transmit.level || self._level
@@ -503,3 +519,29 @@ function pfGlobalThisOrFallback () {
 
 module.exports.default = pino
 module.exports.pino = pino
+
+// Attempt to extract the user callsite (file:line:column)
+/* istanbul ignore next */
+function getCallerLocation () {
+  const stack = (new Error()).stack
+  if (!stack) return null
+  const lines = stack.split('\n')
+  for (let i = 1; i < lines.length; i++) {
+    const l = lines[i].trim()
+    // skip frames from this file and internals
+    if (/(^at\s+)?(createWrap|LOG|set\s*\(|asObject|Object\.apply|Function\.apply)/.test(l)) continue
+    if (l.indexOf('browser.js') !== -1) continue
+    if (l.indexOf('node:internal') !== -1) continue
+    if (l.indexOf('node_modules') !== -1) continue
+    // try formats like: at func (file:line:col) or at file:line:col
+    let m = l.match(/\((.*?):(\d+):(\d+)\)/)
+    if (!m) m = l.match(/at\s+(.*?):(\d+):(\d+)/)
+    if (m) {
+      const file = m[1]
+      const line = m[2]
+      const col = m[3]
+      return file + ':' + line + ':' + col
+    }
+  }
+  return null
+}

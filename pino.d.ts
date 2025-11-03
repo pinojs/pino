@@ -482,6 +482,13 @@ declare namespace pino {
                 log?: (object: Record<string, unknown>) => Record<string, unknown>;
             }
             /**
+             * When true, attempts to capture and include the caller location (file:line:column).
+             * In object mode, adds a `caller` string property to the logged object.
+             * Otherwise, appends the caller string as an extra console argument.
+             * This is a browser-only, best-effort feature.
+             */
+            reportCaller?: boolean;
+            /**
              * Instead of passing log messages to `console.log` they can be passed to a supplied function. If `write` is
              * set to a single function, all logging objects are passed to this function. If `write` is an object, it
              * can have methods that correspond to the levels. When a message is logged at a given level, the

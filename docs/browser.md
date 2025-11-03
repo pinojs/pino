@@ -61,6 +61,42 @@ const formatters = {
 ```
 
 
+### `reportCaller` (Boolean)
+
+Attempts to capture and include the originating callsite (file:line:column) for each log call in the browser logger.
+
+- When used together with `asObject` (or when `formatters` are provided), the callsite is added as a `caller` string property on the emitted log object.
+- In the default mode (non‑object), the callsite string is appended as the last argument passed to the corresponding `console` method. This makes the location visible in the console output even though the console’s clickable header still points to Pino internals.
+
+```js
+// Object mode: adds `caller` to the log object
+const pino = require('pino')({
+  browser: {
+    asObject: true,
+    reportCaller: true
+  }
+})
+
+pino.info('hello')
+// -> { level: 30, msg: 'hello', time: <ts>, caller: '/path/to/file.js:10:15' }
+
+// Default mode: appends the caller string as the last console argument
+const pino2 = require('pino')({
+  browser: {
+    reportCaller: true
+  }
+})
+
+pino2.info('hello')
+// -> console receives: 'hello', '/path/to/file.js:10:15'
+```
+
+Notes:
+
+- This is a best‑effort feature that parses the JavaScript Error stack. Stack formats vary across engines.
+- The clickable link shown by devtools for a console message is determined by where `console.*` is invoked and cannot be changed by libraries; `reportCaller` surfaces the user callsite alongside the log message.
+
+
 ### `write` (Function | Object)
 
 Instead of passing log messages to `console.log` they can be passed to
