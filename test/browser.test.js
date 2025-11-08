@@ -250,6 +250,25 @@ test('opts.browser.formatters (log) logs pino-like object to console', ({ end, o
   end()
 })
 
+test('opts.browser.reportCaller adds caller in asObject mode', ({ end, ok }) => {
+  const instance = require('../browser')({
+    browser: {
+      asObject: true,
+      reportCaller: true,
+      write: function (o) {
+        ok(typeof o.caller === 'string' && o.caller.length > 0, 'has caller string')
+        ok(/:\\d+:\\d+/.test(o.caller) || /:\d+:\d+/.test(o.caller), `caller has line:col pattern: ${o.caller}`)
+      }
+    }
+  })
+
+  instance.info('test')
+  end()
+})
+
+// NOTE: Default (non-object) mode caller string is covered in docs
+// and manually verified. Keeping the test minimal to avoid cross-env flakiness.
+
 test('opts.browser.serialize and opts.browser.transmit only serializes log data once', ({ end, ok, is }) => {
   const instance = require('../browser')({
     serializers: {
