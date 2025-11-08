@@ -427,9 +427,9 @@ PRs to this document are welcome for any new transports!
 + [@logtail/pino](#@logtail/pino)
 + [@macfja/pino-fingers-crossed](#macfja-pino-fingers-crossed)
 + [@openobserve/pino-openobserve](#pino-openobserve)
++ [datadog-logger-integrations](#datadog-logger-integrations)
 + [pino-airbrake-transport](#pino-airbrake-transport)
 + [pino-axiom](#pino-axiom)
-+ [pino-datadog-transport](#pino-datadog-transport)
 + [pino-discord-webhook](#pino-discord-webhook)
 + [pino-elasticsearch](#pino-elasticsearch)
 + [pino-hana](#pino-hana)
@@ -662,18 +662,18 @@ $ node foo | pino-datadog --key blablabla
 
 For full documentation of command line switches read [README](https://github.com/ovhemert/pino-datadog#readme)
 
-<a id="pino-datadog-transport"></a>
-### pino-datadog-transport
+<a id="datadog-logger-integrations"></a>
+### datadog-logger-integrations
 
-[pino-datadog-transport][pino-datadog-transport] is a Pino v7+ compatible transport to forward log events to [Datadog][Datadog]
+[datadog-logger-integrations][datadog-logger-integrations] is a Pino v7+ compatible transport to forward log events to [Datadog][Datadog]
 from a dedicated worker:
 
 ```js
 const pino = require('pino')
 const transport = pino.transport({
-  target: 'pino-datadog-transport',
+  target: 'datadog-logger-integrations',
   options: {
-    ddClientConf: {
+    ddClientConfig: {
       authMethods: {
         apiKeyAuth: <your datadog API key>
       }
@@ -684,7 +684,7 @@ const transport = pino.transport({
 pino(transport)
 ```
 
-[pino-datadog-transport]: https://github.com/theogravity/datadog-transports
+[datadog-logger-integrations]: https://github.com/marklai1998/datadog-logger-integrations
 [Datadog]: https://www.datadoghq.com/
 
 #### Logstash
