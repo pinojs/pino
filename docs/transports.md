@@ -286,19 +286,63 @@ a terminating target, i.e. a `Writable` stream.__
 
 ### TypeScript compatibility
 
-Pino provides basic support for transports written in TypeScript.
+Pino provides support for transports written in TypeScript.
 
-Ideally, they should be transpiled to ensure maximum compatibility, but sometimes
-you might want to use tools such as TS-Node, to execute your TypeScript
-code without having to go through an explicit transpilation step.
+#### Node.js 22+ with Type Stripping
 
-You can use your TypeScript code without explicit transpilation, but there are
-some known caveats:
-- For "pure" TypeScript code, ES imports are still not supported (ES imports are
+Starting with Node.js 22.6.0, you can use TypeScript transports directly with native type stripping support. This provides full ESM support without any transpilation or additional tooling:
+
+```ts
+// my-transport.mts
+import { createWriteStream } from 'node:fs'
+
+export default (options: { destination: string }) => {
+  return createWriteStream(options.destination)
+}
+```
+
+```js
+// app.js
+const pino = require('pino')
+const transport = pino.transport({
+  target: './my-transport.mts',
+  options: { destination: '/path/to/file' }
+})
+pino(transport)
+```
+
+**Version requirements:**
+
+- **Node.js 22.6.0 - 22.17.x**: Use the `--experimental-strip-types` flag:
+  ```sh
+  node --experimental-strip-types app.ts
+  ```
+
+- **Node.js 22.18.0+ and 24.0.0+**: Type stripping is enabled by default, no flag needed:
+  ```sh
+  node app.ts
+  ```
+
+**Important notes:**
+- Use the `.mts` extension for TypeScript ESM modules to ensure proper module resolution
+- Alternatively, you can use `.ts` extension if your `package.json` has `"type": "module"`, but this requires your entire application to use ESM
+- Type stripping is not available in Node.js 20.x or earlier versions
+- This approach provides the cleanest TypeScript experience with full ESM support and no build step required
+
+#### Using TS-Node (Legacy)
+
+For older Node.js versions, you can use tools such as [TS-Node](https://typestrong.org/ts-node/) to execute TypeScript
+code without explicit transpilation, but there are some known caveats:
+- For "pure" TypeScript code, ES imports are not fully supported (ES imports are
   supported once the code is transpiled).
-- Only TS-Node is supported for now, there's no TSM support.
-- Running transports TypeScript code on TS-Node seems to be problematic on
-  Windows systems, there's no official support for that yet.
+- Only TS-Node is supported. Other TypeScript loaders like [TSM](https://github.com/lukeed/tsm) are not currently supported.
+- Running transports TypeScript code on TS-Node may be problematic on
+  Windows systems.
+
+#### Transpiled TypeScript (Recommended for Production)
+
+For maximum compatibility and production use, it's still recommended to transpile
+TypeScript transports to JavaScript before deployment.
 
 ### Notable transports
 
