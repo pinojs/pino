@@ -331,11 +331,11 @@ pino(transport)
 
 #### Using TS-Node (Legacy)
 
-For older Node.js versions, you can use tools such as TS-Node to execute TypeScript
+For older Node.js versions, you can use tools such as [TS-Node](https://typestrong.org/ts-node/) to execute TypeScript
 code without explicit transpilation, but there are some known caveats:
 - For "pure" TypeScript code, ES imports are not fully supported (ES imports are
   supported once the code is transpiled).
-- Only TS-Node is supported, there's no TSM support.
+- Only TS-Node is supported. Other TypeScript loaders like [TSM](https://github.com/lukeed/tsm) are not currently supported.
 - Running transports TypeScript code on TS-Node may be problematic on
   Windows systems.
 
