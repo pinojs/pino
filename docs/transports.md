@@ -325,6 +325,7 @@ pino(transport)
 
 **Important notes:**
 - Use the `.mts` extension for TypeScript ESM modules to ensure proper module resolution
+- Alternatively, you can use `.ts` extension if your `package.json` has `"type": "module"`, but this requires your entire application to use ESM
 - Type stripping is not available in Node.js 20.x or earlier versions
 - This approach provides the cleanest TypeScript experience with full ESM support and no build step required
 
