@@ -315,12 +315,12 @@ pino(transport)
 
 - **Node.js 22.6.0 - 22.17.x**: Use the `--experimental-strip-types` flag:
   ```sh
-  node --experimental-strip-types app.js
+  node --experimental-strip-types app.ts
   ```
 
-- **Node.js 22.18.0+ and 23.6.0+**: Type stripping is enabled by default, no flag needed:
+- **Node.js 22.18.0+ and 24.0.0+**: Type stripping is enabled by default, no flag needed:
   ```sh
-  node app.js
+  node app.ts
   ```
 
 **Important notes:**
