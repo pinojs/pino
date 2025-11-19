@@ -18,13 +18,11 @@
 import type { EventEmitter } from "events";
 import * as pinoStdSerializers from "pino-std-serializers";
 import type { SonicBoom, SonicBoomOpts } from "sonic-boom";
+import ThreadStream from "thread-stream";
 import type { WorkerOptions } from "worker_threads";
 
 declare namespace pino {
     //// Non-exported types and interfaces
-
-    // ToDo https://github.com/pinojs/thread-stream/issues/24
-    type ThreadStream = any
 
     type TimeFn = () => string;
     type MixinFn<CustomLevels extends string = never> = (mergeObject: object, level: number, logger:Logger<CustomLevels>) => object;
