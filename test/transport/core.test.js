@@ -666,4 +666,16 @@ test('pino.transport handles prototype pollution of __bundlerPathsOverrides', as
     options: { destination }
   })
   t.after(transport.end.bind(transport))
+
+  const instance = pino(transport)
+  instance.info('hello')
+  await watchFileCreated(destination)
+  const result = JSON.parse(await readFile(destination))
+  delete result.time
+  assert.deepEqual(result, {
+    pid,
+    hostname,
+    level: 30,
+    msg: 'hello'
+  })
 })
