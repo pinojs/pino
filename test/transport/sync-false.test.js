@@ -8,7 +8,7 @@ const { readFile } = require('node:fs').promises
 const { promisify } = require('node:util')
 
 const pino = require('../..')
-const { watchFileCreated, file } = require('../helper')
+const { watchFileCreated, watchForWrite, file } = require('../helper')
 
 const { pid } = process
 const hostname = os.hostname()
@@ -55,16 +55,13 @@ test('thread-stream async flush should call the passed callback', async () => {
 
   assert.equal(firstFlushData.msg, 'hello')
 
-  // should not flush this as no data accumulated that's bigger than min length
   instance.info('world')
 
-  // Making sure data is not flushed yet
-  const afterLogData = await getOutputLogLines()
-  assert.equal(afterLogData.length, 1)
-
   await flushPromise()
+  await watchForWrite(outputPath, 'world')
 
-  // Making sure data is not flushed yet
-  const afterSecondFlush = (await getOutputLogLines())[1]
-  assert.equal(afterSecondFlush.msg, 'world')
+  // After flush, both messages should be present
+  const afterSecondFlush = await getOutputLogLines()
+  assert.equal(afterSecondFlush.length, 2)
+  assert.equal(afterSecondFlush[1].msg, 'world')
 })
