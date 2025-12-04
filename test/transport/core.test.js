@@ -652,3 +652,30 @@ test('transport options with stream', async (t) => {
     Error('option.transport do not allow stream, please pass to option directly. e.g. pino(transport)')
   )
 })
+
+test('pino.transport handles prototype pollution of __bundlerPathsOverrides', async (t) => {
+  // eslint-disable-next-line no-extend-native
+  Object.prototype.__bundlerPathsOverrides = { 'pino/file': '/malicious/path' }
+  t.after(() => {
+    delete Object.prototype.__bundlerPathsOverrides
+  })
+
+  const destination = file()
+  const transport = pino.transport({
+    target: 'pino/file',
+    options: { destination }
+  })
+  t.after(transport.end.bind(transport))
+
+  const instance = pino(transport)
+  instance.info('hello')
+  await watchFileCreated(destination)
+  const result = JSON.parse(await readFile(destination))
+  delete result.time
+  assert.deepEqual(result, {
+    pid,
+    hostname,
+    level: 30,
+    msg: 'hello'
+  })
+})
