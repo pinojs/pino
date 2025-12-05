@@ -21,8 +21,8 @@ security model:
   logging functions. If your code logs sensitive data (passwords, tokens,
   PII), that is an application-level concern, not a Pino vulnerability.
 - **Log message content**: Data passed to `logger.info()`, `logger.error()`,
-  etc. is trusted. Use [serializers](docs/api.md#opt-serializers) and the
-  [redact](docs/redaction.md) feature to sanitize sensitive data before it
+  etc. is trusted. Use [serializers](./docs/api.md#opt-serializers) and the
+  [redact](./docs/redaction.md) feature to sanitize sensitive data before it
   is written to the log destination.
 - **Configuration options**: Options passed to `pino()` are trusted.
   Misconfiguration (e.g., insecure file paths, unsafe serializers) is
