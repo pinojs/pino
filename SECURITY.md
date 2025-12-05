@@ -64,22 +64,14 @@ The following would be considered security vulnerabilities:
 
 ### What is NOT a Vulnerability in Pino
 
-The following are explicitly out of scope:
+In addition to the trusted elements listed above, the following are
+explicitly out of scope:
 
-- **Logging sensitive data**: If your application logs passwords,
-  API keys, or PII, that is an application bug. Use redaction features
-  like `pino.redact` to prevent this.
-- **Log injection**: If untrusted user input is logged and creates
-  misleading log entries, the application should sanitize input before
-  logging. Pino outputs JSON by default, which mitigates many traditional
-  log injection attacks.
+- **Log injection**: Pino outputs JSON by default, which mitigates many
+  traditional log injection attacks. Applications should sanitize input
+  if human-readable formats are used.
 - **Large log volume performance**: Logging millions of messages
   consuming resources is expected behavior, not a vulnerability.
-- **File system access via transports**: Transports writing to files
-  or network destinations are configured by the application.
-- **Prototype pollution via log objects**: If application code passes
-  a malicious object with `__proto__` properties to logging functions,
-  Pino trusts that input as it trusts all application-provided data.
 - **Vulnerabilities in example code or tests**: These are not production
   code and issues there are not security vulnerabilities.
 - **Vulnerabilities requiring deprecated or experimental Node.js features**:
