@@ -41,10 +41,11 @@ security model:
 
 ### What Pino Does NOT Trust
 
-Pino currently does not directly process untrusted external input. All
-data flows through application code before reaching Pino. However, if
-a scenario is identified where Pino processes untrusted data and this
-leads to a security issue, it would be considered a vulnerability.
+All data flows through application code before reaching Pino. Applications
+are responsible for ensuring that logged objects are serializable and safe.
+Logging non-serializable inputs (e.g. circular references, objects with
+throwing getters) may cause errors or unexpected behavior, but this is an
+application-level concern.
 
 ### What IS a Vulnerability in Pino
 
