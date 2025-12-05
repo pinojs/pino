@@ -41,11 +41,7 @@ security model:
 
 ### What Pino Does NOT Trust
 
-Nothing. All data flows through application code before reaching Pino. Applications
-are responsible for ensuring that logged objects are serializable and safe.
-Logging non-serializable inputs (e.g. circular references, objects with
-throwing getters) may cause errors or unexpected behavior, but this is an
-application-level concern.
+Nothing.
 
 ### What IS a Vulnerability in Pino
 
