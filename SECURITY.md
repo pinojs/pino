@@ -3,6 +3,87 @@
 This document describes the management of vulnerabilities for the
 Pino project and all modules within the Pino organization.
 
+## The Pino Threat Model
+
+Pino is a fast JSON logger for Node.js. Understanding what Pino considers
+a security vulnerability requires understanding its trust boundaries.
+
+Pino's threat model builds upon the
+[Node.js threat model](https://github.com/nodejs/node/blob/main/SECURITY.md#the-nodejs-threat-model).
+We recommend reading that document first, as Pino inherits its trust assumptions.
+
+### What Pino Trusts
+
+The following are considered trusted and are outside the scope of Pino's
+security model:
+
+- **Application code**: Pino trusts the application code that invokes
+  logging functions. If your code logs sensitive data (passwords, tokens,
+  PII), that is an application-level concern, not a Pino vulnerability.
+- **Log message content**: Data passed to `logger.info()`, `logger.error()`,
+  etc. is trusted. Pino does not sanitize or validate log content.
+- **Configuration options**: Options passed to `pino()` are trusted.
+  Misconfiguration (e.g., insecure file paths, unsafe serializers) is
+  not a Pino vulnerability.
+- **Transports**: Custom transports and transport configurations are
+  trusted. Security issues in third-party transports should be reported
+  to their respective maintainers.
+- **The Node.js runtime**: Pino assumes the underlying Node.js runtime
+  and operating system have not been compromised.
+- **The file system**: As per the Node.js threat model, the file system
+  is trusted. Path traversal or file overwrites via transport configuration
+  are application-level concerns.
+- **Dependencies**: Pino trusts its dependencies. Vulnerabilities in
+  dependencies should be reported to those projects directly, though
+  we will update promptly when fixes are available.
+
+### What Pino Does NOT Trust
+
+Pino currently does not directly process untrusted external input. All
+data flows through application code before reaching Pino. However, if
+a scenario is identified where Pino processes untrusted data and this
+leads to a security issue, it would be considered a vulnerability.
+
+### What IS a Vulnerability in Pino
+
+The following would be considered security vulnerabilities:
+
+- **Code execution**: If crafted log input (when used correctly by
+  the application) could lead to arbitrary code execution within Pino
+  itself.
+- **Prototype pollution in Pino's internals**: If Pino's internal
+  processing of log objects could be exploited to pollute prototypes.
+- **Denial of service via algorithmic complexity**: If specific log
+  patterns could cause unbounded CPU or memory consumption within
+  Pino's processing (not due to the volume of logs, but due to
+  algorithmic inefficiency).
+- **Information disclosure from Pino internals**: If Pino leaks
+  internal state or data beyond what was explicitly logged.
+
+### What is NOT a Vulnerability in Pino
+
+The following are explicitly out of scope:
+
+- **Logging sensitive data**: If your application logs passwords,
+  API keys, or PII, that is an application bug. Use redaction features
+  like `pino.redact` to prevent this.
+- **Log injection**: If untrusted user input is logged and creates
+  misleading log entries, the application should sanitize input before
+  logging. Pino outputs JSON by default, which mitigates many traditional
+  log injection attacks.
+- **Large log volume performance**: Logging millions of messages
+  consuming resources is expected behavior, not a vulnerability.
+- **File system access via transports**: Transports writing to files
+  or network destinations are configured by the application.
+- **Prototype pollution via log objects**: If application code passes
+  a malicious object with `__proto__` properties to logging functions,
+  Pino trusts that input as it trusts all application-provided data.
+- **Vulnerabilities in example code or tests**: These are not production
+  code and issues there are not security vulnerabilities.
+- **Vulnerabilities requiring deprecated or experimental Node.js features**:
+  Issues only reproducible on unsupported Node.js versions or experimental
+  features are generally not considered vulnerabilities.
+
 ## Reporting vulnerabilities
 
 Individuals who find potential vulnerabilities in Pino are invited
