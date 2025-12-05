@@ -25,7 +25,7 @@ security model:
   [redact](./docs/redaction.md) feature to sanitize sensitive data before it
   is written to the log destination.
 - **Configuration options**: Options passed to `pino()` are trusted.
-  Misconfiguration (e.g., insecure file paths, unsafe serializers) is
+  Misconfiguration (e.g. insecure file paths or unsafe serializers) is
   not a Pino vulnerability.
 - **Transports**: Custom transports and transport configurations are
   trusted. Security issues in third-party transports should be reported
