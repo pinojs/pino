@@ -12,68 +12,15 @@ Pino's threat model builds upon the
 [Node.js threat model](https://github.com/nodejs/node/blob/main/SECURITY.md#the-nodejs-threat-model).
 We recommend reading that document first, as Pino inherits its trust assumptions.
 
-### What Pino Trusts
+Pino trust the applications and the environment that it is being run on top.
+This includes all the application code, the transport, the filesystem and all
+non-externally provided input.
 
-The following are considered trusted and are outside the scope of Pino's
-security model:
+Pino assumes all objects being logged `logger.info(obj, message)` are json-serializable.
+Use the `serializers` and `redact` features to sanitize them.
 
-- **Application code**: Pino trusts the application code that invokes
-  logging functions. If your code logs sensitive data (passwords, tokens,
-  PII), that is an application-level concern, not a Pino vulnerability.
-- **Log message content**: Data passed to `logger.info()`, `logger.error()`,
-  etc. is trusted. Use [serializers](./docs/api.md#opt-serializers) and the
-  [redact](./docs/redaction.md) feature to sanitize sensitive data before it
-  is written to the log destination.
-- **Configuration options**: Options passed to `pino()` are trusted.
-  Misconfiguration (e.g. insecure file paths or unsafe serializers) is
-  not a Pino vulnerability.
-- **Transports**: Custom transports and transport configurations are
-  trusted. Security issues in third-party transports should be reported
-  to their respective maintainers.
-- **The Node.js runtime**: Pino assumes the underlying Node.js runtime
-  and operating system have not been compromised.
-- **The file system**: As per the Node.js threat model, the file system
-  is trusted. Path traversal or file overwrites via transport configuration
-  are application-level concerns.
-- **Dependencies**: Pino trusts its dependencies. Vulnerabilities in
-  dependencies should be reported to those projects directly, though
-  we will update promptly when fixes are available.
-
-### What Pino Does NOT Trust
-
-Nothing.
-
-### What IS a Vulnerability in Pino
-
-The following would be considered security vulnerabilities:
-
-- **Code execution**: If crafted log input (when used correctly by
-  the application) could lead to arbitrary code execution within Pino
-  itself.
-- **Prototype pollution in Pino's internals**: If Pino's internal
-  processing of log objects could be exploited to pollute prototypes.
-- **Denial of service via algorithmic complexity**: If specific log
-  patterns could cause unbounded CPU or memory consumption within
-  Pino's processing (not due to the volume of logs, but due to
-  algorithmic inefficiency).
-- **Information disclosure from Pino internals**: If Pino leaks
-  internal state or data beyond what was explicitly logged.
-
-### What is NOT a Vulnerability in Pino
-
-In addition to the trusted elements listed above, the following are
-explicitly out of scope:
-
-- **Log injection**: Pino outputs JSON by default, which mitigates many
-  traditional log injection attacks. Applications should sanitize input
-  if human-readable formats are used.
-- **Large log volume performance**: Logging millions of messages
-  consuming resources is expected behavior, not a vulnerability.
-- **Vulnerabilities in example code or tests**: These are not production
-  code and issues there are not security vulnerabilities.
-- **Vulnerabilities requiring deprecated or experimental Node.js features**:
-  Issues only reproducible on unsupported Node.js versions or experimental
-  features are generally not considered vulnerabilities.
+Pino is not robust against external prototype pollution attacks, but we
+will accept a vulnerability if Pino can be misused to cause a prototype pollution.
 
 ## Reporting vulnerabilities
 
