@@ -12,7 +12,7 @@ Pino's threat model builds upon the
 [Node.js threat model](https://github.com/nodejs/node/blob/main/SECURITY.md#the-nodejs-threat-model).
 We recommend reading that document first, as Pino inherits its trust assumptions.
 
-Pino trust the applications and the environment that it is being run on top.
+Pino trusts the applications using it and the environment that it is running in.
 This includes all the application code, the transport, the filesystem and all
 non-externally provided input.
 
