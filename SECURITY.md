@@ -3,6 +3,25 @@
 This document describes the management of vulnerabilities for the
 Pino project and all modules within the Pino organization.
 
+## The Pino Threat Model
+
+Pino is a fast JSON logger for Node.js. Understanding what Pino considers
+a security vulnerability requires understanding its trust boundaries.
+
+Pino's threat model builds upon the
+[Node.js threat model](https://github.com/nodejs/node/blob/main/SECURITY.md#the-nodejs-threat-model).
+We recommend reading that document first, as Pino inherits its trust assumptions.
+
+Pino trusts the applications using it and the environment that it is running in.
+This includes all the application code, the transport, the filesystem and all
+non-externally provided input.
+
+Pino assumes all objects being logged, `logger.info(obj, message)`, are json-serializable.
+Use the `serializers` and `redact` features to sanitize them.
+
+Pino is not hardened against external prototype pollution attacks, but we
+will accept a vulnerability if Pino can be misused to cause a prototype pollution.
+
 ## Reporting vulnerabilities
 
 Individuals who find potential vulnerabilities in Pino are invited
