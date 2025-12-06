@@ -16,7 +16,7 @@ Pino trusts the applications using it and the environment that it is running in.
 This includes all the application code, the transport, the filesystem and all
 non-externally provided input.
 
-Pino assumes all objects being logged `logger.info(obj, message)` are json-serializable.
+Pino assumes all objects being logged, `logger.info(obj, message)`, are json-serializable.
 Use the `serializers` and `redact` features to sanitize them.
 
 Pino is not robust against external prototype pollution attacks, but we
