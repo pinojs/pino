@@ -19,7 +19,7 @@ non-externally provided input.
 Pino assumes all objects being logged, `logger.info(obj, message)`, are json-serializable.
 Use the `serializers` and `redact` features to sanitize them.
 
-Pino is not robust against external prototype pollution attacks, but we
+Pino is not hardened against external prototype pollution attacks, but we
 will accept a vulnerability if Pino can be misused to cause a prototype pollution.
 
 ## Reporting vulnerabilities
