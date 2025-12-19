@@ -1,4 +1,4 @@
-import { PathLike } from 'node:fs'
+import type { PathLike } from 'node:fs'
 
-export declare function watchFileCreated(filename: PathLike): Promise<void>
-export declare function watchForWrite(filename: PathLike, testString: string): Promise<void>
+export declare function watchFileCreated (filename: PathLike): Promise<void>
+export declare function watchForWrite (filename: PathLike, testString: string): Promise<void>
