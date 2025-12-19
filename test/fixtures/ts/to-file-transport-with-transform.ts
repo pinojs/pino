@@ -2,7 +2,7 @@ import * as fs from 'node:fs'
 import { once } from 'node:events'
 import { Transform } from 'node:stream'
 
-async function run (opts: {  destination?: fs.PathLike }): Promise<Transform> {
+async function run (opts: { destination?: fs.PathLike }): Promise<Transform> {
   if (!opts.destination) throw new Error('kaboom')
   const stream = fs.createWriteStream(opts.destination)
   await once(stream, 'open')

@@ -14,7 +14,7 @@ const { pid } = process
 const hostname = os.hostname()
 
 // A subset of the test from core.test.js, we don't need all of them to check for compatibility
-function runTests(esVersion: string): void {
+function runTests (esVersion: string): void {
   test(`(ts -> ${esVersion}) pino.transport with file`, async (t) => {
     const destination = join(
       os.tmpdir(),
