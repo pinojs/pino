@@ -411,8 +411,11 @@ Changes the shape of the log level. The default shape is `{ level: number }`.
 The function takes two arguments, the label of the level (e.g. `'info'`)
 and the numeric value (e.g. `30`).
 
-ps: The log level cannot be customized when using multiple transports
-
+**Note:** The log level cannot be customized via the `formatters` object when using multiple
+ transports, as the options object must be serializable when multiple transports are
+ used. Instead, you could use [`pino-template`](https://npm.im/pino-template) as
+ part of a pipeline. See [the example in the README for `pino-template`](https://npm.im/pino-template#example)
+ 
 ```js
 const formatters = {
   level (label, number) {

@@ -1,20 +1,21 @@
 # Help
 
-* [Log rotation](#rotate)
-* [Reopening log files](#reopening)
-* [Saving to multiple files](#multiple)
-* [Log filtering](#filter-logs)
-* [Transports and systemd](#transport-systemd)
-* [Log to different streams](#multi-stream)
-* [Duplicate keys](#dupe-keys)
-* [Log levels as labels instead of numbers](#level-string)
-* [Pino with `debug`](#debug)
-* [Unicode and Windows terminal](#windows)
-* [Mapping Pino Log Levels to Google Cloud Logging (Stackdriver) Severity Levels](#stackdriver)
-* [Using Grafana Loki to evaluate pino logs in a kubernetes cluster](#grafana-loki)
-* [Avoid Message Conflict](#avoid-message-conflict)
-* [Best performance for logging to `stdout`](#best-performance-for-stdout)
-* [Testing](#testing)
+- [Help](#help)
+  - [Log rotation](#log-rotation)
+  - [Reopening log files](#reopening-log-files)
+  - [Saving to multiple files](#saving-to-multiple-files)
+  - [Log Filtering](#log-filtering)
+  - [Transports and systemd](#transports-and-systemd)
+  - [Log to different streams](#log-to-different-streams)
+  - [How Pino handles duplicate keys](#how-pino-handles-duplicate-keys)
+  - [Log levels as labels instead of numbers](#log-levels-as-labels-instead-of-numbers)
+  - [Pino with `debug`](#pino-with-debug)
+  - [Unicode and Windows terminal](#unicode-and-windows-terminal)
+  - [Mapping Pino Log Levels to Google Cloud Logging (Stackdriver) Severity Levels](#mapping-pino-log-levels-to-google-cloud-logging-stackdriver-severity-levels)
+  - [Using Grafana Loki to evaluate pino logs in a kubernetes cluster](#using-grafana-loki-to-evaluate-pino-logs-in-a-kubernetes-cluster)
+  - [Avoid Message Conflict](#avoid-message-conflict)
+  - [Best performance for logging to `stdout`](#best-performance-for-logging-to-stdout)
+  - [Testing](#testing)
 
 <a id="rotate"></a>
 ## Log rotation
@@ -182,6 +183,8 @@ Although it works, we recommend using one of these options instead if you are ab
 
 1. If the only change desired is the name then a transport can be used. One such
 transport is [`pino-text-level-transport`](https://npm.im/pino-text-level-transport).
+    * You can also use [`pino-template`](https://npm.im/pino.template) to convert the level number to a 
+      name. See [the example in the README for `pino-template`](https://npm.im/pino-template#example)
 1. Use a prettifier like [`pino-pretty`](https://npm.im/pino-pretty) to make
 the logs human friendly.
 
