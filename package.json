@@ -64,7 +64,7 @@
     "@arethetypeswrong/cli": "^0.18.1",
     "@matteo.collina/tspl": "^0.2.0",
     "@types/flush-write-stream": "^1.0.0",
-    "@types/node": "^24.0.8",
+    "@types/node": "^25.0.3",
     "airtap": "5.0.0",
     "bole": "^5.0.5",
     "borp": "^0.21.0",
