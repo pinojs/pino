@@ -326,7 +326,7 @@ declare namespace pino {
         : T extends 's'
             ? unknown
             : T extends 'j' | 'o' | 'O'
-            ? object
+            ? {} | null
             : never;
 
     type ParseLogFnArgs<
