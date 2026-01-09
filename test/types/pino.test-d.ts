@@ -54,12 +54,19 @@ info('All primitive types %s %s %s %s %s %s %s', 'string', 123, true, BigInt(123
 declare const errorOrString: string | Error;
 info(errorOrString)
 
+// %o placeholder supports primitives too (except undefined)
+info('Boolean %o', true);
+info('Boolean %o', false);
+info('Number %o', 123);
+info('Number %o', 3.14);
+info('BigInt %o', BigInt(123));
+info('Null %o', null);
+info('Symbol %o', Symbol('test'));
+info('String %o', 'hello');
+
 // placeholder messages type errors
 expectError(info('The answer is %d', 'not a number'));
-expectError(info('The object is %o', 'not an object'));
-expectError(info('The object is %j', 'not a JSON'));
-expectError(info('The object is %O', 'not an object'));
-expectError(info('The answer is %d and the question is %s with %o', 42, { incorrect: 'order' }, 'unknown'));
+expectError(info('The answer is %d and the question is %s with %o', 'unknown', { incorrect: 'order' }, 42));
 expectError(info('Extra message %s', 'after placeholder', 'not allowed'));
 
 // object types with messages
