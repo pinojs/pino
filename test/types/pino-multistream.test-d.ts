@@ -18,11 +18,10 @@ expectType<pino.MultiStreamRes<'fatal'>>(pino.multistream([{ level: 'fatal' as c
 
 expectType<pino.MultiStreamRes<'error' | 'fatal'>>(pino.multistream(streams))
 expectType<pino.MultiStreamRes<'error' | 'fatal'>>(pino.multistream(streams, {}))
-expectType<pino.MultiStreamRes<'error' | 'fatal'>>(pino.multistream(streams, { levels: { 'info': 30 } }))
+expectType<pino.MultiStreamRes<'error' | 'fatal'>>(pino.multistream(streams, { levels: { info: 30 } }))
 expectType<pino.MultiStreamRes<'error' | 'fatal'>>(pino.multistream(streams, { dedupe: true }))
 expectType<pino.MultiStreamRes<'error' | 'fatal'>>(pino.multistream(streams[0]).add(streams[1]))
 expectType<pino.MultiStreamRes<'error' | 'fatal'>>(multistream(streams))
 expectType<pino.MultiStreamRes<'error'>>(multistream(streams).clone('error'))
 
-
-expectType<pino.MultiStreamRes>(multistream(process.stdout));
+expectType<pino.MultiStreamRes>(multistream(process.stdout))
