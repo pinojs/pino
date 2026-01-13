@@ -34,7 +34,9 @@ info('The answer is %d', 42)
 info('The object is %o', { a: 1, b: '2' })
 info('The json is %j', { a: 1, b: '2' })
 info('The object is %O', { a: 1, b: '2' })
-info('The answer is %d and the question is %s with %o', 42, 'unknown', { correct: 'order' })
+info('The answer is %d and the question is %s with %o', 42, 'unknown', {
+  correct: 'order',
+})
 info('Missing placeholder is fine %s')
 
 // %s placeholder supports all primitive types
@@ -50,16 +52,39 @@ info('String %s', 'hello')
 
 // %s placeholder with multiple primitives
 info('Multiple primitives %s %s %s', true, 42, 'world')
-info('All primitive types %s %s %s %s %s %s %s', 'string', 123, true, BigInt(123), null, undefined, Symbol('test'))
+info(
+  'All primitive types %s %s %s %s %s %s %s',
+  'string',
+  123,
+  true,
+  BigInt(123),
+  null,
+  undefined,
+  Symbol('test')
+)
 declare const errorOrString: string | Error
 info(errorOrString)
 
+// %o placeholder supports primitives too (except undefined)
+info('Boolean %o', true)
+info('Boolean %o', false)
+info('Number %o', 123)
+info('Number %o', 3.14)
+info('BigInt %o', BigInt(123))
+info('Null %o', null)
+info('Symbol %o', Symbol('test'))
+info('String %o', 'hello')
+
 // placeholder messages type errors
 expectError(info('The answer is %d', 'not a number'))
-expectError(info('The object is %o', 'not an object'))
-expectError(info('The object is %j', 'not a JSON'))
-expectError(info('The object is %O', 'not an object'))
-expectError(info('The answer is %d and the question is %s with %o', 42, { incorrect: 'order' }, 'unknown'))
+expectError(
+  info(
+    'The answer is %d and the question is %s with %o',
+    'unknown',
+    { incorrect: 'order' },
+    42
+  )
+)
 expectError(info('Extra message %s', 'after placeholder', 'not allowed'))
 
 // object types with messages
@@ -120,7 +145,10 @@ pino({
 })
 
 pino({
-  mixin: (context: object, level: number) => ({ customName: 'unknown', customId: 111 }),
+  mixin: (context: object, level: number) => ({
+    customName: 'unknown',
+    customId: 111,
+  }),
 })
 
 pino({
@@ -146,16 +174,18 @@ pino({
   },
 })
 
-expectError(pino({
-  redact: { paths: [], censor: (value: string) => value },
-}))
+expectError(
+  pino({
+    redact: { paths: [], censor: (value: string) => value },
+  })
+)
 
 pino({
-  depthLimit: 1
+  depthLimit: 1,
 })
 
 pino({
-  edgeLimit: 1
+  edgeLimit: 1,
 })
 
 pino({
@@ -182,14 +212,14 @@ pino({
         logEvent.messages
       },
     },
-    disabled: false
+    disabled: false,
   },
 })
 
 pino({
   browser: {
     asObjectBindingsOnly: true,
-  }
+  },
 })
 
 pino({}, undefined)
@@ -214,7 +244,9 @@ const customSerializers = {
     return 'this is my serializer'
   },
 }
-pino().child({}, { serializers: customSerializers }).info({ test: 'should not show up' })
+pino()
+  .child({}, { serializers: customSerializers })
+  .info({ test: 'should not show up' })
 const child2 = log.child({ father: true })
 const childChild = child2.child({ baby: true })
 const childRedacted = pino().child({}, { redact: ['path'] })
@@ -222,12 +254,15 @@ childRedacted.info({
   msg: 'logged with redacted properties',
   path: 'Not shown',
 })
-const childAnotherRedacted = pino().child({}, {
-  redact: {
-    paths: ['anotherPath'],
-    censor: 'Not the log you\re looking for',
+const childAnotherRedacted = pino().child(
+  {},
+  {
+    redact: {
+      paths: ['anotherPath'],
+      censor: 'Not the log you\re looking for',
+    },
   }
-})
+)
 childAnotherRedacted.info({
   msg: 'another logged with redacted properties',
   anotherPath: 'Not shown',
@@ -306,26 +341,38 @@ const withHooks = pino({
 })
 
 // Properties/types imported from pino-std-serializers
-const wrappedErrSerializer = pino.stdSerializers.wrapErrorSerializer((err: pino.SerializedError) => {
-  return { ...err, newProp: 'foo' }
-})
-const wrappedReqSerializer = pino.stdSerializers.wrapRequestSerializer((req: pino.SerializedRequest) => {
-  return { ...req, newProp: 'foo' }
-})
-const wrappedResSerializer = pino.stdSerializers.wrapResponseSerializer((res: pino.SerializedResponse) => {
-  return { ...res, newProp: 'foo' }
-})
+const wrappedErrSerializer = pino.stdSerializers.wrapErrorSerializer(
+  (err: pino.SerializedError) => {
+    return { ...err, newProp: 'foo' }
+  }
+)
+const wrappedReqSerializer = pino.stdSerializers.wrapRequestSerializer(
+  (req: pino.SerializedRequest) => {
+    return { ...req, newProp: 'foo' }
+  }
+)
+const wrappedResSerializer = pino.stdSerializers.wrapResponseSerializer(
+  (res: pino.SerializedResponse) => {
+    return { ...res, newProp: 'foo' }
+  }
+)
 
 const socket = new Socket()
 const incomingMessage = new IncomingMessage(socket)
 const serverResponse = new ServerResponse(incomingMessage)
 
-const mappedHttpRequest: { req: pino.SerializedRequest } = pino.stdSerializers.mapHttpRequest(incomingMessage)
-const mappedHttpResponse: { res: pino.SerializedResponse } = pino.stdSerializers.mapHttpResponse(serverResponse)
+const mappedHttpRequest: { req: pino.SerializedRequest } =
+  pino.stdSerializers.mapHttpRequest(incomingMessage)
+const mappedHttpResponse: { res: pino.SerializedResponse } =
+  pino.stdSerializers.mapHttpResponse(serverResponse)
 
-const serializedErr: pino.SerializedError = pino.stdSerializers.err(new Error())
-const serializedReq: pino.SerializedRequest = pino.stdSerializers.req(incomingMessage)
-const serializedRes: pino.SerializedResponse = pino.stdSerializers.res(serverResponse)
+const serializedErr: pino.SerializedError = pino.stdSerializers.err(
+  new Error()
+)
+const serializedReq: pino.SerializedRequest =
+  pino.stdSerializers.req(incomingMessage)
+const serializedRes: pino.SerializedResponse =
+  pino.stdSerializers.res(serverResponse)
 
 /**
  * Destination static method
@@ -334,7 +381,10 @@ const destinationViaDefaultArgs = pino.destination()
 const destinationViaStrFileDescriptor = pino.destination('/log/path')
 const destinationViaNumFileDescriptor = pino.destination(2)
 const destinationViaStream = pino.destination(process.stdout)
-const destinationViaOptionsObject = pino.destination({ dest: '/log/path', sync: false })
+const destinationViaOptionsObject = pino.destination({
+  dest: '/log/path',
+  sync: false,
+})
 
 pino(destinationViaDefaultArgs)
 pino({ name: 'my-logger' }, destinationViaDefaultArgs)
@@ -377,7 +427,7 @@ const serializerFunc: pino.SerializerFn = () => {}
 const writeFunc: pino.WriteFn = () => {}
 
 interface CustomBaseLogger extends pino.BaseLogger {
-  child(): CustomBaseLogger
+  child(): CustomBaseLogger;
 }
 
 const customBaseLogger: CustomBaseLogger = {
@@ -389,7 +439,9 @@ const customBaseLogger: CustomBaseLogger = {
   debug () {},
   trace () {},
   silent () {},
-  child () { return this },
+  child () {
+    return this
+  },
   msgPrefix: 'prefix',
 }
 
@@ -421,7 +473,7 @@ const ccclog3 = clog3.child({})
 expectError(ccclog3.nonLevel(''))
 
 const withChildCallback = pino({
-  onChild: (child: Logger) => {}
+  onChild: (child: Logger) => {},
 })
 withChildCallback.onChild = (child: Logger) => {}
 
@@ -445,7 +497,7 @@ fn(customLevelChildLogger) // missing foo typing
 // unknown option
 expectError(
   pino({
-    hello: 'world'
+    hello: 'world',
   })
 )
 
@@ -454,8 +506,8 @@ expectError(
   pino({
     hello: 'world',
     customLevels: {
-      log: 30
-    }
+      log: 30,
+    },
   })
 )
 
@@ -490,7 +542,12 @@ const bLogger = pino({
 
 // Test that we can properly extract parameters from the log fn type
 type LogParam = Parameters<LogFn>
-const [param1, param2, param3, param4]: LogParam = [{ multiple: 'params' }, 'should', 'be', 'accepted']
+const [param1, param2, param3, param4]: LogParam = [
+  { multiple: 'params' },
+  'should',
+  'be',
+  'accepted',
+]
 
 expectType<unknown>(param1)
 expectType<string>(param2)
@@ -505,47 +562,71 @@ const hooks: LoggerOptions['hooks'] = {
     if (parameters.length >= 2) {
       const [parameter1, parameter2, ...remainingParameters] = parameters
       if (typeof parameter1 === 'string') {
-        return method.apply(this, [parameter2, parameter1, ...remainingParameters])
+        return method.apply(this, [
+          parameter2,
+          parameter1,
+          ...remainingParameters,
+        ])
       }
       return method.apply(this, [parameter2])
     }
 
     return method.apply(this, parameters)
-  }
+  },
 }
 
-expectType<Logger<'log'>>(pino({
-  customLevels: {
-    log: 5,
-  },
-  level: 'log',
-  transport: {
-    target: 'pino-pretty',
-    options: {
-      colorize: true,
+expectType<Logger<'log'>>(
+  pino({
+    customLevels: {
+      log: 5,
+    },
+    level: 'log',
+    transport: {
+      target: 'pino-pretty',
+      options: {
+        colorize: true,
+      },
+    },
+  })
+)
+
+const parentLogger1 = pino(
+  {
+    customLevels: { myLevel: 90 },
+    onChild: (child) => {
+      const a = child.myLevel
     },
   },
-}))
-
-const parentLogger1 = pino({
-  customLevels: { myLevel: 90 },
-  onChild: (child) => { const a = child.myLevel }
-}, process.stdout)
-parentLogger1.onChild = (child) => { child.myLevel('') }
+  process.stdout
+)
+parentLogger1.onChild = (child) => {
+  child.myLevel('')
+}
 
 const childLogger1 = parentLogger1.child({})
 childLogger1.myLevel('')
 expectError(childLogger1.doesntExist(''))
 
 const parentLogger2 = pino({}, process.stdin)
-expectError(parentLogger2.onChild = (child) => { const b = child.doesntExist })
+expectError(
+  (parentLogger2.onChild = (child) => {
+    const b = child.doesntExist
+  })
+)
 
 const childLogger2 = parentLogger2.child({})
 expectError(childLogger2.doesntExist)
 
-expectError(pino({
-  onChild: (child) => { const a = child.doesntExist }
-}, process.stdout))
+expectError(
+  pino(
+    {
+      onChild: (child) => {
+        const a = child.doesntExist
+      },
+    },
+    process.stdout
+  )
+)
 
 const pinoWithoutLevelsSorting = pino({})
 const pinoWithDescSortingLevels = pino({ levelComparison: 'DESC' })
@@ -587,7 +668,7 @@ expectError(loggerWithCustomLevelOnly.trace('test'))
 declare module '../../' {
   interface LogFnFields {
     bannedField?: never;
-    typeCheckedField?: string
+    typeCheckedField?: string;
   }
 }
 
@@ -595,6 +676,8 @@ info({ typeCheckedField: 'bar' })
 expectError(info({ bannedField: 'bar' }))
 expectError(info({ typeCheckedField: 123 }))
 
-const someGenericFunction = <T extends string | number | symbol = never>(arg: Record<T, unknown>) => {
+const someGenericFunction = <T extends string | number | symbol = never>(
+  arg: Record<T, unknown>
+) => {
   info(arg)
 }
