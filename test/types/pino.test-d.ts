@@ -38,7 +38,9 @@ info('The answer is %d', 42)
 info('The object is %o', { a: 1, b: '2' })
 info('The json is %j', { a: 1, b: '2' })
 info('The object is %O', { a: 1, b: '2' })
-info('The answer is %d and the question is %s with %o', 42, 'unknown', { correct: 'order' })
+info('The answer is %d and the question is %s with %o', 42, 'unknown', {
+  correct: 'order',
+})
 info('Missing placeholder is fine %s')
 
 // %s placeholder supports all primitive types
@@ -54,16 +56,38 @@ info('String %s', 'hello')
 
 // %s placeholder with multiple primitives
 info('Multiple primitives %s %s %s', true, 42, 'world')
-info('All primitive types %s %s %s %s %s %s %s', 'string', 123, true, BigInt(123), null, undefined, Symbol('test'))
+info(
+  'All primitive types %s %s %s %s %s %s %s',
+  'string',
+  123,
+  true,
+  BigInt(123),
+  null,
+  undefined,
+  Symbol('test')
+)
 declare const errorOrString: string | Error
 info(errorOrString)
 
+// %o placeholder supports primitives too (except undefined)
+info('Boolean %o', true)
+info('Boolean %o', false)
+info('Number %o', 123)
+info('Number %o', 3.14)
+info('BigInt %o', BigInt(123))
+info('Null %o', null)
+info('Symbol %o', Symbol('test'))
+info('String %o', 'hello')
+
 // placeholder messages type errors
 expect(info).type.not.toBeCallableWith('The answer is %d', 'not a number')
-expect(info).type.not.toBeCallableWith('The object is %o', 'not an object')
-expect(info).type.not.toBeCallableWith('The object is %j', 'not a JSON')
-expect(info).type.not.toBeCallableWith('The object is %O', 'not an object')
-expect(info).type.not.toBeCallableWith('The answer is %d and the question is %s with %o', 42, { incorrect: 'order' }, 'unknown')
+expect(
+  info).type.not.toBeCallableWith(
+  'The answer is %d and the question is %s with %o',
+  'unknown',
+  { incorrect: 'order' },
+  42
+)
 expect(info).type.not.toBeCallableWith('Extra message %s', 'after placeholder', 'not allowed')
 
 // object types with messages
@@ -73,7 +97,12 @@ info({ obj: { aa: 'bbb' } }, 'another')
 info({ a: 1, b: '2' }, 'hello world with %s', 'extra data')
 
 // Extra message after placeholder
-expect(info).type.not.toBeCallableWith({ a: 1, b: '2' }, 'hello world with %d', 2, 'extra')
+expect(info).type.not.toBeCallableWith(
+  { a: 1, b: '2' },
+  'hello world with %d',
+  2,
+  'extra'
+)
 
 // metadata with messages type passes, because of custom toString method
 // We can't detect if the object has a custom toString method that returns a string
@@ -124,7 +153,10 @@ pino({
 })
 
 pino({
-  mixin: (context: object, level: number) => ({ customName: 'unknown', customId: 111 }),
+  mixin: (context: object, level: number) => ({
+    customName: 'unknown',
+    customId: 111,
+  }),
 })
 
 pino({
@@ -155,11 +187,11 @@ expect(pino).type.not.toBeCallableWith({
 })
 
 pino({
-  depthLimit: 1
+  depthLimit: 1,
 })
 
 pino({
-  edgeLimit: 1
+  edgeLimit: 1,
 })
 
 pino({
@@ -186,14 +218,14 @@ pino({
         logEvent.messages
       },
     },
-    disabled: false
+    disabled: false,
   },
 })
 
 pino({
   browser: {
     asObjectBindingsOnly: true,
-  }
+  },
 })
 
 pino({}, undefined)
@@ -218,7 +250,9 @@ const customSerializers = {
     return 'this is my serializer'
   },
 }
-pino().child({}, { serializers: customSerializers }).info({ test: 'should not show up' })
+pino()
+  .child({}, { serializers: customSerializers })
+  .info({ test: 'should not show up' })
 const child2 = log.child({ father: true })
 const childChild = child2.child({ baby: true })
 const childRedacted = pino().child({}, { redact: ['path'] })
@@ -226,12 +260,15 @@ childRedacted.info({
   msg: 'logged with redacted properties',
   path: 'Not shown',
 })
-const childAnotherRedacted = pino().child({}, {
-  redact: {
-    paths: ['anotherPath'],
-    censor: 'Not the log you\re looking for',
+const childAnotherRedacted = pino().child(
+  {},
+  {
+    redact: {
+      paths: ['anotherPath'],
+      censor: 'Not the log you\re looking for',
+    },
   }
-})
+)
 childAnotherRedacted.info({
   msg: 'another logged with redacted properties',
   anotherPath: 'Not shown',
@@ -310,26 +347,38 @@ const withHooks = pino({
 })
 
 // Properties/types imported from pino-std-serializers
-const wrappedErrSerializer = pino.stdSerializers.wrapErrorSerializer((err: pino.SerializedError) => {
-  return { ...err, newProp: 'foo' }
-})
-const wrappedReqSerializer = pino.stdSerializers.wrapRequestSerializer((req: pino.SerializedRequest) => {
-  return { ...req, newProp: 'foo' }
-})
-const wrappedResSerializer = pino.stdSerializers.wrapResponseSerializer((res: pino.SerializedResponse) => {
-  return { ...res, newProp: 'foo' }
-})
+const wrappedErrSerializer = pino.stdSerializers.wrapErrorSerializer(
+  (err: pino.SerializedError) => {
+    return { ...err, newProp: 'foo' }
+  }
+)
+const wrappedReqSerializer = pino.stdSerializers.wrapRequestSerializer(
+  (req: pino.SerializedRequest) => {
+    return { ...req, newProp: 'foo' }
+  }
+)
+const wrappedResSerializer = pino.stdSerializers.wrapResponseSerializer(
+  (res: pino.SerializedResponse) => {
+    return { ...res, newProp: 'foo' }
+  }
+)
 
 const socket = new Socket()
 const incomingMessage = new IncomingMessage(socket)
 const serverResponse = new ServerResponse(incomingMessage)
 
-const mappedHttpRequest: { req: pino.SerializedRequest } = pino.stdSerializers.mapHttpRequest(incomingMessage)
-const mappedHttpResponse: { res: pino.SerializedResponse } = pino.stdSerializers.mapHttpResponse(serverResponse)
+const mappedHttpRequest: { req: pino.SerializedRequest } =
+  pino.stdSerializers.mapHttpRequest(incomingMessage)
+const mappedHttpResponse: { res: pino.SerializedResponse } =
+  pino.stdSerializers.mapHttpResponse(serverResponse)
 
-const serializedErr: pino.SerializedError = pino.stdSerializers.err(new Error())
-const serializedReq: pino.SerializedRequest = pino.stdSerializers.req(incomingMessage)
-const serializedRes: pino.SerializedResponse = pino.stdSerializers.res(serverResponse)
+const serializedErr: pino.SerializedError = pino.stdSerializers.err(
+  new Error()
+)
+const serializedReq: pino.SerializedRequest =
+  pino.stdSerializers.req(incomingMessage)
+const serializedRes: pino.SerializedResponse =
+  pino.stdSerializers.res(serverResponse)
 
 /**
  * Destination static method
@@ -338,7 +387,10 @@ const destinationViaDefaultArgs = pino.destination()
 const destinationViaStrFileDescriptor = pino.destination('/log/path')
 const destinationViaNumFileDescriptor = pino.destination(2)
 const destinationViaStream = pino.destination(process.stdout)
-const destinationViaOptionsObject = pino.destination({ dest: '/log/path', sync: false })
+const destinationViaOptionsObject = pino.destination({
+  dest: '/log/path',
+  sync: false,
+})
 
 pino(destinationViaDefaultArgs)
 pino({ name: 'my-logger' }, destinationViaDefaultArgs)
@@ -358,8 +410,8 @@ try {
 }
 
 interface StrictShape {
-  activity: string
-  err?: unknown
+  activity: string;
+  err?: unknown;
 }
 
 info<StrictShape>({
@@ -374,14 +426,14 @@ const logLine: pino.LogDescriptor = {
 }
 
 interface CustomLogger extends pino.Logger {
-  customMethod(msg: string, ...args: unknown[]): void
+  customMethod(msg: string, ...args: unknown[]): void;
 }
 
 const serializerFunc: pino.SerializerFn = () => {}
 const writeFunc: pino.WriteFn = () => {}
 
 interface CustomBaseLogger extends pino.BaseLogger {
-  child(): CustomBaseLogger
+  child(): CustomBaseLogger;
 }
 
 const customBaseLogger: CustomBaseLogger = {
@@ -393,7 +445,9 @@ const customBaseLogger: CustomBaseLogger = {
   debug () {},
   trace () {},
   silent () {},
-  child () { return this },
+  child () {
+    return this
+  },
   msgPrefix: 'prefix',
 }
 
@@ -425,7 +479,7 @@ const ccclog3 = clog3.child({})
 expect(ccclog3).type.not.toHaveProperty('nonLevel')
 
 const withChildCallback = pino({
-  onChild: (child: Logger) => {}
+  onChild: (child: Logger) => {},
 })
 withChildCallback.onChild = (child: Logger) => {}
 
@@ -448,15 +502,15 @@ fn(customLevelChildLogger) // missing foo typing
 
 // unknown option
 expect(pino).type.not.toBeCallableWith({
-  hello: 'world'
+  hello: 'world',
 })
 
 // unknown option
 expect(pino).type.not.toBeCallableWith({
   hello: 'world',
   customLevels: {
-    log: 30
-  }
+    log: 30,
+  },
 })
 
 function dangerous () {
@@ -490,7 +544,12 @@ const bLogger = pino({
 
 // Test that we can properly extract parameters from the log fn type
 type LogParam = Parameters<LogFn>
-const [param1, param2, param3, param4]: LogParam = [{ multiple: 'params' }, 'should', 'be', 'accepted']
+const [param1, param2, param3, param4]: LogParam = [
+  { multiple: 'params' },
+  'should',
+  'be',
+  'accepted',
+]
 
 expect(param1).type.toBe<unknown>()
 expect(param2).type.toBe<string>()
@@ -505,33 +564,46 @@ const hooks: LoggerOptions['hooks'] = {
     if (parameters.length >= 2) {
       const [parameter1, parameter2, ...remainingParameters] = parameters
       if (typeof parameter1 === 'string') {
-        return method.apply(this, [parameter2, parameter1, ...remainingParameters])
+        return method.apply(this, [
+          parameter2,
+          parameter1,
+          ...remainingParameters,
+        ])
       }
       return method.apply(this, [parameter2])
     }
 
     return method.apply(this, parameters)
-  }
+  },
 }
 
-expect(pino({
-  customLevels: {
-    log: 5,
-  },
-  level: 'log',
-  transport: {
-    target: 'pino-pretty',
-    options: {
-      colorize: true,
+expect(
+  pino({
+    customLevels: {
+      log: 5,
+    },
+    level: 'log',
+    transport: {
+      target: 'pino-pretty',
+      options: {
+        colorize: true,
+      },
+    },
+  })
+).type.toBe<Logger<'log'>>()
+
+const parentLogger1 = pino(
+  {
+    customLevels: { myLevel: 90 },
+    onChild: (child) => {
+      const a = child.myLevel
     },
   },
-})).type.toBe<Logger<'log'>>()
-
-const parentLogger1 = pino({
-  customLevels: { myLevel: 90 },
-  onChild: (child) => { const a = child.myLevel }
-}, process.stdout)
-parentLogger1.onChild = (child) => { child.myLevel('') }
+  process.stdout
+)
+parentLogger1.onChild = (child) => {
+  child.myLevel('')
+}
 
 const childLogger1 = parentLogger1.child({})
 childLogger1.myLevel('')
@@ -545,11 +617,14 @@ parentLogger2.onChild = (child) => {
 const childLogger2 = parentLogger2.child({})
 expect(childLogger2).type.not.toHaveProperty('doesntExist')
 
-pino({
-  onChild: (child) => {
-    expect(child).type.not.toHaveProperty('doesntExist')
-  }
-}, process.stdout)
+pino(
+  {
+    onChild: (child) => {
+      expect(child).type.not.toHaveProperty('doesntExist')
+    },
+  },
+  process.stdout
+)
 
 const pinoWithoutLevelsSorting = pino({})
 const pinoWithDescSortingLevels = pino({ levelComparison: 'DESC' })
@@ -590,14 +665,16 @@ expect(loggerWithCustomLevelOnly.trace).type.toBe<never>()
 // Module extension
 declare module '../../' {
   interface LogFnFields {
-    bannedField?: never
-    typeCheckedField?: string
+    bannedField?: never;
+    typeCheckedField?: string;
   }
 }
 
 info({ typeCheckedField: 'bar' })
 expect(info).type.not.toBeCallableWith({ bannedField: 'bar' })
 expect(info).type.not.toBeCallableWith({ typeCheckedField: 123 })
-const someGenericFunction = <T extends string | number | symbol = never>(arg: Record<T, unknown>) => {
+const someGenericFunction = <T extends string | number | symbol = never>(
+  arg: Record<T, unknown>
+) => {
   info(arg)
 }
