@@ -10,7 +10,7 @@ import type {
   LevelOrString,
   LevelWithSilentOrString,
   LoggerExtras,
-  LoggerOptions,
+  LoggerOptions
 } from '../../pino.js'
 
 // NB: can also use `import * as pino`, but that form is callable as `pino()`
@@ -62,9 +62,9 @@ const loggerOptions: LoggerOptions = {
       },
       level (label, number) {
         return { label, number }
-      },
-    },
-  },
+      }
+    }
+  }
 }
 
 expect(loggerOptions).type.toBe<LoggerOptions>()

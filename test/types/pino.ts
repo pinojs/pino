@@ -31,7 +31,7 @@ loggerDefault.info('test2')
 loggerDefault.flush()
 
 const transport2 = transport({
-  target: 'pino-pretty',
+  target: 'pino-pretty'
 })
 const logger2 = pino(transport2)
 logger2.info('test2')
@@ -63,7 +63,7 @@ const customLevels = {
   customDebug: 1,
   info: 2,
   customNetwork: 3,
-  customError: 4,
+  customError: 4
 }
 
 type CustomLevels = keyof typeof customLevels
@@ -71,7 +71,7 @@ type CustomLevels = keyof typeof customLevels
 const pinoOpts = {
   useOnlyCustomLevels: true,
   customLevels,
-  level: 'customDebug',
+  level: 'customDebug'
 } satisfies LoggerOptions
 
 const multistreamOpts = {

@@ -39,7 +39,7 @@ info('The object is %o', { a: 1, b: '2' })
 info('The json is %j', { a: 1, b: '2' })
 info('The object is %O', { a: 1, b: '2' })
 info('The answer is %d and the question is %s with %o', 42, 'unknown', {
-  correct: 'order',
+  correct: 'order'
 })
 info('Missing placeholder is fine %s')
 
@@ -124,7 +124,7 @@ error(new Error('an error'))
 const writeSym = pino.symbols.writeSym
 
 const testUniqSymbol = {
-  [pino.symbols.needsMetadataGsym]: true,
+  [pino.symbols.needsMetadataGsym]: true
 }[pino.symbols.needsMetadataGsym]
 
 const log2: pino.Logger = pino({
@@ -133,81 +133,81 @@ const log2: pino.Logger = pino({
   serializers: {
     req: pino.stdSerializers.req,
     res: pino.stdSerializers.res,
-    err: pino.stdSerializers.err,
-  },
+    err: pino.stdSerializers.err
+  }
 })
 
 pino({
-  write (o) {},
+  write (o) {}
 })
 
 pino({
   mixin () {
     return { customName: 'unknown', customId: 111 }
-  },
+  }
 })
 
 pino({
-  mixin: () => ({ customName: 'unknown', customId: 111 }),
+  mixin: () => ({ customName: 'unknown', customId: 111 })
 })
 
 pino({
-  mixin: (context: object) => ({ customName: 'unknown', customId: 111 }),
+  mixin: (context: object) => ({ customName: 'unknown', customId: 111 })
 })
 
 pino({
   mixin: (context: object, level: number) => ({
     customName: 'unknown',
-    customId: 111,
-  }),
+    customId: 111
+  })
 })
 
 pino({
-  redact: { paths: [], censor: 'SECRET' },
+  redact: { paths: [], censor: 'SECRET' }
 })
 
 pino({
-  redact: { paths: [], censor: () => 'SECRET' },
+  redact: { paths: [], censor: () => 'SECRET' }
 })
 
 pino({
-  redact: { paths: [], censor: (value) => value },
+  redact: { paths: [], censor: (value) => value }
 })
 
 pino({
-  redact: { paths: [], censor: (value, path) => path.join() },
+  redact: { paths: [], censor: (value, path) => path.join() }
 })
 
 pino({
   redact: {
     paths: [],
-    censor: (value): string => 'SECRET',
-  },
+    censor: (value): string => 'SECRET'
+  }
 })
 
 expect(pino).type.not.toBeCallableWith({
-  redact: { paths: [], censor: (value: string) => value },
+  redact: { paths: [], censor: (value: string) => value }
 })
 
 pino({
-  depthLimit: 1,
+  depthLimit: 1
 })
 
 pino({
-  edgeLimit: 1,
+  edgeLimit: 1
 })
 
 pino({
   browser: {
-    write (o) {},
-  },
+    write (o) {}
+  }
 })
 
 pino({
   browser: {
     write: {
       info (o) {},
-      error (o) {},
+      error (o) {}
     },
     serialize: true,
     asObject: true,
@@ -219,16 +219,16 @@ pino({
         logEvent.level
         logEvent.ts
         logEvent.messages
-      },
+      }
     },
-    disabled: false,
-  },
+    disabled: false
+  }
 })
 
 pino({
   browser: {
-    asObjectBindingsOnly: true,
-  },
+    asObjectBindingsOnly: true
+  }
 })
 
 pino({}, undefined)
@@ -251,7 +251,7 @@ child.bindings()
 const customSerializers = {
   test () {
     return 'this is my serializer'
-  },
+  }
 }
 pino()
   .child({}, { serializers: customSerializers })
@@ -261,20 +261,20 @@ const childChild = child2.child({ baby: true })
 const childRedacted = pino().child({}, { redact: ['path'] })
 childRedacted.info({
   msg: 'logged with redacted properties',
-  path: 'Not shown',
+  path: 'Not shown'
 })
 const childAnotherRedacted = pino().child(
   {},
   {
     redact: {
       paths: ['anotherPath'],
-      censor: 'Not the log you\re looking for',
-    },
+      censor: 'Not the log you\re looking for'
+    }
   }
 )
 childAnotherRedacted.info({
   msg: 'another logged with redacted properties',
-  anotherPath: 'Not shown',
+  anotherPath: 'Not shown'
 })
 
 log.level = 'info'
@@ -304,36 +304,36 @@ log.level === 'info'
 const isEnabled: boolean = log.isLevelEnabled('info')
 
 const redacted = pino({
-  redact: ['path'],
+  redact: ['path']
 })
 
 redacted.info({
   msg: 'logged with redacted properties',
-  path: 'Not shown',
+  path: 'Not shown'
 })
 
 const anotherRedacted = pino({
   redact: {
     paths: ['anotherPath'],
-    censor: 'Not the log you\re looking for',
-  },
+    censor: 'Not the log you\re looking for'
+  }
 })
 
 anotherRedacted.info({
   msg: 'another logged with redacted properties',
-  anotherPath: 'Not shown',
+  anotherPath: 'Not shown'
 })
 
 const withTimeFn = pino({
-  timestamp: pino.stdTimeFunctions.isoTime,
+  timestamp: pino.stdTimeFunctions.isoTime
 })
 
 const withRFC3339TimeFn = pino({
-  timestamp: pino.stdTimeFunctions.isoTimeNano,
+  timestamp: pino.stdTimeFunctions.isoTimeNano
 })
 
 const withNestedKey = pino({
-  nestedKey: 'payload',
+  nestedKey: 'payload'
 })
 
 const withHooks = pino({
@@ -345,8 +345,8 @@ const withHooks = pino({
     streamWrite (s) {
       expect(s).type.toBe<string>()
       return s.replaceAll('secret-key', 'xxx')
-    },
-  },
+    }
+  }
 })
 
 // Properties/types imported from pino-std-serializers
@@ -392,7 +392,7 @@ const destinationViaNumFileDescriptor = pino.destination(2)
 const destinationViaStream = pino.destination(process.stdout)
 const destinationViaOptionsObject = pino.destination({
   dest: '/log/path',
-  sync: false,
+  sync: false
 })
 
 pino(destinationViaDefaultArgs)
@@ -418,14 +418,14 @@ interface StrictShape {
 }
 
 info<StrictShape>({
-  activity: 'Required property',
+  activity: 'Required property'
 })
 
 const logLine: pino.LogDescriptor = {
   level: 20,
   msg: 'A log message',
   time: new Date().getTime(),
-  aCustomProperty: true,
+  aCustomProperty: true
 }
 
 interface CustomLogger extends pino.Logger {
@@ -451,7 +451,7 @@ const customBaseLogger: CustomBaseLogger = {
   child () {
     return this
   },
-  msgPrefix: 'prefix',
+  msgPrefix: 'prefix'
 }
 
 // custom levels
@@ -482,12 +482,12 @@ const ccclog3 = clog3.child({})
 expect(ccclog3).type.not.toHaveProperty('nonLevel')
 
 const withChildCallback = pino({
-  onChild: (child: Logger) => {},
+  onChild: (child: Logger) => {}
 })
 withChildCallback.onChild = (child: Logger) => {}
 
 pino({
-  crlf: true,
+  crlf: true
 })
 
 const customLevels = { foo: 99, bar: 42 }
@@ -534,15 +534,15 @@ try {
 
 const bLogger = pino({
   customLevels: {
-    log: 5,
+    log: 5
   },
   level: 'log',
   transport: {
     target: 'pino-pretty',
     options: {
-      colorize: true,
-    },
-  },
+      colorize: true
+    }
+  }
 })
 
 // Test that we can properly extract parameters from the log fn type
@@ -551,7 +551,7 @@ const [param1, param2, param3, param4]: LogParam = [
   { multiple: 'params' },
   'should',
   'be',
-  'accepted',
+  'accepted'
 ]
 
 expect(param1).type.toBe<unknown>()
@@ -570,28 +570,28 @@ const hooks: LoggerOptions['hooks'] = {
         return method.apply(this, [
           parameter2,
           parameter1,
-          ...remainingParameters,
+          ...remainingParameters
         ])
       }
       return method.apply(this, [parameter2])
     }
 
     return method.apply(this, parameters)
-  },
+  }
 }
 
 expect(
   pino({
     customLevels: {
-      log: 5,
+      log: 5
     },
     level: 'log',
     transport: {
       target: 'pino-pretty',
       options: {
-        colorize: true,
-      },
-    },
+        colorize: true
+      }
+    }
   })
 ).type.toBe<Logger<'log'>>()
 
@@ -600,7 +600,7 @@ const parentLogger1 = pino(
     customLevels: { myLevel: 90 },
     onChild: (child) => {
       const a = child.myLevel
-    },
+    }
   },
   process.stdout
 )
@@ -624,7 +624,7 @@ pino(
   {
     onChild: (child) => {
       expect(child).type.not.toHaveProperty('doesntExist')
-    },
+    }
   },
   process.stdout
 )
@@ -648,9 +648,9 @@ const customLevelsOnlyOpts = {
     customDebug: 10,
     info: 20, // to make sure the default names are also available for override
     customNetwork: 30,
-    customError: 40,
+    customError: 40
   },
-  level: 'customDebug',
+  level: 'customDebug'
 } satisfies LoggerOptions
 
 const loggerWithCustomLevelOnly = pino(customLevelsOnlyOpts)

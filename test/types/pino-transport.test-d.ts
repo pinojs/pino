@@ -45,7 +45,7 @@ expect(
           level: 'trace',
           target: '#pino/file',
           options: { destination: './test.log' }
-        },
+        }
       ]
     }
   })
@@ -81,7 +81,7 @@ expect(
           level: 'trace',
           target: '#pino/file',
           options: { destination: './test.log' }
-        },
+        }
       ],
       levels: { foo: 35 }
     }
@@ -93,7 +93,7 @@ const transportsWithoutOptions = pino.transport({
     { target: '#pino/pretty' },
     { target: '#pino/file' }
   ],
-  levels: { foo: 35 },
+  levels: { foo: 35 }
 })
 pino(transportsWithoutOptions)
 
@@ -134,7 +134,7 @@ expect(
           // Use target: 'pino/file' to write to stdout
           // without any change.
           target: 'pino-pretty'
-        },
+        }
       ]
     }
   })

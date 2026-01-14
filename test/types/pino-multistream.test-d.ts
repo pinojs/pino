@@ -20,7 +20,7 @@ expect(
 ).type.toBe<pino.MultiStreamRes<'error'>>()
 expect(
   pino.multistream([
-    { level: 'fatal' as const, stream: createWriteStream('') },
+    { level: 'fatal' as const, stream: createWriteStream('') }
   ])
 ).type.toBe<pino.MultiStreamRes<'fatal'>>()
 

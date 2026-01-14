@@ -10,19 +10,20 @@ module.exports = defineConfig([
   globalIgnores([
     'pino.d.ts',
     'test/fixtures/syntax-error-esm.mjs',
-    'test/fixtures/ts/*cjs',
+    'test/fixtures/ts/*cjs'
   ]),
   {
     rules: {
-      'no-var': 'off',
-    },
+      'comma-dangle': ['error', 'never'],
+      'no-var': 'off'
+    }
   },
   {
     files: ['test/types/**/*'],
     rules: {
       '@typescript-eslint/no-unused-expressions': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
-      'n/handle-callback-err': 'off',
-    },
-  },
+      'n/handle-callback-err': 'off'
+    }
+  }
 ])
