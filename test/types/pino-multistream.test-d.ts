@@ -42,7 +42,7 @@ expect(pino.multistream(streams[0]).add(streams[1])).type.toBe<
 expect(multistream(streams)).type.toBe<
   pino.MultiStreamRes<'error' | 'fatal'>
 >()
-// @tstyche fixme -- Use const type parameter of the 'clone()' signature: 'clone<const TLevel = Level>'
+// @tstyche fixme -- To make it work, add 'const' to the type parameter: 'clone<const TLevel = Level>'
 expect(multistream(streams).clone('error')).type.toBe<
   pino.MultiStreamRes<'error'>
 >()
