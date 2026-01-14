@@ -306,7 +306,7 @@ declare namespace pino {
         flushSync: () => void,
         minLevel: number,
         streams: StreamEntry<TOriginLevel>[],
-        clone<const TLevel = Level>(level: TLevel): MultiStreamRes<TLevel>,
+        clone<TLevel = Level>(level: TLevel): MultiStreamRes<TLevel>,
     }
 
     export interface LevelMapping {
