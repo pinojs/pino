@@ -505,15 +505,15 @@ fn(customLevelChildLogger) // missing foo typing
 
 // unknown option
 expect(pino).type.not.toBeCallableWith({
-  hello: 'world',
+  hello: 'world'
 })
 
 // unknown option
 expect(pino).type.not.toBeCallableWith({
   hello: 'world',
   customLevels: {
-    log: 30,
-  },
+    log: 30
+  }
 })
 
 function dangerous () {

@@ -8,7 +8,7 @@ const streams = [
   { stream: process.stdout },
   { stream: createWriteStream('') },
   { level: 'error' as const, stream: process.stderr },
-  { level: 'fatal' as const, stream: process.stderr },
+  { level: 'fatal' as const, stream: process.stderr }
 ]
 
 expect(pino.multistream(process.stdout)).type.toBe<pino.MultiStreamRes>()
