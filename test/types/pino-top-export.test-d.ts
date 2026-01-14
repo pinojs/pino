@@ -27,6 +27,6 @@ expect(version).type.toBe<string>()
 expect(
   transport({
     target: '#pino/pretty',
-    options: { some: 'options for', the: 'transport' }
+    options: { some: 'options for', the: 'transport' },
   })
 ).type.toBe<ThreadStream>()

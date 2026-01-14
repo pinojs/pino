@@ -139,6 +139,27 @@ pino(transport);
 
 For more details on `pino.transport` see the [API docs for `pino.transport`][pino-transport].
 
+### Using transports with `--import` or `--require` preloads
+
+Pino transports work correctly when loaded via Node.js preload flags (`--import` or `--require`).
+Pino automatically detects when it's being loaded during the preload phase and filters out the
+preload flags from the transport worker's `execArgv` to prevent infinite worker spawning.
+
+```js
+// preload.mjs
+import pino from 'pino'
+
+export const logger = pino({
+  transport: {
+    target: 'pino-pretty'
+  }
+})
+```
+
+```bash
+node --import=./preload.mjs app.js
+```
+
 [pino-transport]: /docs/api.md#pino-transport
 [sca]: https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm
 

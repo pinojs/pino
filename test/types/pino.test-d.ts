@@ -81,14 +81,17 @@ info('String %o', 'hello')
 
 // placeholder messages type errors
 expect(info).type.not.toBeCallableWith('The answer is %d', 'not a number')
-expect(
-  info).type.not.toBeCallableWith(
+expect(info).type.not.toBeCallableWith(
   'The answer is %d and the question is %s with %o',
   'unknown',
   { incorrect: 'order' },
   42
 )
-expect(info).type.not.toBeCallableWith('Extra message %s', 'after placeholder', 'not allowed')
+expect(info).type.not.toBeCallableWith(
+  'Extra message %s',
+  'after placeholder',
+  'not allowed'
+)
 
 // object types with messages
 info({ obj: 42 }, 'hello world')

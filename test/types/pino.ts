@@ -3,7 +3,13 @@ import { join } from 'node:path'
 import pinoPretty from 'pino-pretty'
 
 // Test both default ("Pino") and named ("pino") imports.
-import Pino, { type LoggerOptions, type StreamEntry, pino, multistream, transport } from '../../pino.js'
+import Pino, {
+  type LoggerOptions,
+  type StreamEntry,
+  pino,
+  multistream,
+  transport,
+} from '../../pino.js'
 
 const destination = join(
   tmpdir(),
@@ -13,7 +19,7 @@ const destination = join(
 // Single
 const transport1 = transport({
   target: 'pino-pretty',
-  options: { some: 'options for', the: 'transport' }
+  options: { some: 'options for', the: 'transport' },
 })
 const logger = pino(transport1)
 logger.setBindings({ some: 'bindings' })
@@ -39,14 +45,14 @@ const transports = transport({
     {
       level: 'info',
       target: 'pino-pretty',
-      options: { some: 'options for', the: 'transport' }
+      options: { some: 'options for', the: 'transport' },
     },
     {
       level: 'trace',
       target: 'pino/file',
-      options: { destination }
-    }
-  ]
+      options: { destination },
+    },
+  ],
 })
 const loggerMulti = pino(transports)
 loggerMulti.info('test2')
@@ -70,7 +76,7 @@ const pinoOpts = {
 
 const multistreamOpts = {
   dedupe: true,
-  levels: customLevels
+  levels: customLevels,
 }
 
 const streams: StreamEntry<CustomLevels>[] = [
@@ -85,7 +91,10 @@ loggerCustomLevel.customDebug('test3')
 loggerCustomLevel.info('test4')
 loggerCustomLevel.customError('test5')
 loggerCustomLevel.customNetwork('test6')
-const loggerCustomLevelDefault = Pino(pinoOpts, multistream(streams, multistreamOpts))
+const loggerCustomLevelDefault = Pino(
+  pinoOpts,
+  multistream(streams, multistreamOpts)
+)
 loggerCustomLevelDefault.customDebug('test3')
 loggerCustomLevelDefault.info('test4')
 loggerCustomLevelDefault.customError('test5')

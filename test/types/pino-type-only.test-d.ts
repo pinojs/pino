@@ -10,7 +10,7 @@ import type {
   LevelOrString,
   LevelWithSilentOrString,
   LoggerExtras,
-  LoggerOptions
+  LoggerOptions,
 } from '../../pino.js'
 
 // NB: can also use `import * as pino`, but that form is callable as `pino()`
@@ -37,7 +37,9 @@ expect(levelOrString).type.toBeAssignableTo<pino.LevelWithSilentOrString>()
 const levelWithSilentOrString: LevelWithSilentOrString = 'myCustomLevel'
 expect(levelWithSilentOrString).type.toBeAssignableTo<string>()
 expect(levelWithSilentOrString).type.not.toBeAssignableTo<pino.Level>()
-expect(levelWithSilentOrString).type.not.toBeAssignableTo<pino.LevelWithSilent>()
+expect(
+  levelWithSilentOrString
+).type.not.toBeAssignableTo<pino.LevelWithSilent>()
 expect(levelWithSilentOrString).type.toBeAssignableTo<pino.LevelOrString>()
 
 function createStream (): DestinationStreamWithMetadata {
@@ -46,12 +48,13 @@ function createStream (): DestinationStreamWithMetadata {
 
 const stream = createStream()
 // Argh. TypeScript doesn't seem to narrow unless we assign the symbol like so
-const needsMetadata: typeof pino.symbols.needsMetadataGsym = pino.symbols.needsMetadataGsym
+const needsMetadata: typeof pino.symbols.needsMetadataGsym =
+  pino.symbols.needsMetadataGsym
 if (stream[needsMetadata]) {
   expect(stream.lastLevel).type.toBe<number>()
 }
 
-const loggerOptions:LoggerOptions = {
+const loggerOptions: LoggerOptions = {
   browser: {
     formatters: {
       log (obj) {
@@ -59,10 +62,9 @@ const loggerOptions:LoggerOptions = {
       },
       level (label, number) {
         return { label, number }
-      }
-
-    }
-  }
+      },
+    },
+  },
 }
 
 expect(loggerOptions).type.toBe<LoggerOptions>()
