@@ -78,6 +78,7 @@
     "eslint-plugin-promise": "^6.0.0",
     "execa": "^5.0.0",
     "fastbench": "^1.0.1",
+    "fastify-tsconfig": "^3.0.0",
     "flush-write-stream": "^2.0.0",
     "import-fresh": "^3.2.1",
     "jest": "^30.0.3",

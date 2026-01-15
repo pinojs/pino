@@ -1,5 +1,3 @@
-/// <reference lib="es2021" />
-
 import { expect } from 'tstyche'
 
 import { IncomingMessage, ServerResponse } from 'node:http'
