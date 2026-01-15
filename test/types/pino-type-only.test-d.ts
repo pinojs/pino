@@ -1,6 +1,6 @@
-import { expectAssignable, expectType, expectNotAssignable } from 'tsd'
+import { expect } from 'tstyche'
 
-import pino from '../../'
+import pino from '../../pino.js'
 import type {
   LevelWithSilent,
   Logger,
@@ -10,46 +10,48 @@ import type {
   LevelOrString,
   LevelWithSilentOrString,
   LoggerExtras,
-  LoggerOptions,
-} from '../../pino'
+  LoggerOptions
+} from '../../pino.js'
 
 // NB: can also use `import * as pino`, but that form is callable as `pino()`
 // under `esModuleInterop: false` or `pino.default()` under `esModuleInterop: true`.
 const log = pino()
-expectAssignable<LoggerExtras>(log)
-expectType<Logger>(log)
-expectType<LogFn>(log.info)
+expect(log).type.toBeAssignableTo<LoggerExtras>()
+expect(log).type.toBe<Logger>()
+expect(log.info).type.toBe<LogFn>()
 
-expectType<Parameters<typeof log.isLevelEnabled>>([log.level])
+expect<Parameters<typeof log.isLevelEnabled>>().type.toBe<[typeof log.level]>()
 
 const level: Level = 'debug'
-expectAssignable<string>(level)
+expect(level).type.toBeAssignableTo<string>()
 
 const levelWithSilent: LevelWithSilent = 'silent'
-expectAssignable<string>(levelWithSilent)
+expect(levelWithSilent).type.toBeAssignableTo<string>()
 
 const levelOrString: LevelOrString = 'myCustomLevel'
-expectAssignable<string>(levelOrString)
-expectNotAssignable<pino.Level>(levelOrString)
-expectNotAssignable<pino.LevelWithSilent>(levelOrString)
-expectAssignable<pino.LevelWithSilentOrString>(levelOrString)
+expect(levelOrString).type.toBeAssignableTo<string>()
+expect(levelOrString).type.not.toBeAssignableTo<pino.Level>()
+expect(levelOrString).type.not.toBeAssignableTo<pino.LevelWithSilent>()
+expect(levelOrString).type.toBeAssignableTo<pino.LevelWithSilentOrString>()
 
 const levelWithSilentOrString: LevelWithSilentOrString = 'myCustomLevel'
-expectAssignable<string>(levelWithSilentOrString)
-expectNotAssignable<pino.Level>(levelWithSilentOrString)
-expectNotAssignable<pino.LevelWithSilent>(levelWithSilentOrString)
-expectAssignable<pino.LevelOrString>(levelWithSilentOrString)
+expect(levelWithSilentOrString).type.toBeAssignableTo<string>()
+expect(levelWithSilentOrString).type.not.toBeAssignableTo<pino.Level>()
+expect(
+  levelWithSilentOrString
+).type.not.toBeAssignableTo<pino.LevelWithSilent>()
+expect(levelWithSilentOrString).type.toBeAssignableTo<pino.LevelOrString>()
 
 function createStream (): DestinationStreamWithMetadata {
   return { write () {} }
 }
 
 const stream = createStream()
-// Argh. TypeScript doesn't seem to narrow unless we assign the symbol like so, and tsd seems to
-// break without annotating the type explicitly
-const needsMetadata: typeof pino.symbols.needsMetadataGsym = pino.symbols.needsMetadataGsym
+// Argh. TypeScript doesn't seem to narrow unless we assign the symbol like so
+const needsMetadata: typeof pino.symbols.needsMetadataGsym =
+  pino.symbols.needsMetadataGsym
 if (stream[needsMetadata]) {
-  expectType<number>(stream.lastLevel)
+  expect(stream.lastLevel).type.toBe<number>()
 }
 
 const loggerOptions: LoggerOptions = {
@@ -60,12 +62,12 @@ const loggerOptions: LoggerOptions = {
       },
       level (label, number) {
         return { label, number }
-      },
-    },
-  },
+      }
+    }
+  }
 }
 
-expectType<LoggerOptions>(loggerOptions)
+expect(loggerOptions).type.toBe<LoggerOptions>()
 
 // Reference: https://github.com/pinojs/pino/issues/2285
 const someConst = 'test' as const
