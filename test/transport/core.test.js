@@ -679,3 +679,55 @@ test('pino.transport handles prototype pollution of __bundlerPathsOverrides', as
     msg: 'hello'
   })
 })
+
+const hasThreadName = 'threadName' in require('worker_threads')
+
+test('pino.transport with single target sets worker thread name to target', { skip: !hasThreadName }, async (t) => {
+  const plan = tspl(t, { plan: 1 })
+  const transport = pino.transport({
+    target: join(__dirname, '..', 'fixtures', 'transport-worker-name.js')
+  })
+  t.after(transport.end.bind(transport))
+  const instance = pino(transport)
+  transport.once('workerThreadName', (name) => {
+    plan.equal(name, join(__dirname, '..', 'fixtures', 'transport-worker-name.js'))
+  })
+  instance.info('hello')
+
+  await plan
+})
+
+test('pino.transport with targets sets worker thread name to pino.transport', { skip: !hasThreadName }, async (t) => {
+  const plan = tspl(t, { plan: 1 })
+  const transport = pino.transport({
+    targets: [{
+      level: 'info',
+      target: join(__dirname, '..', 'fixtures', 'transport-worker-name.js')
+    }]
+  })
+  t.after(transport.end.bind(transport))
+  const instance = pino(transport)
+  transport.once('workerThreadName', (name) => {
+    plan.equal(name, 'pino.transport')
+  })
+  instance.info('hello')
+
+  await plan
+})
+
+test('pino.transport with pipeline sets worker thread name to pino.transport', { skip: !hasThreadName }, async (t) => {
+  const plan = tspl(t, { plan: 1 })
+  const transport = pino.transport({
+    pipeline: [{
+      target: join(__dirname, '..', 'fixtures', 'transport-worker-name.js')
+    }]
+  })
+  t.after(transport.end.bind(transport))
+  const instance = pino(transport)
+  transport.once('workerThreadName', (name) => {
+    plan.equal(name, 'pino.transport')
+  })
+  instance.info('hello')
+
+  await plan
+})

@@ -152,3 +152,7 @@ profile-*
 test/fixtures/ts/*js
 !test/fixtures/eval/node_modules
 !test/fixtures/ts/transpile.cjs
+
+# Claude
+CLAUDE.md
+.claude
