@@ -183,7 +183,7 @@ Although it works, we recommend using one of these options instead if you are ab
 
 1. If the only change desired is the name then a transport can be used. One such
 transport is [`pino-text-level-transport`](https://npm.im/pino-text-level-transport).
-    * You can also use [`pino-template`](https://npm.im/pino.template) to convert the level number to a 
+    * You can also use [`pino-template`](https://npm.im/pino-template) to convert the level number to a 
       name. See [the example in the README for `pino-template`](https://npm.im/pino-template#example)
 1. Use a prettifier like [`pino-pretty`](https://npm.im/pino-pretty) to make
 the logs human friendly.
