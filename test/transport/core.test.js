@@ -680,7 +680,9 @@ test('pino.transport handles prototype pollution of __bundlerPathsOverrides', as
   })
 })
 
-test('pino.transport with single target sets worker thread name to target', async (t) => {
+const hasThreadName = 'threadName' in require('worker_threads')
+
+test('pino.transport with single target sets worker thread name to target', { skip: !hasThreadName }, async (t) => {
   const plan = tspl(t, { plan: 1 })
   const transport = pino.transport({
     target: join(__dirname, '..', 'fixtures', 'transport-worker-name.js')
@@ -695,7 +697,7 @@ test('pino.transport with single target sets worker thread name to target', asyn
   await plan
 })
 
-test('pino.transport with targets sets worker thread name to pino.transport', async (t) => {
+test('pino.transport with targets sets worker thread name to pino.transport', { skip: !hasThreadName }, async (t) => {
   const plan = tspl(t, { plan: 1 })
   const transport = pino.transport({
     targets: [{
@@ -713,7 +715,7 @@ test('pino.transport with targets sets worker thread name to pino.transport', as
   await plan
 })
 
-test('pino.transport with pipeline sets worker thread name to pino.transport', async (t) => {
+test('pino.transport with pipeline sets worker thread name to pino.transport', { skip: !hasThreadName }, async (t) => {
   const plan = tspl(t, { plan: 1 })
   const transport = pino.transport({
     pipeline: [{
