@@ -1,6 +1,6 @@
 {
   "name": "pino",
-  "version": "10.2.1",
+  "version": "10.3.0",
   "description": "super fast, all natural json logger",
   "main": "pino.js",
   "type": "commonjs",
