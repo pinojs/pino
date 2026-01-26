@@ -496,6 +496,38 @@ test('sets worker data informing the transport that pino will send its config (f
   await plan
 })
 
+test('warns when custom formatters.level is incompatible with multi-target transport routing', async (t) => {
+  const warnings = []
+  const originalEmitWarning = process.emitWarning
+  process.emitWarning = function (warning, options) {
+    warnings.push({ warning, options })
+  }
+  t.after(() => {
+    process.emitWarning = originalEmitWarning
+  })
+
+  const transport = pino.transport({
+    targets: [
+      { target: join(__dirname, '..', 'fixtures', 'noop-transport.js') },
+      { target: join(__dirname, '..', 'fixtures', 'noop-transport.js') }
+    ]
+  })
+  t.after(transport.end.bind(transport))
+
+  const instance = pino({
+    formatters: {
+      level (label) {
+        return { severity: label }
+      }
+    }
+  }, transport)
+
+  instance.info('hello')
+
+  assert.equal(warnings.length, 1)
+  assert.equal(warnings[0].options.code, 'PINO_TRANSPORT_MULTI_TARGETS_LEVEL_FORMATTER')
+})
+
 test('stdout in worker', async () => {
   let actual = ''
   const child = execa(process.argv[0], [join(__dirname, '..', 'fixtures', 'transport-main.js')])
