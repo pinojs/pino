@@ -1,11 +1,14 @@
 {
   "compilerOptions": {
     "target": "es6",
-    "lib": [ "es2015", "dom" ],
+    "lib": ["es2015", "dom"],
     "module": "commonjs",
+    "moduleResolution": "node",
     "noEmit": true,
     "strict": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true
   },
   "exclude": [
     "./test/types/*.test-d.ts",
