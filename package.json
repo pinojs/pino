@@ -22,7 +22,7 @@
     "smoke:browser": "node ./browser.js",
     "smoke:file": "node ./file.js",
     "transpile": "node ./test/fixtures/ts/transpile.cjs",
-    "cov-ui": "tap --ts --coverage-report=html",
+    "cov-ui": "c8 --reporter=html --reporter=text borp --timeout 60000",
     "bench": "node benchmarks/utils/runbench all",
     "bench-basic": "node benchmarks/utils/runbench basic",
     "bench-object": "node benchmarks/utils/runbench object",
