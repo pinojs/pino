@@ -687,6 +687,35 @@ test('safe-stable-stringify must be used when interpolating', async () => {
   assert.equal(msg, 'test {"a":{"b":{"c":"[Circular]"}}}')
 })
 
+test('serializes bigint values by default', async () => {
+  const stream = sink()
+  const instance = pino(stream)
+
+  instance.info({ id: 2n })
+
+  const { id } = await once(stream, 'data')
+  assert.equal(id, 2)
+})
+
+test('throws on bigint values when bigint option is false', () => {
+  const stream = sink()
+  const instance = pino({ bigint: false }, stream)
+
+  assert.throws(() => {
+    instance.info({ id: 2n })
+  }, /Do not know how to serialize a BigInt/)
+})
+
+test('uses custom bigint replacer when configured', async () => {
+  const stream = sink()
+  const instance = pino({ bigint: (value) => `bigint:${value}` }, stream)
+
+  instance.info({ id: 2n })
+
+  const { id } = await once(stream, 'data')
+  assert.equal(id, 'bigint:2')
+})
+
 test('throws when setting useOnlyCustomLevels without customLevels', () => {
   assert.throws(
     () => {

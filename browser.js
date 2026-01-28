@@ -13,6 +13,10 @@ const stdSerializers = {
   wrapErrorSerializer: passthrough,
   req: mock,
   res: mock,
+  nodeReq: mock,
+  nodeRes: mock,
+  whatwgReq: mock,
+  whatwgRes: mock,
   err: asErrValue,
   errWithCause: asErrValue
 }

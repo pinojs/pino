@@ -189,6 +189,20 @@ pino({
 })
 
 pino({
+  bigint: false,
+})
+
+pino({
+  bigint: (value) => value.toString(),
+})
+
+expectError(
+  pino({
+    bigint: 'nope',
+  })
+)
+
+pino({
   browser: {
     write (o) {},
   },

@@ -699,6 +699,14 @@ declare namespace pino {
           edgeLimit?: number
 
         /**
+         * Controls how BigInt values are serialized when fallback stringification is required.
+         * - `true`: convert to a JSON number (default).
+         * - `false`: throw when a BigInt is encountered.
+         * - `function`: return a replacement value for the BigInt.
+         */
+        bigint?: boolean | ((value: bigint) => unknown)
+
+        /**
          * Optional child creation callback.
          */
         onChild?: OnChildCallback<CustomLevels>;

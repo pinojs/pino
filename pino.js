@@ -43,7 +43,8 @@ const {
   hooksSym,
   nestedKeyStrSym,
   mixinMergeStrategySym,
-  msgPrefixSym
+  msgPrefixSym,
+  bigintSym
 } = symbols
 const { epochTime, nullTime } = time
 const { pid } = process
@@ -79,7 +80,8 @@ const defaultOptions = {
   customLevels: null,
   useOnlyCustomLevels: false,
   depthLimit: 5,
-  edgeLimit: 100
+  edgeLimit: 100,
+  bigint: true
 }
 
 const normalize = createArgsNormalizer(defaultOptions)
@@ -112,13 +114,15 @@ function pino (...args) {
     hooks,
     depthLimit,
     edgeLimit,
+    bigint,
     onChild,
     msgPrefix
   } = opts
 
   const stringifySafe = configure({
     maximumDepth: depthLimit,
-    maximumBreadth: edgeLimit
+    maximumBreadth: edgeLimit,
+    ...(typeof bigint === 'boolean' ? { bigint } : {})
   })
 
   const allFormatters = buildFormatters(
@@ -128,7 +132,8 @@ function pino (...args) {
   )
 
   const stringifyFn = stringify.bind({
-    [stringifySafeSym]: stringifySafe
+    [stringifySafeSym]: stringifySafe,
+    [bigintSym]: bigint
   })
   const stringifiers = redact ? redaction(redact, stringifyFn) : {}
   const formatOpts = redact
@@ -141,7 +146,8 @@ function pino (...args) {
     [stringifiersSym]: stringifiers,
     [stringifySym]: stringify,
     [stringifySafeSym]: stringifySafe,
-    [formattersSym]: allFormatters
+    [formattersSym]: allFormatters,
+    [bigintSym]: bigint
   })
 
   let chindings = ''
@@ -161,6 +167,7 @@ function pino (...args) {
   if (useOnlyCustomLevels && !customLevels) throw Error('customLevels is required if useOnlyCustomLevels is set true')
   if (mixin && typeof mixin !== 'function') throw Error(`Unknown mixin type "${typeof mixin}" - expected "function"`)
   if (msgPrefix && typeof msgPrefix !== 'string') throw Error(`Unknown msgPrefix type "${typeof msgPrefix}" - expected "string"`)
+  if (bigint !== undefined && typeof bigint !== 'boolean' && typeof bigint !== 'function') throw Error(`Unknown bigint type "${typeof bigint}" - expected "boolean" or "function"`)
 
   assertDefaultLevelFound(level, customLevels, useOnlyCustomLevels)
   const levels = mappings(customLevels, useOnlyCustomLevels)
@@ -182,6 +189,7 @@ function pino (...args) {
     [stringifySym]: stringify,
     [stringifySafeSym]: stringifySafe,
     [stringifiersSym]: stringifiers,
+    [bigintSym]: bigint,
     [endSym]: end,
     [formatOptsSym]: formatOpts,
     [messageKeySym]: messageKey,
