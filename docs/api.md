@@ -149,8 +149,8 @@ Option to limit stringification of properties/elements when logging a specific o
 
 Default: `true`
 
-Controls how `BigInt` values are stringified when logging objects that require
-`safe-stable-stringify` fallback behavior.
+Controls how `BigInt` values are stringified when `JSON.stringify` fails and
+Pino falls back to [`safe-stable-stringify`](https://www.npmjs.com/package/safe-stable-stringify).
 
 - `true`: Convert `BigInt` values to a JSON number (default behavior).
 - `false`: Throw the original `JSON.stringify` error when a `BigInt` is encountered.
