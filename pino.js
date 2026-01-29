@@ -131,7 +131,13 @@ function pino (...args) {
     formatters.log
   )
 
-  const stringifyFn = stringify.bind({
+  const useBigint = bigint === false || typeof bigint === 'function'
+  const stringifyImpl = useBigint
+    ? function stringifyWithBigint (obj, stringifySafeFn) {
+        return stringify.call(this, obj, stringifySafeFn, bigint)
+      }
+    : stringify
+  const stringifyFn = stringifyImpl.bind({
     [stringifySafeSym]: stringifySafe,
     [bigintSym]: bigint
   })
@@ -144,7 +150,7 @@ function pino (...args) {
     [chindingsSym]: '',
     [serializersSym]: serializers,
     [stringifiersSym]: stringifiers,
-    [stringifySym]: stringify,
+    [stringifySym]: stringifyImpl,
     [stringifySafeSym]: stringifySafe,
     [formattersSym]: allFormatters,
     [bigintSym]: bigint
@@ -186,7 +192,7 @@ function pino (...args) {
     [streamSym]: stream,
     [timeSym]: time,
     [timeSliceIndexSym]: timeSliceIndex,
-    [stringifySym]: stringify,
+    [stringifySym]: stringifyImpl,
     [stringifySafeSym]: stringifySafe,
     [stringifiersSym]: stringifiers,
     [bigintSym]: bigint,
