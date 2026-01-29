@@ -145,6 +145,17 @@ Default: `100`
 
 Option to limit stringification of properties/elements when logging a specific object/array with circular references.
 
+#### `bigint` (Boolean | Function)
+
+Default: `true`
+
+Controls how `BigInt` values are stringified when logging objects that require
+`safe-stable-stringify` fallback behavior.
+
+- `true`: Convert `BigInt` values to a JSON number (default behavior).
+- `false`: Throw the original `JSON.stringify` error when a `BigInt` is encountered.
+- `function (value)`: Return a replacement value for the `BigInt` (e.g. a string).
+
 <a id="opt-mixin"></a>
 #### `mixin` (Function):
 

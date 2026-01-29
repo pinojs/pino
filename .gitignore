@@ -153,6 +153,9 @@ test/fixtures/ts/*js
 !test/fixtures/eval/node_modules
 !test/fixtures/ts/transpile.cjs
 
-# Claude
+# AI assistants
 CLAUDE.md
 .claude
+.agents
+.pi
+AGENTS.md
