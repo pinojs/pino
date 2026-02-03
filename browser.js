@@ -519,6 +519,43 @@ function pfGlobalThisOrFallback () {
 
 module.exports.default = pino
 module.exports.pino = pino
+module.exports.logEventToObject = logEventToObject
+
+/**
+ * Converts a LogEvent to a log object similar to what Node.js transports receive.
+ * This is useful in transmit.send to format logs for upstream logging systems.
+ *
+ * @param {Object} logEvent - The log event from transmit.send
+ * @param {Object} opts - Options object
+ * @param {string} [opts.messageKey='msg'] - The key to use for the message
+ * @returns {Object} A log object with time, level, merged bindings, and message
+ */
+function logEventToObject (logEvent, opts) {
+  opts = opts || {}
+  const messageKey = opts.messageKey || 'msg'
+  const messages = logEvent.messages.slice()
+
+  const logObject = {
+    time: logEvent.ts,
+    level: logEvent.level.value
+  }
+
+  for (let i = 0; i < logEvent.bindings.length; i++) {
+    Object.assign(logObject, logEvent.bindings[i])
+  }
+
+  if (messages.length > 0 && messages[0] !== null && typeof messages[0] === 'object') {
+    Object.assign(logObject, messages.shift())
+  }
+
+  if (messages.length > 0) {
+    logObject[messageKey] = messages.length === 1
+      ? messages[0]
+      : format(messages.shift(), messages)
+  }
+
+  return logObject
+}
 
 // Attempt to extract the user callsite (file:line:column)
 /* istanbul ignore next */
