@@ -13,7 +13,6 @@
 //                 Michel Nemnom <https://github.com/Pegase745>
 //                 Igor Savin <https://github.com/kibertoad>
 //                 James Bromwell <https://github.com/thw0rted>
-// TypeScript Version: 4.4
 
 import type { EventEmitter } from "events";
 import * as pinoStdSerializers from "pino-std-serializers";
@@ -306,7 +305,7 @@ declare namespace pino {
         flushSync: () => void,
         minLevel: number,
         streams: StreamEntry<TOriginLevel>[],
-        clone<TLevel = Level>(level: TLevel): MultiStreamRes<TLevel>,
+        clone<const TLevel = Level>(level: TLevel): MultiStreamRes<TLevel>,
     }
 
     export interface LevelMapping {

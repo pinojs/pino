@@ -1,6 +1,6 @@
 {
   "name": "pino",
-  "version": "10.1.1",
+  "version": "10.3.0",
   "description": "super fast, all natural json logger",
   "main": "pino.js",
   "type": "commonjs",
@@ -73,7 +73,7 @@
     "docsify-cli": "^4.4.4",
     "eslint": "^9.37.0",
     "eslint-plugin-import": "^2.26.0",
-    "eslint-plugin-n": "17.23.1",
+    "eslint-plugin-n": "17.23.2",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^6.0.0",
     "execa": "^5.0.0",

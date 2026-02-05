@@ -1,4 +1,4 @@
-import { expectType } from 'tsd'
+import { expectType, expectNotType } from 'tsd'
 
 import { createWriteStream } from 'node:fs'
 
@@ -23,5 +23,6 @@ expectType<pino.MultiStreamRes<'error' | 'fatal'>>(pino.multistream(streams, { d
 expectType<pino.MultiStreamRes<'error' | 'fatal'>>(pino.multistream(streams[0]).add(streams[1]))
 expectType<pino.MultiStreamRes<'error' | 'fatal'>>(multistream(streams))
 expectType<pino.MultiStreamRes<'error'>>(multistream(streams).clone('error'))
+expectNotType<pino.MultiStreamRes<string>>(multistream(streams).clone('error'))
 
 expectType<pino.MultiStreamRes>(multistream(process.stdout))
