@@ -1,8 +1,10 @@
-import { IncomingMessage, ServerResponse } from 'http'
+import { expect } from 'tstyche'
+
+import { IncomingMessage, ServerResponse } from 'node:http'
+import { Socket } from 'node:net'
 import { mock } from 'node:test'
-import { Socket } from 'net'
-import { expectError, expectType } from 'tsd'
-import pino, { LogFn, LoggerOptions } from '../../'
+
+import pino, { type LogFn, type LoggerOptions } from '../../pino.js'
 import Logger = pino.Logger
 
 const log = pino()
@@ -35,7 +37,7 @@ info('The object is %o', { a: 1, b: '2' })
 info('The json is %j', { a: 1, b: '2' })
 info('The object is %O', { a: 1, b: '2' })
 info('The answer is %d and the question is %s with %o', 42, 'unknown', {
-  correct: 'order',
+  correct: 'order'
 })
 info('Missing placeholder is fine %s')
 
@@ -76,16 +78,18 @@ info('Symbol %o', Symbol('test'))
 info('String %o', 'hello')
 
 // placeholder messages type errors
-expectError(info('The answer is %d', 'not a number'))
-expectError(
-  info(
-    'The answer is %d and the question is %s with %o',
-    'unknown',
-    { incorrect: 'order' },
-    42
-  )
+expect(info).type.not.toBeCallableWith('The answer is %d', 'not a number')
+expect(info).type.not.toBeCallableWith(
+  'The answer is %d and the question is %s with %o',
+  'unknown',
+  { incorrect: 'order' },
+  42
 )
-expectError(info('Extra message %s', 'after placeholder', 'not allowed'))
+expect(info).type.not.toBeCallableWith(
+  'Extra message %s',
+  'after placeholder',
+  'not allowed'
+)
 
 // object types with messages
 info({ obj: 42 }, 'hello world')
@@ -94,18 +98,23 @@ info({ obj: { aa: 'bbb' } }, 'another')
 info({ a: 1, b: '2' }, 'hello world with %s', 'extra data')
 
 // Extra message after placeholder
-expectError(info({ a: 1, b: '2' }, 'hello world with %d', 2, 'extra'))
+expect(info).type.not.toBeCallableWith(
+  { a: 1, b: '2' },
+  'hello world with %d',
+  2,
+  'extra'
+)
 
 // metadata with messages type passes, because of custom toString method
 // We can't detect if the object has a custom toString method that returns a string
 info({ a: 1, b: '2' }, 'hello world with %s', {})
 
 // metadata after message
-expectError(info('message', { a: 1, b: '2' }))
+expect(info).type.not.toBeCallableWith('message', { a: 1, b: '2' })
 
 // multiple strings without placeholder
-expectError(info('string1', 'string2'))
-expectError(info('string1', 'string2', 'string3'))
+expect(info).type.not.toBeCallableWith('string1', 'string2')
+expect(info).type.not.toBeCallableWith('string1', 'string2', 'string3')
 
 setImmediate(info, 'after setImmediate')
 error(new Error('an error'))
@@ -113,7 +122,7 @@ error(new Error('an error'))
 const writeSym = pino.symbols.writeSym
 
 const testUniqSymbol = {
-  [pino.symbols.needsMetadataGsym]: true,
+  [pino.symbols.needsMetadataGsym]: true
 }[pino.symbols.needsMetadataGsym]
 
 const log2: pino.Logger = pino({
@@ -122,83 +131,81 @@ const log2: pino.Logger = pino({
   serializers: {
     req: pino.stdSerializers.req,
     res: pino.stdSerializers.res,
-    err: pino.stdSerializers.err,
-  },
+    err: pino.stdSerializers.err
+  }
 })
 
 pino({
-  write (o) {},
+  write (o) {}
 })
 
 pino({
   mixin () {
     return { customName: 'unknown', customId: 111 }
-  },
+  }
 })
 
 pino({
-  mixin: () => ({ customName: 'unknown', customId: 111 }),
+  mixin: () => ({ customName: 'unknown', customId: 111 })
 })
 
 pino({
-  mixin: (context: object) => ({ customName: 'unknown', customId: 111 }),
+  mixin: (context: object) => ({ customName: 'unknown', customId: 111 })
 })
 
 pino({
   mixin: (context: object, level: number) => ({
     customName: 'unknown',
-    customId: 111,
-  }),
+    customId: 111
+  })
 })
 
 pino({
-  redact: { paths: [], censor: 'SECRET' },
+  redact: { paths: [], censor: 'SECRET' }
 })
 
 pino({
-  redact: { paths: [], censor: () => 'SECRET' },
+  redact: { paths: [], censor: () => 'SECRET' }
 })
 
 pino({
-  redact: { paths: [], censor: (value) => value },
+  redact: { paths: [], censor: (value) => value }
 })
 
 pino({
-  redact: { paths: [], censor: (value, path) => path.join() },
+  redact: { paths: [], censor: (value, path) => path.join() }
 })
 
 pino({
   redact: {
     paths: [],
-    censor: (value): string => 'SECRET',
-  },
+    censor: (value): string => 'SECRET'
+  }
 })
 
-expectError(
-  pino({
-    redact: { paths: [], censor: (value: string) => value },
-  })
-)
-
-pino({
-  depthLimit: 1,
+expect(pino).type.not.toBeCallableWith({
+  redact: { paths: [], censor: (value: string) => value }
 })
 
 pino({
-  edgeLimit: 1,
+  depthLimit: 1
+})
+
+pino({
+  edgeLimit: 1
 })
 
 pino({
   browser: {
-    write (o) {},
-  },
+    write (o) {}
+  }
 })
 
 pino({
   browser: {
     write: {
       info (o) {},
-      error (o) {},
+      error (o) {}
     },
     serialize: true,
     asObject: true,
@@ -210,16 +217,16 @@ pino({
         logEvent.level
         logEvent.ts
         logEvent.messages
-      },
+      }
     },
-    disabled: false,
-  },
+    disabled: false
+  }
 })
 
 pino({
   browser: {
-    asObjectBindingsOnly: true,
-  },
+    asObjectBindingsOnly: true
+  }
 })
 
 pino({}, undefined)
@@ -227,7 +234,7 @@ pino({}, undefined)
 pino({ base: null })
 if ('pino' in log) console.log(`pino version: ${log.pino}`)
 
-expectType<void>(log.flush())
+expect(log.flush()).type.toBe<void>()
 log.flush((err?: Error) => undefined)
 log.child({ a: 'property' }).info('hello child!')
 log.level = 'error'
@@ -242,7 +249,7 @@ child.bindings()
 const customSerializers = {
   test () {
     return 'this is my serializer'
-  },
+  }
 }
 pino()
   .child({}, { serializers: customSerializers })
@@ -252,20 +259,20 @@ const childChild = child2.child({ baby: true })
 const childRedacted = pino().child({}, { redact: ['path'] })
 childRedacted.info({
   msg: 'logged with redacted properties',
-  path: 'Not shown',
+  path: 'Not shown'
 })
 const childAnotherRedacted = pino().child(
   {},
   {
     redact: {
       paths: ['anotherPath'],
-      censor: 'Not the log you\re looking for',
-    },
+      censor: 'Not the log you\re looking for'
+    }
   }
 )
 childAnotherRedacted.info({
   msg: 'another logged with redacted properties',
-  anotherPath: 'Not shown',
+  anotherPath: 'Not shown'
 })
 
 log.level = 'info'
@@ -295,49 +302,49 @@ log.level === 'info'
 const isEnabled: boolean = log.isLevelEnabled('info')
 
 const redacted = pino({
-  redact: ['path'],
+  redact: ['path']
 })
 
 redacted.info({
   msg: 'logged with redacted properties',
-  path: 'Not shown',
+  path: 'Not shown'
 })
 
 const anotherRedacted = pino({
   redact: {
     paths: ['anotherPath'],
-    censor: 'Not the log you\re looking for',
-  },
+    censor: 'Not the log you\re looking for'
+  }
 })
 
 anotherRedacted.info({
   msg: 'another logged with redacted properties',
-  anotherPath: 'Not shown',
+  anotherPath: 'Not shown'
 })
 
 const withTimeFn = pino({
-  timestamp: pino.stdTimeFunctions.isoTime,
+  timestamp: pino.stdTimeFunctions.isoTime
 })
 
 const withRFC3339TimeFn = pino({
-  timestamp: pino.stdTimeFunctions.isoTimeNano,
+  timestamp: pino.stdTimeFunctions.isoTimeNano
 })
 
 const withNestedKey = pino({
-  nestedKey: 'payload',
+  nestedKey: 'payload'
 })
 
 const withHooks = pino({
   hooks: {
     logMethod (args, method, level) {
-      expectType<pino.Logger>(this)
+      expect(this).type.toBe<pino.Logger>()
       return method.apply(this, args)
     },
     streamWrite (s) {
-      expectType<string>(s)
+      expect(s).type.toBe<string>()
       return s.replaceAll('secret-key', 'xxx')
-    },
-  },
+    }
+  }
 })
 
 // Properties/types imported from pino-std-serializers
@@ -383,7 +390,7 @@ const destinationViaNumFileDescriptor = pino.destination(2)
 const destinationViaStream = pino.destination(process.stdout)
 const destinationViaOptionsObject = pino.destination({
   dest: '/log/path',
-  sync: false,
+  sync: false
 })
 
 pino(destinationViaDefaultArgs)
@@ -409,14 +416,14 @@ interface StrictShape {
 }
 
 info<StrictShape>({
-  activity: 'Required property',
+  activity: 'Required property'
 })
 
 const logLine: pino.LogDescriptor = {
   level: 20,
   msg: 'A log message',
   time: new Date().getTime(),
-  aCustomProperty: true,
+  aCustomProperty: true
 }
 
 interface CustomLogger extends pino.Logger {
@@ -442,12 +449,12 @@ const customBaseLogger: CustomBaseLogger = {
   child () {
     return this
   },
-  msgPrefix: 'prefix',
+  msgPrefix: 'prefix'
 }
 
 // custom levels
 const log3 = pino({ customLevels: { myLevel: 100 } })
-expectError(log3.log())
+expect(log3).type.not.toHaveProperty('log')
 log3.level = 'myLevel'
 log3.myLevel('')
 log3.child({}).myLevel('')
@@ -470,15 +477,15 @@ cclog3.childLevel('')
 cclog3.childLevel2('')
 
 const ccclog3 = clog3.child({})
-expectError(ccclog3.nonLevel(''))
+expect(ccclog3).type.not.toHaveProperty('nonLevel')
 
 const withChildCallback = pino({
-  onChild: (child: Logger) => {},
+  onChild: (child: Logger) => {}
 })
 withChildCallback.onChild = (child: Logger) => {}
 
 pino({
-  crlf: true,
+  crlf: true
 })
 
 const customLevels = { foo: 99, bar: 42 }
@@ -495,21 +502,17 @@ const customLevelChildLogger = customLevelLogger.child({ name: 'child' })
 fn(customLevelChildLogger) // missing foo typing
 
 // unknown option
-expectError(
-  pino({
-    hello: 'world',
-  })
-)
+expect(pino).type.not.toBeCallableWith({
+  hello: 'world'
+})
 
 // unknown option
-expectError(
-  pino({
-    hello: 'world',
-    customLevels: {
-      log: 30,
-    },
-  })
-)
+expect(pino).type.not.toBeCallableWith({
+  hello: 'world',
+  customLevels: {
+    log: 30
+  }
+})
 
 function dangerous () {
   throw Error('foo')
@@ -529,15 +532,15 @@ try {
 
 const bLogger = pino({
   customLevels: {
-    log: 5,
+    log: 5
   },
   level: 'log',
   transport: {
     target: 'pino-pretty',
     options: {
-      colorize: true,
-    },
-  },
+      colorize: true
+    }
+  }
 })
 
 // Test that we can properly extract parameters from the log fn type
@@ -546,13 +549,13 @@ const [param1, param2, param3, param4]: LogParam = [
   { multiple: 'params' },
   'should',
   'be',
-  'accepted',
+  'accepted'
 ]
 
-expectType<unknown>(param1)
-expectType<string>(param2)
-expectType<unknown>(param3)
-expectType<unknown>(param4)
+expect(param1).type.toBe<unknown>()
+expect(param2).type.toBe<string>()
+expect(param3).type.toBe<unknown>()
+expect(param4).type.toBe<unknown>()
 
 const logger = mock.fn<LogFn>()
 logger.mock.calls[0].arguments[1]?.includes('I should be able to get params')
@@ -565,37 +568,37 @@ const hooks: LoggerOptions['hooks'] = {
         return method.apply(this, [
           parameter2,
           parameter1,
-          ...remainingParameters,
+          ...remainingParameters
         ])
       }
       return method.apply(this, [parameter2])
     }
 
     return method.apply(this, parameters)
-  },
+  }
 }
 
-expectType<Logger<'log'>>(
+expect(
   pino({
     customLevels: {
-      log: 5,
+      log: 5
     },
     level: 'log',
     transport: {
       target: 'pino-pretty',
       options: {
-        colorize: true,
-      },
-    },
+        colorize: true
+      }
+    }
   })
-)
+).type.toBe<Logger<'log'>>()
 
 const parentLogger1 = pino(
   {
     customLevels: { myLevel: 90 },
     onChild: (child) => {
       const a = child.myLevel
-    },
+    }
   },
   process.stdout
 )
@@ -605,27 +608,23 @@ parentLogger1.onChild = (child) => {
 
 const childLogger1 = parentLogger1.child({})
 childLogger1.myLevel('')
-expectError(childLogger1.doesntExist(''))
+expect(childLogger1).type.not.toHaveProperty('doesntExist')
 
 const parentLogger2 = pino({}, process.stdin)
-expectError(
-  (parentLogger2.onChild = (child) => {
-    const b = child.doesntExist
-  })
-)
+parentLogger2.onChild = (child) => {
+  expect(child).type.not.toHaveProperty('doesntExist')
+}
 
 const childLogger2 = parentLogger2.child({})
-expectError(childLogger2.doesntExist)
+expect(childLogger2).type.not.toHaveProperty('doesntExist')
 
-expectError(
-  pino(
-    {
-      onChild: (child) => {
-        const a = child.doesntExist
-      },
-    },
-    process.stdout
-  )
+pino(
+  {
+    onChild: (child) => {
+      expect(child).type.not.toHaveProperty('doesntExist')
+    }
+  },
+  process.stdout
 )
 
 const pinoWithoutLevelsSorting = pino({})
@@ -633,13 +632,13 @@ const pinoWithDescSortingLevels = pino({ levelComparison: 'DESC' })
 const pinoWithAscSortingLevels = pino({ levelComparison: 'ASC' })
 const pinoWithCustomSortingLevels = pino({ levelComparison: () => false })
 // with wrong level comparison direction
-expectError(pino({ levelComparison: 'SOME' }), process.stdout)
+expect(pino).type.not.toBeCallableWith({ levelComparison: 'SOME' })
 // with wrong level comparison type
-expectError(pino({ levelComparison: 123 }), process.stdout)
+expect(pino).type.not.toBeCallableWith({ levelComparison: 123 })
 // with wrong custom level comparison return type
-expectError(pino({ levelComparison: () => null }), process.stdout)
-expectError(pino({ levelComparison: () => 1 }), process.stdout)
-expectError(pino({ levelComparison: () => 'string' }), process.stdout)
+expect(pino).type.not.toBeCallableWith({ levelComparison: () => null })
+expect(pino).type.not.toBeCallableWith({ levelComparison: () => 1 })
+expect(pino).type.not.toBeCallableWith({ levelComparison: () => 'string' })
 
 const customLevelsOnlyOpts = {
   useOnlyCustomLevels: true,
@@ -647,9 +646,9 @@ const customLevelsOnlyOpts = {
     customDebug: 10,
     info: 20, // to make sure the default names are also available for override
     customNetwork: 30,
-    customError: 40,
+    customError: 40
   },
-  level: 'customDebug',
+  level: 'customDebug'
 } satisfies LoggerOptions
 
 const loggerWithCustomLevelOnly = pino(customLevelsOnlyOpts)
@@ -658,11 +657,11 @@ loggerWithCustomLevelOnly.info('test4')
 loggerWithCustomLevelOnly.customError('test5')
 loggerWithCustomLevelOnly.customNetwork('test6')
 
-expectError(loggerWithCustomLevelOnly.fatal('test'))
-expectError(loggerWithCustomLevelOnly.error('test'))
-expectError(loggerWithCustomLevelOnly.warn('test'))
-expectError(loggerWithCustomLevelOnly.debug('test'))
-expectError(loggerWithCustomLevelOnly.trace('test'))
+expect(loggerWithCustomLevelOnly.fatal).type.toBe<never>()
+expect(loggerWithCustomLevelOnly.error).type.toBe<never>()
+expect(loggerWithCustomLevelOnly.warn).type.toBe<never>()
+expect(loggerWithCustomLevelOnly.debug).type.toBe<never>()
+expect(loggerWithCustomLevelOnly.trace).type.toBe<never>()
 
 // Module extension
 declare module '../../' {
@@ -673,9 +672,8 @@ declare module '../../' {
 }
 
 info({ typeCheckedField: 'bar' })
-expectError(info({ bannedField: 'bar' }))
-expectError(info({ typeCheckedField: 123 }))
-
+expect(info).type.not.toBeCallableWith({ bannedField: 'bar' })
+expect(info).type.not.toBeCallableWith({ typeCheckedField: 123 })
 const someGenericFunction = <T extends string | number | symbol = never>(
   arg: Record<T, unknown>
 ) => {
