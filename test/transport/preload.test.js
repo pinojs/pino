@@ -41,3 +41,14 @@ test('pino.transport works when loaded via --import preload (space separated)', 
   const result = JSON.parse(await readFile(destination))
   assert.equal(result.msg, 'hello from main')
 })
+
+test('pino.transport ignores missing absolute preload from NODE_OPTIONS in worker', async () => {
+  const destination = file()
+  const main = join(__dirname, '..', 'fixtures', 'transport-invalid-node-options.js')
+
+  await execa(process.argv[0], [main, destination], { timeout: 10000 })
+
+  await watchFileCreated(destination)
+  const result = JSON.parse(await readFile(destination))
+  assert.equal(result.msg, 'hello with invalid node options preload')
+})
