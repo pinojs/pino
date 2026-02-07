@@ -757,6 +757,43 @@ declare namespace pino {
         };
     }
 
+    /**
+     * Options for the logEventToObject function.
+     */
+    export interface LogEventToObjectOptions {
+        /**
+         * The key to use for the message in the output object. Default: "msg".
+         */
+        messageKey?: string;
+    }
+
+    /**
+     * Converts a LogEvent to a log object similar to what Node.js transports receive.
+     * This is useful in transmit.send to format logs for upstream logging systems.
+     *
+     * @param logEvent - The log event from transmit.send
+     * @param opts - Options object
+     * @returns A log object with time, level, merged bindings, and message
+     *
+     * @example
+     * ```typescript
+     * const logger = pino({
+     *   browser: {
+     *     transmit: {
+     *       send(level, logEvent) {
+     *         const logObject = pino.logEventToObject(logEvent)
+     *         // Send logObject to your logging service
+     *       }
+     *     }
+     *   }
+     * })
+     * ```
+     */
+    export function logEventToObject(logEvent: LogEvent, opts?: LogEventToObjectOptions): {
+        time: number;
+        level: number;
+        [key: string]: any;
+    };
 
 
     //// Top level variable (const) exports
