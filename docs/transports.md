@@ -85,7 +85,7 @@ This means that the options object can only contain types that are supported by 
 [Structured Clone Algorithm][sca] which is used to (de)serialize objects between threads.
 
 What if we wanted to use both transports, but send only error logs to `my-transport.mjs` while
-sending all logs to `some-file-transport`? We can use the `pino.transport` function's `level` option:
+sending all logs to `some-file-transport`? We can use the per-target `level` option:
 
 ```js
 const pino = require('pino')
@@ -97,6 +97,54 @@ const transport = pino.transport({
 })
 pino(transport)
 ```
+
+### How level filtering works with transports
+
+Pino applies level filtering in two different places depending on the transport configuration.
+
+#### A) Single `target` (or single `pipeline`)
+
+```text
+Main thread                                   Worker thread
+────────────────────────────────────────────  ─────────────────────────────────
+logger.debug()/info()/...                     transport target (stream)
+        │                                              ▲
+        ▼                                              │
+logger.level gate (enabled methods) ──ThreadStream─────┘
+
+Result:
+- `logger.level` decides what is emitted.
+- `transport.level` is not used in this path.
+```
+
+#### B) `targets` (multiple destinations)
+
+```text
+Main thread                                   Worker thread
+────────────────────────────────────────────  ─────────────────────────────────
+logger.debug()/info()/...                     pino.multistream
+        │                                      (per-target level filter)
+        ▼                                              │
+logger.level gate (enabled methods) ──ThreadStream────┼──> target #1 (level: ...)
+                                                       ├──> target #2 (level: ...)
+                                                       └──> target #N (default: info)
+
+Result:
+- `logger.level` is the first gate.
+- each `targets[i].level` is the second gate.
+- missing `targets[i].level` defaults to `info`.
+```
+
+Summary:
+
+- Single `target`/single `pipeline`: only `logger.level` filters messages.
+- Multiple `targets`: `logger.level` is applied first, then each `targets[i].level` is applied.
+- If `targets[i].level` is missing, it defaults to `info`.
+
+If you need `debug` (or lower) logs to reach one or more targets, set:
+
+1. `logger.level` low enough, and
+2. `level` on each target that should receive those messages.
 
 If we're using custom levels, they should be passed in when using more than one transport.
 ```js
