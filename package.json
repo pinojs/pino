@@ -16,7 +16,7 @@
     "test-ci": "npm run lint && npm run transpile && npm run borp && npm run test-types",
     "test-ci-pnpm": "pnpm run lint && npm run transpile && borp --timeout 60000 && pnpm run test-types",
     "test-ci-yarn-pnp": "yarn run lint && npm run transpile && borp --timeout 60000",
-    "test-types": "tsc && tsd && ts-node test/types/pino.ts && attw --pack .",
+    "test-types": "tsc && tstyche && ts-node test/types/pino.ts && attw --pack .",
     "test:smoke": "smoker smoke:pino && smoker smoke:browser && smoker smoke:file",
     "smoke:pino": "node ./pino.js",
     "smoke:browser": "node ./browser.js",
@@ -78,6 +78,7 @@
     "eslint-plugin-promise": "^6.0.0",
     "execa": "^5.0.0",
     "fastbench": "^1.0.1",
+    "fastify-tsconfig": "^3.0.0",
     "flush-write-stream": "^2.0.0",
     "import-fresh": "^3.2.1",
     "jest": "^30.0.3",
@@ -97,11 +98,12 @@
     "tape": "^5.5.3",
     "through2": "^4.0.0",
     "ts-node": "^10.9.1",
-    "tsd": "^0.33.0",
+    "tstyche": "^6.0.2",
     "typescript": "~5.9.2",
     "winston": "^3.7.2"
   },
   "dependencies": {
+    "@pinojs/redact": "^0.4.0",
     "atomic-sleep": "^1.0.0",
     "on-exit-leak-free": "^2.1.0",
     "pino-abstract-transport": "^3.0.0",
@@ -110,11 +112,7 @@
     "quick-format-unescaped": "^4.0.3",
     "real-require": "^0.2.0",
     "safe-stable-stringify": "^2.3.1",
-    "@pinojs/redact": "^0.4.0",
     "sonic-boom": "^4.0.1",
     "thread-stream": "^4.0.0"
-  },
-  "tsd": {
-    "directory": "test/types"
   }
 }

@@ -1,34 +1,32 @@
-import { expectType, expectAssignable } from 'tsd'
-import type { SonicBoom } from 'sonic-boom'
+import { expect } from 'tstyche'
 
-import pino, {
+import type { SonicBoom } from 'sonic-boom'
+import type ThreadStream from 'thread-stream'
+
+import {
   destination,
   type LevelMapping,
   levels,
-  type Logger,
   multistream,
   type MultiStreamRes,
   type SerializedError,
   stdSerializers,
   stdTimeFunctions,
-  symbols,
   transport,
-  version,
-} from '../../pino'
+  version
+} from '../../pino.js'
 
-expectType<SonicBoom>(destination(''))
-expectType<LevelMapping>(levels)
-expectType<MultiStreamRes>(multistream(process.stdout))
-expectType<SerializedError>(stdSerializers.err({} as any))
-expectType<string>(stdTimeFunctions.isoTime())
-expectType<string>(stdTimeFunctions.isoTimeNano())
-expectType<string>(version)
+expect(destination('')).type.toBe<SonicBoom>()
+expect(levels).type.toBe<LevelMapping>()
+expect(multistream(process.stdout)).type.toBe<MultiStreamRes>()
+expect(stdSerializers.err({} as Error)).type.toBe<SerializedError>()
+expect(stdTimeFunctions.isoTime()).type.toBe<string>()
+expect(stdTimeFunctions.isoTimeNano()).type.toBe<string>()
+expect(version).type.toBe<string>()
 
-// Can't test against `unique symbol`, see https://github.com/SamVerschueren/tsd/issues/49
-expectAssignable<Symbol>(symbols.endSym)
-
-// TODO: currently returns (aliased) `any`, waiting for strong typed `thread-stream`
-transport({
-  target: '#pino/pretty',
-  options: { some: 'options for', the: 'transport' }
-})
+expect(
+  transport({
+    target: '#pino/pretty',
+    options: { some: 'options for', the: 'transport' }
+  })
+).type.toBe<ThreadStream>()

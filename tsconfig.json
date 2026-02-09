@@ -8,7 +8,7 @@
     "esModuleInterop": true
   },
   "exclude": [
-    "./test/types/*.test-d.ts",
+    "./test/types/**/*",
     "./*.d.ts"
   ]
 }

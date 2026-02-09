@@ -1,5 +1,6 @@
-import pino from '../../pino'
-import { expectType } from 'tsd'
+import { expect } from 'tstyche'
+
+import pino from '../../pino.js'
 
 // Single
 const transport = pino.transport({
@@ -8,11 +9,11 @@ const transport = pino.transport({
 })
 pino(transport)
 
-expectType<pino.Logger>(pino({
-  transport: {
-    target: 'pino-pretty'
-  },
-}))
+expect(
+  pino({
+    transport: { target: 'pino-pretty' }
+  })
+).type.toBe<pino.Logger>()
 
 // Multiple
 const transports = pino.transport({
@@ -31,22 +32,24 @@ const transports = pino.transport({
 })
 pino(transports)
 
-expectType<pino.Logger>(pino({
-  transport: {
-    targets: [
-      {
-        level: 'info',
-        target: '#pino/pretty',
-        options: { some: 'options for', the: 'transport' }
-      },
-      {
-        level: 'trace',
-        target: '#pino/file',
-        options: { destination: './test.log' }
-      }
-    ]
-  },
-}))
+expect(
+  pino({
+    transport: {
+      targets: [
+        {
+          level: 'info',
+          target: '#pino/pretty',
+          options: { some: 'options for', the: 'transport' }
+        },
+        {
+          level: 'trace',
+          target: '#pino/file',
+          options: { destination: './test.log' }
+        }
+      ]
+    }
+  })
+).type.toBe<pino.Logger>()
 
 const transportsWithCustomLevels = pino.transport({
   targets: [
@@ -63,25 +66,27 @@ const transportsWithCustomLevels = pino.transport({
   ],
   levels: { foo: 35 }
 })
-pino(transports)
+pino(transportsWithCustomLevels)
 
-expectType<pino.Logger>(pino({
-  transport: {
-    targets: [
-      {
-        level: 'info',
-        target: '#pino/pretty',
-        options: { some: 'options for', the: 'transport' }
-      },
-      {
-        level: 'trace',
-        target: '#pino/file',
-        options: { destination: './test.log' }
-      }
-    ],
-    levels: { foo: 35 }
-  },
-}))
+expect(
+  pino({
+    transport: {
+      targets: [
+        {
+          level: 'info',
+          target: '#pino/pretty',
+          options: { some: 'options for', the: 'transport' }
+        },
+        {
+          level: 'trace',
+          target: '#pino/file',
+          options: { destination: './test.log' }
+        }
+      ],
+      levels: { foo: 35 }
+    }
+  })
+).type.toBe<pino.Logger>()
 
 const transportsWithoutOptions = pino.transport({
   targets: [
@@ -90,40 +95,50 @@ const transportsWithoutOptions = pino.transport({
   ],
   levels: { foo: 35 }
 })
-pino(transports)
+pino(transportsWithoutOptions)
 
-expectType<pino.Logger>(pino({
-  transport: {
-    targets: [
-      { target: '#pino/pretty' },
-      { target: '#pino/file' }
-    ],
-    levels: { foo: 35 }
-  },
-}))
+expect(
+  pino({
+    transport: {
+      targets: [
+        { target: '#pino/pretty' },
+        { target: '#pino/file' }
+      ],
+      levels: { foo: 35 }
+    }
+  })
+).type.toBe<pino.Logger>()
 
 const pipelineTransport = pino.transport({
-  pipeline: [{
-    target: './my-transform.js'
-  }, {
-    // Use target: 'pino/file' to write to stdout
-    // without any change.
-    target: 'pino-pretty'
-  }]
-})
-pino(pipelineTransport)
-
-expectType<pino.Logger>(pino({
-  transport: {
-    pipeline: [{
+  pipeline: [
+    {
       target: './my-transform.js'
-    }, {
+    },
+    {
       // Use target: 'pino/file' to write to stdout
       // without any change.
       target: 'pino-pretty'
-    }]
-  }
-}))
+    }
+  ]
+})
+pino(pipelineTransport)
+
+expect(
+  pino({
+    transport: {
+      pipeline: [
+        {
+          target: './my-transform.js'
+        },
+        {
+          // Use target: 'pino/file' to write to stdout
+          // without any change.
+          target: 'pino-pretty'
+        }
+      ]
+    }
+  })
+).type.toBe<pino.Logger>()
 
 type TransportConfig = {
   id: string
@@ -144,7 +159,7 @@ pino.transport({
     stdin: false,
     stderr: true,
     stdout: false,
-    autoEnd: true,
+    autoEnd: true
   },
   options: { id: 'abc' }
 })
@@ -152,5 +167,5 @@ pino.transport({
 // Dedupe
 pino.transport({
   targets: [],
-  dedupe: true,
+  dedupe: true
 })
