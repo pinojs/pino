@@ -545,6 +545,7 @@ PRs to this document are welcome for any new transports!
 + [pino-axiom](#pino-axiom)
 + [pino-discord-webhook](#pino-discord-webhook)
 + [pino-elasticsearch](#pino-elasticsearch)
++ [pino-email-transport](#pino-email-transport)
 + [pino-hana](#pino-hana)
 + [pino-logflare](#pino-logflare)
 + [pino-logfmt](#pino-logfmt)
@@ -892,6 +893,13 @@ Then [create an index pattern](https://www.elastic.co/guide/en/kibana/current/se
 [pino-elasticsearch]: https://github.com/pinojs/pino-elasticsearch
 [elasticsearch]: https://www.elastic.co/products/elasticsearch
 [kibana]: https://www.elastic.co/products/kibana
+
+<a id="pino-email-transport"></a>
+### pino-email-transport
+
+The [pino-email-transport](https://www.npmjs.com/package/pino-email-transport) NPM package for sending log emails with nodemailer.
+
+[Quick start guide ⇗](https://www.npmjs.com/package/pino-email-transport)
 
 <a id="pino-gelf"></a>
 ### pino-gelf
