@@ -465,6 +465,11 @@ in the serializers. The only exception is the `err` serializer as it is also app
 the object is an instance of `Error`, e.g. `logger.info(new Error('kaboom'))`.
 See `errorKey` option to change `err` namespace.
 
+For performance-sensitive cases where the serializer can produce JSON directly,
+it may return `pino.raw(jsonString)` to inject a pre-serialized JSON string
+into the log output, bypassing the overhead of `JSON.stringify`.
+See [`pino.raw()`](#pino-raw).
+
 * See [pino.stdSerializers](#pino-stdserializers)
 
 #### `msgPrefix` (String)
@@ -1187,6 +1192,43 @@ Exposes the cumulative `msgPrefix` of the logger.
 * See [`options.msgPrefix`](#options-msgPrefix)
 
 ## Statics
+
+<a id="pino-raw"></a>
+### `pino.raw(value) => RawJSON`
+
+Wraps a pre-serialized JSON string so that pino injects it directly into the
+log output without additional stringification. This is a performance
+optimization for serializers that can produce JSON directly, avoiding the
+overhead of creating an intermediate object that pino would then re-stringify.
+
+* `value` (String): A valid JSON string.
+* Returns: An opaque marker object to be returned from a serializer.
+
+The caller is responsible for providing valid JSON. Pino does not validate
+the string — invalid JSON will corrupt the log output. Values returned via
+`pino.raw()` bypass pino's redaction. If you need redaction, apply it within
+the serializer before calling `pino.raw()`.
+
+```js
+const pino = require('pino')
+
+const logger = pino({
+  serializers: {
+    headers: (rawHeaders) => {
+      // Build JSON directly from raw undici headers (Buffer[])
+      let json = '{'
+      for (let i = 0; i < rawHeaders.length; i += 2) {
+        if (i > 0) json += ','
+        json += '"' + rawHeaders[i] + '":"' + rawHeaders[i + 1] + '"'
+      }
+      return pino.raw(json + '}')
+    }
+  }
+})
+
+logger.info({ headers: rawUndiciHeaders })
+// headers value is injected as-is, no double serialization
+```
 
 <a id="pino-destination"></a>
 ### `pino.destination([opts]) => SonicBoom`
