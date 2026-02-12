@@ -615,6 +615,17 @@ parentLogger2.onChild = (child) => {
   expect(child).type.not.toHaveProperty('doesntExist')
 }
 
+// pino.raw()
+const rawValue = pino.raw('{"key":"value"}')
+expect(rawValue).type.toBe<pino.RawJSON>()
+expect(pino.raw).type.toBeCallableWith('valid json string')
+
+pino({
+  serializers: {
+    headers: (value): pino.RawJSON => pino.raw(JSON.stringify(value))
+  }
+})
+
 const childLogger2 = parentLogger2.child({})
 expect(childLogger2).type.not.toHaveProperty('doesntExist')
 

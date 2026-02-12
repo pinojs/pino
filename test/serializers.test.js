@@ -255,3 +255,50 @@ test('custom serializer for messageKey', async () => {
   const { msg } = await once(stream, 'data')
   assert.equal(msg, '422')
 })
+
+test('pino.raw() injects raw JSON object from serializer', async () => {
+  const stream = sink()
+  const instance = pino({
+    serializers: {
+      headers: () => pino.raw('{"host":"example.com","accept":"*/*"}')
+    }
+  }, stream)
+
+  instance.info({ headers: ['host', 'example.com'] })
+  const o = await once(stream, 'data')
+  assert.equal(o.headers.host, 'example.com')
+  assert.equal(o.headers.accept, '*/*')
+})
+
+test('pino.raw() injects raw JSON string from serializer', async () => {
+  const stream = sink()
+  const instance = pino({
+    serializers: {
+      data: () => pino.raw('"already-a-json-string"')
+    }
+  }, stream)
+
+  instance.info({ data: 'original' })
+  const o = await once(stream, 'data')
+  assert.equal(o.data, 'already-a-json-string')
+})
+
+test('pino.raw() works in child logger bindings', async () => {
+  const stream = sink()
+  const parent = pino({
+    serializers: {
+      headers: () => pino.raw('{"x-req-id":"abc123"}')
+    }
+  }, stream)
+  const child = parent.child({ headers: { 'x-req-id': 'abc123' } })
+
+  child.info('test')
+  const o = await once(stream, 'data')
+  assert.equal(o.headers['x-req-id'], 'abc123')
+})
+
+test('pino.raw() throws on non-string argument', async () => {
+  assert.throws(() => pino.raw(42), TypeError)
+  assert.throws(() => pino.raw({}), TypeError)
+  assert.throws(() => pino.raw(null), TypeError)
+})
