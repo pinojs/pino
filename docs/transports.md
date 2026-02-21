@@ -554,6 +554,7 @@ PRs to this document are welcome for any new transports!
 + [pino-roll](#pino-roll)
 + [pino-seq-transport](#pino-seq-transport)
 + [pino-sentry-transport](#pino-sentry-transport)
++ [Sentry Native SDK Integration](#sentry-native-integration)
 + [pino-slack-webhook](#pino-slack-webhook)
 + [pino-telegram-webhook](#pino-telegram-webhook)
 + [pino-yc-transport](#pino-yc-transport)
@@ -1167,6 +1168,46 @@ pino(transport)
 
 [pino-sentry-transport]: https://github.com/tomer-yechiel/pino-sentry-transport
 [Sentry]: https://sentry.io/
+
+<a id="sentry-native-integration"></a>
+### Sentry Native SDK Integration
+
+As an alternative to using a Pino transport, Sentry's Node.js SDK (v10.18.0+) provides a native `pinoIntegration` that instruments Pino directly. This approach captures logs within the Sentry SDK rather than forwarding them through a separate worker process.
+
+```js
+const Sentry = require('@sentry/node')
+const pino = require('pino')
+
+Sentry.init({
+  dsn: 'https://******@sentry.io/12345',
+  enableLogs: true,
+  integrations: [Sentry.pinoIntegration()],
+})
+
+const logger = pino()
+logger.info('This log will be captured by Sentry')
+```
+
+The integration supports configuring which log levels are captured as Sentry logs or errors:
+
+```js
+Sentry.init({
+  dsn: 'https://******@sentry.io/12345',
+  enableLogs: true,
+  integrations: [
+    Sentry.pinoIntegration({
+      // Capture these levels as Sentry logs
+      log: { levels: ['info', 'warn', 'error'] },
+      // Capture these levels as Sentry errors
+      error: { levels: ['error', 'fatal'], handled: true }
+    })
+  ],
+})
+```
+
+**Note:** This integration only works in the Node.js runtime. Requires Sentry SDK version 10.18.0 or higher and pino version 8.0.0 or higher. For full documentation, see the [Sentry Pino integration docs][sentry-pino-docs].
+
+[sentry-pino-docs]: https://docs.sentry.io/platforms/javascript/guides/node/configuration/integrations/pino/
 
 <a id="pino-seq"></a>
 ### pino-seq

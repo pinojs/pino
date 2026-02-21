@@ -71,6 +71,7 @@ according to a given format string.
 
 + [`@google-cloud/pino-logging-gcp-config`](https://www.npmjs.com/package/@google-cloud/pino-logging-gcp-config): Config helper and formatter to output [Google Cloud Platform Structured Logging](https://cloud.google.com/logging/docs/structured-logging)
 + [`@newrelic/pino-enricher`](https://github.com/newrelic/newrelic-node-log-extensions/blob/main/packages/pino-log-enricher): a log customization to add New Relic context to use [Logs In Context](https://docs.newrelic.com/docs/logs/logs-context/logs-in-context/)
++ [`@sentry/node`](https://docs.sentry.io/platforms/javascript/guides/node/configuration/integrations/pino/): Sentry SDK with native pinoIntegration for direct Pino instrumentation and error tracking.
 + [`cloud-pine`](https://github.com/metcoder95/cloud-pine): transport that provides abstraction and compatibility with [`@google-cloud/logging`](https://www.npmjs.com/package/@google-cloud/logging).
 + [`cls-proxify`](https://github.com/keenondrums/cls-proxify): integration of pino and [CLS](https://github.com/jeff-lewis/cls-hooked). Useful for creating dynamically configured child loggers (e.g. with added trace ID) for each request.
 + [`crawlee-pino`](https://github.com/imyelo/crawlee-pino): use Pino to log within Crawlee
