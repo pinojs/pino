@@ -80,7 +80,7 @@
     "fastbench": "^1.0.1",
     "fastify-tsconfig": "^3.0.0",
     "flush-write-stream": "^2.0.0",
-    "import-fresh": "^3.2.1",
+    "import-fresh": "^4.0.0",
     "jest": "^30.0.3",
     "log": "^6.0.0",
     "loglevel": "^1.6.7",
