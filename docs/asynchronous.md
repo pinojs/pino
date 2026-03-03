@@ -34,6 +34,18 @@ Asynchronous logging has a couple of important caveats:
 * There is a possibility of the most recently buffered log messages being lost
   in case of a system failure, e.g. a power cut.
 
+### Flush Limitations with `pino-pretty`
+
+The `logger.flush()` method does not work when using `pino-pretty` because:
+
+1. **Transport Architecture**: `pino-pretty` runs in a separate worker thread via the transport mechanism.
+
+2. **Buffer Flow**: When you call `logger.flush()`, it flushes the SonicBoom destination in the main thread, but the logs remain queued in the thread-stream worker waiting to be processed by `pino-pretty`.
+
+3. **No Cross-Thread Flush**: The flush operation never propagates through to the worker thread where the pretty printer is processing the output.
+
+This means that even with `logger.flush()`, your formatted logs may not appear immediately, and the flush will only ensure the main thread buffer is written, not the formatted output.
+
 See also:
 
 * [`pino.destination` API](/docs/api.md#pino-destination)

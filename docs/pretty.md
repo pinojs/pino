@@ -32,4 +32,7 @@ module like [`pino-pretty`][pp]:
   logger.info('hi')
   ```
 
+**Note:** The `logger.flush()` method does not work when using `pino-pretty`. See
+[Flush Limitations with `pino-pretty`](/docs/asynchronous.md) for more details.
+
   [pp]: https://github.com/pinojs/pino-pretty

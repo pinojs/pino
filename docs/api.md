@@ -1042,8 +1042,11 @@ and safer logging at low demand periods.
 
 If there is a need to wait for the logs to be flushed, a callback should be used.
 
+**Note:** `flush()` does not work when using `pino-pretty`. See
+[Flush Limitations with `pino-pretty`](/docs/asynchronous.md) for more details.
+
 * See [`destination` parameter](#destination)
-* See [Asynchronous Logging ⇗](/docs/asynchronous.md)
+* See [Asynchronous Logging ⇗](./asynchronous.md)
 
 <a id="logger-level"></a>
 ### `logger.level` (String) [Getter/Setter]
