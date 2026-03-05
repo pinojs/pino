@@ -1,8 +1,33 @@
 'use strict'
 
 const format = require('quick-format-unescaped')
+const Redact = require('@pinojs/redact')
 
 module.exports = pino
+
+const CENSOR = '[Redacted]'
+
+function handleRedactOpts (opts) {
+  if (Array.isArray(opts)) {
+    return { paths: opts, censor: CENSOR }
+  }
+  const { paths, censor = CENSOR, remove } = opts
+  if (!Array.isArray(paths)) {
+    throw Error('pino – redact must contain an array of strings')
+  }
+  return { paths, censor: remove ? undefined : censor, remove }
+}
+
+function buildRedactFn (redact) {
+  if (!redact) return null
+  const { paths, censor, remove } = handleRedactOpts(redact)
+  return Redact({
+    paths,
+    censor,
+    remove,
+    serialize: false
+  })
+}
 
 const _console = pfGlobalThisOrFallback().console || {}
 const stdSerializers = {
@@ -105,6 +130,8 @@ function pino (opts) {
     set: setLevel
   })
 
+  const redactFn = buildRedactFn(opts.redact)
+
   const setOpts = {
     transmit,
     serialize,
@@ -115,7 +142,8 @@ function pino (opts) {
     levels,
     timestamp: getTimeFunction(opts),
     messageKey: opts.messageKey || 'msg',
-    onChild: opts.onChild || noop
+    onChild: opts.onChild || noop,
+    redactFn
   }
   logger.levels = getLevels(opts)
   logger.level = level
@@ -393,7 +421,10 @@ function asObject (logger, level, args, ts, opts) {
       }
     }
 
-    const formattedLogObject = logObjectFormatter(logObject)
+    let formattedLogObject = logObjectFormatter(logObject)
+    if (opts.redactFn) {
+      formattedLogObject = opts.redactFn(formattedLogObject)
+    }
     return [formattedLogObject, ...argsCloned]
   } else {
     // deliberate, catching objects, arrays
@@ -405,7 +436,10 @@ function asObject (logger, level, args, ts, opts) {
     } else if (typeof msg === 'string') msg = format(argsCloned.shift(), argsCloned)
     if (msg !== undefined) logObject[opts.messageKey] = msg
 
-    const formattedLogObject = logObjectFormatter(logObject)
+    let formattedLogObject = logObjectFormatter(logObject)
+    if (opts.redactFn) {
+      formattedLogObject = opts.redactFn(formattedLogObject)
+    }
     return [formattedLogObject]
   }
 }
