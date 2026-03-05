@@ -798,6 +798,7 @@ declare namespace pino {
         readonly useOnlyCustomLevelsSym: unique symbol;
         readonly formattersSym: unique symbol;
         readonly hooksSym: unique symbol;
+        readonly rawJSONSym: unique symbol;
     };
 
     /**
@@ -843,6 +844,41 @@ declare namespace pino {
      *                but for peak log writing performance, it is strongly recommended to use `pino.destination` to create the destination stream.
      * @returns A Sonic-Boom  stream to be used as destination for the pino function
      */
+    /**
+     * Opaque type representing a pre-serialized JSON string.
+     * When returned from a serializer, pino injects the raw string
+     * directly into the log output without additional stringification.
+     */
+    export interface RawJSON {
+        readonly [symbols.rawJSONSym]: string;
+    }
+
+    /**
+     * Wraps a pre-serialized JSON string so that pino injects it directly
+     * into the log output. Designed to be used inside serializers only.
+     *
+     * The caller is responsible for providing valid JSON.
+     *
+     * @param value A valid JSON string.
+     *
+     * @example
+     * ```js
+     * const logger = pino({
+     *   serializers: {
+     *     headers: (rawHeaders) => {
+     *       let json = '{'
+     *       for (let i = 0; i < rawHeaders.length; i += 2) {
+     *         if (i > 0) json += ','
+     *         json += '"' + rawHeaders[i] + '":"' + rawHeaders[i + 1] + '"'
+     *       }
+     *       return pino.raw(json + '}')
+     *     }
+     *   }
+     * })
+     * ```
+     */
+    export function raw(value: string): RawJSON;
+
     export function destination(
         dest?: number | object | string | DestinationStream | NodeJS.WritableStream | SonicBoomOpts,
     ): SonicBoom;

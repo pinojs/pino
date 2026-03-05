@@ -44,7 +44,8 @@ const {
   nestedKeyStrSym,
   mixinMergeStrategySym,
   msgPrefixSym,
-  transportUsesMultistreamSym
+  transportUsesMultistreamSym,
+  rawJSONSym
 } = symbols
 const { epochTime, nullTime } = time
 const { pid } = process
@@ -232,6 +233,13 @@ function pino (...args) {
   return instance
 }
 
+function raw (value) {
+  if (typeof value !== 'string') {
+    throw new TypeError(`pino.raw() expects a pre-serialized JSON string, received ${typeof value}`)
+  }
+  return { [rawJSONSym]: value }
+}
+
 module.exports = pino
 
 module.exports.destination = (dest = process.stdout.fd) => {
@@ -251,6 +259,7 @@ module.exports.stdSerializers = serializers
 module.exports.stdTimeFunctions = Object.assign({}, time)
 module.exports.symbols = symbols
 module.exports.version = version
+module.exports.raw = raw
 
 // Enables default and name export with TypeScript and Babel
 module.exports.default = pino
