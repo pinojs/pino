@@ -1,6 +1,7 @@
 'use strict'
 const test = require('tape')
 const pino = require('../browser')
+const { logEventToObject } = require('../browser')
 
 function noop () {}
 
@@ -413,5 +414,161 @@ test('does not call send when transmit.level is set to silent', ({ end, fail, is
   })
 
   is(c, levels.length, 'write must be called exactly once per level')
+  end()
+})
+
+// logEventToObject tests
+
+test('logEventToObject converts basic logEvent to object', ({ end, is, same }) => {
+  const logEvent = {
+    ts: 1234567890,
+    messages: ['hello world'],
+    bindings: [],
+    level: { label: 'info', value: 30 }
+  }
+
+  const result = logEventToObject(logEvent)
+
+  is(result.time, 1234567890)
+  is(result.level, 30)
+  is(result.msg, 'hello world')
+  end()
+})
+
+test('logEventToObject merges bindings into object', ({ end, is, same }) => {
+  const logEvent = {
+    ts: 1234567890,
+    messages: ['hello world'],
+    bindings: [{ foo: 'foo' }, { bar: 'bar' }],
+    level: { label: 'info', value: 30 }
+  }
+
+  const result = logEventToObject(logEvent)
+
+  is(result.time, 1234567890)
+  is(result.level, 30)
+  is(result.foo, 'foo')
+  is(result.bar, 'bar')
+  is(result.msg, 'hello world')
+  end()
+})
+
+test('logEventToObject extracts merging object from messages', ({ end, is }) => {
+  const logEvent = {
+    ts: 1234567890,
+    messages: [{ requestId: '123' }, 'hello world'],
+    bindings: [],
+    level: { label: 'info', value: 30 }
+  }
+
+  const result = logEventToObject(logEvent)
+
+  is(result.time, 1234567890)
+  is(result.level, 30)
+  is(result.requestId, '123')
+  is(result.msg, 'hello world')
+  end()
+})
+
+test('logEventToObject formats message with arguments', ({ end, is }) => {
+  const logEvent = {
+    ts: 1234567890,
+    messages: ['hello %s!', 'world'],
+    bindings: [],
+    level: { label: 'info', value: 30 }
+  }
+
+  const result = logEventToObject(logEvent)
+
+  is(result.msg, 'hello world!')
+  end()
+})
+
+test('logEventToObject uses custom messageKey', ({ end, is, ok }) => {
+  const logEvent = {
+    ts: 1234567890,
+    messages: ['hello world'],
+    bindings: [],
+    level: { label: 'info', value: 30 }
+  }
+
+  const result = logEventToObject(logEvent, { messageKey: 'message' })
+
+  is(result.message, 'hello world')
+  ok(!('msg' in result))
+  end()
+})
+
+test('logEventToObject works with child bindings and merging object', ({ end, is }) => {
+  const logEvent = {
+    ts: 1234567890,
+    messages: [{ requestId: '123' }, 'request %s completed', 'GET /api'],
+    bindings: [{ service: 'api' }, { userId: 42 }],
+    level: { label: 'info', value: 30 }
+  }
+
+  const result = logEventToObject(logEvent)
+
+  is(result.time, 1234567890)
+  is(result.level, 30)
+  is(result.service, 'api')
+  is(result.userId, 42)
+  is(result.requestId, '123')
+  is(result.msg, 'request GET /api completed')
+  end()
+})
+
+test('logEventToObject does not mutate original logEvent', ({ end, is, same }) => {
+  const logEvent = {
+    ts: 1234567890,
+    messages: [{ requestId: '123' }, 'hello'],
+    bindings: [{ foo: 'foo' }],
+    level: { label: 'info', value: 30 }
+  }
+
+  logEventToObject(logEvent)
+
+  same(logEvent.messages, [{ requestId: '123' }, 'hello'])
+  same(logEvent.bindings, [{ foo: 'foo' }])
+  end()
+})
+
+test('logEventToObject handles empty messages', ({ end, ok }) => {
+  const logEvent = {
+    ts: 1234567890,
+    messages: [],
+    bindings: [],
+    level: { label: 'info', value: 30 }
+  }
+
+  const result = logEventToObject(logEvent)
+
+  ok(!('msg' in result))
+  end()
+})
+
+test('logEventToObject can be used in transmit.send', ({ end, is }) => {
+  let logObject = null
+  const logger = pino({
+    browser: {
+      write: noop,
+      transmit: {
+        send (level, logEvent) {
+          logObject = logEventToObject(logEvent, { messageKey: 'msg' })
+        }
+      }
+    }
+  })
+
+  logger
+    .child({ service: 'api' })
+    .child({ userId: 42 })
+    .info({ requestId: '123' }, 'hello %s!', 'world')
+
+  is(logObject.level, 30)
+  is(logObject.service, 'api')
+  is(logObject.userId, 42)
+  is(logObject.requestId, '123')
+  is(logObject.msg, 'hello world!')
   end()
 })
