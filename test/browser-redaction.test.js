@@ -163,3 +163,102 @@ test('redact with bracket notation for hyphenated keys', ({ end, is }) => {
 
   instance.info({ 'api-key': 'sensitive', name: 'test' })
 })
+
+test('redact works with asObjectBindingsOnly mode', ({ end, is, deepEqual }) => {
+  const instance = pino({
+    browser: {
+      asObjectBindingsOnly: true,
+      write (o, ...args) {
+        is(o.password, '[Redacted]')
+        is(o.username, 'john')
+        deepEqual(args, ['remaining', 'args'])
+        end()
+      }
+    },
+    redact: ['password']
+  })
+
+  instance.info({ password: 'secret', username: 'john' }, 'remaining', 'args')
+})
+
+test('redact works with asObjectBindingsOnly mode and object message', ({ end, is, ok }) => {
+  const instance = pino({
+    browser: {
+      asObjectBindingsOnly: true,
+      write (o, ...args) {
+        is(o.password, '[Redacted]')
+        is(o.foo, 'bar')
+        ok(o.time)
+        is(args.length, 0)
+        end()
+      }
+    },
+    redact: ['password']
+  })
+
+  instance.info({ password: 'secret', foo: 'bar' })
+})
+
+test('redact with asObjectBindingsOnly and child logger merges multiple bindings', ({ end, is, ok }) => {
+  const parent = pino({
+    browser: {
+      asObjectBindingsOnly: true,
+      write (o, ...args) {
+        is(o.password, '[Redacted]')
+        is(o.parentBinding, 'parent')
+        is(o.childBinding, 'child')
+        is(o.logData, 'value')
+        ok(o.time)
+        end()
+      }
+    },
+    redact: ['password']
+  })
+
+  const child = parent.child({ parentBinding: 'parent' }).child({ childBinding: 'child' })
+  child.info({ logData: 'value', password: 'secret' })
+})
+
+test('formatters.level works with asObject mode', ({ end, is, ok }) => {
+  const instance = pino({
+    browser: {
+      asObject: true,
+      write (o) {
+        is(o.levelLabel, 'info')
+        is(o.levelValue, 30)
+        is(o.msg, 'test message')
+        ok(o.time)
+        end()
+      },
+      formatters: {
+        level (label, number) {
+          return { levelLabel: label, levelValue: number }
+        }
+      }
+    }
+  })
+
+  instance.info('test message')
+})
+
+test('formatters.level with asObject and object message', ({ end, is, ok }) => {
+  const instance = pino({
+    browser: {
+      asObject: true,
+      write (o) {
+        is(o.levelLabel, 'warn')
+        is(o.levelValue, 40)
+        is(o.data, 'value')
+        ok(o.time)
+        end()
+      },
+      formatters: {
+        level (label, number) {
+          return { levelLabel: label, levelValue: number }
+        }
+      }
+    }
+  })
+
+  instance.warn({ data: 'value' })
+})
