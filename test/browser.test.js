@@ -47,6 +47,21 @@ test('throw if creating child without bindings', ({ end, throws }) => {
   end()
 })
 
+test('pino.destination throws with descriptive message in browser', ({ end, throws }) => {
+  throws(() => pino.destination(), /not supported in the browser/)
+  end()
+})
+
+test('pino.transport throws with descriptive message in browser', ({ end, throws }) => {
+  throws(() => pino.transport(), /not supported in the browser/)
+  end()
+})
+
+test('pino.multistream throws with descriptive message in browser', ({ end, throws }) => {
+  throws(() => pino.multistream(), /not supported in the browser/)
+  end()
+})
+
 test('stubs write, flush and ee methods on instance', ({ end, ok, is }) => {
   const instance = pino()
 

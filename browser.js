@@ -519,6 +519,15 @@ function pfGlobalThisOrFallback () {
 
 module.exports.default = pino
 module.exports.pino = pino
+module.exports.destination = function () {
+  throw Error('pino.destination is not supported in the browser')
+}
+module.exports.transport = function () {
+  throw Error('pino.transport is not supported in the browser')
+}
+module.exports.multistream = function () {
+  throw Error('pino.multistream is not supported in the browser')
+}
 
 // Attempt to extract the user callsite (file:line:column)
 /* istanbul ignore next */
