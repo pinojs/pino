@@ -1,6 +1,7 @@
 'use strict'
 
 const format = require('quick-format-unescaped')
+const Redact = require('@pinojs/redact')
 
 module.exports = pino
 
@@ -88,6 +89,9 @@ function pino (opts) {
       proto[level] = proto
     })
   }
+  const redact = opts.redact
+  const redactFn = redact ? createRedactFn(redact) : null
+
   if (opts.enabled === false || opts.browser.disabled) opts.level = 'silent'
   const level = opts.level || 'info'
   const logger = Object.create(proto)
@@ -112,6 +116,7 @@ function pino (opts) {
     asObjectBindingsOnly: opts.browser.asObjectBindingsOnly,
     formatters: opts.browser.formatters,
     reportCaller: opts.browser.reportCaller,
+    redactFn,
     levels,
     timestamp: getTimeFunction(opts),
     messageKey: opts.messageKey || 'msg',
@@ -333,8 +338,18 @@ function createWrap (self, opts, rootLogger, level) {
             if (caller) out[0].caller = caller
           } catch (e) {}
         }
+        if (opts.redactFn && out.length > 0 && out[0] && typeof out[0] === 'object') {
+          out[0] = opts.redactFn(out[0])
+        }
         write.call(proto, ...out)
       } else {
+        if (opts.redactFn) {
+          for (var j = 0; j < args.length; j++) {
+            if (args[j] !== null && typeof args[j] === 'object' && !Array.isArray(args[j])) {
+              args[j] = opts.redactFn(args[j])
+            }
+          }
+        }
         if (opts.reportCaller) {
           try {
             const caller = getCallerLocation()
@@ -486,6 +501,27 @@ function getTimeFunction (opts) {
     return nullTime
   }
   return epochTime
+}
+
+function createRedactFn (redact) {
+  const paths = Array.isArray(redact) ? redact : redact.paths
+  if (!Array.isArray(paths)) { throw Error('pino: redact.paths must be an array of strings') }
+  const redactOpts = { paths, serialize: false }
+  if (typeof redact === 'object' && !Array.isArray(redact)) {
+    if (redact.censor !== undefined) redactOpts.censor = redact.censor
+    if (redact.remove === true) redactOpts.remove = true
+  }
+  const redactor = Redact(redactOpts)
+  return function redactFn (obj) {
+    const redacted = redactor(obj)
+    if (typeof redacted.restore === 'function') {
+      const result = Object.assign({}, redacted)
+      delete result.restore
+      redacted.restore()
+      return result
+    }
+    return redacted
+  }
 }
 
 function mock () { return {} }
