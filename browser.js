@@ -14,7 +14,7 @@ const stdSerializers = {
   req: mock,
   res: mock,
   err: asErrValue,
-  errWithCause: asErrValue
+  errWithCause: asErrWithCauseValue
 }
 function levelToValue (level, logger) {
   return level === 'silent'
@@ -474,6 +474,14 @@ function asErrValue (err) {
     if (obj[key] === undefined) {
       obj[key] = err[key]
     }
+  }
+  return obj
+}
+
+function asErrWithCauseValue (err) {
+  const obj = asErrValue(err)
+  if (err.cause != null && typeof err.cause.message === 'string') {
+    obj.cause = asErrWithCauseValue(err.cause)
   }
   return obj
 }

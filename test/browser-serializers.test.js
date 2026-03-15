@@ -244,6 +244,47 @@ if (process.title !== 'browser') {
   })
 }
 
+test('errWithCause serializes the cause property', ({ end, is, ok }) => {
+  const cause = new Error('root cause')
+  const err = new Error('top error', { cause })
+  const serialized = pino.stdSerializers.errWithCause(err)
+  is(serialized.msg, 'top error')
+  ok(serialized.cause)
+  is(serialized.cause.msg, 'root cause')
+  is(serialized.cause.type, 'Error')
+  ok(serialized.cause.stack)
+  end()
+})
+
+test('errWithCause serializes nested causes', ({ end, is, ok }) => {
+  const root = new Error('root')
+  const mid = new Error('mid', { cause: root })
+  const top = new Error('top', { cause: mid })
+  const serialized = pino.stdSerializers.errWithCause(top)
+  is(serialized.msg, 'top')
+  is(serialized.cause.msg, 'mid')
+  is(serialized.cause.cause.msg, 'root')
+  ok(!serialized.cause.cause.cause)
+  end()
+})
+
+test('errWithCause handles errors without cause', ({ end, is, ok }) => {
+  const err = new Error('no cause')
+  const serialized = pino.stdSerializers.errWithCause(err)
+  is(serialized.msg, 'no cause')
+  ok(!serialized.cause)
+  end()
+})
+
+test('err serializer does not serialize cause', ({ end, is, ok }) => {
+  const cause = new Error('root cause')
+  const err = new Error('top error', { cause })
+  const serialized = pino.stdSerializers.err(err)
+  is(serialized.msg, 'top error')
+  ok(!serialized.cause)
+  end()
+})
+
 test('child does not overwrite parent serializers', ({ end, is }) => {
   let c = 0
   const parent = pino({
