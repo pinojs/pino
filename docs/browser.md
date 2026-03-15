@@ -276,3 +276,12 @@ const pino = require('pino')({browser: {disabled: true}})
 
 The `disabled` option will disable logging in browser if set
 to `true`, by default it is set to `false`.
+
+## Unsupported APIs
+
+The following APIs are not available in the browser version of pino.
+Calling them will throw an error with a descriptive message:
+
+- `pino.destination()` — Use `browser.write` instead for custom output handling
+- `pino.transport()` — Use `browser.transmit` instead for sending logs to a remote service
+- `pino.multistream()` — Use `browser.write` with a function that dispatches to multiple outputs
