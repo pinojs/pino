@@ -8,7 +8,6 @@ module.exports = defineConfig([
     ts: true
   }),
   globalIgnores([
-    'pino.d.ts',
     'test/fixtures/syntax-error-esm.mjs',
     'test/fixtures/ts/*cjs'
   ]),
@@ -16,6 +15,13 @@ module.exports = defineConfig([
     rules: {
       'comma-dangle': ['error', 'never'],
       'no-var': 'off'
+    }
+  },
+  {
+    files: ['pino.d.ts'],
+    rules: {
+      '@typescript-eslint/no-use-before-define': 'off',
+      '@typescript-eslint/no-unused-vars': 'off'
     }
   },
   {
