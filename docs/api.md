@@ -411,7 +411,7 @@ Changes the shape of the log level. The default shape is `{ level: number }`.
 The function takes two arguments, the label of the level (e.g. `'info'`)
 and the numeric value (e.g. `30`).
 
-ps: The log level cannot be customized when using multiple transports
+When using multiple transport targets, the log record must keep a numeric `level` field for per-target routing. Because of that, `formatters.level` cannot be used to replace `level` with a string or rename it in multi-target mode. `timestamp` customization is still supported.
 
 ```js
 const formatters = {

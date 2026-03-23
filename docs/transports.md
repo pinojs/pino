@@ -159,6 +159,36 @@ const transport = pino.transport({
 pino(transport)
 ```
 
+#### `formatters.level` with multiple targets
+
+When using `targets`, Pino routes records in the worker thread based on the numeric `level` field in each log line. Because of that, a custom `formatters.level` must not remove, rename, or convert `level` to a string when multiple targets are configured.
+
+Unsupported example:
+
+```js
+const logger = pino({
+  formatters: {
+    level (label) {
+      return { severity: label }
+    }
+  },
+  transport: {
+    targets: [
+      { target: 'pino/file', options: { destination: 1 } },
+      { target: 'pino/file', options: { destination: 2 } }
+    ]
+  }
+})
+```
+
+In this case, Pino cannot apply per-target level filtering correctly. Depending on how the transport is constructed, Pino will either throw or emit a warning.
+
+Supported alternatives:
+
+- Keep the numeric `level` field unchanged when using multiple targets.
+- If you need string labels such as `"info"`, transform the output in a transport pipeline or in a custom transport after routing has already happened.
+- `timestamp` customization still works with multiple targets.
+
 It is also possible to use the `dedupe` option to send logs only to the stream with the higher level.
 ```js
 const pino = require('pino')
