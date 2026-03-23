@@ -247,8 +247,26 @@ declare namespace pino {
     export type SerializedResponse = pinoStdSerializers.SerializedResponse
     export type SerializedRequest = pinoStdSerializers.SerializedRequest
 
+    /**
+     * An object that a transport module can export to allow pino to resolve
+     * the module's file path. This is useful when using bundlers that cannot
+     * resolve string-based transport targets.
+     *
+     * @example
+     * // In your transport module:
+     * export function getModule() { return import.meta.filename }
+     * module.exports.getModule = function() { return __filename }
+     *
+     * // In your application:
+     * import myTransport from './my-transport'
+     * pino.transport({ target: myTransport })
+     */
+    export interface PinoModuleReference {
+      getModule(): string
+    }
+
     export interface TransportTargetOptions<TransportOptions = Record<string, any>> {
-      target: string
+      target: string | PinoModuleReference
       options?: TransportOptions
       level?: LevelWithSilentOrString
     }
@@ -259,7 +277,7 @@ declare namespace pino {
     }
 
     export interface TransportSingleOptions<TransportOptions = Record<string, any>> extends TransportBaseOptions<TransportOptions> {
-      target: string
+      target: string | PinoModuleReference
     }
 
     export interface TransportPipelineOptions<TransportOptions = Record<string, any>> extends TransportBaseOptions<TransportOptions> {
