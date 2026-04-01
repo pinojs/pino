@@ -110,7 +110,7 @@
     "pino-std-serializers": "^7.0.0",
     "process-warning": "^5.0.0",
     "quick-format-unescaped": "^4.0.3",
-    "real-require": "^0.2.0",
+    "real-require": "^1.0.0",
     "safe-stable-stringify": "^2.3.1",
     "sonic-boom": "^4.0.1",
     "thread-stream": "^4.0.0"
