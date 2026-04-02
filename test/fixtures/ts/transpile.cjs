@@ -7,7 +7,7 @@ const existsSync = fs.existsSync
 const stat = fs.promises.stat
 
 // Hardcoded parameters
-const esVersions = ['es5', 'es6', 'es2017', 'esnext']
+const esVersions = ['es6', 'es2017', 'esnext']
 const filesToTranspile = ['to-file-transport.ts']
 
 async function transpile () {
@@ -23,8 +23,8 @@ async function transpile () {
       const shouldTranspile = !existsSync(targetFileName) || (await stat(targetFileName)).mtimeMs < sourceStat.mtimeMs
 
       if (shouldTranspile) {
-        await execa('tsc', ['--target', esVersion, '--module', 'commonjs', sourceFileName])
-        await execa('mv', [intermediateFileName, targetFileName])
+        await execa('tsc', [ '--ignoreConfig', '--types', 'node', '--target', esVersion, '--module', 'commonjs', sourceFileName ])
+        await execa('mv', [ intermediateFileName, targetFileName ])
       }
     }
   }

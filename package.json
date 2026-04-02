@@ -99,7 +99,7 @@
     "through2": "^4.0.0",
     "ts-node": "^10.9.1",
     "tstyche": "^6.0.2",
-    "typescript": "~5.9.2",
+    "typescript": "~6.0.2",
     "winston": "^3.7.2"
   },
   "dependencies": {
