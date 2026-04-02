@@ -6,11 +6,10 @@
     "moduleResolution": "node16",
     "noEmit": true,
     "strict": true,
-    "esModuleInterop": true,
     "types": ["node"]
   },
   "exclude": [
-    "./test/types/**/*.tst.*",
+    "./test/types/**/*",
     "./*.d.ts"
   ]
 }
