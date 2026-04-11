@@ -9,7 +9,6 @@
     "types": ["node"]
   },
   "exclude": [
-    "./test/types/**/*",
     "./*.d.ts"
   ]
 }
