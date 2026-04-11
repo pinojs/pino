@@ -27,6 +27,7 @@ module.exports = defineConfig([
   {
     files: ['test/types/**/*'],
     rules: {
+      'no-unused-expressions': 'off',
       '@typescript-eslint/no-unused-expressions': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
       'n/handle-callback-err': 'off'
