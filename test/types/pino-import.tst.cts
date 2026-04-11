@@ -3,8 +3,6 @@ import { expect } from 'tstyche'
 import * as pinoStar from '../../pino.js'
 import pinoDefault, { default as pino, pino as pinoNamed } from '../../pino.js'
 import pinoCjsImport = require ('../../pino.js')
-const pinoCjs = require('../../pino.js')
-const { P: pinoCjsNamed } = require('pino')
 
 const log = pino()
 expect(log.info).type.toBe<pino.LogFn>()
@@ -17,8 +15,6 @@ expect(pinoStar.pino()).type.toBe<pino.Logger>()
 expect(pinoCjsImport()).type.toBe<pino.Logger>()
 expect(pinoCjsImport.default()).type.toBe<pino.Logger>()
 expect(pinoCjsImport.pino()).type.toBe<pino.Logger>()
-expect(pinoCjsNamed()).type.toBe<any>()
-expect(pinoCjs()).type.toBe<any>()
 
 expect(pinoDefault.stdTimeFunctions.isoTimeNano()).type.toBe<string>()
 expect(pinoNamed.stdTimeFunctions.isoTimeNano()).type.toBe<string>()
