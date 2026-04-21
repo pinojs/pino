@@ -18,7 +18,10 @@ There are a few basic ground-rules for contributors:
 1. All pull-requests for new features **must** target the `main` branch. PRs to fix bugs in LTS releases are also allowed.
 1. Contributors should attempt to adhere to the prevailing code-style.
 1. 100% code coverage
-1. Pure-AI contributions with no human in the loop are not welcome.
+1. Pure-AI contributions with no human in the loop are not welcome. Pull
+requests ***MUST*** be opened by a human. Pull requests opened by bots not
+managed by the Pino organization will result in the bot being banned
+from the organization.
 
 ## Releases
 
