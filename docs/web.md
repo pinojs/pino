@@ -274,28 +274,25 @@ See the [pino-http README](https://npm.im/pino-http) for more info.
 ## Pino with Hono
 
 ```sh
-npm install pino pino-http hono
+npm install pino @hono/structured-logger hono
 ```
 
 ```js
 import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
 import { requestId } from 'hono/request-id';
-import { pinoHttp } from 'pino-http';
+import { structuredLogger } from '@hono/structured-logger';
+import pino from 'pino';
+
+const rootLogger = pino();
 
 const app = new Hono();
 app.use(requestId());
-app.use(async (c, next) => {
-  // pass hono's request-id to pino-http
-  c.env.incoming.id = c.var.requestId;
-
-  // map express style middleware to hono
-  await new Promise((resolve) => pinoHttp()(c.env.incoming, c.env.outgoing, () => resolve()));
-
-  c.set('logger', c.env.incoming.log);
-
-  await next();
-});
+app.use(
+  structuredLogger({
+    createLogger: (c) => rootLogger.child({ requestId: c.var.requestId }),
+  })
+);
 
 app.get('/', (c) => {
   c.var.logger.info('something');
@@ -306,4 +303,4 @@ app.get('/', (c) => {
 serve(app);
 ```
 
-See the [pino-http README](https://npm.im/pino-http) for more info.
+See the [@hono/structured-logger README](https://github.com/honojs/middleware/blob/main/packages/structured-logger/README.md) for more info.
