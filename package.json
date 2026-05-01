@@ -96,7 +96,7 @@
     "tape": "^5.5.3",
     "through2": "^4.0.0",
     "ts-node": "^10.9.1",
-    "tstyche": "^6.0.2",
+    "tstyche": "^7.1.0",
     "typescript": "~5.9.2",
     "winston": "^3.7.2"
   },
