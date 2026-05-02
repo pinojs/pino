@@ -38,7 +38,6 @@
   "bin": {
     "pino": "./bin.js"
   },
-  "precommit": "test",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/pinojs/pino.git"
@@ -75,7 +74,7 @@
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-n": "17.23.2",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^6.0.0",
+    "eslint-plugin-promise": "^7.3.0",
     "execa": "^5.0.0",
     "fastbench": "^1.0.1",
     "fastify-tsconfig": "^3.0.0",
@@ -87,7 +86,6 @@
     "midnight-smoker": "1.1.1",
     "neostandard": "^0.13.0",
     "pino-pretty": "^13.0.0",
-    "pre-commit": "^1.2.2",
     "proxyquire": "^2.1.3",
     "pump": "^3.0.0",
     "rimraf": "^6.0.1",
@@ -98,8 +96,8 @@
     "tape": "^5.5.3",
     "through2": "^4.0.0",
     "ts-node": "^10.9.1",
-    "tstyche": "^6.0.2",
     "typescript": "~6.0.2",
+    "tstyche": "^7.1.0",
     "winston": "^3.7.2"
   },
   "dependencies": {

@@ -854,36 +854,7 @@ declare namespace pino {
       opts?: MultiStreamOptions
     ): MultiStreamRes<TLevel>
 
-    /// Nested version of default export for TypeScript/Babel compatibility
-
-    /**
-     * @param [optionsOrStream]: an options object or a writable stream where the logs will be written. It can also receive some log-line metadata, if the
-     * relative protocol is enabled. Default: process.stdout
-     * @returns a new logger instance.
-     */
-    function pino<CustomLevels extends string = never, UseOnlyCustomLevels extends boolean = boolean> (optionsOrStream?: LoggerOptions<CustomLevels, UseOnlyCustomLevels> | DestinationStream): Logger<CustomLevels, UseOnlyCustomLevels>
-
-    /**
-     * @param [options]: an options object
-     * @param [stream]: a writable stream where the logs will be written. It can also receive some log-line metadata, if the
-     * relative protocol is enabled. Default: process.stdout
-     * @returns a new logger instance.
-     */
-    function pino<CustomLevels extends string = never, UseOnlyCustomLevels extends boolean = boolean> (options: LoggerOptions<CustomLevels, UseOnlyCustomLevels>, stream?: DestinationStream | undefined): Logger<CustomLevels, UseOnlyCustomLevels>
-
-    /**
-     * Attach selected static members to the nested callable export, so that
-     * `const { pino } = require('pino')` exposes them (e.g. `pino.stdTimeFunctions`).
-     */
-    namespace pino {
-      const stdTimeFunctions: {
-        epochTime: TimeFn;
-        unixTime: TimeFn;
-        nullTime: TimeFn;
-        isoTime: TimeFn;
-        isoTimeNano: TimeFn;
-      }
-    }
+    export { pino as default, pino }
 }
 
 /// Callable default export
