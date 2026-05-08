@@ -7,7 +7,7 @@ const { join } = require('node:path')
 const { readFile } = require('node:fs').promises
 const writeStream = require('flush-write-stream')
 
-const { watchFileCreated, file } = require('../helper')
+const { watchForWrite, file } = require('../helper')
 const pino = require('../../')
 
 const { pid } = process
@@ -45,7 +45,7 @@ test('transport uses pino config', async (t) => {
   const error = new Error('bar')
   instance.custom('foo')
   instance.error(error)
-  await watchFileCreated(destination)
+  await watchForWrite(destination, '"body":"bar"')
   const result = parseLogs(await readFile(destination))
 
   assert.deepEqual(result, [{
@@ -82,7 +82,7 @@ test('transport uses pino config without customizations', async (t) => {
   const error = new Error('qux')
   instance.info('baz')
   instance.error(error)
-  await watchFileCreated(destination)
+  await watchForWrite(destination, '"body":"qux"')
   const result = parseLogs(await readFile(destination))
 
   assert.deepEqual(result, [{
@@ -131,7 +131,7 @@ test('transport uses pino config with multistream', async (t) => {
   const serializedError = serializeError(error)
   instance.custom('fizz')
   instance.error(error)
-  await watchFileCreated(destination)
+  await watchForWrite(destination, '"body":"buzz"')
   const result = parseLogs(await readFile(destination))
 
   assert.deepEqual(result, [{

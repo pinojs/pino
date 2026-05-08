@@ -88,14 +88,18 @@ function watchForWrite (filename, testString) {
     const threshold = TIMEOUT / INTERVAL
     let counter = 0
     const interval = setInterval(() => {
-      if (readFileSync(filename).includes(testString)) {
+      const exists = existsSync(filename)
+      if (exists && readFileSync(filename).includes(testString)) {
         clearInterval(interval)
         resolve()
       } else if (counter <= threshold) {
         counter++
       } else {
         clearInterval(interval)
-        reject(new Error(`'${testString}' hasn't been written to ${filename} within ${TIMEOUT} ms.`))
+        reject(new Error(
+          `'${testString}' hasn't been written to ${filename} within ${TIMEOUT} ms. ` +
+          (exists ? 'File exists, but content is still incomplete.' : 'File not yet created.')
+        ))
       }
     }, INTERVAL)
   })
