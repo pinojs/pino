@@ -31,7 +31,7 @@ Pino is built to run on [Node.js](http://nodejs.org).
 
 ### Bare
 
-Pino works on [Bare](https://github.com/holepunchto/bare) with the [`pino-bare`](https://github.com/pinojs/pino-bare) compatability module.
+Pino works on [Bare](https://github.com/holepunchto/bare) with the [`pino-bare`](https://github.com/pinojs/pino-bare) compatibility module.
 
 ### Pear
 
