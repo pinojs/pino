@@ -47,6 +47,47 @@ test('throw if creating child without bindings', ({ end, throws }) => {
   end()
 })
 
+test('setBindings applies bindings to subsequent logs', ({ end, is, ok }) => {
+  const instance = pino({
+    browser: {
+      write: function (o) {
+        is(o.level, 30)
+        is(o.foo, 'bar')
+        is(o.msg, 'test')
+        ok(o.time)
+      }
+    }
+  })
+
+  instance.setBindings({ foo: 'bar' })
+  instance.info('test')
+
+  end()
+})
+
+test('setBindings can overwrite existing bindings', ({ end, is, ok }) => {
+  let call = 0
+  const instance = pino({
+    browser: {
+      write: function (o) {
+        call++
+        is(o.level, 30)
+        is(o.foo, call === 1 ? 'bar' : 'baz')
+        is(o.msg, 'test')
+        ok(o.time)
+      }
+    }
+  })
+
+  instance.setBindings({ foo: 'bar' })
+  instance.info('test')
+
+  instance.setBindings({ foo: 'baz' })
+  instance.info('test')
+
+  end()
+})
+
 test('stubs write, flush and ee methods on instance', ({ end, ok, is }) => {
   const instance = pino()
 
@@ -65,6 +106,7 @@ test('stubs write, flush and ee methods on instance', ({ end, ok, is }) => {
   ok(isFunc(instance.eventNames))
   ok(isFunc(instance.write))
   ok(isFunc(instance.flush))
+  ok(isFunc(instance.setBindings))
 
   is(instance.on(), undefined)
 
