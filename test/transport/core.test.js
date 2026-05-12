@@ -267,6 +267,59 @@ test('pino.transport with two files and dedupe', async (t) => {
   })
 })
 
+test('pino.transport with single target in targets array honors level filter (#1996)', async (t) => {
+  const destination = file()
+  const transport = pino.transport({
+    targets: [{
+      level: 'error',
+      target: join(__dirname, '..', 'fixtures', 'to-file-transport.js'),
+      options: { destination }
+    }]
+  })
+  t.after(transport.end.bind(transport))
+  const instance = pino({ level: 'debug' }, transport)
+  instance.debug('debug-msg')
+  instance.info('info-msg')
+  instance.warn('warn-msg')
+  instance.error('error-msg')
+  await watchForWrite(destination, 'error-msg')
+  const lines = (await readFile(destination, 'utf8')).trim().split('\n').filter(Boolean)
+  assert.equal(lines.length, 1, 'only error should be written to destination')
+  const result = JSON.parse(lines[0])
+  delete result.time
+  assert.deepEqual(result, {
+    pid,
+    hostname,
+    level: 50,
+    msg: 'error-msg'
+  })
+})
+
+test('pino.transport with single target in targets array without level keeps logger.level gating', async (t) => {
+  const destination = file()
+  const transport = pino.transport({
+    targets: [{
+      target: join(__dirname, '..', 'fixtures', 'to-file-transport.js'),
+      options: { destination }
+    }]
+  })
+  t.after(transport.end.bind(transport))
+  const instance = pino({ level: 'debug' }, transport)
+  instance.debug('debug-msg')
+  instance.info('info-msg')
+  await watchForWrite(destination, 'info-msg')
+  const lines = (await readFile(destination, 'utf8')).trim().split('\n').filter(Boolean)
+  assert.equal(lines.length, 2, 'both debug and info reach the single target when no per-target level is set')
+  const first = JSON.parse(lines[0])
+  delete first.time
+  assert.deepEqual(first, {
+    pid,
+    hostname,
+    level: 20,
+    msg: 'debug-msg'
+  })
+})
+
 test('pino.transport with an array including a pino-pretty destination', async (t) => {
   const dest1 = file()
   const dest2 = file()
