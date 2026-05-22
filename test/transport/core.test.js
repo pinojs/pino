@@ -496,16 +496,7 @@ test('sets worker data informing the transport that pino will send its config (f
   await plan
 })
 
-test('warns when custom formatters.level is incompatible with multi-target transport routing', async (t) => {
-  const warnings = []
-  const originalEmitWarning = process.emitWarning
-  process.emitWarning = function (warning, options) {
-    warnings.push({ warning, options })
-  }
-  t.after(() => {
-    process.emitWarning = originalEmitWarning
-  })
-
+test('throws when custom formatters.level is incompatible with externally-created multi-target transport routing', async (t) => {
   const transport = pino.transport({
     targets: [
       { target: join(__dirname, '..', 'fixtures', 'noop-transport.js') },
@@ -514,18 +505,38 @@ test('warns when custom formatters.level is incompatible with multi-target trans
   })
   t.after(transport.end.bind(transport))
 
-  const instance = pino({
-    formatters: {
-      level (label) {
-        return { severity: label }
+  assert.throws(
+    () => {
+      pino({
+        formatters: {
+          level (label) {
+            return { severity: label }
+          }
+        }
+      }, transport)
+    },
+    Error('multiple transport targets/pipelines do not allow custom level formatters that replace the numeric level')
+  )
+})
+
+test('allows custom formatters.level that keeps numeric levels with externally-created multi-target transport routing', async (t) => {
+  const transport = pino.transport({
+    targets: [
+      { target: join(__dirname, '..', 'fixtures', 'noop-transport.js') },
+      { target: join(__dirname, '..', 'fixtures', 'noop-transport.js') }
+    ]
+  })
+  t.after(transport.end.bind(transport))
+
+  assert.doesNotThrow(() => {
+    pino({
+      formatters: {
+        level (label, number) {
+          return { level: number, severity: label }
+        }
       }
-    }
-  }, transport)
-
-  instance.info('hello')
-
-  assert.equal(warnings.length, 1)
-  assert.equal(warnings[0].options.code, 'PINO_TRANSPORT_MULTI_TARGETS_LEVEL_FORMATTER')
+    }, transport)
+  })
 })
 
 test('stdout in worker', async () => {
