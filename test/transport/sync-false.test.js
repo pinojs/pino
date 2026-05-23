@@ -20,7 +20,7 @@ test('thread-stream async flush', async (t) => {
     target: join(__dirname, '..', 'fixtures', 'to-file-transport.js'),
     options: { destination }
   })
-  t.after(transport.end.bind(transport))
+  t.after(() => transport.end())
   const instance = pino(transport)
   instance.info('hello')
 
@@ -52,14 +52,14 @@ test('thread-stream async flush should call the passed callback', async (t) => {
     target: join(__dirname, '..', 'fixtures', 'to-file-transport.js'),
     options: { destination: outputPath }
   })
-  t.after(transport.end.bind(transport))
+  t.after(() => transport.end())
   const instance = pino(transport)
   const flushPromise = promisify(instance.flush).bind(instance)
   await once(transport, 'ready')
 
   instance.info('hello')
-  await flushPromise()
   await watchFileCreated(outputPath)
+  await flushPromise()
 
   const [firstFlushData] = await getOutputLogLines()
 
