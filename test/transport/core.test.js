@@ -496,7 +496,16 @@ test('sets worker data informing the transport that pino will send its config (f
   await plan
 })
 
-test('throws when custom formatters.level is incompatible with externally-created multi-target transport routing', async (t) => {
+test('warns when custom formatters.level is incompatible with multi-target transport routing', async (t) => {
+  const warnings = []
+  const originalEmitWarning = process.emitWarning
+  process.emitWarning = function (warning, options) {
+    warnings.push({ warning, options })
+  }
+  t.after(() => {
+    process.emitWarning = originalEmitWarning
+  })
+
   const transport = pino.transport({
     targets: [
       { target: join(__dirname, '..', 'fixtures', 'noop-transport.js') },
@@ -505,21 +514,30 @@ test('throws when custom formatters.level is incompatible with externally-create
   })
   t.after(transport.end.bind(transport))
 
-  assert.throws(
-    () => {
-      pino({
-        formatters: {
-          level (label) {
-            return { severity: label }
-          }
-        }
-      }, transport)
-    },
-    Error('multiple transport targets/pipelines do not allow custom level formatters that replace the numeric level')
-  )
+  const instance = pino({
+    formatters: {
+      level (label) {
+        return { severity: label }
+      }
+    }
+  }, transport)
+
+  instance.info('hello')
+
+  assert.equal(warnings.length, 1)
+  assert.equal(warnings[0].options.code, 'PINO_TRANSPORT_MULTI_TARGETS_LEVEL_FORMATTER')
 })
 
-test('allows custom formatters.level that keeps numeric levels with externally-created multi-target transport routing', async (t) => {
+test('does not warn when custom formatters.level keeps numeric levels with externally-created multi-target transport routing', async (t) => {
+  const warnings = []
+  const originalEmitWarning = process.emitWarning
+  process.emitWarning = function (warning, options) {
+    warnings.push({ warning, options })
+  }
+  t.after(() => {
+    process.emitWarning = originalEmitWarning
+  })
+
   const transport = pino.transport({
     targets: [
       { target: join(__dirname, '..', 'fixtures', 'noop-transport.js') },
@@ -528,15 +546,17 @@ test('allows custom formatters.level that keeps numeric levels with externally-c
   })
   t.after(transport.end.bind(transport))
 
-  assert.doesNotThrow(() => {
-    pino({
-      formatters: {
-        level (label, number) {
-          return { level: number, severity: label }
-        }
+  const instance = pino({
+    formatters: {
+      level (label, number) {
+        return { level: number, severity: label }
       }
-    }, transport)
-  })
+    }
+  }, transport)
+
+  instance.info('hello')
+
+  assert.equal(warnings.length, 0)
 })
 
 test('stdout in worker', async () => {

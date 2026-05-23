@@ -3,8 +3,9 @@
 const test = require('node:test')
 const assert = require('node:assert')
 const os = require('node:os')
+const { once } = require('node:events')
 const { join } = require('node:path')
-const { readFile } = require('node:fs').promises
+const { readFile, unlink } = require('node:fs').promises
 const { promisify } = require('node:util')
 
 const pino = require('../..')
@@ -35,8 +36,14 @@ test('thread-stream async flush', async () => {
   })
 })
 
-test('thread-stream async flush should call the passed callback', async () => {
-  const outputPath = file()
+test('thread-stream async flush should call the passed callback', async (t) => {
+  const outputPath = join(os.tmpdir(), `pino-${process.pid}-${Date.now()}-${Math.random().toString(16).slice(2)}`)
+  t.after(async () => {
+    try {
+      await unlink(outputPath)
+    } catch {
+    }
+  })
   async function getOutputLogLines () {
     return (await readFile(outputPath)).toString().trim().split('\n').map(JSON.parse)
   }
@@ -46,10 +53,11 @@ test('thread-stream async flush should call the passed callback', async () => {
   })
   const instance = pino(transport)
   const flushPromise = promisify(instance.flush).bind(instance)
+  await once(transport, 'ready')
 
   instance.info('hello')
-  await flushPromise()
   await watchFileCreated(outputPath)
+  await flushPromise()
 
   const [firstFlushData] = await getOutputLogLines()
 

@@ -181,7 +181,10 @@ function pino (...args) {
     }
 
     if (!ok) {
-      throw Error('multiple transport targets/pipelines do not allow custom level formatters that replace the numeric level')
+      process.emitWarning(
+        'custom formatters.level detected with multiple transport targets/pipelines; ensure logs include a numeric "level" field or they may be dropped',
+        { code: 'PINO_TRANSPORT_MULTI_TARGETS_LEVEL_FORMATTER' }
+      )
     }
   }
 
