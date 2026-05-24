@@ -14,6 +14,13 @@ const { watchFileCreated, watchForWrite, file } = require('../helper')
 const { pid } = process
 const hostname = os.hostname()
 
+async function waitForReady (stream) {
+  if (stream.ready) {
+    return
+  }
+  await once(stream, 'ready')
+}
+
 test('thread-stream async flush', async (t) => {
   const destination = file()
   const transport = pino.transport({
@@ -55,7 +62,7 @@ test('thread-stream async flush should call the passed callback', async (t) => {
   t.after(() => transport.end())
   const instance = pino(transport)
   const flushPromise = promisify(instance.flush).bind(instance)
-  await once(transport, 'ready')
+  await waitForReady(transport)
   transport.ref()
 
   instance.info('hello')
