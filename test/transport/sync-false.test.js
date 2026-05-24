@@ -56,10 +56,11 @@ test('thread-stream async flush should call the passed callback', async (t) => {
   const instance = pino(transport)
   const flushPromise = promisify(instance.flush).bind(instance)
   await once(transport, 'ready')
+  transport.ref()
 
   instance.info('hello')
-  await watchFileCreated(outputPath)
   await flushPromise()
+  await watchFileCreated(outputPath)
 
   const [firstFlushData] = await getOutputLogLines()
 
