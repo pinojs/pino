@@ -112,8 +112,5 @@
     "safe-stable-stringify": "^2.3.1",
     "sonic-boom": "^4.0.1",
     "thread-stream": "^4.0.0"
-  },
-  "overrides": {
-    "fflate": "0.8.2"
   }
 }
