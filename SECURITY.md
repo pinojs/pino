@@ -19,6 +19,16 @@ non-externally provided input.
 Pino assumes all objects being logged, `logger.info(obj, message)`, are json-serializable.
 Use the `serializers` and `redact` features to sanitize them.
 
+Pino also assumes that applications control the top-level keys of logged objects
+and child logger bindings. Do not pass externally supplied objects directly as
+`logger.info(untrustedObject)` or `logger.child(untrustedObject)`. Top-level
+keys are written at the root of the log line and can conflict with Pino fields
+such as `level`, `time`, or `msg`, as well as application or security fields.
+If untrusted data must be logged, place it under an application-controlled key,
+for example `logger.info({ untrusted })` or `logger.child({ untrusted })`, and
+apply appropriate serialization and redaction. As a matter of good security
+hygiene, prefer not to log untrusted data at all unless it is necessary.
+
 Pino is not hardened against external prototype pollution attacks, but we
 will accept a vulnerability if Pino can be misused to cause a prototype pollution.
 
