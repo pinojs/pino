@@ -147,11 +147,19 @@ const logger = pino({
 <a id="dupe-keys"></a>
 ## How Pino handles duplicate keys
 
-Duplicate keys are possibly when a child logger logs an object with a key that
-collides with a key in the child loggers bindings.
+Duplicate keys are possible when a logged object contains a top-level key that
+collides with a Pino field or a key in the child logger's bindings, or when child
+logger bindings collide with parent bindings.
+
+For untrusted data, avoid passing externally supplied objects directly to logging
+methods or child logger bindings. User-controlled top-level keys can conflict
+with Pino fields such as `level`, `time`, or `msg`, as well as application or
+security fields. If untrusted data must be logged, place it under an
+application-controlled key, such as `logger.info({ untrusted })`, and prefer not
+to log untrusted data at all unless necessary.
 
 See the [child logger duplicate keys caveat](/docs/child-loggers.md#duplicate-keys-caveat)
-for information on this is handled.
+and [`logger.child()` bindings](/docs/api.md#logger-child-bindings) for more information.
 
 <a id="level-string"></a>
 ## Log levels as labels instead of numbers

@@ -724,6 +724,25 @@ logger.info({MIX: {IN: true}})
 // {"level":30,"time":1531254555820,"pid":55956,"hostname":"x","MIX":{"IN":true}}
 ```
 
+Do not pass an externally supplied object directly as the `mergingObject`.
+Top-level keys are written at the root of the log line and can conflict with
+Pino fields such as `level`, `time`, or `msg`, as well as application or
+security fields. If untrusted data must be logged, place it under an
+application-controlled key:
+
+```js
+// Avoid: user-controlled keys become top-level log fields
+logger.info(untrustedObject)
+
+// Prefer: user-controlled keys are contained under a trusted namespace
+logger.info({ untrusted: untrustedObject })
+```
+
+As a matter of good security hygiene, prefer not to log untrusted data at all
+unless it is necessary. When it is necessary, sanitize and redact it first.
+The same top-level key guidance applies to [`logger.child()` bindings](#logger-child-bindings)
+and [`logger.setBindings()`](#logger-set-bindings).
+
 If the object is of type Error, it is wrapped in an object containing a property err (`{ err: mergingObject }`).
 This allows for a unified error handling flow.
 
@@ -926,6 +945,24 @@ child.info('child!')
 
 The `bindings` object may contain any key except for reserved configuration keys `level` and `serializers`.
 
+Do not pass externally supplied objects directly as child bindings. Binding keys
+are top-level log fields emitted on every log line from the child logger, so
+user-controlled keys can conflict with Pino fields such as `level`, `time`, or
+`msg`, as well as application or security fields. If untrusted data must be
+included in child bindings, place it under an application-controlled key:
+
+```js
+// Avoid: user-controlled keys become top-level fields on every child log line
+const child = logger.child(untrustedObject)
+
+// Prefer: user-controlled keys are contained under a trusted namespace
+const child = logger.child({ untrusted: untrustedObject })
+```
+
+As a matter of good security hygiene, prefer not to log untrusted data at all
+unless it is necessary. When it is necessary, sanitize and redact it first.
+See also [`mergingObject`](#mergingobject) and [`logger.setBindings()`](#logger-set-bindings).
+
 ##### `bindings.serializers` (Object) - DEPRECATED
 
 Use `options.serializers` instead.
@@ -1022,6 +1059,11 @@ Adds to the bindings of this logger instance.
 
 **Note:** Does not overwrite bindings. Can potentially result in duplicate keys in
 log lines.
+
+Do not pass externally supplied objects directly as bindings. Binding keys are
+top-level log fields and can conflict with Pino fields or application fields.
+If untrusted data must be added, place it under an application-controlled key,
+for example `logger.setBindings({ untrusted })`, and sanitize or redact it first.
 
 * See [`bindings` parameter in `logger.child`](#logger-child-bindings)
 
