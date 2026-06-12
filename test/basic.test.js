@@ -473,6 +473,23 @@ test('correctly escape quote in a key', async () => {
   assert.deepEqual(Object.keys(obj), ['some"obj'])
 })
 
+test('correctly escape quote in a child binding key', async () => {
+  const stream = sink()
+  const instance = pino(stream)
+  const key = 'some":1,"level":60,"binding'
+  const child = instance.child({ [key]: 'world' })
+  child.info('a string')
+  const result = await once(stream, 'data')
+  delete result.time
+  assert.deepEqual(result, {
+    level: 30,
+    pid,
+    hostname,
+    msg: 'a string',
+    [key]: 'world'
+  })
+})
+
 // https://github.com/pinojs/pino/issues/139
 test('object and format string', async () => {
   const stream = sink()
