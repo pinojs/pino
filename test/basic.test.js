@@ -884,3 +884,69 @@ test('grandchild message should inherent parent prefix', async () => {
   const { msg } = await once(stream, 'data')
   assert.equal(msg, 'My name is Bond James Bond')
 })
+
+test('logs an object with an own enumerable __proto__ key', async () => {
+  const stream = sink()
+  const instance = pino(stream)
+  // JSON.parse produces an own enumerable __proto__ key from any untrusted JSON
+  const obj = JSON.parse('{"__proto__":{"x":1},"user":"bob"}')
+  instance.info(obj, 'incoming request')
+  const result = await once(stream, 'data')
+  check(assert.equal.bind(assert), result, 30, 'incoming request')
+  assert.equal(result.user, 'bob')
+})
+
+test('logs a redacted object with an own enumerable __proto__ key', async () => {
+  const stream = sink()
+  const instance = pino({ redact: ['user'] }, stream)
+  const obj = JSON.parse('{"__proto__":{"x":1},"user":"bob"}')
+  instance.info(obj, 'incoming request')
+  const result = await once(stream, 'data')
+  check(assert.equal.bind(assert), result, 30, 'incoming request')
+  assert.equal(result.user, '[Redacted]')
+})
+
+test('logs child bindings with an own enumerable __proto__ key', async () => {
+  const stream = sink()
+  const bindings = JSON.parse('{"__proto__":{"x":1},"reqId":"abc"}')
+  const instance = pino(stream).child(bindings)
+  instance.info('incoming request')
+  const result = await once(stream, 'data')
+  check(assert.equal.bind(assert), result, 30, 'incoming request')
+  assert.equal(result.reqId, 'abc')
+})
+
+test('logs an object with keys named after Object.prototype members', async () => {
+  const stream = sink()
+  const instance = pino(stream)
+  const obj = {
+    toString: 'a',
+    constructor: 'b',
+    valueOf: 'c',
+    hasOwnProperty: 'd',
+    propertyIsEnumerable: 'e',
+    toLocaleString: 'f',
+    isPrototypeOf: 'g'
+  }
+  instance.info(obj, 'incoming request')
+  const result = await once(stream, 'data')
+  check(assert.equal.bind(assert), result, 30, 'incoming request')
+  assert.equal(result.toString, 'a')
+  assert.equal(result.constructor, 'b')
+  assert.equal(result.valueOf, 'c')
+  assert.equal(result.hasOwnProperty, 'd')
+  assert.equal(result.propertyIsEnumerable, 'e')
+  assert.equal(result.toLocaleString, 'f')
+  assert.equal(result.isPrototypeOf, 'g')
+})
+
+test('logs a redacted object with keys named after Object.prototype members', async () => {
+  const stream = sink()
+  const instance = pino({ redact: ['secret'] }, stream)
+  instance.info({ toString: 'a', valueOf: 'b', secret: 'x' }, 'incoming request')
+  const result = await once(stream, 'data')
+  check(assert.equal.bind(assert), result, 30, 'incoming request')
+  assert.equal(result.toString, 'a')
+  assert.equal(result.valueOf, 'b')
+  assert.equal(result.secret, '[Redacted]')
+})
