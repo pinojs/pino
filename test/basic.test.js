@@ -884,3 +884,34 @@ test('grandchild message should inherent parent prefix', async () => {
   const { msg } = await once(stream, 'data')
   assert.equal(msg, 'My name is Bond James Bond')
 })
+
+test('logs an object with an own enumerable __proto__ key', async () => {
+  const stream = sink()
+  const instance = pino(stream)
+  // JSON.parse produces an own enumerable __proto__ key from any untrusted JSON
+  const obj = JSON.parse('{"__proto__":{"x":1},"user":"bob"}')
+  instance.info(obj, 'incoming request')
+  const result = await once(stream, 'data')
+  check(assert.equal.bind(assert), result, 30, 'incoming request')
+  assert.equal(result.user, 'bob')
+})
+
+test('logs a redacted object with an own enumerable __proto__ key', async () => {
+  const stream = sink()
+  const instance = pino({ redact: ['user'] }, stream)
+  const obj = JSON.parse('{"__proto__":{"x":1},"user":"bob"}')
+  instance.info(obj, 'incoming request')
+  const result = await once(stream, 'data')
+  check(assert.equal.bind(assert), result, 30, 'incoming request')
+  assert.equal(result.user, '[Redacted]')
+})
+
+test('logs child bindings with an own enumerable __proto__ key', async () => {
+  const stream = sink()
+  const bindings = JSON.parse('{"__proto__":{"x":1},"reqId":"abc"}')
+  const instance = pino(stream).child(bindings)
+  instance.info('incoming request')
+  const result = await once(stream, 'data')
+  check(assert.equal.bind(assert), result, 30, 'incoming request')
+  assert.equal(result.reqId, 'abc')
+})
