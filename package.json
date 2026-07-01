@@ -65,7 +65,7 @@
     "@types/flush-write-stream": "^1.0.0",
     "@types/node": "^25.0.3",
     "airtap": "5.0.0",
-    "bole": "^5.0.5",
+    "bole": "^6.0.3",
     "borp": "^0.21.0",
     "bunyan": "^1.8.14",
     "debug": "^4.3.4",
