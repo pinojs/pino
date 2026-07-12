@@ -6,6 +6,7 @@ const os = require('node:os')
 const { join } = require('node:path')
 const { readFile } = require('node:fs').promises
 const { promisify } = require('node:util')
+const { once } = require('node:events')
 
 const pino = require('../..')
 const { watchFileCreated, watchForWrite, file } = require('../helper')
@@ -47,6 +48,14 @@ test('thread-stream async flush should call the passed callback', async () => {
   const instance = pino(transport)
   const flushPromise = promisify(instance.flush).bind(instance)
 
+  // The worker thread backing the transport is unref'd once it becomes ready
+  // (see lib/transport.js) so it does not keep the process alive. Because this
+  // test awaits `flush()` on an otherwise idle event loop, re-ref the worker
+  // after it is ready so the loop stays alive until the flush callback runs;
+  // otherwise the awaited promise never settles and the test hangs.
+  await once(transport, 'ready')
+  transport.ref()
+
   instance.info('hello')
   await flushPromise()
   await watchFileCreated(outputPath)
@@ -64,4 +73,7 @@ test('thread-stream async flush should call the passed callback', async () => {
   const afterSecondFlush = await getOutputLogLines()
   assert.equal(afterSecondFlush.length, 2)
   assert.equal(afterSecondFlush[1].msg, 'world')
+
+  // Restore the unref'd state so the test process can exit cleanly.
+  transport.unref()
 })
