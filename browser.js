@@ -166,6 +166,15 @@ function pino (opts) {
   logger._serialize = serialize
   logger._stdErrSerialize = stdErrSerialize
   logger.child = function (...args) { return child.call(this, setOpts, ...args) }
+  logger.setBindings = function (newBindings) {
+    this.bindings = Object.assign({}, this.bindings, newBindings)
+    if (this._logEvent) {
+      this._logEvent.bindings.push(newBindings)
+    }
+    // reassigning the level rebuilds the log functions so the updated
+    // bindings are prepended to subsequent log calls
+    this.level = this._level
+  }
 
   if (transmit) logger._logEvent = createLogEventShape()
 
