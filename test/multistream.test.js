@@ -678,6 +678,36 @@ test('multistream.write should not throw if one stream fails', async () => {
   assert.equal(messageCount, 3)
 })
 
+test('write routes correctly when the source sets a string lastLevel', async () => {
+  // A source that formats levels as labels (e.g. pino-abstract-transport
+  // relaying lines produced with a `formatters.level` option) assigns the
+  // string label to `lastLevel` via the metadata protocol. multistream must
+  // resolve that label to a numeric value before comparing against the
+  // per-stream levels, otherwise the log line is silently dropped.
+  const received = []
+  const mkStream = (name) => writeStream(function (data, enc, cb) {
+    received.push(name)
+    cb()
+  })
+  const streams = [
+    { level: 'debug', stream: mkStream('debug') },
+    { level: 'error', stream: mkStream('error') }
+  ]
+  const multi = multistream(streams, { levels: pino.levels.values })
+
+  // Emulate the metadata protocol used by pino / pino-abstract-transport,
+  // but with a level label string instead of a number.
+  multi.lastLevel = 'error'
+  multi.lastMsg = 'boom'
+  multi.lastObj = {}
+  multi.lastTime = Date.now()
+  multi.write('{"level":"error","msg":"boom"}\n')
+
+  // An error-level record must reach both the debug (<= error) and error
+  // streams, exactly as it would when lastLevel is the numeric 50.
+  assert.deepStrictEqual(received.sort(), ['debug', 'error'])
+})
+
 test('flushSync', async (t) => {
   const plan = tspl(t, { plan: 2 })
   const tmp = file()
