@@ -37,6 +37,35 @@ A "month" is defined as 30 consecutive days.
 
 [semver]: https://semver.org/
 
+<a name="supported-nodejs"></a>
+
+### Supported Node.js versions
+
+Pino follows the [Node.js release schedule][node-release]. A Pino release line
+is tested against, and supports, every Node.js release line that is in its
+_current_, _active LTS_, or _maintenance LTS_ phase when the Pino line is
+released, as described above.
+
+Support for a Node.js version is **only dropped in a new Pino major release**. A
+published Pino major will never drop a Node.js release line that it originally
+shipped with, so upgrading within a major line (for example, from `9.1.0` to
+`9.4.0`) will never remove support for a Node.js version you already run on.
+
+Once a Node.js release line reaches its end-of-life, Pino supports it on a
+best-effort basis, with the following caveats:
+
+- End-of-life Node.js versions are not exercised in continuous integration.
+- Some fixes and features cannot be backported to the Pino lines that still
+  support them.
+- Dependencies cannot be kept up to date.
+
+To keep running on an end-of-life Node.js version, pin your dependency to the
+last Pino major line that supported it. The [Schedule](#lts-schedule) below maps
+each Pino release line to the Node.js versions it supports; for example, to stay
+on Node.js 14, install the latest `8.x` release with `"pino": "8.x"`.
+
+[node-release]: https://github.com/nodejs/release#release-schedule
+
 <a name="lts-schedule"></a>
 
 ### Schedule
