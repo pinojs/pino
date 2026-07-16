@@ -16,8 +16,14 @@ Pino trusts the applications using it and the environment that it is running in.
 This includes all the application code, the transport, the filesystem and all
 non-externally provided input.
 
-Pino assumes all objects being logged, `logger.info(obj, message)`, are json-serializable.
-Use the `serializers` and `redact` features to sanitize them.
+Pino assumes all objects being logged, `logger.info(obj, message)`, are JSON-serializable.
+Applications are responsible for the data structures their code constructs and logs,
+including ensuring that their size, depth, breadth, and reference topology can be
+serialized within acceptable CPU, memory, and output-size bounds. Resource exhaustion
+caused by logging an application-constructed data structure is an application-level
+concern. The `depthLimit` and `edgeLimit` options apply only to Pino's fallback
+serializer after `JSON.stringify` throws; they are not general resource limits.
+Use the `serializers` and `redact` features to sanitize logged objects.
 
 Pino also assumes that applications control the top-level keys of logged objects
 and child logger bindings. Do not pass externally supplied objects directly as
