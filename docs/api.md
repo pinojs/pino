@@ -137,13 +137,19 @@ logger.info('hello') // Will throw an error saying info is not found in logger o
 
 Default: `5`
 
-Option to limit stringification at a specific nesting depth when logging circular objects.
+Maximum nesting depth used by Pino's fallback serializer.
 
 #### `edgeLimit` (Number)
 
 Default: `100`
 
-Option to limit stringification of properties/elements when logging a specific object/array with circular references.
+Maximum number of properties/elements per object or array used by Pino's fallback serializer.
+
+Pino uses the fallback serializer, and therefore applies `depthLimit` and `edgeLimit`, only after
+`JSON.stringify` throws. These options are not general limits on serialization work or output size.
+For example, `JSON.stringify` successfully serializes a non-circular object graph that contains
+repeated references to the same object. In that case, every reference is traversed and serialized
+in full, without applying either limit.
 
 <a id="opt-mixin"></a>
 #### `mixin` (Function):
