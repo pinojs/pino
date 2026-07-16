@@ -36,6 +36,23 @@ testEscape('\\r', '\r')
 testEscape('\\t', '\t')
 testEscape('\\b', '\b')
 
+test('correctly escape child binding keys', async () => {
+  const stream = sink()
+  const key = 'x"}\n{"level":60,"msg":"forged"}\n{"swallow'
+  const instance = pino(stream).child({ [key]: true })
+
+  instance.info('hello')
+  const result = await once(stream, 'data')
+  delete result.time
+  assert.deepEqual(result, {
+    pid,
+    hostname,
+    level: 30,
+    msg: 'hello',
+    [key]: true
+  })
+})
+
 const toEscape = [
   '\u0000', // NUL  Null character
   '\u0001', // SOH  Start of Heading
