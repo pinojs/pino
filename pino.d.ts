@@ -687,12 +687,14 @@ declare namespace pino {
       };
 
       /**
-       * Stringification limit at a specific nesting depth when logging circular object. Default: `5`.
+       * Maximum nesting depth used by the fallback serializer after `JSON.stringify` throws. Default: `5`.
+       * This is not a general limit on serialization work or output size for values that `JSON.stringify` can serialize.
        */
       depthLimit?: number
 
       /**
-       * Stringification limit of properties/elements when logging a specific object/array with circular references. Default: `100`.
+       * Maximum properties/elements per object or array used by the fallback serializer after `JSON.stringify` throws. Default: `100`.
+       * This is not a general limit on serialization work or output size, including for non-circular shared-reference graphs.
        */
       edgeLimit?: number
 
