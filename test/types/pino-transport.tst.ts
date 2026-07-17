@@ -169,3 +169,21 @@ pino.transport({
   targets: [],
   dedupe: true
 })
+
+// Caller
+pino.transport({
+  target: 'custom',
+  caller: __filename
+})
+
+pino.transport({
+  targets: [],
+  caller: [__filename]
+})
+
+pino.transport({
+  pipeline: [
+    { target: './my-transform.js' }
+  ],
+  caller: __filename
+})
