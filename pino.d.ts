@@ -301,8 +301,10 @@ declare namespace pino {
     export interface MultiStreamRes<TOriginLevel = Level> {
       write: (data: any) => void,
       add: <TLevel = Level>(dest: StreamEntry<TLevel> | DestinationStream) => MultiStreamRes<TOriginLevel & TLevel>,
+      remove: (id: number) => MultiStreamRes<TOriginLevel>,
       flushSync: () => void,
       minLevel: number,
+      lastId: number,
       streams: StreamEntry<TOriginLevel>[],
       clone<const TLevel = Level>(level: TLevel): MultiStreamRes<TLevel>,
     }
