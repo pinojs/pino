@@ -50,6 +50,11 @@ Using YARN:
 $ yarn add pino
 ```
 
+Using Deno:
+```
+$ deno install pino
+```
+
 If you would like to install pino v6, refer to https://github.com/pinojs/pino/tree/v6.x.
 
 ## Usage
