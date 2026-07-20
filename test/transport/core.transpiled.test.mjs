@@ -1,12 +1,16 @@
 import test from 'node:test'
 import assert from 'node:assert'
 import * as os from 'node:os'
-import { join } from 'node:path'
+import { join, dirname } from 'node:path'
 import fs from 'node:fs'
 import * as url from 'node:url'
 
-import { watchFileCreated } from '../helper'
-import pino from '../../'
+import { fileURLToPath } from 'node:url'
+import { watchFileCreated } from '../helper.js'
+import pino from '../../pino.js'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 const readFile = fs.promises.readFile
 
@@ -14,7 +18,7 @@ const { pid } = process
 const hostname = os.hostname()
 
 // A subset of the test from core.test.js, we don't need all of them to check for compatibility
-function runTests (esVersion: string): void {
+function runTests (esVersion) {
   test(`(ts -> ${esVersion}) pino.transport with file`, async (t) => {
     const destination = join(
       os.tmpdir(),
