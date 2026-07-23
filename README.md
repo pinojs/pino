@@ -21,6 +21,7 @@
 * [Asynchronous Logging ⇗](/docs/asynchronous.md)
 * [Ecosystem ⇗](/docs/ecosystem.md)
 * [Help ⇗](/docs/help.md)
+* [Production setup ⇗](/docs/production.md)
 * [Long Term Support Policy ⇗](/docs/lts.md)
 
 ## Runtimes
