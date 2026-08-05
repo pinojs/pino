@@ -414,6 +414,40 @@ test('clone generates a new multistream with all stream at the same level', asyn
   await plan
 })
 
+test('clone supports add, remove, and end methods correctly', async (t) => {
+  const plan = tspl(t, { plan: 5 })
+  const stream1 = writeStream(function (data, enc, cb) {
+    cb()
+  })
+  const stream2 = writeStream(function (data, enc, cb) {
+    cb()
+  })
+
+  const ms = multistream([{ stream: stream1 }])
+  const clone = ms.clone(30)
+
+  // Verify that adding a stream with a string level doesn't throw and returns the clone
+  const updatedClone = clone.add({ level: 'info', stream: stream2 })
+  plan.equal(updatedClone, clone)
+  plan.equal(clone.streams.length, 2)
+
+  // Verify remove returns the clone and works correctly
+  const stream2Entry = clone.streams.find(s => s.stream === stream2)
+  if (stream2Entry) {
+    const afterRemove = clone.remove(stream2Entry.id)
+    plan.equal(afterRemove, clone)
+    plan.equal(clone.streams.length, 1)
+  } else {
+    plan.fail('stream2 entry not found')
+  }
+
+  // Verify end method is present and can be called without errors
+  plan.equal(typeof clone.end, 'function')
+  clone.end()
+
+  await plan
+})
+
 test('one stream', async () => {
   let messageCount = 0
   const stream = writeStream(function (data, enc, cb) {
