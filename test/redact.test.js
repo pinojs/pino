@@ -891,3 +891,33 @@ test('censor function should not be called for non-existent nested paths (issue 
   assert.equal(censorCalls[0].path, 'req.authorization')
   assert.equal(censorCalls[0].value, 'bearer token')
 })
+
+test('redact option – a path whose first segment names an Object.prototype member', async () => {
+  // The shape of the redactor is keyed by the first segment of each path, and
+  // those come from the caller. On a plain object 'constructor.secret' reads the
+  // inherited function, and building the logger threw
+  // "o[ns].push is not a function" before it could log anything.
+  const stream = sink()
+  const instance = pino({ redact: ['constructor.secret'] }, stream)
+  instance.info({ constructor: { secret: 'hunter2', keep: 'me' } }, 'hello')
+  const o = await once(stream, 'data')
+  assert.equal(o.constructor.secret, '[Redacted]')
+  assert.equal(o.constructor.keep, 'me')
+})
+
+test('redact option – other inherited names no longer throw while building', async () => {
+  for (const name of ['toString', 'valueOf', 'hasOwnProperty', 'isPrototypeOf', '__proto__']) {
+    assert.doesNotThrow(() => {
+      pino({ redact: [`${name}.secret`] }, sink())
+    }, `redact path under ${name}`)
+  }
+})
+
+test('redact option – top level path named after an Object.prototype member', async () => {
+  const stream = sink()
+  const instance = pino({ redact: ['constructor'] }, stream)
+  instance.info({ constructor: 'hunter2', keep: 'me' }, 'hello')
+  const o = await once(stream, 'data')
+  assert.equal(o.constructor, '[Redacted]')
+  assert.equal(o.keep, 'me')
+})
