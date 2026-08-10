@@ -131,7 +131,9 @@ function pino (...args) {
   const stringifyFn = stringify.bind({
     [stringifySafeSym]: stringifySafe
   })
-  const stringifiers = redact ? redaction(redact, stringifyFn) : {}
+  const stringifiers = redact
+    ? Object.assign(Object.create(null), redaction(redact, stringifyFn))
+    : Object.create(null)
   const formatOpts = redact
     ? { stringify: stringifiers[redactFmtSym] }
     : { stringify: stringifyFn }
