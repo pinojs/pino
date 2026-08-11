@@ -727,6 +727,53 @@ test('flushSync', async (t) => {
   await plan
 })
 
+test('multistream.write continues writing to remaining streams when one stream throws synchronously', async () => {
+  // Regression test: a stream whose write() throws must not prevent subsequent
+  // streams from receiving the log line.
+  let afterCount = 0
+
+  const throwingStream = {
+    write () {
+      throw new Error('boom')
+    }
+  }
+
+  const afterStream = writeStream(function (data, enc, cb) {
+    afterCount += 1
+    cb()
+  })
+
+  const multi = multistream([
+    { level: 'info', stream: throwingStream },
+    { level: 'info', stream: afterStream }
+  ])
+
+  // Attach an error listener so the emitted error does not go unhandled.
+  const errors = []
+  multi.on('error', (err) => errors.push(err))
+
+  const log = pino({ level: 'info' }, multi)
+  log.info('test message 1')
+  log.info('test message 2')
+
+  assert.equal(afterCount, 2, 'afterStream should have received both log lines')
+  assert.equal(errors.length, 2, 'an error should have been emitted for each throwing write')
+})
+
+test('multistream.write does not throw when a stream write() throws and no error listener is registered', async () => {
+  const throwingStream = {
+    write () {
+      throw new Error('silent failure')
+    }
+  }
+
+  const multi = multistream([{ level: 'info', stream: throwingStream }])
+  const log = pino({ level: 'info' }, multi)
+
+  // Should not throw even without an error listener.
+  assert.doesNotThrow(() => log.info('test'))
+})
+
 test('ends all streams', async (t) => {
   const plan = tspl(t, { plan: 7 })
   const stream = writeStream(function (data, enc, cb) {
