@@ -107,6 +107,6 @@
     "real-require": "^1.0.0",
     "safe-stable-stringify": "^2.3.1",
     "sonic-boom": "^4.0.1",
-    "thread-stream": "^4.0.0"
+    "thread-stream": "^4.2.0"
   }
 }
