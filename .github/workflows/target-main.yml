@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   comment:
-    if: ${{ github.base_ref != "master" }}
+    if: ${{ github.base_ref != "main" }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/github-script@v9
@@ -19,5 +19,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '⚠️ This pull request does not target the master branch.'
+              body: '⚠️ This pull request does not target the main branch.'
             })
