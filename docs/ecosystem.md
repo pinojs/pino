@@ -76,6 +76,7 @@ according to a given format string.
 + [`cls-proxify`](https://github.com/keenondrums/cls-proxify): integration of pino and [CLS](https://github.com/jeff-lewis/cls-hooked). Useful for creating dynamically configured child loggers (e.g. with added trace ID) for each request.
 + [`crawlee-pino`](https://github.com/imyelo/crawlee-pino): use Pino to log within Crawlee
 + [`eslint-plugin-pino`](https://github.com/orzarchi/eslint-plugin-pino): linting rules for pino usage, primarly for preventing missing context in logs due to incorrect argument order.
++ [`nark`](https://nark.sh/profiles/pino): static analyzer for TypeScript that catches missing error handling around pino transports and logger lifecycle.
 + [`pino-colada`](https://github.com/lrlna/pino-colada): cute ndjson formatter for pino.
 + [`pino-dev`](https://github.com/dnjstrom/pino-dev): simple prettifier for pino with built-in support for common ecosystem packages.
 + [`pino-fluentd`](https://github.com/davidedantonio/pino-fluentd): send Pino logs to Elasticsearch,
