@@ -49,6 +49,9 @@ function levelToValue (level, logger) {
 const baseLogFunctionSymbol = Symbol('pino.logFuncs')
 const hierarchySymbol = Symbol('pino.hierarchy')
 
+const ownBindingsSymbol = Symbol('pino.ownBindings')
+const bindingsSymbol = Symbol('pino.bindings')
+
 const logFallbackMap = {
   error: 'log',
   fatal: 'error',
@@ -122,6 +125,8 @@ function pino (opts) {
   // setup root hierarchy entry
   appendChildLogger({}, logger)
 
+  logger[bindingsSymbol] = {}
+
   Object.defineProperty(logger, 'levelVal', {
     get: getLevelVal
   })
@@ -166,8 +171,14 @@ function pino (opts) {
   logger._serialize = serialize
   logger._stdErrSerialize = stdErrSerialize
   logger.child = function (...args) { return child.call(this, setOpts, ...args) }
+
+  logger.bindings = function () {
+    return Object.assign({}, this[bindingsSymbol])
+  }
+
   logger.setBindings = function (newBindings) {
-    this.bindings = Object.assign({}, this.bindings, newBindings)
+    this[ownBindingsSymbol] = Object.assign({}, this[ownBindingsSymbol], newBindings)
+    this[bindingsSymbol] = Object.assign({}, this[bindingsSymbol], newBindings)
     if (this._logEvent) {
       this._logEvent.bindings.push(newBindings)
     }
@@ -224,7 +235,13 @@ function pino (opts) {
       this._childLevel = (parent._childLevel | 0) + 1
 
       // make sure bindings are available in the `set` function
-      this.bindings = bindings
+      this[ownBindingsSymbol] = bindings
+
+      this[bindingsSymbol] = Object.assign(
+        {},
+        parent[bindingsSymbol],
+        bindings
+      )
 
       if (childSerializers) {
         this.serializers = childSerializers
@@ -295,16 +312,16 @@ pino.stdTimeFunctions = Object.assign({}, { nullTime, epochTime, unixTime, isoTi
 
 function getBindingChain (logger) {
   const bindings = []
-  if (logger.bindings) {
-    bindings.push(logger.bindings)
+  if (logger[ownBindingsSymbol]) {
+    bindings.push(logger[ownBindingsSymbol])
   }
 
   // traverse up the tree to get all bindings
   let hierarchy = logger[hierarchySymbol]
   while (hierarchy.parent) {
     hierarchy = hierarchy.parent
-    if (hierarchy.logger.bindings) {
-      bindings.push(hierarchy.logger.bindings)
+    if (hierarchy.logger[ownBindingsSymbol]) {
+      bindings.push(hierarchy.logger[ownBindingsSymbol])
     }
   }
 
