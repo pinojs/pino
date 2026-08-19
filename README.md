@@ -4,6 +4,7 @@
 [![npm version](https://img.shields.io/npm/v/pino)](https://www.npmjs.com/package/pino)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/pinojs/pino/ci.yml)](https://github.com/pinojs/pino/actions)
 [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat)](https://standardjs.com/)
+[![inspect.software](https://raw.githubusercontent.com/inspect-software/badges/main/v1/p/pinojs/pino.svg)](https://inspect.software/software/pinojs/pino)
 
 [Very low overhead](#low-overhead) JavaScript logger.
 
