@@ -142,6 +142,7 @@ function pino (opts) {
     levels,
     timestamp: getTimeFunction(opts),
     messageKey: opts.messageKey || 'msg',
+    errorKey: opts.errorKey || 'err',
     onChild: opts.onChild || noop,
     redactFn
   }
@@ -359,7 +360,7 @@ function createWrap (self, opts, rootLogger, level) {
 
       var argsIsSerialized = false
       if (opts.serialize) {
-        applySerializers(args, this._serialize, this.serializers, this._stdErrSerialize)
+        applySerializers(args, this._serialize, this.serializers, this._stdErrSerialize, opts.asObject, opts.errorKey, opts.messageKey)
         argsIsSerialized = true
       }
       if (opts.asObject || opts.formatters) {
@@ -453,10 +454,25 @@ function asObject (logger, level, args, ts, opts) {
   }
 }
 
-function applySerializers (args, serialize, serializers, stdErrSerialize) {
+function applySerializers (args, serialize, serializers, stdErrSerialize, wrapErrors, errorKey, messageKey) {
+  errorKey = errorKey || 'err'
+  messageKey = messageKey || 'msg'
   for (const i in args) {
     if (stdErrSerialize && args[i] instanceof Error) {
-      args[i] = pino.stdSerializers.err(args[i])
+      const err = args[i]
+      const serialized = pino.stdSerializers.err(err)
+      if (wrapErrors) {
+        // For object output, nest the serialized error under the error key
+        // (matching the Node transport) instead of flattening its properties
+        // onto the log object, and surface its message under messageKey.
+        const wrapped = { [errorKey]: serialized }
+        if (wrapped[messageKey] === undefined) {
+          wrapped[messageKey] = err.message
+        }
+        args[i] = wrapped
+      } else {
+        args[i] = serialized
+      }
     } else if (typeof args[i] === 'object' && !Array.isArray(args[i]) && serialize) {
       for (const k in args[i]) {
         if (serialize.indexOf(k) > -1 && k in serializers) {
