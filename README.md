@@ -13,6 +13,7 @@
 * [API ⇗](/docs/api.md)
 * [Browser API ⇗](/docs/browser.md)
 * [Redaction ⇗](/docs/redaction.md)
+* [Serializers ⇗](/docs/serializers.md)
 * [Child Loggers ⇗](/docs/child-loggers.md)
 * [Transports ⇗](/docs/transports.md)
 * [Diagnostics ⇗](/docs/diagnostics.md)
