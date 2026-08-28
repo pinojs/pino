@@ -2,6 +2,8 @@
 
 const format = require('quick-format-unescaped')
 const Redact = require('@pinojs/redact')
+const symbols = require('./lib/symbols')
+const { version } = require('./lib/meta')
 
 module.exports = pino
 
@@ -292,6 +294,8 @@ pino.levels = {
 
 pino.stdSerializers = stdSerializers
 pino.stdTimeFunctions = Object.assign({}, { nullTime, epochTime, unixTime, isoTime })
+pino.symbols = symbols
+pino.version = version
 
 function getBindingChain (logger) {
   const bindings = []
