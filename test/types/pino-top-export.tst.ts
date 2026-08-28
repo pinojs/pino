@@ -9,6 +9,8 @@ import {
   levels,
   multistream,
   type MultiStreamRes,
+  raw,
+  type RawJSON,
   type SerializedError,
   stdSerializers,
   stdTimeFunctions,
@@ -19,6 +21,7 @@ import {
 expect(destination('')).type.toBe<SonicBoom>()
 expect(levels).type.toBe<LevelMapping>()
 expect(multistream(process.stdout)).type.toBe<MultiStreamRes>()
+expect(raw('{"key":"value"}')).type.toBe<RawJSON>()
 expect(stdSerializers.err({} as Error)).type.toBe<SerializedError>()
 expect(stdTimeFunctions.isoTime()).type.toBe<string>()
 expect(stdTimeFunctions.isoTimeNano()).type.toBe<string>()
