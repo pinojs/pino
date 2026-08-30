@@ -531,7 +531,7 @@ test('opts.browser.asObject defensively mitigates naughty numbers', ({ end, pass
     browser: { asObject: true, write: () => {} }
   })
   const child = instance.child({ test: 'test' })
-  child._childLevel = -10
+  child._bindingsDepth = -10
   child.info('test')
   pass() // if we reached here, there was no infinite loop, so, .. pass.
 

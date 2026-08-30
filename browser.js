@@ -336,6 +336,9 @@ function set (self, opts, rootLogger, level) {
 
   // prepend bindings if it is not the root logger
   const bindings = getBindingChain(self)
+  // asObject() has to skip exactly the bindings prepended here before it
+  // reaches the caller's own merging object, so record how many that is
+  self._bindingsDepth = bindings.length
   if (bindings.length === 0) {
     // early exit in case for rootLogger
     return
@@ -409,7 +412,7 @@ function asObject (logger, level, args, ts, opts) {
   let msg = argsCloned[0]
   const logObject = {}
 
-  let lvl = (logger._childLevel | 0) + 1
+  let lvl = (logger._bindingsDepth | 0) + 1
   if (lvl < 1) lvl = 1
 
   if (ts) {

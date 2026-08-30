@@ -97,3 +97,59 @@ test('setBindings bindings are transmitted', ({ end, same }) => {
   instance.info('test')
   end()
 })
+
+function collect (opts) {
+  let logged
+  const instance = pino(Object.assign({
+    browser: { asObject: true, write (o) { logged = o } }
+  }, opts))
+  return { instance, get: () => logged }
+}
+
+test('setBindings keeps the merging object of subsequent log calls', ({ end, is }) => {
+  const { instance, get } = collect()
+
+  instance.setBindings({ answer: 42 })
+  instance.info({ a: 1 }, 'test')
+
+  is(get().answer, 42)
+  is(get().a, 1)
+  is(get().msg, 'test')
+  end()
+})
+
+test('setBindings keeps the merging object for child loggers', ({ end, is }) => {
+  const { instance, get } = collect()
+
+  instance.setBindings({ answer: 42 })
+  instance.child({ child: true }).info({ a: 1 }, 'test')
+
+  is(get().answer, 42)
+  is(get().child, true)
+  is(get().a, 1)
+  is(get().msg, 'test')
+  end()
+})
+
+test('setBindings keeps format arguments of subsequent log calls', ({ end, is }) => {
+  const { instance, get } = collect()
+
+  instance.setBindings({ answer: 42 })
+  instance.info({ a: 1 }, 'hello %s', 'world')
+
+  is(get().a, 1)
+  is(get().msg, 'hello world')
+  end()
+})
+
+test('setBindings still merges only one object of subsequent log calls', ({ end, is, same }) => {
+  const { instance, get } = collect()
+
+  instance.setBindings({ answer: 42 })
+  instance.info({ a: 1 }, { b: 2 })
+
+  is(get().a, 1)
+  is(get().b, undefined)
+  same(get().msg, { b: 2 })
+  end()
+})
