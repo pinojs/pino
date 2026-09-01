@@ -3,8 +3,10 @@
 const test = require('node:test')
 const assert = require('node:assert')
 const os = require('node:os')
+const { tmpdir } = require('node:os')
 const { join } = require('node:path')
 const { readFile } = require('node:fs').promises
+const { unlink } = require('node:fs/promises')
 const { promisify } = require('node:util')
 
 const execa = require('execa')
@@ -73,9 +75,13 @@ test('flush callback is invoked on an idle event loop with transport', async () 
     timeout: 15000,
     killSignal: 'SIGKILL'
   })
-
-  const { stdout, stderr, exitCode } = await child
-  assert.equal(exitCode, 0, stderr)
-  assert.match(stdout, /callback-fired/)
-  assert.doesNotMatch(stdout + stderr, /callback-missing/)
+  const dest = join(tmpdir(), `pino-flush-idle-${child.pid}.log`)
+  try {
+    const { stdout, stderr, exitCode } = await child
+    assert.equal(exitCode, 0, stderr)
+    assert.match(stdout, /callback-fired/)
+    assert.doesNotMatch(stdout + stderr, /callback-missing/)
+  } finally {
+    await unlink(dest).catch(() => {})
+  }
 })
