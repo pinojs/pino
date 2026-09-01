@@ -69,7 +69,7 @@
     "docsify-cli": "^5.0.0",
     "eslint": "^9.37.0",
     "eslint-plugin-import": "^2.26.0",
-    "eslint-plugin-n": "18.2.2",
+    "eslint-plugin-n": "18.3.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^7.3.0",
     "execa": "^5.0.0",
