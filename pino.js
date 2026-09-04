@@ -34,6 +34,7 @@ const {
   endSym,
   formatOptsSym,
   messageKeySym,
+  messageKeyStrSym,
   errorKeySym,
   nestedKeySym,
   mixinSym,
@@ -210,6 +211,7 @@ function pino (...args) {
     [endSym]: end,
     [formatOptsSym]: formatOpts,
     [messageKeySym]: messageKey,
+    [messageKeyStrSym]: JSON.stringify(messageKey),
     [errorKeySym]: errorKey,
     [nestedKeySym]: nestedKey,
     // protect against injection
