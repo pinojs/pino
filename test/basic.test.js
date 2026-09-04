@@ -916,6 +916,14 @@ test('logs child bindings with an own enumerable __proto__ key', async () => {
   assert.equal(result.reqId, 'abc')
 })
 
+test('logs child bindings with a hasOwnProperty key', async () => {
+  const stream = sink()
+  const instance = pino(stream).child({ hasOwnProperty: 'value' })
+  instance.info('incoming request')
+  const result = await once(stream, 'data')
+  assert.equal(result.hasOwnProperty, 'value')
+})
+
 test('logs an object with keys named after Object.prototype members', async () => {
   const stream = sink()
   const instance = pino(stream)

@@ -34,6 +34,7 @@ const {
   endSym,
   formatOptsSym,
   messageKeySym,
+  messageKeyStrSym,
   errorKeySym,
   nestedKeySym,
   mixinSym,
@@ -169,11 +170,11 @@ function pino (...args) {
   const levels = mappings(customLevels, useOnlyCustomLevels)
 
   if (stream && stream[transportUsesMultistreamSym] === true) {
-    let sampleLabel = typeof level === 'string' ? level : undefined
-    if (!sampleLabel || levels[sampleLabel] === undefined) {
-      sampleLabel = Object.keys(levels)[0]
+    let sampleLabel = typeof level === 'string' ? level : levels.labels[level]
+    if (!sampleLabel || levels.values[sampleLabel] === undefined) {
+      sampleLabel = Object.keys(levels.values)[0]
     }
-    const sampleNumber = levels[sampleLabel]
+    const sampleNumber = levels.values[sampleLabel]
     let ok = false
     try {
       const formatted = formatters.level(sampleLabel, sampleNumber)
@@ -210,6 +211,7 @@ function pino (...args) {
     [endSym]: end,
     [formatOptsSym]: formatOpts,
     [messageKeySym]: messageKey,
+    [messageKeyStrSym]: JSON.stringify(messageKey),
     [errorKeySym]: errorKey,
     [nestedKeySym]: nestedKey,
     // protect against injection

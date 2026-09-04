@@ -218,7 +218,9 @@ function pino (opts) {
         ? Object.keys(childSerializers)
         : serialize
       delete bindings.serializers
-      applySerializers([bindings], childSerialize, childSerializers, this._stdErrSerialize)
+      const serializedBindings = [bindings]
+      applySerializers(serializedBindings, childSerialize, childSerializers, this._stdErrSerialize)
+      bindings = serializedBindings[0]
     }
     function Child (parent) {
       this._childLevel = (parent._childLevel | 0) + 1
@@ -359,7 +361,7 @@ function createWrap (self, opts, rootLogger, level) {
 
       var argsIsSerialized = false
       if (opts.serialize) {
-        applySerializers(args, this._serialize, this.serializers, this._stdErrSerialize)
+        applySerializers(args, this._serialize, this.serializers, this._stdErrSerialize, this._logEvent)
         argsIsSerialized = true
       }
       if (opts.asObject || opts.formatters) {
@@ -453,14 +455,23 @@ function asObject (logger, level, args, ts, opts) {
   }
 }
 
-function applySerializers (args, serialize, serializers, stdErrSerialize) {
+function applySerializers (args, serialize, serializers, stdErrSerialize, logEvent) {
   for (const i in args) {
     if (stdErrSerialize && args[i] instanceof Error) {
       args[i] = pino.stdSerializers.err(args[i])
     } else if (typeof args[i] === 'object' && !Array.isArray(args[i]) && serialize) {
-      for (const k in args[i]) {
+      const original = args[i]
+      let cloned
+      for (const k in original) {
         if (serialize.indexOf(k) > -1 && k in serializers) {
-          args[i][k] = serializers[k](args[i][k])
+          if (!cloned) {
+            args[i] = cloned = { ...original }
+            if (logEvent) {
+              const bindingIndex = logEvent.bindings.indexOf(original)
+              if (bindingIndex !== -1) logEvent.bindings[bindingIndex] = cloned
+            }
+          }
+          cloned[k] = serializers[k](cloned[k])
         }
       }
     }
@@ -480,7 +491,8 @@ function transmit (logger, opts, args, argsIsSerialized = false) {
       args,
       logger._serialize || Object.keys(logger.serializers),
       logger.serializers,
-      logger._stdErrSerialize === undefined ? true : logger._stdErrSerialize
+      logger._stdErrSerialize === undefined ? true : logger._stdErrSerialize,
+      logger._logEvent
     )
   }
 

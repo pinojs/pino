@@ -184,6 +184,25 @@ test('opts.browser.asObject uses opts.messageKey in logs', ({ end, ok, is }) => 
   end()
 })
 
+test('opts.browser.serialize does not mutate logged objects', ({ end, deepEqual }) => {
+  const input = { payload: { secret: 'value' } }
+  const original = input.payload
+  const instance = require('../browser')({
+    serializers: {
+      payload: () => ({ redacted: true })
+    },
+    browser: {
+      serialize: ['payload'],
+      write: function () {}
+    }
+  })
+
+  instance.info(input)
+  deepEqual(input, { payload: { secret: 'value' } })
+  deepEqual(input.payload, original)
+  end()
+})
+
 test('opts.browser.asObjectBindingsOnly passes the bindings but keep the message unformatted', ({ end, ok, is, deepEqual }) => {
   const messageKey = 'message'
   const instance = require('../browser')({

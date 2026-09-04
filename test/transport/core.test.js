@@ -581,6 +581,65 @@ test('warns when custom formatters.level is incompatible with multi-target trans
   assert.equal(warnings[0].options.code, 'PINO_TRANSPORT_MULTI_TARGETS_LEVEL_FORMATTER')
 })
 
+test('does not warn for a compatible formatter for the configured level', async (t) => {
+  const warnings = []
+  const originalEmitWarning = process.emitWarning
+  process.emitWarning = function (warning, options) {
+    warnings.push({ warning, options })
+  }
+  t.after(() => {
+    process.emitWarning = originalEmitWarning
+  })
+
+  const transport = pino.transport({
+    targets: [
+      { target: join(__dirname, '..', 'fixtures', 'noop-transport.js') },
+      { target: join(__dirname, '..', 'fixtures', 'noop-transport.js') }
+    ]
+  })
+  t.after(transport.end.bind(transport))
+
+  pino({
+    formatters: {
+      level (label, number) {
+        return label === 'info' ? { level: number } : {}
+      }
+    }
+  }, transport)
+
+  assert.equal(warnings.length, 0)
+})
+
+test('warns when a formatter drops the configured level field', async (t) => {
+  const warnings = []
+  const originalEmitWarning = process.emitWarning
+  process.emitWarning = function (warning, options) {
+    warnings.push({ warning, options })
+  }
+  t.after(() => {
+    process.emitWarning = originalEmitWarning
+  })
+
+  const transport = pino.transport({
+    targets: [
+      { target: join(__dirname, '..', 'fixtures', 'noop-transport.js') },
+      { target: join(__dirname, '..', 'fixtures', 'noop-transport.js') }
+    ]
+  })
+  t.after(transport.end.bind(transport))
+
+  pino({
+    formatters: {
+      level (label, number) {
+        return label === 'labels' ? { level: number } : { severity: label }
+      }
+    }
+  }, transport)
+
+  assert.equal(warnings.length, 1)
+  assert.equal(warnings[0].options.code, 'PINO_TRANSPORT_MULTI_TARGETS_LEVEL_FORMATTER')
+})
+
 test('stdout in worker', async () => {
   let actual = ''
   const child = execa(process.argv[0], [join(__dirname, '..', 'fixtures', 'transport-main.js')])
