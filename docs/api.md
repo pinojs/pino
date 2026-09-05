@@ -24,6 +24,7 @@
   * [logger.version](#version)
   * [logger.msgPrefix](#msgPrefix)
 * [Statics](#statics)
+  * [pino.raw()](#pino-raw)
   * [pino.destination()](#pino-destination)
   * [pino.transport()](#pino-transport)
   * [pino.multistream()](#pino-multistream)
@@ -470,6 +471,9 @@ The serializers are applied when a property in the logged object matches a prope
 in the serializers. The only exception is the `err` serializer as it is also applied in case
 the object is an instance of `Error`, e.g. `logger.info(new Error('kaboom'))`.
 See `errorKey` option to change `err` namespace.
+
+For performance-sensitive serializers that already produce JSON, return
+[`pino.raw(json)`](#pino-raw) to write that JSON directly as the property value.
 
 * See [pino.stdSerializers](#pino-stdserializers)
 
@@ -1245,6 +1249,19 @@ Exposes the cumulative `msgPrefix` of the logger.
 * See [`options.msgPrefix`](#options-msgPrefix)
 
 ## Statics
+
+<a id="pino-raw"></a>
+### `pino.raw(value) => RawJSON`
+
+Wraps a pre-serialized JSON string so a serializer can write it directly into
+the log output.
+
+* `value` (String): a valid JSON string.
+* Returns: an opaque marker object to return from a serializer.
+
+Pino does not validate the string. Invalid JSON will corrupt the log line.
+Values returned through `pino.raw()` bypass Pino's redaction, so apply any
+redaction inside the serializer before returning raw JSON.
 
 <a id="pino-destination"></a>
 ### `pino.destination([opts]) => SonicBoom`

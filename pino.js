@@ -46,6 +46,7 @@ const {
   msgPrefixSym,
   transportUsesMultistreamSym
 } = symbols
+const { raw } = require('./lib/raw')
 const { epochTime, nullTime } = time
 const { pid } = process
 const hostname = os.hostname()
@@ -253,6 +254,7 @@ module.exports.stdSerializers = serializers
 module.exports.stdTimeFunctions = Object.assign({}, time)
 module.exports.symbols = symbols
 module.exports.version = version
+module.exports.raw = raw
 
 // Enables default and name export with TypeScript and Babel
 module.exports.default = pino

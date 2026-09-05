@@ -26,6 +26,7 @@ declare namespace pino {
     type TimeFn = () => string
     type MixinFn<CustomLevels extends string = never> = (mergeObject: object, level: number, logger:Logger<CustomLevels>) => object
     type MixinMergeStrategyFn = (mergeObject: object, mixinObject: object) => object
+    const rawJSONSym: unique symbol
 
     type CustomLevelLogger<CustomLevels extends string, UseOnlyCustomLevels extends boolean = boolean> = {
       /**
@@ -837,6 +838,23 @@ declare namespace pino {
     }
 
     /// Exported functions
+
+    /**
+     * Opaque marker for a pre-serialized JSON value.
+     */
+    export interface RawJSON {
+      readonly [rawJSONSym]: string;
+    }
+
+    /**
+     * Wraps a pre-serialized JSON string so a serializer can write it directly
+     * into the log output.
+     *
+     * The caller is responsible for providing valid JSON.
+     *
+     * @param value A valid JSON string.
+     */
+    export function raw (value: string): RawJSON
 
     /**
      * Create a Pino Destination instance: a stream-like object with significantly more throughput (over 30%) than a standard Node.js stream.
