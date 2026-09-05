@@ -184,6 +184,42 @@ test('opts.browser.asObject uses opts.messageKey in logs', ({ end, ok, is }) => 
   end()
 })
 
+test('opts.nestedKey nests logged object payload under specified key in asObject mode', ({ end, is, same }) => {
+  const instance = require('../browser')({
+    nestedKey: 'payload',
+    browser: {
+      asObject: true,
+      write: function (o) {
+        is(o.level, 30)
+        is(o.msg, 'hello')
+        same(o.payload, { foo: 'bar', count: 42 })
+      }
+    }
+  })
+
+  instance.info({ foo: 'bar', count: 42 }, 'hello')
+  end()
+})
+
+test('opts.nestedKey with child loggers keeps bindings at top level and payload nested', ({ end, is, same }) => {
+  const instance = require('../browser')({
+    nestedKey: 'payload',
+    browser: {
+      asObject: true,
+      write: function (o) {
+        is(o.level, 30)
+        is(o.childKey, 'childVal')
+        is(o.msg, 'child message')
+        same(o.payload, { inner: 'data' })
+      }
+    }
+  })
+
+  const child = instance.child({ childKey: 'childVal' })
+  child.info({ inner: 'data' }, 'child message')
+  end()
+})
+
 test('opts.browser.asObjectBindingsOnly passes the bindings but keep the message unformatted', ({ end, ok, is, deepEqual }) => {
   const messageKey = 'message'
   const instance = require('../browser')({
