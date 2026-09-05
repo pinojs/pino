@@ -1093,6 +1093,9 @@ If there is a need to wait for the logs to be flushed, a callback should be used
 **Note:** `flush()` does not work when using `pino-pretty`. See
 [Flush Limitations with `pino-pretty`](/docs/asynchronous.md) for more details.
 
+**Note:** in the browser this method is a no-op and `cb` is never invoked. See
+[Node.js-only APIs](/docs/browser.md#nodejs-only-apis).
+
 * See [`destination` parameter](#destination)
 * See [Asynchronous Logging ⇗](./asynchronous.md)
 
@@ -1190,6 +1193,10 @@ register its own serializer upon instantiation the serializers of the parent wil
 
 The logger instance is also an [`EventEmitter ⇗`](https://nodejs.org/dist/latest/docs/api/events.html#events_class_eventemitter)
 
+**Note:** the `EventEmitter` methods are no-ops in the browser, so this event
+never fires there. See
+[Node.js-only APIs](/docs/browser.md#nodejs-only-apis).
+
 A listener function can be attached to a logger via the `level-change` event
 
 The listener is passed five arguments:
@@ -1245,6 +1252,8 @@ Exposes the cumulative `msgPrefix` of the logger.
 Create a Pino Destination instance: a stream-like object with
 significantly more throughput than a standard Node.js stream.
 
+**Note:** this is not available in the browser build. See [Node.js-only APIs](/docs/browser.md#nodejs-only-apis).
+
 ```js
 const pino = require('pino')
 const logger = pino(pino.destination('./my-file'))
@@ -1278,6 +1287,8 @@ A `pino.destination` instance can also be used to reopen closed files
 
 Create a stream that routes logs to a worker thread that
 wraps around a [Pino Transport](/docs/transports.md).
+
+**Note:** this is not available in the browser build. See [Node.js-only APIs](/docs/browser.md#nodejs-only-apis).
 
 ```js
 const pino = require('pino')
@@ -1398,6 +1409,8 @@ Notes:
 
 Create a stream composed by multiple destination streams and returns an
 object implementing the [MultiStreamRes](#multistreamres) interface.
+
+**Note:** this is not available in the browser build. See [Node.js-only APIs](/docs/browser.md#nodejs-only-apis).
 
 ```js
 var fs = require('node:fs')
