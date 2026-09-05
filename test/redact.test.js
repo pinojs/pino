@@ -848,6 +848,46 @@ test('redact safe stringify', async () => {
   assert.equal(other.mySecondBigInt, 222)
 })
 
+test('child redact safe stringify', async () => {
+  const stream = sink()
+  const instance = pino({}, stream).child({}, { redact: { paths: ['that.secret'] } })
+
+  instance.info({
+    that: {
+      secret: 'please hide me',
+      myBigInt: 123n
+    },
+    other: {
+      mySecondBigInt: 222n
+    }
+  })
+  const { that, other } = await once(stream, 'data')
+  assert.equal(that.secret, '[Redacted]')
+  assert.equal(that.myBigInt, 123)
+  assert.equal(other.mySecondBigInt, 222)
+})
+
+test('child redact handles a circular reference like the parent does', async () => {
+  const circular = () => {
+    const that = { secret: 'please hide me' }
+    that.self = that
+    return that
+  }
+
+  const parentStream = sink()
+  pino({ redact: { paths: ['that.secret'] } }, parentStream).info({ that: circular() })
+  const fromParent = await once(parentStream, 'data')
+
+  const childStream = sink()
+  pino({}, childStream)
+    .child({}, { redact: { paths: ['that.secret'] } })
+    .info({ that: circular() })
+  const fromChild = await once(childStream, 'data')
+
+  assert.deepStrictEqual(fromChild.that, fromParent.that)
+  assert.equal(fromChild.that.secret, '[Redacted]')
+})
+
 test('censor function should not be called for non-existent nested paths (issue #2313)', async () => {
   const stream = sink()
   const censorCalls = []
