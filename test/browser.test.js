@@ -203,6 +203,24 @@ test('opts.browser.asObjectBindingsOnly passes the bindings but keep the message
   end()
 })
 
+test('opts.browser.write func passes additional arguments when asObject is enabled', ({ end, ok, is, deepEqual }) => {
+  const instance = pino({
+    browser: {
+      asObject: true,
+      write: function (o, ...args) {
+        is(o.level, 30)
+        is(o.msg, 'test')
+        ok(o.time)
+        deepEqual(args, [{ di: 'da' }])
+      }
+    }
+  })
+
+  instance.info('test', { di: 'da' })
+
+  end()
+})
+
 test('opts.browser.formatters (level) logs pino-like object to console', ({ end, ok, is }) => {
   const info = console.info
   console.info = function (o) {
