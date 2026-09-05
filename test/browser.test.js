@@ -118,6 +118,18 @@ test('exposes err stdSerializer', ({ end, ok }) => {
   end()
 })
 
+test('exposes symbols object', ({ end, is, same }) => {
+  is(typeof pino.symbols, 'object')
+  same(pino.symbols, require('../lib/symbols'))
+  end()
+})
+
+test('exposes version string', ({ end, is }) => {
+  is(typeof pino.version, 'string')
+  is(pino.version, require('../lib/meta').version)
+  end()
+})
+
 consoleMethodTest('error')
 consoleMethodTest('fatal', 'error')
 consoleMethodTest('warn')
