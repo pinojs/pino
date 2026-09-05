@@ -118,6 +118,17 @@ test('exposes err stdSerializer', ({ end, ok }) => {
   end()
 })
 
+test('exposes errWithCause stdSerializer', ({ end, is }) => {
+  const err = new Error('outer')
+  err.cause = new Error('inner')
+  const serialized = pino.stdSerializers.errWithCause(err)
+  is(serialized.type, 'Error')
+  is(serialized.msg, 'outer')
+  is(serialized.cause.type, 'Error')
+  is(serialized.cause.msg, 'inner')
+  end()
+})
+
 consoleMethodTest('error')
 consoleMethodTest('fatal', 'error')
 consoleMethodTest('warn')
