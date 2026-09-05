@@ -7,6 +7,69 @@ This can be useful with isomorphic/universal JavaScript code.
 By default, in the browser,
 `pino` uses corresponding [Log4j](https://en.wikipedia.org/wiki/Log4j) `console` methods (`console.error`, `console.warn`, `console.info`, `console.debug`, `console.trace`) and uses `console.error` for any `fatal` level logs.
 
+<a id="nodejs-only-apis"></a>
+## Node.js-only APIs
+
+The browser build (`browser.js`, selected through the `browser` field in
+`package.json`) does not implement the parts of the API that depend on the file
+system or on worker threads. Accessing them in the browser throws a
+`TypeError`, because the export is simply absent:
+
+```js
+const pino = require('pino')
+pino.destination('./my-file') // TypeError: pino.destination is not a function
+```
+
+The following statics are available in Node.js only:
+
+| Static | Why it is Node.js only |
+| --- | --- |
+| [`pino.destination()`](/docs/api.md#pino-destination) | Returns a [`SonicBoom`](https://github.com/pinojs/sonic-boom) instance writing to a file descriptor. |
+| [`pino.transport()`](/docs/api.md#pino-transport) | Runs a [transport](/docs/transports.md) on a worker thread. |
+| [`pino.multistream()`](/docs/api.md#pino-multistream) | Fans out to multiple destination streams. |
+
+`pino.levels`, `pino.stdSerializers` and `pino.stdTimeFunctions` are available in
+both environments.
+
+### Methods that are no-ops in the browser
+
+These exist on a browser logger, so calling them is safe, but they do nothing:
+
+* [`logger.flush([cb])`](/docs/api.md#flush) — there is no write buffer
+  to flush. Note that a callback passed to it is **not** invoked.
+* Every `EventEmitter` method (`on`, `once`, `emit`, `removeListener`,
+  `listeners`, ...). As a consequence the
+  [`level-change`](/docs/api.md#level-change) event never fires in the
+  browser.
+
+### Writing isomorphic code
+
+Code shared between a server and a browser bundle should not call the Node.js
+only statics unconditionally. Guard the call rather than the environment, so the
+same branch works under any bundler:
+
+```js
+const pino = require('pino')
+
+const logger = pino.destination
+  ? pino(pino.destination('./my-file')) // Node.js
+  : pino({ browser: { asObject: true } }) // browser
+```
+
+Note that the browser build's `pino()` accepts the options object only. A second
+`destination` argument is accepted but ignored, so a logger constructed with one
+still writes to the console rather than failing:
+
+```js
+// in the browser the second argument is ignored, not honoured
+const logger = pino({ level: 'info' }, someDestination)
+logger.info('still goes to the console')
+```
+
+Assigning a no-op shim onto the `pino` export (`pino.destination = () => {}`)
+works too, but it mutates a module object shared with every other importer in the
+bundle; guarding the call site keeps the change local.
+
 ## Options
 
 Pino can be passed a `browser` object in the options object,
