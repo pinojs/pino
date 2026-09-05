@@ -305,6 +305,7 @@ declare namespace pino {
       flushSync: () => void,
       end: () => void,
       minLevel: number,
+      lastId: number,
       streams: StreamEntry<TOriginLevel>[],
       clone<const TLevel = Level>(level: TLevel): MultiStreamRes<TLevel>,
     }
