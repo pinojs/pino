@@ -298,7 +298,7 @@ test('applies all serializers to messages and bindings (serialize:true)', ({ end
           same(bindings[0], { first: 'first' })
           same(bindings[1], { second: 'second' })
           same(messages[0], { test: 'serialize it' })
-          is(messages[1].type, 'Error')
+          is(messages[1].err.type, 'Error')
         }
       }
     }

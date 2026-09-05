@@ -184,6 +184,32 @@ test('opts.browser.asObject uses opts.messageKey in logs', ({ end, ok, is }) => 
   end()
 })
 
+test('opts.browser.asObject nests a serialized Error under errorKey and sets messageKey', ({ end, ok, is }) => {
+  const err = new Error('Something went wrong')
+  const instance = require('../browser')({
+    messageKey: 'message',
+    browser: {
+      asObject: true,
+      serialize: true,
+      write: function (o) {
+        is(o.level, 50)
+        ok(o.time)
+        // the error is nested under `err`, not flattened onto the log object
+        is(o.type, undefined)
+        is(o.stack, undefined)
+        ok(o.err)
+        is(o.err.type, 'Error')
+        ok(o.err.stack)
+        // and its message is surfaced under the configured messageKey
+        is(o.message, 'Something went wrong')
+      }
+    }
+  })
+
+  instance.error(err)
+  end()
+})
+
 test('opts.browser.asObjectBindingsOnly passes the bindings but keep the message unformatted', ({ end, ok, is, deepEqual }) => {
   const messageKey = 'message'
   const instance = require('../browser')({
