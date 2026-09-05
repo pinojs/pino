@@ -53,6 +53,16 @@ test('correctly escape child binding keys', async () => {
   })
 })
 
+test('correctly escape messageKey', async () => {
+  const stream = sink()
+  const key = 'x"}\n{"level":60,"msg":"forged"}\n{"swallow'
+  const instance = pino({ messageKey: key }, stream)
+
+  instance.info('hello')
+  const result = await once(stream, 'data')
+  assert.equal(result[key], 'hello')
+})
+
 const toEscape = [
   '\u0000', // NUL  Null character
   '\u0001', // SOH  Start of Heading
