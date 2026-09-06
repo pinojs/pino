@@ -42,6 +42,15 @@ These exist on a browser logger, so calling them is safe, but they do nothing:
   [`level-change`](/docs/api.md#level-change) event never fires in the
   browser.
 
+### `logger.bindings()`
+
+Supported in the browser. It returns the effective bindings of the logger:
+the child bindings merged over the parent bindings (child values win), and an
+empty object on the root logger. This matches the behavior of
+[`logger.bindings()`](/docs/api.md#logger-bindings) in Node.js. Updates made
+with [`logger.setBindings()`](/docs/api.md#logger-set-bindings) are reflected
+in the returned object.
+
 ### Writing isomorphic code
 
 Code shared between a server and a browser bundle should not call the Node.js

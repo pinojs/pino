@@ -48,6 +48,7 @@ function levelToValue (level, logger) {
 }
 const baseLogFunctionSymbol = Symbol('pino.logFuncs')
 const hierarchySymbol = Symbol('pino.hierarchy')
+const bindingsSymbol = Symbol('pino.bindings')
 
 const logFallbackMap = {
   error: 'log',
@@ -166,8 +167,13 @@ function pino (opts) {
   logger._serialize = serialize
   logger._stdErrSerialize = stdErrSerialize
   logger.child = function (...args) { return child.call(this, setOpts, ...args) }
+  logger.bindings = function () {
+    return getBindingChain(this).reduce(function (acc, bindings) {
+      return Object.assign(acc, bindings)
+    }, {})
+  }
   logger.setBindings = function (newBindings) {
-    this.bindings = Object.assign({}, this.bindings, newBindings)
+    this[bindingsSymbol] = Object.assign({}, this[bindingsSymbol], newBindings)
     if (this._logEvent) {
       this._logEvent.bindings.push(newBindings)
     }
@@ -224,7 +230,7 @@ function pino (opts) {
       this._childLevel = (parent._childLevel | 0) + 1
 
       // make sure bindings are available in the `set` function
-      this.bindings = bindings
+      this[bindingsSymbol] = bindings
 
       if (childSerializers) {
         this.serializers = childSerializers
@@ -295,16 +301,16 @@ pino.stdTimeFunctions = Object.assign({}, { nullTime, epochTime, unixTime, isoTi
 
 function getBindingChain (logger) {
   const bindings = []
-  if (logger.bindings) {
-    bindings.push(logger.bindings)
+  if (logger[bindingsSymbol]) {
+    bindings.push(logger[bindingsSymbol])
   }
 
   // traverse up the tree to get all bindings
   let hierarchy = logger[hierarchySymbol]
   while (hierarchy.parent) {
     hierarchy = hierarchy.parent
-    if (hierarchy.logger.bindings) {
-      bindings.push(hierarchy.logger.bindings)
+    if (hierarchy.logger[bindingsSymbol]) {
+      bindings.push(hierarchy.logger[bindingsSymbol])
     }
   }
 
