@@ -98,6 +98,42 @@ const transportsWithoutOptions = pino.transport({
 pino(transportsWithoutOptions)
 
 expect(
+  pino.transport({
+    target: '#pino/pretty',
+    caller: '/path/to/caller.js'
+  })
+).type.toBe<ReturnType<typeof pino.transport>>()
+
+expect(
+  pino.transport({
+    targets: [
+      { target: '#pino/pretty' }
+    ],
+    caller: ['/path/to/caller.js']
+  })
+).type.toBe<ReturnType<typeof pino.transport>>()
+
+expect(
+  pino({
+    transport: {
+      target: 'pino-pretty',
+      caller: '/path/to/caller.js'
+    }
+  })
+).type.toBe<pino.Logger>()
+
+expect(
+  pino({
+    transport: {
+      targets: [
+        { target: '#pino/pretty' }
+      ],
+      caller: ['/path/to/caller.js']
+    }
+  })
+).type.toBe<pino.Logger>()
+
+expect(
   pino({
     transport: {
       targets: [
