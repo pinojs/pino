@@ -1097,7 +1097,7 @@ and safer logging at low demand periods.
 
 If there is a need to wait for the logs to be flushed, a callback should be used.
 
-**Note:** `flush()` does not work when using `pino-pretty`. See
+**Note:** `logger.flush()` does not flush the output of `pino-pretty`. See
 [Flush Limitations with `pino-pretty`](/docs/asynchronous.md) for more details.
 
 **Note:** in the browser this method is a no-op and `cb` is never invoked. See

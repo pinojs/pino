@@ -39,15 +39,15 @@ Asynchronous logging has a couple of important caveats:
 
 ### Flush Limitations with `pino-pretty`
 
-The `logger.flush()` method does not work when using `pino-pretty` because:
+`logger.flush()` does not flush the output of `pino-pretty` because:
 
 1. **Transport Architecture**: `pino-pretty` runs in a separate worker thread via the transport mechanism.
 
-2. **Buffer Flow**: When you call `logger.flush()`, it flushes the SonicBoom destination in the main thread, but the logs remain queued in the thread-stream worker waiting to be processed by `pino-pretty`.
+2. **Cross-Thread Flush**: `logger.flush(cb)` does reach the worker. Since [thread-stream#198](https://github.com/pinojs/thread-stream/pull/198) the worker waits for the shared buffer to be drained, then looks for a flush primitive on the destination the transport returned: `flush`, `flushSync`, or a pending `drain`.
 
-3. **No Cross-Thread Flush**: The flush operation never propagates through to the worker thread where the pretty printer is processing the output.
+3. **No Flush Primitive**: The stream `pino-pretty` returns exposes none of those. Its buffered `SonicBoom` is reachable only through the internal `pump`, so the worker has nothing to call and acknowledges the flush right away.
 
-This means that even with `logger.flush()`, your formatted logs may not appear immediately, and the flush will only ensure the main thread buffer is written, not the formatted output.
+This means that even with `logger.flush()`, your formatted logs may not appear immediately. The flush only guarantees that the main thread buffer was written and that the worker drained the shared buffer, not that `pino-pretty` has written its formatted output.
 
 See also:
 
