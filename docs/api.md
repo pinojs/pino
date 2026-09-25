@@ -471,6 +471,13 @@ in the serializers. The only exception is the `err` serializer as it is also app
 the object is an instance of `Error`, e.g. `logger.info(new Error('kaboom'))`.
 See `errorKey` option to change `err` namespace.
 
+Serializers are also applied to the [bindings passed to `logger.child()`](#logger-child-bindings).
+Child bindings are serialized once, when the child logger is created, so a matching
+serializer runs at that point rather than on every subsequent log call. This is
+deliberate: it allows a child logger to precompute its bindings and stay fast at log
+time. If a serializer needs to run per log call, pass the value to the log method
+instead of to `child()`.
+
 * See [pino.stdSerializers](#pino-stdserializers)
 
 #### `msgPrefix` (String)
