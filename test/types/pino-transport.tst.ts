@@ -169,3 +169,41 @@ pino.transport({
   targets: [],
   dedupe: true
 })
+
+// Caller
+pino.transport({
+  target: 'pino-pretty',
+  caller: '/path/to/module.js'
+})
+
+pino.transport({
+  target: 'pino-pretty',
+  caller: ['/path/to/module.js', '/path/to/other.js']
+})
+
+expect(
+  pino({
+    transport: {
+      target: 'pino-pretty',
+      caller: '/path/to/module.js'
+    }
+  })
+).type.toBe<pino.Logger>()
+
+expect(
+  pino({
+    transport: {
+      targets: [{ target: 'pino-pretty' }],
+      caller: ['/path/to/module.js']
+    }
+  })
+).type.toBe<pino.Logger>()
+
+expect(
+  pino({
+    transport: {
+      pipeline: [{ target: 'pino-pretty' }],
+      caller: '/path/to/module.js'
+    }
+  })
+).type.toBe<pino.Logger>()
