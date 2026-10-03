@@ -256,6 +256,12 @@ declare namespace pino {
     export interface TransportBaseOptions<TransportOptions = Record<string, any>> {
       options?: TransportOptions
       worker?: WorkerOptions & { autoEnd?: boolean }
+      /**
+       * Path(s) to resolve relative target paths against. Defaults to the call
+       * sites of the caller that created the transport. See `caller` in
+       * https://get.pino.io/#/docs/api?id=logtransport
+       */
+      caller?: string | string[]
     }
 
     export interface TransportSingleOptions<TransportOptions = Record<string, any>> extends TransportBaseOptions<TransportOptions> {
