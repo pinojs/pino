@@ -90,14 +90,14 @@ function shouldSerialize (serialize, serializers) {
   return false
 }
 
-function pino (opts) {
+function pino (opts, destination) {
   opts = opts || {}
   opts.browser = opts.browser || {}
 
   const transmit = opts.browser.transmit
   if (transmit && typeof transmit.send !== 'function') { throw Error('pino: transmit option must have a send function') }
 
-  const proto = opts.browser.write || _console
+  let proto = opts.browser.write || _console
   if (opts.browser.write) opts.browser.asObject = true
   const serializers = opts.serializers || {}
   const serialize = shouldSerialize(opts.browser.serialize, serializers)
@@ -115,6 +115,21 @@ function pino (opts) {
     levels.forEach(function (level) {
       proto[level] = proto
     })
+  }
+  if (destination != null) {
+    if (typeof destination.write !== 'function') {
+      throw Error('pino: destination must have a write method')
+    }
+    const valuesMap = getLevels(opts).values
+    const destinationWrite = {}
+    levels.forEach(level => {
+      destinationWrite[level] = function (...args) {
+        destination.lastLevel = valuesMap[level]
+        destination.write(...args)
+      }
+    })
+    proto = destinationWrite
+    opts.browser.asObject = true
   }
   if (opts.enabled === false || opts.browser.disabled) opts.level = 'silent'
   const level = opts.level || 'info'
@@ -579,6 +594,7 @@ function pfGlobalThisOrFallback () {
 
 module.exports.default = pino
 module.exports.pino = pino
+module.exports.multistream = require('./lib/multistream')
 
 // Attempt to extract the user callsite (file:line:column)
 /* istanbul ignore next */
