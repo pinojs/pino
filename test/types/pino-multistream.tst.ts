@@ -45,5 +45,7 @@ expect(multistream(streams)).type.toBe<
 expect(multistream(streams).clone('error')).type.toBe<
   pino.MultiStreamRes<'error'>
 >()
+expect(multistream(process.stdout).lastId).type.toBe<number | undefined>()
+expect(multistream(process.stdout).clone('error').lastId).type.toBe<number | undefined>()
 
 expect(multistream(process.stdout)).type.toBe<pino.MultiStreamRes>()

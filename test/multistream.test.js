@@ -414,6 +414,13 @@ test('clone generates a new multistream with all stream at the same level', asyn
   await plan
 })
 
+test('lastId is present on multistreams but absent on clones', () => {
+  const ms = multistream([])
+
+  assert.equal(ms.lastId, 0)
+  assert.equal(ms.clone(30).lastId, undefined)
+})
+
 test('clone supports add, remove, and end methods correctly', async (t) => {
   const plan = tspl(t, { plan: 5 })
   const stream1 = writeStream(function (data, enc, cb) {
