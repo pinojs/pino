@@ -171,6 +171,10 @@ function pino (opts) {
   logger._serialize = serialize
   logger._stdErrSerialize = stdErrSerialize
   logger.child = function (...args) { return child.call(this, setOpts, ...args) }
+  logger.setBindings = function (bindings) {
+    this.bindings = bindings
+    setLevel.call(this, this.level)
+  }
 
   logger.bindings = function () {
     return Object.assign({}, this[bindingsSymbol])
