@@ -147,6 +147,7 @@ function pino (opts) {
     levels,
     timestamp: getTimeFunction(opts),
     messageKey: opts.messageKey || 'msg',
+    nestedKey: opts.nestedKey || opts.browser.nestedKey || null,
     onChild: opts.onChild || noop,
     redactFn
   }
@@ -443,7 +444,10 @@ function asObject (logger, level, args, ts, opts) {
   if (opts.asObjectBindingsOnly) {
     if (msg !== null && typeof msg === 'object') {
       while (lvl-- && typeof argsCloned[0] === 'object') {
-        Object.assign(logObject, argsCloned.shift())
+        const target = (lvl === 0 && opts.nestedKey)
+          ? (logObject[opts.nestedKey] = logObject[opts.nestedKey] || {})
+          : logObject
+        Object.assign(target, argsCloned.shift())
       }
     }
 
@@ -456,7 +460,10 @@ function asObject (logger, level, args, ts, opts) {
     // deliberate, catching objects, arrays
     if (msg !== null && typeof msg === 'object') {
       while (lvl-- && typeof argsCloned[0] === 'object') {
-        Object.assign(logObject, argsCloned.shift())
+        const target = (lvl === 0 && opts.nestedKey)
+          ? (logObject[opts.nestedKey] = logObject[opts.nestedKey] || {})
+          : logObject
+        Object.assign(target, argsCloned.shift())
       }
       msg = argsCloned.length ? format(argsCloned.shift(), argsCloned) : undefined
     } else if (typeof msg === 'string') msg = format(argsCloned.shift(), argsCloned)
