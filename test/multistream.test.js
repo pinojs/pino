@@ -415,7 +415,7 @@ test('clone generates a new multistream with all stream at the same level', asyn
 })
 
 test('clone supports add, remove, and end methods correctly', async (t) => {
-  const plan = tspl(t, { plan: 5 })
+  const plan = tspl(t, { plan: 6 })
   const stream1 = writeStream(function (data, enc, cb) {
     cb()
   })
@@ -440,6 +440,13 @@ test('clone supports add, remove, and end methods correctly', async (t) => {
   } else {
     plan.fail('stream2 entry not found')
   }
+
+  // Inherited entries keep their assigned id, so remove() can target them;
+  // without this, every cloned entry has `id: undefined` and remove() would
+  // strip an arbitrary entry instead of the requested one.
+  clone.streams.forEach((entry) => {
+    plan.equal(typeof entry.id, 'number')
+  })
 
   // Verify end method is present and can be called without errors
   plan.equal(typeof clone.end, 'function')
