@@ -72,8 +72,9 @@ on Node.js 14, install the latest `8.x` release with `"pino": "8.x"`.
 
 | Version | Release Date | End Of LTS Date | Node.js              |
 | :------ | :----------- | :-------------- | :------------------- |
-| 9.x     | 2024-04-26   | TBD             | 18, 20, 22            |
-| 8.x     | 2022-06-01   | 2024-10-26      | 14, 16, 18, 20        |
+| 10.x    | 2025-10-03   | TBD             | 20, 22, 24, 25       |
+| 9.x     | 2024-04-26   | TBD             | 18, 20, 22           |
+| 8.x     | 2022-06-01   | 2024-10-26      | 14, 16, 18, 20       |
 | 7.x     | 2021-10-14   | 2023-06-01      | 12, 14, 16           |
 | 6.x     | 2020-03-07   | 2022-04-14      | 10, 12, 14, 16       |
 
@@ -88,6 +89,6 @@ the YAML workflow labels below:
 
 | OS      | YAML Workflow Label    | Node.js      |
 |---------|------------------------|--------------|
-| Linux   | `ubuntu-latest`        | 18, 20, 22   |
-| Windows | `windows-latest`       | 18, 20, 22   |
-| MacOS   | `macos-latest`         | 18, 20, 22   |
+| Linux   | `ubuntu-latest`        | 20, 22, 24, 25, 26 |
+| Windows | `windows-latest`       | 20, 24, 25, 26      |
+| MacOS   | `macOS-latest`         | 20, 22, 24, 25, 26 |
