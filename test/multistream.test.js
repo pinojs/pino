@@ -838,3 +838,67 @@ test('ends all streams', async (t) => {
 
   await plan
 })
+
+test('multistream clone reports write errors to the same error listeners', async () => {
+  let afterCount = 0
+
+  const throwingStream = {
+    write () {
+      throw new Error('boom')
+    }
+  }
+
+  const afterStream = writeStream(function (data, enc, cb) {
+    afterCount += 1
+    cb()
+  })
+
+  const multi = multistream([
+    { level: 'info', stream: throwingStream },
+    { level: 'info', stream: afterStream }
+  ])
+
+  const errors = []
+  const failed = []
+  const cloned = multi.clone(30)
+  cloned.on('error', (err, stream) => {
+    errors.push(err)
+    failed.push(stream)
+  })
+
+  cloned.lastLevel = 30
+  cloned.write('{"level":30,"msg":"from clone"}\n')
+
+  assert.equal(afterCount, 1, 'afterStream should have received the log line')
+  assert.equal(errors.length, 1)
+  assert.equal(errors[0].message, 'boom')
+  assert.equal(failed[0], throwingStream, 'the failing stream is passed to the listener')
+})
+
+test('multistream error listeners can be removed', async () => {
+  const throwingStream = {
+    write () {
+      throw new Error('boom')
+    }
+  }
+
+  const multi = multistream([{ level: 'info', stream: throwingStream }])
+  const log = pino({ level: 'info' }, multi)
+
+  let calls = 0
+  const listener = () => { calls += 1 }
+
+  multi.once('error', listener)
+  log.info('first')
+  log.info('second')
+  assert.equal(calls, 1, 'once() listener fires a single time')
+
+  multi.on('error', listener)
+  log.info('third')
+  multi.off('error', listener)
+  log.info('fourth')
+  multi.on('error', listener)
+  multi.removeListener('error', listener)
+  log.info('fifth')
+  assert.equal(calls, 2, 'removed listeners are not called')
+})

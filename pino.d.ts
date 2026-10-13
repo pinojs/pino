@@ -304,6 +304,14 @@ declare namespace pino {
       remove: (id: number) => MultiStreamRes<TOriginLevel>,
       flushSync: () => void,
       end: () => void,
+      /**
+       * Registers a listener for errors thrown by a destination's `write()`. The other destinations
+       * still receive the log line. Without an `'error'` listener such errors are swallowed.
+       */
+      on(event: 'error', listener: (err: Error, stream: DestinationStream) => void): this,
+      once(event: 'error', listener: (err: Error, stream: DestinationStream) => void): this,
+      off(event: 'error', listener: (err: Error, stream: DestinationStream) => void): this,
+      removeListener(event: 'error', listener: (err: Error, stream: DestinationStream) => void): this,
       minLevel: number,
       streams: StreamEntry<TOriginLevel>[],
       clone<const TLevel = Level>(level: TLevel): MultiStreamRes<TLevel>,
