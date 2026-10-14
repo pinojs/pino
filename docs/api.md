@@ -1546,6 +1546,15 @@ Exposes the Pino package version. Also available on the logger instance.
 
  Call `flushSync` on each stream held by the current instance.
 
+ * `on('error', listener)`
+    - `listener` Function, called with `(err, stream)`
+    - Returns: [MultiStreamRes](#multistreamres)
+
+ Register a listener for errors thrown by the `write()` of one of the streams.
+ The remaining streams still receive the log line. `once()`, `off()` and
+ `removeListener()` are available too. Without an `'error'` listener such
+ errors are swallowed.
+
  * `lastId`
    - number
 
