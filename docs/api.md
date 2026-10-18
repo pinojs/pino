@@ -1409,6 +1409,7 @@ Notes:
 - The top-level `level` in `pino.transport({ ... })` is not used for filtering.
 - With a single `target` (or a single `pipeline`), filtering is controlled by `logger.level`.
 - Per-transport level filtering is applied when using `targets` (multi-destination mode).
+- Per-stage `worker` options in `targets` and `pipeline` support `workerData` and `transferList`: `transferList` entries are forwarded to the worker thread, and `workerData` is passed to the transport's exported function as its second argument. Thread-construction options (such as `execArgv`) can only be set on the top-level `worker` option.
 
 <a id="pino-multistream"></a>
 
