@@ -379,7 +379,7 @@ function createWrap (self, opts, rootLogger, level) {
         applySerializers(args, this._serialize, this.serializers, this._stdErrSerialize)
         argsIsSerialized = true
       }
-      if (opts.asObject || opts.formatters) {
+      if (opts.asObject || opts.asObjectBindingsOnly || opts.formatters) {
         const out = asObject(this, level, args, ts, opts)
         if (opts.reportCaller && out && out.length > 0 && out[0] && typeof out[0] === 'object') {
           try {

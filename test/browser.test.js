@@ -137,6 +137,9 @@ if (process.title !== 'browser') {
     delete global.console
     const instance = fresh('../browser')()
     global.console = console
+    // fresh() leaves this console-less copy in the require cache; drop it so
+    // later tests get a browser logger that sees the real console
+    delete require.cache[require.resolve('../browser')]
     ok(fnName(instance.log).match(/noop/))
     ok(fnName(instance.fatal).match(/noop/))
     ok(fnName(instance.error).match(/noop/))
@@ -201,6 +204,25 @@ test('opts.browser.asObjectBindingsOnly passes the bindings but keep the message
 
   instance.info('test %s', 'foo')
   end()
+})
+
+test('opts.browser.asObjectBindingsOnly without write logs the bindings and the unformatted message to console', ({ plan, ok, is, deepEqual }) => {
+  plan(4)
+  const info = console.info
+  console.info = function (o, msg, ...args) {
+    console.info = info
+    is(o.level, 30)
+    ok(o.time)
+    is(msg, 'test %s')
+    deepEqual(args, ['foo'])
+  }
+  const instance = require('../browser')({
+    browser: {
+      asObjectBindingsOnly: true
+    }
+  })
+
+  instance.info('test %s', 'foo')
 })
 
 test('opts.browser.formatters (level) logs pino-like object to console', ({ end, ok, is }) => {
