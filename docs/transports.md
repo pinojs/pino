@@ -1356,21 +1356,21 @@ Example output for the "hello world" log:
 <a id="pino-telegram-webhook"></a>
 ### pino-telegram-webhook
 
-[pino-telegram-webhook](https://github.com/Jhon-Mosk/pino-telegram-webhook) is a Pino v7+ transport for sending messages to [Telegram](https://telegram.org/). 
+[pino-telegram-webhook](https://github.com/Jhon-Mosk/pino-telegram-webhook) is a Pino v7+ transport for sending messages to [Telegram](https://telegram.org/) chats, groups, forum topics and channels. Messages are sent in order, rate limits (`429`) and network errors are retried, and messages longer than the Telegram limit are truncated.
 
 ```js
 const pino = require('pino');
 
 const logger = pino({
+  level: 'error',
   transport: {
     target: 'pino-telegram-webhook',
-    level: 'error',
     options: {
-      chatId: -1234567890,
-      botToken: "123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11",
+      chatId: -1001234567890,
+      botToken: process.env.TELEGRAM_BOT_TOKEN,
       extra: {
-              parse_mode: "HTML",
-            },
+        parse_mode: 'HTML',
+      },
     },
   },
 })
@@ -1378,7 +1378,9 @@ const logger = pino({
 logger.error('<b>test log!</b>');
 ```
 
-The `extra` parameter is optional. Parameters that the method [`sendMessage`](https://core.telegram.org/bots/api#sendmessage) supports can be passed to it.
+The `extra` parameter is optional. Parameters that the method [`sendMessage`](https://core.telegram.org/bots/api#sendmessage) supports can be passed to it, e.g. `message_thread_id` to post to a forum topic.
+
+For all options, such as `verbose`, `timeout`, `retries` and `maxQueueSize`, see the [README](https://github.com/Jhon-Mosk/pino-telegram-webhook#readme).
 
 <a id="pino-websocket"></a>
 ### pino-websocket
