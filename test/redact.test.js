@@ -312,6 +312,62 @@ test('redact.remove – top level key in child logger', async () => {
   assert.equal('key' in o, false)
 })
 
+test('redact.remove – message key - string, number and boolean messages', async () => {
+  const lines = []
+  const instance = pino({ redact: { paths: ['msg'], remove: true } }, {
+    write (line) { lines.push(line) }
+  })
+  instance.info('secret')
+  instance.info(5)
+  instance.info(true)
+  instance.info({ a: 1 }, 'secret')
+  assert.equal(lines.length, 4)
+  for (const line of lines) {
+    assert.equal('msg' in JSON.parse(line), false)
+  }
+  assert.equal(JSON.parse(lines[3]).a, 1)
+})
+
+test('redact.remove – custom message key', async () => {
+  const lines = []
+  const instance = pino({ messageKey: 'message', redact: { paths: ['message'], remove: true } }, {
+    write (line) { lines.push(line) }
+  })
+  instance.info('secret')
+  assert.equal('message' in JSON.parse(lines[0]), false)
+})
+
+test('redact.remove – top level wildcard removes the message', async () => {
+  const lines = []
+  const instance = pino({ redact: { paths: ['*'], remove: true } }, {
+    write (line) { lines.push(line) }
+  })
+  instance.info({ a: 1 }, 'secret')
+  const o = JSON.parse(lines[0])
+  assert.equal('a' in o, false)
+  assert.equal('msg' in o, false)
+})
+
+test('redact.remove – message of a logged error', async () => {
+  const lines = []
+  const instance = pino({ redact: { paths: ['msg'], remove: true } }, {
+    write (line) { lines.push(line) }
+  })
+  instance.error(new Error('secret'))
+  const o = JSON.parse(lines[0])
+  assert.equal('msg' in o, false)
+  assert.equal(o.err.message, 'secret')
+})
+
+test('redact.censor function returning undefined removes the message', async () => {
+  const lines = []
+  const instance = pino({ redact: { paths: ['msg'], censor: () => undefined } }, {
+    write (line) { lines.push(line) }
+  })
+  instance.info('secret')
+  assert.equal('msg' in JSON.parse(lines[0]), false)
+})
+
 test('redact.paths preserves original object values after the log write', async () => {
   const stream = sink()
   const instance = pino({ redact: ['req.headers.cookie'] }, stream)

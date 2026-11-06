@@ -245,6 +245,15 @@ test('non-overridden serializers are available in the children', async () => {
   assert.equal((await o4).onlyChild, 'test')
 })
 
+test('custom serializer for messageKey returning undefined omits the message', async () => {
+  const lines = []
+  const instance = pino({ serializers: { msg: () => undefined } }, {
+    write (line) { lines.push(line) }
+  })
+  instance.info('secret')
+  assert.equal('msg' in JSON.parse(lines[0]), false)
+})
+
 test('custom serializer for messageKey', async () => {
   const stream = sink()
   const instance = pino({ serializers: { msg: () => '422' } }, stream)
