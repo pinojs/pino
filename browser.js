@@ -426,9 +426,13 @@ function asObject (logger, level, args, ts, opts) {
 
   if (opts.asObjectBindingsOnly) {
     if (msg !== null && typeof msg === 'object') {
+      // A child logger may already hold a binding under `nestedKey`. Reusing it
+      // would either hide this log's object behind the binding or write into a
+      // record already handed to `write`, so start a new object and let the
+      // payload win.
       while (lvl-- && typeof argsCloned[0] === 'object') {
         const target = (lvl === 0 && opts.nestedKey)
-          ? (logObject[opts.nestedKey] = logObject[opts.nestedKey] || {})
+          ? (logObject[opts.nestedKey] = {})
           : logObject
         Object.assign(target, argsCloned.shift())
       }
@@ -442,9 +446,13 @@ function asObject (logger, level, args, ts, opts) {
   } else {
     // deliberate, catching objects, arrays
     if (msg !== null && typeof msg === 'object') {
+      // A child logger may already hold a binding under `nestedKey`. Reusing it
+      // would either hide this log's object behind the binding or write into a
+      // record already handed to `write`, so start a new object and let the
+      // payload win.
       while (lvl-- && typeof argsCloned[0] === 'object') {
         const target = (lvl === 0 && opts.nestedKey)
-          ? (logObject[opts.nestedKey] = logObject[opts.nestedKey] || {})
+          ? (logObject[opts.nestedKey] = {})
           : logObject
         Object.assign(target, argsCloned.shift())
       }
