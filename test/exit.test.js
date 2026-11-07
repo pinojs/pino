@@ -77,3 +77,12 @@ test('transports exits gracefully when logging in exit', async () => {
 
   assert.equal(code, 0)
 })
+
+test('immediate process.exit does not crash with unready destination (issue #2326)', async () => {
+  const child = execa(process.argv[0], [join(__dirname, 'fixtures', 'unready-exit.js')])
+  child.stdout.resume()
+
+  const code = await once(child, 'close')
+
+  assert.equal(code, 0)
+})
