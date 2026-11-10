@@ -9,6 +9,18 @@ const transport = pino.transport({
 })
 pino(transport)
 
+const transportWithCaller = pino.transport({
+  target: '#pino/pretty',
+  caller: 'some-caller-path'
+})
+pino(transportWithCaller)
+
+const transportWithCallers = pino.transport({
+  target: '#pino/pretty',
+  caller: ['caller-1', 'caller-2']
+})
+pino(transportWithCallers)
+
 expect(
   pino({
     transport: { target: 'pino-pretty' }
