@@ -146,6 +146,23 @@ test('the wrong level throws', ({ end, throws }) => {
   end()
 })
 
+test('the wrong level throws when it names an Object.prototype member', ({ end, throws }) => {
+  for (const level of ['constructor', 'toString', 'valueOf', 'hasOwnProperty', 'isPrototypeOf']) {
+    throws(
+      () => pino({ level, browser: { write () {} } }),
+      new RegExp(`unknown level ${level}`),
+      `level "${level}" must not be accepted`
+    )
+    const instance = pino({ browser: { write () {} } })
+    throws(
+      () => { instance.level = level },
+      new RegExp(`unknown level ${level}`),
+      `level "${level}" must not be accepted`
+    )
+  }
+  end()
+})
+
 test('the wrong level by number throws', ({ end, throws }) => {
   const instance = pino()
   throws(() => {
