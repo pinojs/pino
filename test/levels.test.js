@@ -39,6 +39,35 @@ test('the wrong level throws', async () => {
   })
 })
 
+test('the wrong level throws when it names an Object.prototype member', async () => {
+  for (const level of ['constructor', 'toString', 'valueOf', 'hasOwnProperty', 'isPrototypeOf']) {
+    assert.throws(
+      () => pino({ level }, sink()),
+      new RegExp(`default level:${level} must be included in custom levels`),
+      `level "${level}" must not be accepted`
+    )
+    assert.throws(
+      () => pino(sink()).child({}, { level }),
+      new RegExp(`unknown level ${level}`),
+      `child level "${level}" must not be accepted`
+    )
+  }
+})
+
+test('setting the level to an Object.prototype member throws', async () => {
+  const instance = pino(sink())
+  assert.throws(() => {
+    instance.level = 'constructor'
+  }, /unknown level constructor/)
+})
+
+test('isLevelEnabled is false for an Object.prototype member name', async () => {
+  const instance = pino(sink())
+  for (const level of ['constructor', 'toString', 'valueOf', 'hasOwnProperty', 'isPrototypeOf']) {
+    assert.equal(instance.isLevelEnabled(level), false, `isLevelEnabled("${level}")`)
+  }
+})
+
 test('set the level by number', async () => {
   const expected = [{
     level: 50,
