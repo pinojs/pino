@@ -154,7 +154,7 @@ function pino (opts) {
   logger.level = level
 
   logger.isLevelEnabled = function (level) {
-    if (!this.levels.values[level]) {
+    if (Object.prototype.hasOwnProperty.call(this.levels.values, level) === false) {
       return false
     }
 
@@ -197,7 +197,11 @@ function pino (opts) {
     return this._level
   }
   function setLevel (level) {
-    if (level !== 'silent' && !this.levels.values[level]) {
+    // `levels.values` inherits from Object.prototype, so a name such as
+    // `constructor` would otherwise resolve to an inherited member and be
+    // accepted as a level. An own-property check also accepts a custom level
+    // whose numeric value is 0, which a truthiness check rejected.
+    if (level !== 'silent' && Object.prototype.hasOwnProperty.call(this.levels.values, level) === false) {
       throw Error('unknown level ' + level)
     }
     this._level = level
