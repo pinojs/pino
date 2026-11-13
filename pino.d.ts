@@ -352,7 +352,8 @@ declare namespace pino {
     export interface LoggerOptions<CustomLevels extends string = never, UseOnlyCustomLevels extends boolean = boolean> {
       transport?: TransportSingleOptions | TransportMultiOptions | TransportPipelineOptions
       /**
-       * Avoid error causes by circular references in the object tree. Default: `true`.
+       * @deprecated This option has no effect, it was removed in pino v5.
+       * Circular references in logged objects are always handled.
        */
       safe?: boolean;
       /**
@@ -373,8 +374,8 @@ declare namespace pino {
        */
       timestamp?: TimeFn | boolean;
       /**
-       * One of the supported levels or `silent` to disable logging. Any other value defines a custom level and
-       * requires supplying a level value via `levelVal`. Default: 'info'.
+       * One of the supported levels or `silent` to disable logging. To use any other value, define it
+       * as a custom level via `customLevels`. Default: 'info'.
        */
       level?: LevelWithSilentOrString;
 
@@ -427,7 +428,8 @@ declare namespace pino {
       redact?: string[] | redactOptions;
 
       /**
-       * When defining a custom log level via level, set to an integer value to define the new level. Default: `undefined`.
+       * @deprecated This option has no effect, it was removed in pino v5.
+       * Use `customLevels` to define custom log levels.
        */
       levelVal?: number;
       /**
