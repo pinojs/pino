@@ -38,3 +38,30 @@ If you are a Webpack user, you can achieve this with [pino-webpack-plugin](https
 ## Bun Plugin
 
 [bun-plugin-pino](https://github.com/vktrl/bun-plugin-pino) is the Bun plugin to generate extra pino files for bundling.
+
+## Next.js
+
+Since Next.js 16.1, `pino` and `pino-pretty` are on the built-in list of [`serverExternalPackages`](https://nextjs.org/docs/app/api-reference/config/next-config-js/serverExternalPackages), so they are not bundled into your server code and transports work without extra configuration.
+
+On Next.js 15 and 16.0, pino gets bundled and transports fail at runtime with an error like `Cannot find module '.../lib/worker.js'` (with Turbopack, `next build` can fail as well). Add `pino` to `serverExternalPackages` to fix it:
+
+```javascript
+// next.config.mjs
+const nextConfig = {
+  serverExternalPackages: ['pino']
+}
+
+export default nextConfig
+```
+
+## Missing `pino-pretty` warning
+
+Pino v7 and older call `require('pino-pretty')` to support the `prettyPrint` option (removed in v8), so bundlers report `Module not found: Can't resolve 'pino-pretty'` when it is not installed. Upgrading to pino v8 or later removes the warning.
+
+If the older pino comes from one of your dependencies, mark `pino-pretty` as external instead. For example, with webpack:
+
+```javascript
+module.exports = {
+  externals: ['pino-pretty']
+}
+```
