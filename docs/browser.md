@@ -31,6 +31,31 @@ The following statics are available in Node.js only:
 `pino.levels`, `pino.stdSerializers` and `pino.stdTimeFunctions` are available in
 both environments.
 
+### `pino.multistream()`
+
+Supported in the browser. `pino.multistream(streams)` fans each log line out to
+every stream whose level permits it, using the same level semantics as
+[Node.js](/docs/api.md#pino-multistream). Each entry is `{ level?, stream }`
+where `stream` implements `write(data)`; a stream without an explicit level
+defaults to `info`.
+
+Pass the result as the second argument to `pino()`: the logger then writes the
+same object it would hand to [`browser.write`](#asobject-boolean) (log entries
+with `time`, `level`, `msg` and any bindings) to the destination:
+
+```js
+const pino = require('pino')
+
+const log = pino({ level: 'debug' }, pino.multistream([
+  { level: 'info', stream: consoleSink },
+  { level: 'debug', stream: remoteSink }
+]))
+```
+
+A bare object with a `write` method may be passed instead of a multistream
+result. Note that the `lastTime` / `lastMsg` / `lastObj` metadata fields are
+not propagated in the browser.
+
 ### Methods that are no-ops in the browser
 
 These exist on a browser logger, so calling them is safe, but they do nothing:
