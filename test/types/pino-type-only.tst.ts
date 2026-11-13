@@ -10,7 +10,16 @@ import type {
   LevelOrString,
   LevelWithSilentOrString,
   LoggerExtras,
-  LoggerOptions
+  LoggerOptions,
+  TimeFn,
+  MixinFn,
+  MixinMergeStrategyFn,
+  CustomLevelLogger,
+  OnChildCallback,
+  DestinationStreamHasMetadata,
+  PlaceholderSpecifier,
+  PlaceholderTypeMapping,
+  ParseLogFnArgs
 } from '../../pino.js'
 
 // NB: can also use `import * as pino`, but that form is callable as `pino()`
@@ -75,3 +84,14 @@ pino().error({}, someConst)
 const someFunc = <T extends typeof someConst>(someConst: T) => {
   pino().error({}, someConst)
 }
+
+// Reference: https://github.com/pinojs/pino/issues/2531
+expect<pino.TimeFn>().type.toBe<TimeFn>()
+expect<pino.MixinFn>().type.toBe<MixinFn>()
+expect<pino.MixinMergeStrategyFn>().type.toBe<MixinMergeStrategyFn>()
+expect<pino.CustomLevelLogger<'foo'>>().type.toBe<CustomLevelLogger<'foo'>>()
+expect<pino.OnChildCallback>().type.toBe<OnChildCallback>()
+expect<pino.DestinationStreamHasMetadata>().type.toBe<DestinationStreamHasMetadata>()
+expect<pino.PlaceholderSpecifier>().type.toBe<PlaceholderSpecifier>()
+expect<pino.PlaceholderTypeMapping<'s'>>().type.toBe<PlaceholderTypeMapping<'s'>>()
+expect<pino.ParseLogFnArgs<'%s'>>().type.toBe<ParseLogFnArgs<'%s'>>()
