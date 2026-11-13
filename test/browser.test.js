@@ -184,6 +184,87 @@ test('opts.browser.asObject uses opts.messageKey in logs', ({ end, ok, is }) => 
   end()
 })
 
+test('opts.nestedKey nests logged object payload under specified key in asObject mode', ({ end, is, same }) => {
+  const instance = require('../browser')({
+    nestedKey: 'payload',
+    browser: {
+      asObject: true,
+      write: function (o) {
+        is(o.level, 30)
+        is(o.msg, 'hello')
+        same(o.payload, { foo: 'bar', count: 42 })
+      }
+    }
+  })
+
+  instance.info({ foo: 'bar', count: 42 }, 'hello')
+  end()
+})
+
+test('opts.nestedKey with child loggers keeps bindings at top level and payload nested', ({ end, is, same }) => {
+  const instance = require('../browser')({
+    nestedKey: 'payload',
+    browser: {
+      asObject: true,
+      write: function (o) {
+        is(o.level, 30)
+        is(o.childKey, 'childVal')
+        is(o.msg, 'child message')
+        same(o.payload, { inner: 'data' })
+      }
+    }
+  })
+
+  const child = instance.child({ childKey: 'childVal' })
+  child.info({ inner: 'data' }, 'child message')
+  end()
+})
+
+test('opts.nestedKey overrides a colliding binding with a fresh payload object', ({ end, is, same }) => {
+  const records = []
+  const instance = require('../browser')({
+    nestedKey: 'payload',
+    browser: {
+      asObject: true,
+      write: function (o) {
+        records.push(JSON.parse(JSON.stringify(o)))
+      }
+    }
+  })
+
+  const child = instance.child({ payload: 'binding' })
+  child.info({ foo: 'bar' }, 'hello')
+
+  is(records.length, 1)
+  same(records[0].payload, { foo: 'bar' })
+  is(records[0].msg, 'hello')
+  end()
+})
+
+test('opts.nestedKey does not mutate an object binding shared between log calls', ({ end, is, same }) => {
+  const records = []
+  const instance = require('../browser')({
+    nestedKey: 'payload',
+    browser: {
+      asObject: true,
+      write: function (o) {
+        records.push(JSON.parse(JSON.stringify(o)))
+      }
+    }
+  })
+
+  const child = instance.child({ payload: { binding: true } })
+  child.info({ first: 1 })
+  child.info({ second: 2 })
+
+  is(records.length, 2)
+  // The payload replaces the colliding binding, and neither record changes
+  // after it has been written.
+  same(records[0].payload, { first: 1 })
+  same(records[1].payload, { second: 2 })
+  end()
+})
+
 test('opts.browser.asObjectBindingsOnly passes the bindings but keep the message unformatted', ({ end, ok, is, deepEqual }) => {
   const messageKey = 'message'
   const instance = require('../browser')({
