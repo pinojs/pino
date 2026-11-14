@@ -514,6 +514,21 @@ test('correctly strip undefined when returned from toJSON', async () => {
   assert.equal('test' in result, false)
 })
 
+test('omits the message when it cannot be represented in JSON', async () => {
+  const lines = []
+  const instance = pino({}, {
+    write (line) { lines.push(line) }
+  })
+  instance.info(Symbol('foo'))
+  instance.info({ a: 1 }, Symbol('foo'))
+  instance.info({ a: 1 }, { toJSON () { return undefined } })
+  instance.info(() => {})
+  assert.equal(lines.length, 4)
+  for (const line of lines) {
+    assert.equal('msg' in JSON.parse(line), false)
+  }
+})
+
 test('correctly supports stderr', (t, end) => {
   // stderr inherits from Stream, rather than Writable
   const dest = {
