@@ -19,7 +19,7 @@ if (passedVersion) {
 
 const metaContent = `'use strict'
 
-module.exports = { version: '${version}' }
+module.exports = { version: ${JSON.stringify(version)} }
 `
 
 fs.writeFileSync(path.resolve('./lib/meta.js'), metaContent, { encoding: 'utf-8' })
