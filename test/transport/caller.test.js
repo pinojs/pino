@@ -22,3 +22,9 @@ test('when using a custom transport where all files in stacktrace are in the nod
   const { stdout } = await execa(process.argv[0], [evalApp])
   assert.match(stdout, /done!/)
 })
+
+test('when the transport is created from code evaluated at runtime after an await, the target should still be resolved', async function () {
+  const evalApp = join(__dirname, '../', '/fixtures/eval/async-function.js')
+  const { stdout } = await execa(process.argv[0], [evalApp])
+  assert.match(stdout, /done!/)
+})
