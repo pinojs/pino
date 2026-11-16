@@ -1463,7 +1463,7 @@ In order for `multistream` to work, the log level __must__ be set to the lowest 
             silent: Infinity,
             fatal: 60,
             error: 50,
-            warn: 50,
+            warn: 40,
             info: 30,
             debug: 20,
             trace: 10
