@@ -900,6 +900,17 @@ test('grandchild message should inherent parent prefix', async () => {
   assert.equal(msg, 'My name is Bond James Bond')
 })
 
+test('prefixes a message taken from a logged error', async () => {
+  const stream = sink()
+  const child = pino({ msgPrefix: '[HTTP] ' }, stream).child({}, { msgPrefix: '[db] ' })
+  child.error(new Error('connect refused'))
+  assert.equal((await once(stream, 'data')).msg, '[HTTP] [db] connect refused')
+  child.error({ err: new Error('timed out') })
+  assert.equal((await once(stream, 'data')).msg, '[HTTP] [db] timed out')
+  child.error(new Error('ignored'), 'query failed')
+  assert.equal((await once(stream, 'data')).msg, '[HTTP] [db] query failed')
+})
+
 test('logs an object with an own enumerable __proto__ key', async () => {
   const stream = sink()
   const instance = pino(stream)
