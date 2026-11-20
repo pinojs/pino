@@ -791,3 +791,37 @@ test('ends all streams', async (t) => {
 
   await plan
 })
+
+test('end skips streams without an end method and still ends remaining streams', async () => {
+  let ended = false
+  const writeOnly = { write () {} }
+  const endable = {
+    write () {},
+    end () {
+      ended = true
+    }
+  }
+  const multi = multistream([
+    { level: 'trace', stream: writeOnly },
+    { level: 'info', stream: endable }
+  ])
+  multi.end()
+  assert.strictEqual(ended, true)
+})
+
+test('dedupe stops after matching a stream with level 0', async () => {
+  const received = []
+  const mkStream = (name) => ({
+    write () {
+      received.push(name)
+    }
+  })
+  const multi = multistream([
+    { level: -10, stream: mkStream('negative') },
+    { level: 0, stream: mkStream('zero') }
+  ], { dedupe: true })
+
+  multi.lastLevel = 0
+  multi.write('{"level":0,"msg":"zero"}\n')
+  assert.deepStrictEqual(received, ['zero'])
+})
