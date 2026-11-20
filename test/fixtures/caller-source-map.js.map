@@ -1,0 +1,9 @@
+{
+  "version": 3,
+  "file": "caller-source-map.js",
+  "sources": [
+    "caller-source-map.ts"
+  ],
+  "names": [],
+  "mappings": "AAAA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA"
+}
