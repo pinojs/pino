@@ -2,6 +2,9 @@
 
 const test = require('node:test')
 const assert = require('node:assert')
+const { join } = require('node:path')
+
+const execa = require('execa')
 const loop = require('./fixtures/caller-loop.js')
 
 test('returns a callstack of absolute paths', () => {
@@ -17,4 +20,12 @@ test('returns a callstack of absolute paths', () => {
   assert.match(callers[5], /^[/\\]fixtures[/\\]caller-loop\.js$/)
   assert.match(callers[6], /^[/\\]fixtures[/\\]caller-loop\.js$/)
   assert.match(callers[7], /^[/\\]caller\.test\.js$/)
+})
+
+test('ignores source maps when resolving callers', async () => {
+  const fixture = join(__dirname, 'fixtures', 'caller-source-map.js')
+  const { stdout } = await execa(process.argv[0], ['--enable-source-maps', fixture])
+
+  // Without `sourceMap: false` passed to `getCallSites`, the caller is a non-existent .ts` path.
+  assert.equal(JSON.parse(stdout)[0], fixture)
 })
