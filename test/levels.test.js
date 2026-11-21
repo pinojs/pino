@@ -808,3 +808,24 @@ test('accepts capital letter for TRACE level', async () => {
   const { level } = await once(stream, 'data')
   assert.equal(level, 10)
 })
+
+test('setting numeric level 0 and null-prototype options in child', async () => {
+  const stream = sink()
+  const logger = pino({
+    customLevels: { all: 0 },
+    level: 'info'
+  }, stream)
+
+  const child = logger.child({ a: 1 }, { level: 0 })
+  assert.equal(child.level, 'all')
+  assert.equal(child.levelVal, 0)
+  child.all('hello')
+  const { level, msg } = await once(stream, 'data')
+  assert.equal(level, 0)
+  assert.equal(msg, 'hello')
+
+  const nullProtoOpts = Object.assign(Object.create(null), { level: 0 })
+  const child2 = logger.child({ a: 2 }, nullProtoOpts)
+  assert.equal(child2.level, 'all')
+  assert.equal(child2.levelVal, 0)
+})
