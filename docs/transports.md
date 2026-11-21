@@ -10,6 +10,56 @@ The way Pino generates logs:
 It is recommended that any log transformation or transmission is performed either
 in a separate thread or a separate process.
 
+## Recommended setup for production
+
+Production means: least overhead, best performance, logs going to stdout so
+that an external agent (systemd, Docker, Kubernetes, a log shipper) can pick
+them up.
+
+**Use a v7+ transport in a worker thread.** It keeps log processing out of the
+main thread and is the lowest-overhead setup Pino offers:
+
+```js
+const pino = require('pino')
+
+const transport = pino.transport({
+  target: 'pino/file'
+})
+
+const logger = pino(transport)
+```
+
+`pino/file` is the built-in file transport. It writes to stdout (file
+descriptor 1) by default, and it runs in a worker thread, keeping log writes
+off the main thread.
+
+Avoid `pino(pino.destination())` in production *unless* you need synchronous
+writes for a specific reason: `pino.destination()` runs in the main thread and
+adds contention to your application's critical path. It remains the right tool
+for synchronous, low-latency single-process logging, but it is not the
+recommended default for production throughput.
+
+If you need more than one output (for example, a JSON stream to stdout and a
+pretty stream to a file for local debugging), route everything through
+`pino.transport` and let the worker threads fan out:
+
+```js
+const transport = pino.transport({
+  targets: [
+    { target: 'pino/file' }, // stdout
+    {
+      target: 'pino/file',
+      options: { destination: './app.log' },
+      level: 'error'
+    }
+  ]
+})
+```
+
+See [Asynchronous Logging](asynchronous.md) for the trade-offs between
+synchronous and asynchronous logging, and
+[pino.transport()](api.md#pinotransportopts) for the full API.
+
 Before Pino v7 transports would ideally operate in a separate process - these are
 now referred to as [Legacy Transports](#legacy-transports).
 
