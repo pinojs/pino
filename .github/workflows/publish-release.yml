@@ -28,16 +28,33 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - run: npm install npm -g
       - run: npm install
-      - name: Change version number and sync
+      - name: Validate release version
+        env:
+          VERSION: ${{ inputs.version }}
         run: |
-          node build/sync-version.js ${{ inputs.version }}
+          if ! [[ "$VERSION" =~ ^v?[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::Invalid version '$VERSION'. Expected a semantic version such as 1.2.3 or v1.2.3."
+            exit 1
+          fi
+      - name: Change version number and sync
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          node build/sync-version.js "$VERSION"
       - name: GIT commit and push all changed files
+        env:
+          VERSION: ${{ inputs.version }}
+          REF: ${{ github.ref }}
         run: |
           git config --global user.name "mcollina"
           git config --global user.email "hello@matteocollina.com"
-          git commit -n -a -m "Bumped v${{ inputs.version }}"
-          git push origin HEAD:${{ github.ref }}
+          git commit -n -a -m "Bumped v$VERSION"
+          git push origin HEAD:"$REF"
       - run: npm publish --access public --tag ${{ inputs.prerelease == true && 'next' || 'latest' }}
       - name: 'Create release notes'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ inputs.version }}
+          REF: ${{ github.ref }}
         run: |
-          npx @matteo.collina/release-notes -a ${{ secrets.GITHUB_TOKEN }} -t v${{ inputs.version }} -r pino -o pinojs ${{ github.event.inputs.prerelease == 'true' && '-p' || '' }} -c ${{ github.ref }}
+          npx @matteo.collina/release-notes -a "$GITHUB_TOKEN" -t "v$VERSION" -r pino -o pinojs ${{ github.event.inputs.prerelease == 'true' && '-p' || '' }} -c "$REF"
