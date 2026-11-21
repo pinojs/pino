@@ -581,6 +581,248 @@ test('warns when custom formatters.level is incompatible with multi-target trans
   assert.equal(warnings[0].options.code, 'PINO_TRANSPORT_MULTI_TARGETS_LEVEL_FORMATTER')
 })
 
+test('does not warn and routes logs when custom formatters.level preserves numeric level with multi-target transport', async (t) => {
+  const warnings = []
+  const originalEmitWarning = process.emitWarning
+  process.emitWarning = function (warning, options) {
+    warnings.push({ warning, options })
+  }
+  t.after(() => {
+    process.emitWarning = originalEmitWarning
+  })
+
+  const dest1 = file()
+  const dest2 = file()
+  const transport = pino.transport({
+    targets: [
+      {
+        level: 'info',
+        target: join(__dirname, '..', 'fixtures', 'to-file-transport.js'),
+        options: { destination: dest1 }
+      },
+      {
+        level: 'error',
+        target: join(__dirname, '..', 'fixtures', 'to-file-transport.js'),
+        options: { destination: dest2 }
+      }
+    ]
+  })
+  t.after(transport.end.bind(transport))
+
+  const calls = []
+  const instance = pino({
+    formatters: {
+      level (label, number) {
+        calls.push([label, number])
+        return { level: Number(number), severity: label.toUpperCase() }
+      }
+    }
+  }, transport)
+
+  assert.equal(warnings.length, 0)
+  assert.equal(calls.length, 6)
+  assert.deepEqual(calls, [
+    ['trace', 10],
+    ['debug', 20],
+    ['info', 30],
+    ['warn', 40],
+    ['error', 50],
+    ['fatal', 60]
+  ])
+
+  instance.info('hello')
+  instance.error('oops')
+  await Promise.all([watchFileCreated(dest1), watchFileCreated(dest2)])
+  await watchForWrite(dest1, '"oops"')
+
+  const lines1 = (await readFile(dest1, 'utf8')).trim().split('\n').map(line => JSON.parse(line))
+  assert.equal(lines1.length, 2)
+  assert.equal(lines1[0].level, 30)
+  assert.equal(lines1[0].severity, 'INFO')
+  assert.equal(lines1[0].msg, 'hello')
+  assert.equal(lines1[1].level, 50)
+  assert.equal(lines1[1].severity, 'ERROR')
+  assert.equal(lines1[1].msg, 'oops')
+
+  const lines2 = (await readFile(dest2, 'utf8')).trim().split('\n').map(line => JSON.parse(line))
+  assert.equal(lines2.length, 1)
+  assert.equal(lines2[0].level, 50)
+  assert.equal(lines2[0].severity, 'ERROR')
+  assert.equal(lines2[0].msg, 'oops')
+})
+
+test('multi-target level formatter warning validates serialized lsCache entries', async (t) => {
+  function createMultiNoopTransport (ctx) {
+    const transport = pino.transport({
+      targets: [
+        { target: join(__dirname, '..', 'fixtures', 'noop-transport.js') },
+        { target: join(__dirname, '..', 'fixtures', 'noop-transport.js') }
+      ]
+    })
+    ctx.after(transport.end.bind(transport))
+    return transport
+  }
+
+  function captureWarnings (ctx) {
+    const warnings = []
+    const originalEmitWarning = process.emitWarning
+    process.emitWarning = function (warning, options) {
+      warnings.push({ warning, options })
+    }
+    ctx.after(() => {
+      process.emitWarning = originalEmitWarning
+    })
+    return warnings
+  }
+
+  await t.test('supports custom level 0, overridden level value, and string numeric custom level', async (st) => {
+    const warnings = captureWarnings(st)
+    const calls = []
+    pino({
+      customLevels: { all: 0, custom: 30, str: '35' },
+      level: 0,
+      formatters: {
+        level (label, number) {
+          calls.push([label, number])
+          return { level: Number(number), label }
+        }
+      }
+    }, createMultiNoopTransport(st))
+
+    assert.equal(warnings.length, 0)
+    assert.deepEqual(calls[0], ['all', 0])
+    assert.ok(calls.some(([label, number]) => label === 'custom' && number === 30))
+    assert.ok(calls.some(([label, number]) => label === 'str' && number === 35))
+  })
+
+  await t.test('handles silent logger with valid, incompatible, and empty custom levels', async (st) => {
+    await st.test('valid formatter on silent logger does not warn or pass silent', async (sst) => {
+      const warnings = captureWarnings(sst)
+      const calls = []
+      pino({
+        level: 'silent',
+        formatters: {
+          level (label, number) {
+            calls.push([label, number])
+            return { level: number, label }
+          }
+        }
+      }, createMultiNoopTransport(sst))
+
+      assert.equal(warnings.length, 0)
+      assert.equal(calls.length, 6)
+      assert.ok(calls.every(([label, number]) => label !== 'silent' && Number.isFinite(number)))
+    })
+
+    await st.test('incompatible formatter on silent logger still warns', async (sst) => {
+      const warnings = captureWarnings(sst)
+      pino({
+        level: 'silent',
+        formatters: {
+          level (label) {
+            return { level: label }
+          }
+        }
+      }, createMultiNoopTransport(sst))
+
+      assert.equal(warnings.length, 1)
+      assert.equal(warnings[0].options.code, 'PINO_TRANSPORT_MULTI_TARGETS_LEVEL_FORMATTER')
+    })
+
+    await st.test('empty customLevels with useOnlyCustomLevels does not call formatter or warn', async (sst) => {
+      const warnings = captureWarnings(sst)
+      const calls = []
+      pino({
+        customLevels: {},
+        useOnlyCustomLevels: true,
+        level: 'silent',
+        formatters: {
+          level (label, number) {
+            calls.push([label, number])
+            return { level: number }
+          }
+        }
+      }, createMultiNoopTransport(sst))
+
+      assert.equal(calls.length, 0)
+      assert.equal(warnings.length, 0)
+    })
+  })
+
+  await t.test('warns on partial level formatters, non-serialized level fields, and non-object output', async (st) => {
+    await st.test('warns when a formatter drops numeric level on another level', async (sst) => {
+      const warnings = captureWarnings(sst)
+      pino({
+        level: 'info',
+        formatters: {
+          level (label, number) {
+            return label === 'error' ? { severity: 'ERROR' } : { level: number }
+          }
+        }
+      }, createMultiNoopTransport(sst))
+
+      assert.equal(warnings.length, 1)
+      assert.equal(warnings[0].options.code, 'PINO_TRANSPORT_MULTI_TARGETS_LEVEL_FORMATTER')
+    })
+
+    await st.test('warns when level is only inherited or dropped by toJSON', async (sst) => {
+      const warnings1 = captureWarnings(sst)
+      pino({
+        formatters: {
+          level (_label, number) {
+            return Object.create({ level: number })
+          }
+        }
+      }, createMultiNoopTransport(sst))
+      assert.equal(warnings1.length, 1)
+      assert.equal(warnings1[0].options.code, 'PINO_TRANSPORT_MULTI_TARGETS_LEVEL_FORMATTER')
+
+      pino({
+        formatters: {
+          level (label, number) {
+            return {
+              level: number,
+              toJSON () {
+                return { severity: label }
+              }
+            }
+          }
+        }
+      }, createMultiNoopTransport(sst))
+      assert.equal(warnings1.length, 2)
+      assert.equal(warnings1[1].options.code, 'PINO_TRANSPORT_MULTI_TARGETS_LEVEL_FORMATTER')
+    })
+
+    await st.test('warns when formatter returns a non-object value like null', async (sst) => {
+      const warnings = captureWarnings(sst)
+      pino({
+        formatters: {
+          level () {
+            return null
+          }
+        }
+      }, createMultiNoopTransport(sst))
+
+      assert.equal(warnings.length, 1)
+      assert.equal(warnings[0].options.code, 'PINO_TRANSPORT_MULTI_TARGETS_LEVEL_FORMATTER')
+    })
+  })
+
+  await t.test('does not emit a transport warning when formatters.level throws during init', async (st) => {
+    const warnings = captureWarnings(st)
+    assert.throws(() => {
+      pino({
+        formatters: {
+          level () {
+            throw new Error('formatter failure')
+          }
+        }
+      }, createMultiNoopTransport(st))
+    }, /formatter failure/)
+    assert.equal(warnings.length, 0)
+  })
+})
+
 test('stdout in worker', async () => {
   let actual = ''
   const child = execa(process.argv[0], [join(__dirname, '..', 'fixtures', 'transport-main.js')])

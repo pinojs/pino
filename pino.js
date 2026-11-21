@@ -21,6 +21,7 @@ const {
 } = require('./lib/tools')
 const { version } = require('./lib/meta')
 const {
+  lsCacheSym,
   chindingsSym,
   redactFmtSym,
   serializersSym,
@@ -168,28 +169,6 @@ function pino (...args) {
   assertDefaultLevelFound(level, customLevels, useOnlyCustomLevels)
   const levels = mappings(customLevels, useOnlyCustomLevels)
 
-  if (stream && stream[transportUsesMultistreamSym] === true) {
-    let sampleLabel = typeof level === 'string' ? level : undefined
-    if (!sampleLabel || levels[sampleLabel] === undefined) {
-      sampleLabel = Object.keys(levels)[0]
-    }
-    const sampleNumber = levels[sampleLabel]
-    let ok = false
-    try {
-      const formatted = formatters.level(sampleLabel, sampleNumber)
-      ok = formatted && typeof formatted === 'object' && formatted.level === sampleNumber
-    } catch {
-      ok = false
-    }
-
-    if (!ok) {
-      process.emitWarning(
-        'custom formatters.level detected with multiple transport targets/pipelines; ensure logs include a numeric "level" field or they may be dropped',
-        { code: 'PINO_TRANSPORT_MULTI_TARGETS_LEVEL_FORMATTER' }
-      )
-    }
-  }
-
   if (typeof stream.emit === 'function') {
     stream.emit('message', { code: 'PINO_CONFIG', config: { levels, messageKey, errorKey } })
   }
@@ -228,6 +207,31 @@ function pino (...args) {
   Object.setPrototypeOf(instance, proto())
 
   genLsCache(instance)
+
+  if (stream && stream[transportUsesMultistreamSym] === true && formatters.level !== defaultOptions.formatters.level) {
+    const lsCache = instance[lsCacheSym]
+    let ok = true
+    for (const numStr of Object.keys(lsCache)) {
+      let parsed
+      try {
+        parsed = JSON.parse(lsCache[numStr] + '}')
+      } catch {
+        ok = false
+        break
+      }
+      if (!Object.prototype.hasOwnProperty.call(parsed, 'level') || parsed.level !== Number(numStr)) {
+        ok = false
+        break
+      }
+    }
+
+    if (!ok) {
+      process.emitWarning(
+        'custom formatters.level detected with multiple transport targets/pipelines; ensure logs include a numeric "level" field or they may be dropped',
+        { code: 'PINO_TRANSPORT_MULTI_TARGETS_LEVEL_FORMATTER' }
+      )
+    }
+  }
 
   instance[setLevelSym](level)
 
