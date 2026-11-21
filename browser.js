@@ -154,11 +154,11 @@ function pino (opts) {
   logger.level = level
 
   logger.isLevelEnabled = function (level) {
-    if (!this.levels.values[level]) {
+    if (this.levels.values[level] === undefined) {
       return false
     }
 
-    return this.levels.values[level] >= this.levels.values[this.level]
+    return this.levels.values[level] >= levelToValue(this.level, this)
   }
   logger.setMaxListeners = logger.getMaxListeners =
   logger.emit = logger.addListener = logger.on =
@@ -197,7 +197,7 @@ function pino (opts) {
     return this._level
   }
   function setLevel (level) {
-    if (level !== 'silent' && !this.levels.values[level]) {
+    if (level !== 'silent' && this.levels.values[level] === undefined) {
       throw Error('unknown level ' + level)
     }
     this._level = level

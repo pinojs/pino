@@ -98,4 +98,31 @@ describe('Custom levels suite', () => {
     assert.equal(true, log.isLevelEnabled('error'))
     assert.equal(false, log.isLevelEnabled('trace'))
   })
+
+  test('supports custom level with value 0 in setLevel and isLevelEnabled', async () => {
+    const written = []
+    const log = pino({
+      customLevels: { verbose: 0 },
+      level: 'verbose',
+      browser: {
+        write (obj) {
+          written.push(obj)
+        }
+      }
+    })
+    assert.equal(log.level, 'verbose')
+    assert.equal(log.levelVal, 0)
+    assert.equal(log.isLevelEnabled('verbose'), true)
+    assert.equal(log.isLevelEnabled('trace'), true)
+    log.verbose('zero level message')
+    assert.equal(written.length, 1)
+    assert.equal(written[0].level, 0)
+    assert.equal(written[0].msg, 'zero level message')
+
+    log.level = 'info'
+    assert.equal(log.isLevelEnabled('verbose'), false)
+    log.level = 'silent'
+    assert.equal(log.isLevelEnabled('verbose'), false)
+    assert.equal(log.isLevelEnabled('fatal'), false)
+  })
 })
