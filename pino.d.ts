@@ -252,6 +252,7 @@ declare namespace pino {
   }
 
   export interface TransportBaseOptions<TransportOptions = Record<string, any>> {
+    caller?: string
     options?: TransportOptions
     worker?: WorkerOptions & { autoEnd?: boolean }
   }
