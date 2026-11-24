@@ -800,6 +800,11 @@ declare namespace pino {
     readonly useOnlyCustomLevelsSym: unique symbol;
     readonly formattersSym: unique symbol;
     readonly hooksSym: unique symbol;
+    readonly levelCompSym: unique symbol;
+    readonly nestedKeyStrSym: unique symbol;
+    readonly mixinMergeStrategySym: unique symbol;
+    readonly msgPrefixSym: unique symbol;
+    readonly transportUsesMultistreamSym: unique symbol;
   }
 
   /**

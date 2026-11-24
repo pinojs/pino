@@ -120,6 +120,11 @@ setImmediate(info, 'after setImmediate')
 error(new Error('an error'))
 
 const writeSym = pino.symbols.writeSym
+const levelCompSym = pino.symbols.levelCompSym
+const nestedKeyStrSym = pino.symbols.nestedKeyStrSym
+const mixinMergeStrategySym = pino.symbols.mixinMergeStrategySym
+const msgPrefixSym = pino.symbols.msgPrefixSym
+const transportUsesMultistreamSym = pino.symbols.transportUsesMultistreamSym
 
 const testUniqSymbol = {
   [pino.symbols.needsMetadataGsym]: true
