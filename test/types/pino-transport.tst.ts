@@ -5,7 +5,8 @@ import pino from '../../pino.js'
 // Single
 const transport = pino.transport({
   target: '#pino/pretty',
-  options: { some: 'options for', the: 'transport' }
+  options: { some: 'options for', the: 'transport' },
+  sync: true
 })
 pino(transport)
 
