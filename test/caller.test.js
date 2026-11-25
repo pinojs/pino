@@ -3,7 +3,7 @@
 const test = require('node:test')
 const assert = require('node:assert')
 const { execFileSync } = require('node:child_process')
-const { mkdtempSync, rmSync, writeFileSync } = require('node:fs')
+const { mkdtempSync, realpathSync, rmSync, writeFileSync } = require('node:fs')
 const { tmpdir } = require('node:os')
 const { join } = require('node:path')
 const proxyquire = require('proxyquire')
@@ -38,7 +38,7 @@ test('pino() does not invoke caller() when transport is not configured', () => {
 })
 
 test('does not resolve source maps under --enable-source-maps', () => {
-  const dir = mkdtempSync(join(tmpdir(), 'pino-caller-sm-'))
+  const dir = realpathSync(mkdtempSync(join(tmpdir(), 'pino-caller-sm-')))
   try {
     const jsFile = join(dir, 'entry.cjs')
     const mapFile = join(dir, 'entry.cjs.map')
