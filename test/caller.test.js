@@ -18,3 +18,39 @@ test('returns a callstack of absolute paths', () => {
   assert.match(callers[6], /^[/\\]fixtures[/\\]caller-loop\.js$/)
   assert.match(callers[7], /^[/\\]caller\.test\.js$/)
 })
+
+test('does not throw when Error.prepareStackTrace is read-only', (t) => {
+  const descriptor = Object.getOwnPropertyDescriptor(Error, 'prepareStackTrace')
+  Object.defineProperty(Error, 'prepareStackTrace', {
+    value: undefined,
+    writable: false,
+    configurable: true
+  })
+  t.after(() => {
+    if (descriptor) {
+      Object.defineProperty(Error, 'prepareStackTrace', descriptor)
+    } else {
+      delete Error.prepareStackTrace
+    }
+  })
+
+  assert.ok(Array.isArray(loop(0)))
+})
+
+test('ignores the stack trace when it is not captured as call sites', (t) => {
+  const descriptor = Object.getOwnPropertyDescriptor(Error, 'prepareStackTrace')
+  Object.defineProperty(Error, 'prepareStackTrace', {
+    get () {},
+    set () {},
+    configurable: true
+  })
+  t.after(() => {
+    if (descriptor) {
+      Object.defineProperty(Error, 'prepareStackTrace', descriptor)
+    } else {
+      delete Error.prepareStackTrace
+    }
+  })
+
+  assert.ok(Array.isArray(loop(0)))
+})
