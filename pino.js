@@ -89,7 +89,8 @@ const serializers = Object.assign(Object.create(null), stdSerializers)
 
 function pino (...args) {
   const instance = {}
-  const { opts, stream } = normalize(instance, caller(), ...args)
+  const callers = args[0]?.transport ? caller() : undefined
+  const { opts, stream } = normalize(instance, callers, ...args)
 
   if (opts.level && typeof opts.level === 'string' && DEFAULT_LEVELS[opts.level.toLowerCase()] !== undefined) opts.level = opts.level.toLowerCase()
 
