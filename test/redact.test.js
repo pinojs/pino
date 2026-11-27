@@ -273,6 +273,27 @@ test('redact.remove option – removes both key and value', async () => {
   assert.equal('cookie' in req.headers, false)
 })
 
+test('redact.censor: undefined – removes both key and value per documentation', async () => {
+  const stream = sink()
+  const instance = pino({ redact: { paths: ['req.headers.cookie'], censor: undefined } }, stream)
+  instance.info({
+    req: {
+      id: 7915,
+      method: 'GET',
+      url: '/',
+      headers: {
+        host: 'localhost:3000',
+        connection: 'keep-alive',
+        cookie: 'SESSID=298zf09hf012fh2; csrftoken=u32t4o3tb3gg43; _gat=1;'
+      },
+      remoteAddress: '::ffff:127.0.0.1',
+      remotePort: 58022
+    }
+  })
+  const { req } = await once(stream, 'data')
+  assert.equal('cookie' in req.headers, false)
+})
+
 test('redact.remove – top level key - object value', async () => {
   const stream = sink()
   const instance = pino({ redact: { paths: ['key'], remove: true } }, stream)
