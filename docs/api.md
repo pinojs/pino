@@ -385,6 +385,23 @@ const hooks = {
 }
 ```
 
+Inside the hook, `this` is the logger instance the method was called on.
+For a child logger, `this.bindings()` provides the bindings set via
+[`logger.child()`](#logger-child-bindings), which allows adapting the
+message based on the child context:
+
+```js
+const hooks = {
+  logMethod (inputArgs, method) {
+    const context = this.bindings()
+    if (context.featureName) {
+      inputArgs[0] = `${context.featureName}: ${inputArgs[0]}`
+    }
+    return method.apply(this, inputArgs)
+  }
+}
+```
+
 
 <a id="streamWrite"></a>
 ##### `streamWrite`
