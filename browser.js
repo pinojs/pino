@@ -466,7 +466,7 @@ function asObject (logger, level, args, ts, opts) {
     if (opts.redactFn) {
       formattedLogObject = opts.redactFn(formattedLogObject)
     }
-    return [formattedLogObject]
+    return [formattedLogObject, ...argsCloned]
   }
 }
 
