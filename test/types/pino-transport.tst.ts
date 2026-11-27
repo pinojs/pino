@@ -169,3 +169,10 @@ pino.transport({
   targets: [],
   dedupe: true
 })
+
+// Caller
+pino.transport({
+  target: 'pino/file',
+  caller: __filename,
+  options: { destination: 1 }
+})
