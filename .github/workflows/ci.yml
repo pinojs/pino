@@ -66,9 +66,7 @@ jobs:
         run: npm run test-ci
 
       - name: Run smoke test
-        if: >
-          matrix.os != 'windows-latest' &&
-          matrix.node-version > 14
+        if: matrix.os != 'windows-latest'
         run: npm run test:smoke
 
   automerge:
