@@ -118,6 +118,79 @@ test('exposes err stdSerializer', ({ end, ok }) => {
   end()
 })
 
+test('errWithCause serializes a chain of causes', ({ end, is }) => {
+  const root = new Error('root')
+  const middle = new TypeError('middle', { cause: root })
+  const err = new Error('outer', { cause: middle })
+
+  const serialized = pino.stdSerializers.errWithCause(err)
+
+  is(serialized.msg, 'outer')
+  is(serialized.cause.type, 'TypeError')
+  is(serialized.cause.msg, 'middle')
+  is(serialized.cause.stack, middle.stack)
+  is(serialized.cause.cause.type, 'Error')
+  is(serialized.cause.cause.msg, 'root')
+  end()
+})
+
+test('errWithCause serializes a cause assigned as a property', ({ end, is, notEqual }) => {
+  const cause = new Error('cause')
+  const err = new Error('outer')
+  err.cause = cause
+
+  const { cause: serialized } = pino.stdSerializers.errWithCause(err)
+
+  notEqual(serialized, cause)
+  is(serialized.msg, 'cause')
+  end()
+})
+
+test('errWithCause stops at a circular cause', ({ end, is, notOk }) => {
+  const inner = new Error('inner')
+  const outer = new Error('outer', { cause: inner })
+  inner.cause = outer
+
+  const serialized = pino.stdSerializers.errWithCause(outer)
+
+  is(serialized.cause.msg, 'inner')
+  notOk('cause' in serialized.cause)
+  JSON.stringify(serialized)
+  end()
+})
+
+test('errWithCause leaves a cause that is not an error alone', ({ end, is, notOk }) => {
+  const enumerable = new Error('outer')
+  enumerable.cause = 'not an error'
+  is(pino.stdSerializers.errWithCause(enumerable).cause, 'not an error')
+
+  notOk('cause' in pino.stdSerializers.errWithCause(new Error('outer', { cause: 'not an error' })))
+  notOk('cause' in pino.stdSerializers.errWithCause(new Error('outer')))
+  end()
+})
+
+test('errWithCause is used by a logger configured with it', ({ end, is }) => {
+  const instance = pino({
+    browser: {
+      serialize: true,
+      asObject: true,
+      write (o) {
+        is(o.err.msg, 'outer')
+        is(o.err.cause.msg, 'inner')
+      }
+    },
+    serializers: { err: pino.stdSerializers.errWithCause }
+  })
+
+  instance.info({ err: new Error('outer', { cause: new Error('inner') }) })
+  end()
+})
+
+test('err does not serialize a cause', ({ end, notOk }) => {
+  notOk('cause' in pino.stdSerializers.err(new Error('outer', { cause: new Error('inner') })))
+  end()
+})
+
 consoleMethodTest('error')
 consoleMethodTest('fatal', 'error')
 consoleMethodTest('warn')
