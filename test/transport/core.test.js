@@ -581,6 +581,240 @@ test('warns when custom formatters.level is incompatible with multi-target trans
   assert.equal(warnings[0].options.code, 'PINO_TRANSPORT_MULTI_TARGETS_LEVEL_FORMATTER')
 })
 
+function createMultiNoopTransport (t) {
+  const transport = pino.transport({
+    targets: [
+      { target: join(__dirname, '..', 'fixtures', 'noop-transport.js') },
+      { target: join(__dirname, '..', 'fixtures', 'noop-transport.js') }
+    ]
+  })
+  t.after(transport.end.bind(transport))
+  return transport
+}
+
+function captureWarnings (t) {
+  const warnings = []
+  const originalEmitWarning = process.emitWarning
+  process.emitWarning = function (warning, options) {
+    warnings.push({ warning, options })
+  }
+  t.after(() => {
+    process.emitWarning = originalEmitWarning
+  })
+  return warnings
+}
+
+test('does not warn and routes logs when custom formatters.level preserves numeric level with multi-target transport', async (t) => {
+  const warnings = captureWarnings(t)
+
+  const dest1 = file()
+  const dest2 = file()
+  const transport = pino.transport({
+    targets: [
+      {
+        level: 'info',
+        target: join(__dirname, '..', 'fixtures', 'to-file-transport.js'),
+        options: { destination: dest1 }
+      },
+      {
+        level: 'error',
+        target: join(__dirname, '..', 'fixtures', 'to-file-transport.js'),
+        options: { destination: dest2 }
+      }
+    ]
+  })
+  t.after(transport.end.bind(transport))
+
+  const calls = []
+  const instance = pino({
+    formatters: {
+      level (label, number) {
+        calls.push([label, number])
+        return { level: Number(number), severity: label.toUpperCase() }
+      }
+    }
+  }, transport)
+
+  assert.equal(warnings.length, 0)
+  assert.equal(calls.length, 6)
+  assert.deepEqual(calls, [
+    ['trace', 10],
+    ['debug', 20],
+    ['info', 30],
+    ['warn', 40],
+    ['error', 50],
+    ['fatal', 60]
+  ])
+
+  instance.info('hello')
+  instance.error('oops')
+  await Promise.all([watchFileCreated(dest1), watchFileCreated(dest2)])
+  await watchForWrite(dest1, '"oops"')
+
+  const lines1 = (await readFile(dest1, 'utf8')).trim().split('\n').map(line => JSON.parse(line))
+  assert.equal(lines1.length, 2)
+  assert.equal(lines1[0].level, 30)
+  assert.equal(lines1[0].severity, 'INFO')
+  assert.equal(lines1[0].msg, 'hello')
+  assert.equal(lines1[1].level, 50)
+  assert.equal(lines1[1].severity, 'ERROR')
+  assert.equal(lines1[1].msg, 'oops')
+
+  const lines2 = (await readFile(dest2, 'utf8')).trim().split('\n').map(line => JSON.parse(line))
+  assert.equal(lines2.length, 1)
+  assert.equal(lines2[0].level, 50)
+  assert.equal(lines2[0].severity, 'ERROR')
+  assert.equal(lines2[0].msg, 'oops')
+})
+
+test('multi-target level formatter validation supports custom level 0, overridden level value, and string numeric custom level', async (t) => {
+  const warnings = captureWarnings(t)
+  const calls = []
+  pino({
+    customLevels: { all: 0, custom: 30, str: '35' },
+    level: 0,
+    formatters: {
+      level (label, number) {
+        calls.push([label, number])
+        return { level: Number(number), label }
+      }
+    }
+  }, createMultiNoopTransport(t))
+
+  assert.equal(warnings.length, 0)
+  assert.deepEqual(calls[0], ['all', 0])
+  assert.ok(calls.some(([label, number]) => label === 'custom' && number === 30))
+  assert.ok(calls.some(([label, number]) => label === 'str' && number === 35))
+})
+
+test('multi-target level formatter validation does not warn or pass silent for a valid formatter on a silent logger', async (t) => {
+  const warnings = captureWarnings(t)
+  const calls = []
+  pino({
+    level: 'silent',
+    formatters: {
+      level (label, number) {
+        calls.push([label, number])
+        return { level: number, label }
+      }
+    }
+  }, createMultiNoopTransport(t))
+
+  assert.equal(warnings.length, 0)
+  assert.equal(calls.length, 6)
+  assert.ok(calls.every(([label, number]) => label !== 'silent' && Number.isFinite(number)))
+})
+
+test('multi-target level formatter validation warns for an incompatible formatter on a silent logger', async (t) => {
+  const warnings = captureWarnings(t)
+  pino({
+    level: 'silent',
+    formatters: {
+      level (label) {
+        return { level: label }
+      }
+    }
+  }, createMultiNoopTransport(t))
+
+  assert.equal(warnings.length, 1)
+  assert.equal(warnings[0].options.code, 'PINO_TRANSPORT_MULTI_TARGETS_LEVEL_FORMATTER')
+})
+
+test('multi-target level formatter validation skips empty customLevels with useOnlyCustomLevels', async (t) => {
+  const warnings = captureWarnings(t)
+  const calls = []
+  pino({
+    customLevels: {},
+    useOnlyCustomLevels: true,
+    level: 'silent',
+    formatters: {
+      level (label, number) {
+        calls.push([label, number])
+        return { level: number }
+      }
+    }
+  }, createMultiNoopTransport(t))
+
+  assert.equal(calls.length, 0)
+  assert.equal(warnings.length, 0)
+})
+
+test('multi-target level formatter validation warns when a formatter drops numeric level on another level', async (t) => {
+  const warnings = captureWarnings(t)
+  pino({
+    level: 'info',
+    formatters: {
+      level (label, number) {
+        return label === 'error' ? { severity: 'ERROR' } : { level: number }
+      }
+    }
+  }, createMultiNoopTransport(t))
+
+  assert.equal(warnings.length, 1)
+  assert.equal(warnings[0].options.code, 'PINO_TRANSPORT_MULTI_TARGETS_LEVEL_FORMATTER')
+})
+
+test('multi-target level formatter validation warns when level is only inherited', async (t) => {
+  const warnings = captureWarnings(t)
+  pino({
+    formatters: {
+      level (_label, number) {
+        return Object.create({ level: number })
+      }
+    }
+  }, createMultiNoopTransport(t))
+
+  assert.equal(warnings.length, 1)
+  assert.equal(warnings[0].options.code, 'PINO_TRANSPORT_MULTI_TARGETS_LEVEL_FORMATTER')
+})
+
+test('multi-target level formatter validation warns when level is dropped by toJSON', async (t) => {
+  const warnings = captureWarnings(t)
+  pino({
+    formatters: {
+      level (label, number) {
+        return {
+          level: number,
+          toJSON () {
+            return { severity: label }
+          }
+        }
+      }
+    }
+  }, createMultiNoopTransport(t))
+
+  assert.equal(warnings.length, 1)
+  assert.equal(warnings[0].options.code, 'PINO_TRANSPORT_MULTI_TARGETS_LEVEL_FORMATTER')
+})
+
+test('multi-target level formatter validation warns when formatter returns a non-object value like null', async (t) => {
+  const warnings = captureWarnings(t)
+  pino({
+    formatters: {
+      level () {
+        return null
+      }
+    }
+  }, createMultiNoopTransport(t))
+
+  assert.equal(warnings.length, 1)
+  assert.equal(warnings[0].options.code, 'PINO_TRANSPORT_MULTI_TARGETS_LEVEL_FORMATTER')
+})
+
+test('multi-target level formatter validation does not emit a warning when formatters.level throws during init', async (t) => {
+  const warnings = captureWarnings(t)
+  assert.throws(() => {
+    pino({
+      formatters: {
+        level () {
+          throw new Error('formatter failure')
+        }
+      }
+    }, createMultiNoopTransport(t))
+  }, /formatter failure/)
+  assert.equal(warnings.length, 0)
+})
+
 test('stdout in worker', async () => {
   let actual = ''
   const child = execa(process.argv[0], [join(__dirname, '..', 'fixtures', 'transport-main.js')])
