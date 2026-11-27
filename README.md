@@ -20,6 +20,7 @@
 * [Pretty Printing ⇗](/docs/pretty.md)
 * [Asynchronous Logging ⇗](/docs/asynchronous.md)
 * [Ecosystem ⇗](/docs/ecosystem.md)
+* [Migrating from Bunyan ⇗](/docs/bunyan-migration.md)
 * [Help ⇗](/docs/help.md)
 * [Long Term Support Policy ⇗](/docs/lts.md)
 
