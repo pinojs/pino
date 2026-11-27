@@ -3,10 +3,13 @@
 const test = require('node:test')
 const assert = require('node:assert')
 const os = require('node:os')
+const { tmpdir } = require('node:os')
 const { join } = require('node:path')
 const { readFile } = require('node:fs').promises
+const { unlink } = require('node:fs/promises')
 const { promisify } = require('node:util')
-const { once } = require('node:events')
+
+const execa = require('execa')
 
 const pino = require('../..')
 const { watchFileCreated, watchForWrite, file } = require('../helper')
@@ -48,14 +51,6 @@ test('thread-stream async flush should call the passed callback', async () => {
   const instance = pino(transport)
   const flushPromise = promisify(instance.flush).bind(instance)
 
-  // The worker thread backing the transport is unref'd once it becomes ready
-  // (see lib/transport.js) so it does not keep the process alive. Because this
-  // test awaits `flush()` on an otherwise idle event loop, re-ref the worker
-  // after it is ready so the loop stays alive until the flush callback runs;
-  // otherwise the awaited promise never settles and the test hangs.
-  await once(transport, 'ready')
-  transport.ref()
-
   instance.info('hello')
   await flushPromise()
   await watchFileCreated(outputPath)
@@ -73,7 +68,20 @@ test('thread-stream async flush should call the passed callback', async () => {
   const afterSecondFlush = await getOutputLogLines()
   assert.equal(afterSecondFlush.length, 2)
   assert.equal(afterSecondFlush[1].msg, 'world')
+})
 
-  // Restore the unref'd state so the test process can exit cleanly.
-  transport.unref()
+test('flush callback is invoked on an idle event loop with transport', async () => {
+  const child = execa(process.argv[0], [join(__dirname, '..', 'fixtures', 'transport-flush-idle.js')], {
+    timeout: 15000,
+    killSignal: 'SIGKILL'
+  })
+  const dest = join(tmpdir(), `pino-flush-idle-${child.pid}.log`)
+  try {
+    const { stdout, stderr, exitCode } = await child
+    assert.equal(exitCode, 0, stderr)
+    assert.match(stdout, /callback-fired/)
+    assert.doesNotMatch(stdout + stderr, /callback-missing/)
+  } finally {
+    await unlink(dest).catch(() => {})
+  }
 })
