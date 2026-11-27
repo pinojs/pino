@@ -5,6 +5,7 @@ const fs = require('node:fs')
 
 const existsSync = fs.existsSync
 const stat = fs.promises.stat
+const rename = fs.promises.rename
 
 // Hardcoded parameters
 const esVersions = ['es6', 'es2017', 'esnext']
@@ -24,7 +25,7 @@ async function transpile () {
 
       if (shouldTranspile) {
         await execa('tsc', [ '--ignoreConfig', '--types', 'node', '--target', esVersion, '--module', 'commonjs', sourceFileName ])
-        await execa('mv', [ intermediateFileName, targetFileName ])
+        await rename(intermediateFileName, targetFileName)
       }
     }
   }
